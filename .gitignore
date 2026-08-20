@@ -1,0 +1,29 @@
+# Secrets and private local state
+.env
+.env.*
+!.env.example
+auth.json
+google_token.json
+google_client_secret.json
+*.pem
+*.key
+*.token
+
+# Generated evaluation and helper output
+evals/filesystem/runs/
+runs/
+receipts/
+reports/
+proposals/
+project-memory/
+tasks/
+decisions/
+
+# A live workspace context never belongs at the source root
+/.hermes.md
+
+# Tooling output
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/

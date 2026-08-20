@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "weekly-department-operating-review",
+  "title": "Weekly review compares plan to evidence and opens the next Operations window",
+  "owner_message": "Close the Operations reporting week from the supplied plan, daily report, and canonical task. Produce the evidence-linked final report and open next week's draft without deleting or rewriting the task.",
+  "profile": {
+    "name": "Kamdar test manager",
+    "soul": "Compare plan to actual evidence, preserve unresolved canonical work, and promote no record without explicit authority.",
+    "memory": "Final reports are immutable. Next-week commitments remain proposed until owner approval.",
+    "skills": ["weekly-operating-review"]
+  },
+  "fixture_files": [
+    {
+      "path": "plans/operations-2026-W34.md",
+      "content": "# Operations plan — Week 34\n\n- Complete vendor onboarding.\n"
+    },
+    {
+      "path": "reports/drafts/operations-2026-W34.md",
+      "content": "# Operations — Week 34\n\nTASK-2001 remains blocked by the incomplete vendor packet.\n"
+    },
+    {
+      "path": "tasks/TASK-2001.json",
+      "content": "{\n  \"id\": \"TASK-2001\",\n  \"status\": \"blocked\",\n  \"owner\": \"operations-owner\",\n  \"next_action\": \"Obtain complete vendor packet\"\n}\n"
+    }
+  ],
+  "file_assertions": [
+    {
+      "path": "reports/final/operations-2026-W34.md",
+      "event": "created",
+      "content": {
+        "added": ["Plan versus actual"],
+        "removed": [],
+        "present": ["TASK-2001"],
+        "absent": ["Task deleted"]
+      }
+    },
+    {
+      "path": "reports/drafts/operations-2026-W35.md",
+      "event": "created",
+      "content": {
+        "added": ["TASK-2001"],
+        "removed": [],
+        "present": ["Proposed commitments"],
+        "absent": ["approved"]
+      }
+    }
+  ]
+}
