@@ -20,4 +20,4 @@ updated_at: 2026-08-21
   deletions, and Hermes reports the separate runtime workspace as
   `terminal.cwd`.
 - Residual proof: the live install is intentionally not applied while
-  `configs/workspace.hermes.md` remains `proposed-owner-review`.
+  `workspace.hermes.md` remains `proposed-owner-review`.

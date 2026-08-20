@@ -11,11 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class KamdarCompanyOSTests(unittest.TestCase):
     def test_repository_uses_lean_source_layout(self) -> None:
-        for expected in ("configs", "automations", "skills", "evals", "scripts", "tests"):
+        for expected in ("automations", "skills", "evals", "scripts", "tests"):
             self.assertTrue((ROOT / expected).is_dir(), expected)
         for removed in ("profile", "context", "deploy", "hermes-distribution"):
             self.assertFalse((ROOT / removed).exists(), removed)
         self.assertTrue((ROOT / "skills/setup-kamdar-workspace/SKILL.md").is_file())
+        self.assertTrue((ROOT / "workspace.hermes.md").is_file())
+        self.assertFalse((ROOT / "configs").exists())
         self.assertFalse((ROOT / "hermes-profile.yaml").exists())
 
     def test_automation_markdown_contracts_exist(self) -> None:
@@ -32,7 +34,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
     def test_live_context_is_ignored_but_reviewable_config_is_tracked(self) -> None:
         ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
         self.assertIn("/.hermes.md", ignored)
-        proposal = (ROOT / "configs/workspace.hermes.md").read_text(encoding="utf-8")
+        proposal = (ROOT / "workspace.hermes.md").read_text(encoding="utf-8")
         self.assertIn('company_timezone: "Asia/Kuala_Lumpur"', proposal)
         self.assertIn("unmapped_template", proposal)
         self.assertIn("proposal-only", proposal)
@@ -60,7 +62,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
     def test_proposed_context_validates(self) -> None:
         result = subprocess.run(
              [sys.executable, str(ROOT / "scripts/validate_company_context.py"),
-             "--context", str(ROOT / "configs/workspace.hermes.md")],
+             "--context", str(ROOT / "workspace.hermes.md")],
             text=True, capture_output=True, check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -77,7 +79,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
     def test_daily_runner_rejects_tracked_output_path(self) -> None:
         result = subprocess.run(
              [sys.executable, str(ROOT / "scripts/run_daily_documentation_check.py"),
-             "--date", "2026-08-20", "--output", str(ROOT / "configs/workspace.hermes.md")],
+             "--date", "2026-08-20", "--output", str(ROOT / "workspace.hermes.md")],
             text=True, capture_output=True, check=False,
         )
         self.assertNotEqual(result.returncode, 0)

@@ -7,7 +7,7 @@ this repository owns the reviewed inputs used to configure and test it.
 ## Layout
 
 ```text
-configs/       Reviewable, nonsecret workspace context
+workspace.hermes.md  Reviewable, nonsecret workspace context
 automations/   Daily and weekly operating contracts
 skills/        Kamdar skill source and workspace setup
 evals/         Behavioral suites and the authored-filesystem eval UI
@@ -31,7 +31,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 python3 -m unittest discover -s skills/setup-kamdar-workspace/tests -v
 python3 -m unittest discover -s skills/notion-webhook-onboarding/tests -v
 node --test evals/filesystem/tests/*.test.mjs
-python3 scripts/validate_company_context.py --context configs/workspace.hermes.md
+python3 scripts/validate_company_context.py --context workspace.hermes.md
 ```
 
 Preview the explicit source-to-runtime install:

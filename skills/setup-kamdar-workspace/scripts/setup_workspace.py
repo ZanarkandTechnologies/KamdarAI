@@ -15,7 +15,7 @@ from pathlib import Path
 
 PACKAGE = Path(__file__).resolve().parents[1]
 PROJECT = PACKAGE.parents[1]
-CONFIG = PROJECT / "configs" / "workspace.hermes.md"
+CONFIG = PROJECT / "workspace.hermes.md"
 EXCLUDED_NAMES = {".DS_Store", "__pycache__"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 

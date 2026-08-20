@@ -60,11 +60,11 @@ class SetupWorkspaceTests(unittest.TestCase):
             source = root / "source"
             workspace = root / "profile" / "workspace"
             profile_home = workspace.parent
-            (source / "configs").mkdir(parents=True)
+            source.mkdir(parents=True)
             (source / "automations").mkdir()
             (source / "skills/example").mkdir(parents=True)
             workspace.mkdir(parents=True)
-            config = source / "configs/workspace.hermes.md"
+            config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
             (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
@@ -81,11 +81,11 @@ class SetupWorkspaceTests(unittest.TestCase):
             source = root / "source"
             workspace = root / "profile" / "workspace"
             profile_home = workspace.parent
-            (source / "configs").mkdir(parents=True)
+            source.mkdir(parents=True)
             (source / "automations").mkdir()
             (source / "skills/example").mkdir(parents=True)
             (workspace / "automations/daily.md").mkdir(parents=True)
-            config = source / "configs/workspace.hermes.md"
+            config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
             (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")

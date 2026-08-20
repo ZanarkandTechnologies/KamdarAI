@@ -27,7 +27,7 @@ steps. Do not create a profile overlay or link the runtime back to this repo.
 ```text
 setup_kamdar_workspace(workspace, profile_home, apply = false)
   -> setup_receipt + native_cwd_check
-reads: configs/workspace.hermes.md, automations/, skills/, target state
+reads: workspace.hermes.md, automations/, skills/, target state
 does: validates separation, previews or copies allowlisted source files
 writes: workspace/.hermes.md, workspace/automations/, profile_home/skills/
 returns: JSON state, changed or pending paths, deletion count, next gate
@@ -41,8 +41,8 @@ returns: JSON state, changed or pending paths, deletion count, next gate
       is inside the source project or symlinked to it. The normal Hermes
       `<profile-home>/workspace` layout is valid; the profile home may not be
       placed inside the workspace.
-- [ ] 2. Validate `configs/workspace.hermes.md` with
-      `python3 scripts/validate_company_context.py --context configs/workspace.hermes.md`.
+- [ ] 2. Validate `workspace.hermes.md` with
+      `python3 scripts/validate_company_context.py --context workspace.hermes.md`.
       Inspect the context for credentials and require frontmatter status
       `approved` or `active` before applying it.
 - [ ] 3. Run

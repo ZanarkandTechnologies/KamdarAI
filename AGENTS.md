@@ -8,15 +8,15 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
 
 | Location | Owner | Purpose |
 | --- | --- | --- |
-| `/Users/kenjipcx/Zanarkand Technologies/projects/KamdarAI` | KamdarAI | Authoritative Kamdar configs, automation contracts, skills, evals, scripts, and tests. |
+| `/Users/kenjipcx/Zanarkand Technologies/projects/KamdarAI` | KamdarAI | Authoritative Kamdar workspace context, automation contracts, skills, evals, scripts, and tests. |
 | `/Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai/workspace` | Hermes runtime | Live reports, memory, proposals, receipts, and other agent-created company artifacts. |
 | `/Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai` | Hermes profile | Private credentials, installed skill copies, sessions, logs, caches, gateway state, and local databases. |
 | `/Users/kenjipcx/Zanarkand Technologies/projects/HermesCorp` | HermesCorp | Company-agnostic template and upstream home for reusable improvements. Never copy Kamdar data or private runtime state into it. |
 
 ## Repository layout
 
-- `configs/`: reviewed, nonsecret workspace configuration templates. The only
-  current owner is `configs/workspace.hermes.md`.
+- `workspace.hermes.md`: the reviewed, nonsecret workspace context installed as
+  `.hermes.md` in the live runtime.
 - `automations/`: readable automation contracts; scheduling and generated runs
   remain runtime concerns.
 - `skills/`: Kamdar-owned skill source, including the explicit workspace setup
@@ -31,11 +31,11 @@ here.
 
 ## Development flow
 
-1. Edit configs, automations, skills, and eval cases in this repository first.
+1. Edit the workspace context, automations, skills, and eval cases in this repository first.
 2. Run the narrow deterministic tests and filesystem eval tests locally.
 3. Preview source-to-runtime changes with
    `skills/setup-kamdar-workspace/scripts/setup_workspace.py`.
-4. Apply only after `configs/workspace.hermes.md` has owner-approved status.
+4. Apply only after `workspace.hermes.md` has owner-approved status.
    The setup command copies an allowlist and never deletes runtime files.
 5. Set `terminal.cwd` with Hermes' native config command, then verify behavior
    from a fresh Hermes session. Do not use symlinks as synchronization.
@@ -64,6 +64,6 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 python3 -m unittest discover -s skills/setup-kamdar-workspace/tests -v
 python3 -m unittest discover -s skills/notion-webhook-onboarding/tests -v
 node --test evals/filesystem/tests/*.test.mjs
-python3 scripts/validate_company_context.py --context configs/workspace.hermes.md
+python3 scripts/validate_company_context.py --context workspace.hermes.md
 kamdar config get terminal.cwd
 ```
