@@ -1,0 +1,45 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0001",
+  "phase": "qa",
+  "proof_type": "ui",
+  "runtime_target": "http://127.0.0.1:4179",
+  "proof_policy": "Done + QA Strategy + Agent Contract + implementation Goal Program",
+  "verdict": "pass",
+  "summary": "Frozen Daily-to-Weekly proof passed 23/23 assertions, matched the ASCII prototype, rejected live mode, and captured UI screenshots.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "pass",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/ui-home-playwright.png",
+  "artifacts": [
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/report.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/result.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/visual-independent-review.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/agent-evidence-review.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/agent-qa-plan.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/api/run-final.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/api/live-mode-response.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/generated/result.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/generated/tool-trace.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/generated/ascii-comparison.json",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/ui-home-playwright.png",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/showcase-playwright.png"
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "Live Notion, Drive, email, Telegram, installer apply, and scheduling remain out of scope for this local frozen proof."
+  ],
+  "judgment_receipts": [
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/agent-qa-plan.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/agent-evidence-review.md",
+    "tickets/TASK-0001/artifacts/qa/frozen-proof/visual-independent-review.md"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

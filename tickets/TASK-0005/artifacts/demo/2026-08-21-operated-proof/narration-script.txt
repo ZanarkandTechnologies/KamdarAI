@@ -1,0 +1,27 @@
+Before this proof, project truth was scattered across project pages, work items,
+embedded meetings, documents, and messages. A manager could see activity, but
+not reliably see what slipped, why it slipped, or what had been done next.
+
+Now one bounded Daily scan reads the declared sources, updates Project memory,
+requests only missing documentation, comments on stale work before a chase, and
+stages knowledge candidates. The Weekly review turns that Daily evidence into
+Project reports, Area rollups, a Company result, promoted knowledge, and
+next-week evidence.
+
+Here is the concrete check. TASK-101 is stale: twelve planned hours became
+eighteen actual hours, a six-hour and seven-hundred-and-twenty Malaysian ringgit
+variance. The suspected supplier-feed mapping mismatch remains explicitly low
+confidence and unconfirmed. The system writes one source comment before it
+prepares an owner chase. This expanded file follows the pinned Daily template,
+and the visible links open the exact applied Notion evidence.
+
+Two safeguards matter. Daily and Weekly keep one TASK-104 identity: Weekly adds
+linked planning evidence, never a duplicate Work row. And the frozen comparison
+now writes to a separate run root, so checking the local fixture cannot replace
+the operated showcase.
+
+The current result is forty-four of forty-four assertions across nine features,
+with eighteen applied Notion actions. Five provider actions remain visibly
+blocked: Google authentication is expired and Telegram has no configured target.
+That is the right result: the system shows what it proved, and it does not claim
+delivery that did not happen.

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0001",
+  "phase": "demo",
+  "status": "pass",
+  "summary": "Narrated 51 second MP4 recap generated from verified ticket screenshots and QA artifacts.",
+  "final_mp4": "tickets/TASK-0001/artifacts/demo/frozen-proof-recap/final.mp4",
+  "evidence_map": "tickets/TASK-0001/artifacts/demo/frozen-proof-recap/evidence-map.json",
+  "media_probe": "tickets/TASK-0001/artifacts/demo/frozen-proof-recap/media-probe.json",
+  "representative_frame": "tickets/TASK-0001/artifacts/demo/frozen-proof-recap/frame-after.png",
+  "verified": {
+    "duration_seconds": 51,
+    "video": "h264 1280x720",
+    "audio": "aac mono",
+    "uses_verified_assets_only": true
+  },
+  "blockers": [],
+  "residual_risk": [
+    "Independent demo-specific TAS review is represented in the completion review receipt rather than a separate child-agent review artifact."
+  ]
+}

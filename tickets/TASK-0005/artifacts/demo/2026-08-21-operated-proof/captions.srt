@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:17,000
+Before: scattered truth hid variance, causes, and next actions.
+
+2
+00:00:17,000 --> 00:00:34,000
+After: one Daily scan feeds a bounded Weekly operating review.
+
+3
+00:00:34,000 --> 00:00:58,000
+Example: TASK-101 shows +6h / +MYR 720, an unconfirmed cause, and a source comment before chase.
+
+4
+00:00:58,000 --> 00:01:11,000
+One Task identity; frozen comparison cannot overwrite operated proof.
+
+5
+00:01:11,000 --> 00:01:23,000
+44/44 assertions · 18 applied Notion actions · 5 provider actions honestly blocked.

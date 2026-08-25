@@ -1,0 +1,26 @@
+{
+  "ticket_id": "TASK-0001",
+  "claim": "A bounded live POC proves the comprehensive Kamdar manager workflow without activating production.",
+  "segments": [
+    {
+      "time": "00:00-00:13",
+      "source": "../../qa/live-proof/desktop-overview.png",
+      "proves": ["single scenario", "live-poc mode", "provider readiness"]
+    },
+    {
+      "time": "00:13-00:27",
+      "source": "../../qa/live-proof/desktop-run.png",
+      "proves": ["13 explicit receipts", "no hidden evaluator network calls"]
+    },
+    {
+      "time": "00:27-00:42",
+      "source": "../../qa/live-proof/desktop-results.png",
+      "proves": ["37/37 assertions", "generated file inventory"]
+    },
+    {
+      "time": "00:42-00:56",
+      "source": "../../qa/live-proof/desktop-showcase.png",
+      "proves": ["stakeholder showcase", "proposal-only production boundary"]
+    }
+  ]
+}

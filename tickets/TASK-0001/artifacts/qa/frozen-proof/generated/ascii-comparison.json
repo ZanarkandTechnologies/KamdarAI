@@ -1,0 +1,61 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "label": "Story and hidden Meeting extraction",
+      "ascii_anchor": "hidden Meeting block",
+      "observed": true,
+      "evidence": "TASK-201 produces its linked Task proposals in Daily evidence.",
+      "pass": true
+    },
+    {
+      "label": "Company OS relations, routing, and samples",
+      "ascii_anchor": "Company OS: databases, relations, templates, and samples",
+      "observed": true,
+      "evidence": "The UI exposes the relationship map, template routing, and fixture-backed record samples.",
+      "pass": true
+    },
+    {
+      "label": "Daily output and visible source gap",
+      "ascii_anchor": "Daily automation: prompt first, then observed result",
+      "observed": true,
+      "evidence": "Daily produces two Project evidence files, follow-ups, and receipt; TASK-102 remains an observed gap in Festive evidence.",
+      "pass": true
+    },
+    {
+      "label": "Project lifecycle",
+      "ascii_anchor": "MODIFIED",
+      "observed": true,
+      "evidence": "Existing Replenishment W34 Draft is modified; Festive W34 is created.",
+      "pass": true
+    },
+    {
+      "label": "Report hierarchy",
+      "ascii_anchor": "Project reports → Area rollups → Company rollup",
+      "observed": true,
+      "evidence": "Area rollups consume Project reports and the Company rollup consumes Area rollups.",
+      "pass": true
+    },
+    {
+      "label": "Template-first expected files",
+      "ascii_anchor": "template-first assertion rows",
+      "observed": true,
+      "evidence": "Ten file rows resolve their governing template/version and expand derived content checks.",
+      "pass": true
+    },
+    {
+      "label": "Directory-before-route trace",
+      "ascii_anchor": "company directory",
+      "observed": true,
+      "evidence": "Directory resolution appears before every owner-routed follow-up draft.",
+      "pass": true
+    },
+    {
+      "label": "No-write safety and idempotency",
+      "ascii_anchor": "useful gaps should be visible, not papered over",
+      "observed": true,
+      "evidence": "The source gap remains visible; the processor records no provider write and the unchanged rerun is idempotent.",
+      "pass": true
+    }
+  ]
+}

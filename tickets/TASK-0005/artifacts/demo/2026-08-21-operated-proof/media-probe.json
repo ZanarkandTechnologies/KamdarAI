@@ -1,0 +1,19 @@
+{
+  "ticket_id": "TASK-0005",
+  "artifact": "final.mp4",
+  "format": "mov,mp4,m4a,3gp,3g2,mj2",
+  "duration_seconds": 83.0,
+  "size_bytes": 2069116,
+  "streams": [
+    { "index": 0, "codec": "h264", "type": "video", "width": 1280, "height": 720, "fps": 30 },
+    { "index": 1, "codec": "aac", "type": "audio", "sample_rate_hz": 22050, "channels": 1 },
+    { "index": 2, "codec": "mov_text", "type": "subtitle" }
+  ],
+  "audio_audit": { "mean_volume_db": -16.0, "max_volume_db": -1.7 },
+  "frame_inspection": [
+    "frame-001.png",
+    "frame-036.png",
+    "frame-075.png"
+  ],
+  "verdict": "pending-independent-demo-review"
+}

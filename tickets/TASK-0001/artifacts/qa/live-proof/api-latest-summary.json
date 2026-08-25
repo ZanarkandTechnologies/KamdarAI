@@ -1,0 +1,15 @@
+{
+  "mode": "live-poc",
+  "counts": {
+    "pass": 37,
+    "fail": 0,
+    "total": 37
+  },
+  "calls": 13,
+  "safety": {
+    "mocked": false,
+    "network_calls_by_processor": 0,
+    "external_writes_by_processor": 0,
+    "notice": "This processor made no network call; observed connector evidence comes only from externally supplied live POC receipts."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "ticket_id": "TASK-0001",
+  "demo": "tickets/TASK-0001/artifacts/demo/frozen-proof-recap/final.mp4",
+  "narrative_spine": [
+    "Before",
+    "After",
+    "Example",
+    "Key decisions",
+    "Proof",
+    "Residual risk"
+  ],
+  "claims": [
+    {
+      "claim": "Before, the proof surface was bulky and did not foreground the template-first contract.",
+      "evidence": "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/ui-home.png"
+    },
+    {
+      "claim": "After, the proof console shows the Company OS, source routing, and template routing in the first user flow.",
+      "evidence": "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/ui-home-playwright.png"
+    },
+    {
+      "claim": "The example run passes 23/23 assertions and exposes Project -> Area -> Company rollup evidence.",
+      "evidence": "tickets/TASK-0001/artifacts/qa/frozen-proof/screens/showcase-playwright.png"
+    },
+    {
+      "claim": "The processor makes zero provider writes and rejects live mode.",
+      "evidence": "tickets/TASK-0001/artifacts/qa/frozen-proof/generated/result.json"
+    }
+  ],
+  "residual_risk": [
+    "Live provider setup remains out of scope for this local frozen proof."
+  ]
+}

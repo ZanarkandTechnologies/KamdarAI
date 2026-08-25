@@ -1,0 +1,35 @@
+{
+  "ticket_id": "TASK-0005",
+  "claims": [
+    {
+      "id": "before-scattered-truth",
+      "claim": "The original proof hid operating variance and intermediate evidence.",
+      "sources": ["../../ticket.md", "../../ascii-prototype.md"]
+    },
+    {
+      "id": "daily-weekly-flow",
+      "claim": "Daily evidence feeds Weekly Project, Area, and Company outputs.",
+      "sources": ["../../ascii-prototype.md", "../../../../evals/filesystem/runs/kamdar-template-first-latest/showcase/index.html"]
+    },
+    {
+      "id": "task-101-example",
+      "claim": "TASK-101 has +6h / +MYR 720 and an explicitly unconfirmed suspected cause.",
+      "sources": ["../../artifacts/qa/operated-showcase-v4-daily-artifact.png", "../../artifacts/qa/operated-v4-reconciliation.md"]
+    },
+    {
+      "id": "identity-and-isolation",
+      "claim": "Weekly evidence attaches to the existing TASK-104 and frozen output cannot overwrite operated output.",
+      "sources": ["../../artifacts/qa/operated-v4-reconciliation.md", "../../../../evals/filesystem/tests/mock-kamdar-automation.test.mjs"]
+    },
+    {
+      "id": "final-proof",
+      "claim": "The operated proof is 44/44 with 18 applied Notion actions and five blocked provider actions.",
+      "sources": ["../../artifacts/qa/operated-v4-reconciliation.md", "../../../../evals/filesystem/runs/kamdar-template-first-latest/result.json"]
+    }
+  ],
+  "assets": [
+    "../../artifacts/qa/operated-showcase-v4-hero.png",
+    "../../artifacts/qa/operated-showcase-v4-daily-artifact.png"
+  ],
+  "residual_risk": "Drive/email are blocked by expired Google authentication and Telegram has no configured target; no send or publish is claimed."
+}

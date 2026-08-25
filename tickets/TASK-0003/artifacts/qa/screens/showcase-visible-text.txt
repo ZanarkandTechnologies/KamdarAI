@@ -1,0 +1,124 @@
+FROZEN MOCK · NO PROVIDER WRITES
+
+Kamdar automation proof
+6/9 features have current eval coverage · 23/23 assertions pass
+
+A passing assertion count proves only the covered feature paths. Open a feature to inspect its sources, created files, content checks, planned application, and honest gaps.
+
+DAILY FEATURES
+
+FEAT-0001 · Daily
+
+Daily project memory
+Local pass · 6 assertions
+
+Changed Tasks and embedded Meetings become concise Project memory and linked Task proposals.
+
+Notion Projects ↗
+Notion Tasks ↗
+Kamdar Google Drive ↗
+
+Inspect proof
+
+FEAT-0002 · Daily
+
+Daily documentation quality
+Local pass · 1 assertions
+
+Missing template fields become precise comment proposals, never broad rewrite requests.
+
+Notion Tasks ↗
+
+Inspect proof
+
+FEAT-0003 · Daily
+
+Daily progress chasing
+Local pass · 3 assertions
+
+Stale or blocked work becomes a grouped owner follow-up after route resolution.
+
+Notion Projects ↗
+Notion Tasks ↗
+People CRM (discovery-only) ↗
+Not yet an approved Kamdar internal directory.
+
+Inspect proof
+
+FEAT-0004 · Daily
+
+Daily knowledge candidate capture
+Local pass · 1 assertions
+
+Problems, Decisions, Resources, and SOP signals stay proposed until Weekly gates pass.
+
+Notion Tasks ↗
+Kamdar Google Drive ↗
+
+Inspect proof
+
+WEEKLY FEATURES
+
+FEAT-0005 · Weekly
+
+Weekly operating reports
+Local pass · 7 assertions
+
+Daily evidence becomes Project reports, then Area rollups, then one Company rollup.
+
+Kamdar AI root ↗
+Notion Projects ↗
+Notion Tasks ↗
+
+Inspect proof
+
+FEAT-0006 · Weekly
+
+Weekly knowledge promotion
+Designed · not yet proved · 0 assertions
+
+Reviewed candidates route to Work Items, Decisions, Resources, or Skills/wiki only after their gates pass.
+
+Kamdar AI root ↗
+Kamdar Google Drive ↗
+
+Inspect proof
+
+FEAT-0007 · Weekly
+
+Weekly next-week planning
+Designed · not yet proved · 0 assertions
+
+Unresolved work and approved commitments update Project context and linked Tasks.
+
+Notion Projects ↗
+Notion Tasks ↗
+
+Inspect proof
+
+FEAT-0008 · Weekly
+
+Weekly executive distribution
+Designed · not yet proved · 0 assertions
+
+The Company report becomes an executive Telegram delivery only with a recorded receipt.
+
+Kamdar AI root ↗
+
+Inspect proof
+
+SHARED FEATURES
+
+FEAT-0009 · Shared
+
+Automation safety and receipts
+Local pass · 5 assertions
+
+Source routing, no-write mode, lifecycle protection, and idempotency remain inspectable.
+
+Kamdar AI root ↗
+Notion Projects ↗
+Notion Tasks ↗
+
+Inspect proof
+Developer evidence

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0001",
+  "phase": "qa",
+  "proof_type": "ui",
+  "runtime_target": "http://127.0.0.1:4179/",
+  "proof_policy": "Done + QA Strategy + explicit live UI proof path",
+  "verdict": "pass",
+  "summary": "QA proved the live-poc Proof UI and underlying eval result: 37/37 assertions, 13 redacted live receipts, generated reports, and responsive screenshots.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "pass",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0001/artifacts/qa/live-proof/desktop-results.png",
+  "artifacts": [
+    "tickets/TASK-0001/artifacts/qa/live-proof/report.md",
+    "tickets/TASK-0001/artifacts/qa/live-proof/result.json",
+    "tickets/TASK-0001/artifacts/qa/live-proof/tester-report.json",
+    "tickets/TASK-0001/artifacts/qa/live-proof/visual-qa.md",
+    "tickets/TASK-0001/artifacts/qa/live-proof/desktop-overview.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/desktop-run.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/desktop-results.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/desktop-showcase.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/narrow-results.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/narrow-results-pass.png",
+    "tickets/TASK-0001/artifacts/qa/live-proof/api-latest-summary.json",
+    "tickets/TASK-0001/artifacts/qa/live-proof/live-without-receipts-response.json",
+    "evals/filesystem/runs/kamdar-daily-company-showcase-latest/result.json",
+    "evals/filesystem/runs/kamdar-daily-company-showcase-latest/showcase/index.html"
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "Production scheduler remains disabled/proposal-only; this was a bounded live POC, not production activation.",
+    "Live provider URLs, IDs, and exact recipient receipts are intentionally kept in private Hermes runtime state instead of tracked artifacts.",
+    "Screenshots include visible Safari chrome because local Playwright was not installed."
+  ],
+  "judgment_receipts": [
+    "tickets/TASK-0001/artifacts/qa/live-proof/visual-qa.md"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

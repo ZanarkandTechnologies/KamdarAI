@@ -1,0 +1,42 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0003",
+  "phase": "qa",
+  "proof_type": "ui",
+  "runtime_target": "http://127.0.0.1:4179/",
+  "proof_policy": "Done + QA Strategy",
+  "verdict": "pass",
+  "summary": "The feature-first proof UI and generated showcase pass the frozen local contract: 9 features render, 6 have current coverage, 23/23 assertions pass, unproved Weekly features remain explicit gaps, and no provider write or fake result link is claimed.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "pass",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0003/artifacts/qa/screens/feature-file-drilldown.png",
+  "artifacts": [
+    "tickets/TASK-0003/artifacts/qa/frozen-feature-ui/report.md",
+    "tickets/TASK-0003/artifacts/qa/frozen-feature-ui/result.json",
+    "tickets/TASK-0003/artifacts/qa/frozen-feature-ui/visual-qa.md",
+    "tickets/TASK-0003/artifacts/qa/screens/feature-file-drilldown.png",
+    "tickets/TASK-0003/artifacts/qa/screens/showcase-feature-summary.png",
+    "tickets/TASK-0003/artifacts/qa/screens/ui-visible-text.txt",
+    "tickets/TASK-0003/artifacts/qa/screens/showcase-visible-text.txt",
+    "tickets/TASK-0003/artifacts/qa/screens/console-errors.json"
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "Live provider writes and provider result links remain intentionally unproved.",
+    "FEAT-0006 weekly knowledge promotion, FEAT-0007 next-week planning, and FEAT-0008 executive delivery still need later assertion rows and operated receipts."
+  ],
+  "judgment_receipts": [
+    "tickets/TASK-0003/artifacts/review/plan-review.md",
+    "tickets/TASK-0003/artifacts/review/implementation-review.md",
+    "tickets/TASK-0003/artifacts/qa/frozen-feature-ui/visual-qa.md"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

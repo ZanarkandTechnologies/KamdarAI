@@ -1,0 +1,56 @@
+{
+  "ticket_id": "TASK-0001",
+  "runtime_target": "http://127.0.0.1:4179/",
+  "tested_at": "2026-08-21T11:20:00+08:00",
+  "browser": "Safari via local screencapture",
+  "verdict": "pass",
+  "api_observations": {
+    "latest_mode": "live-poc",
+    "assertions": {
+      "pass": 37,
+      "fail": 0,
+      "total": 37
+    },
+    "tool_calls": 13,
+    "explicit_live_receipt_guard": "POST /api/run with live mode and no externalReceipts returned HTTP 400; see live-without-receipts-response.json"
+  },
+  "screenshots": [
+    "desktop-overview.png",
+    "desktop-run.png",
+    "desktop-results.png",
+    "desktop-showcase.png",
+    "narrow-results.png",
+    "narrow-results-pass.png"
+  ],
+  "api_artifacts": [
+    "api-latest-summary.json",
+    "live-without-receipts-response.json"
+  ],
+  "findings": [
+    {
+      "severity": "info",
+      "area": "desktop overview",
+      "finding": "Live POC mode is selected and provider readiness cells show external receipts."
+    },
+    {
+      "severity": "info",
+      "area": "desktop run",
+      "finding": "Run tab exposes the recorded connector trace and a 13-call execution boundary."
+    },
+    {
+      "severity": "info",
+      "area": "desktop results",
+      "finding": "Results tab shows Proof passed, 37/37, live-poc evidence, output files, and assertion verdicts."
+    },
+    {
+      "severity": "info",
+      "area": "narrow",
+      "finding": "Narrow viewport stacks mode, readiness, and verdict rows without visible horizontal overflow or text overlap."
+    }
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "Safari did not permit Apple-event JavaScript, so deterministic UI state capture uses query-param deep links and keyboard scrolling rather than in-page script execution.",
+    "Screenshots include local browser chrome and Codex desktop overlay because capture used visible macOS windows, not a headless browser."
+  ]
+}

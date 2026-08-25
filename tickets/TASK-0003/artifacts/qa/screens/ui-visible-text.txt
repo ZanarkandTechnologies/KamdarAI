@@ -1,0 +1,195 @@
+Kamdar
+automation proof
+FROZEN MOCK · NO PROVIDER WRITES
+
+KAMDAR MANAGER · 2026-W34
+
+What each automation feature proved
+
+Two projects, four selected Work Items, one hidden Meeting block, one missing Drive source, one existing Draft, and one new Project report. The page separates current evidence from designed, unproved capabilities.
+
+Open source: Kamdar AI root ↗
+Open source: Notion Projects ↗
+Open source: Notion Tasks ↗
+Open source: Kamdar Google Drive ↗
+Run frozen Daily → Weekly
+
+Frozen proof complete. Open a feature, then a file, to inspect its evidence.
+
+FEATURE COVERAGE
+6/9
+
+Only features with assertions contribute to this number.
+
+DECLARED ASSERTIONS
+23/23
+
+All currently declared rows pass; unproved features are still visible below.
+
+MOCK ENVIRONMENT
+4 work items
+
+2 Projects, hidden Meeting evidence, one missing Drive source, one existing Draft.
+
+DAILY INSTRUCTION
+
+Read once; produce separate outcomes
+
+Read changed Tasks in full, including hidden Meeting blocks. Update concise Project memory, propose precise quality requests and owner chases, preserve source gaps, and stage knowledge candidates.
+
+WEEKLY INSTRUCTION
+
+Promote only after review gates
+
+Consume Daily evidence into Project → Area → Company reports. Keep knowledge promotion, planning, and executive delivery visibly unproved until their artifacts, calls, and receipts exist.
+
+DAILY FEATURES
+
+One source scan, four outcomes
+
+Each card is a separate business process, not a separate automation run.
+
+FEAT-0001 · DAILY
+
+Daily project memory
+
+Changed Tasks and embedded Meetings become concise Project memory and linked Task proposals.
+
+LOCAL PASS · 6 ASSERTIONS
+
+Changed Tasks and embedded Meetings become concise Project memory and linked Task proposals.
+
+Open source: Notion Projects ↗
+Open source: Notion Tasks ↗
+Open source: Kamdar Google Drive ↗
+Open feature contract
+Artifacts and file-content assertions
+✓ CREATED
+daily/projects/replenishment-accuracy-2026-08-21.md
+
+expect(file).to_follow(kamdar-daily-operating-evidence@0.2.0, FEAT-0001)
+
+CURRENT TEMPLATE CONTENT ASSERTIONS
+
+✓ Material change
+✓ Work Items
+✓ Meeting extraction
+✓ Follow-up proposals
+✓ Source gaps
+Open generated output
+✓ CREATED
+daily/projects/festive-ecommerce-2026-08-21.md
+Behavior assertions
+✓ full-page-for-changed-work
+fetches complete content for every Work Item modified in the Daily window
+4/4 selected Work Items have an explicit full-page read before extraction.
+✓ hidden-meeting-blocks
+extracts embedded Meeting blocks or reports meeting_block_parse_gap
+TASK-201 embedded Meeting block was read in full and rendered into the owning Project's Daily evidence.
+✓ meeting-commitments
+converts explicit commitments into linked Task proposals without overwriting the Meeting
+TASK-104 and TASK-105 are linked Task proposals; TASK-201 remains source evidence.
+✓ project-memory-not-task-list
+updates concise Project Current context without copying task lists or raw meeting notes
+Each Daily Project record preserves concise Project current context and a structured Work Items table; no template payload or raw source object is copied.
+Downstream application
+MOCKED · notion.query_work_items
+
+Bounded current-day read plus overdue unresolved commitments.
+
+MOCKED · notion.fetch_full_page
+
+Full page read before documentation or Meeting extraction.
+
+MOCKED · notion.fetch_full_page
+
+Full page read before documentation or Meeting extraction.
+
+MOCKED · notion.fetch_full_page
+
+Full page read before documentation or Meeting extraction.
+
+MOCKED · notion.fetch_full_page
+
+Full page read before documentation or Meeting extraction.
+
+MOCKED · notion.fetch_projects
+
+Resolve durable Project context.
+
+FEAT-0002 · DAILY
+
+Daily documentation quality
+
+Missing template fields become precise comment proposals, never broad rewrite requests.
+
+LOCAL PASS · 1 ASSERTIONS
+
+FEAT-0003 · DAILY
+
+Daily progress chasing
+
+Stale or blocked work becomes a grouped owner follow-up after route resolution.
+
+LOCAL PASS · 3 ASSERTIONS
+
+FEAT-0004 · DAILY
+
+Daily knowledge candidate capture
+
+Problems, Decisions, Resources, and SOP signals stay proposed until Weekly gates pass.
+
+LOCAL PASS · 1 ASSERTIONS
+
+WEEKLY FEATURES
+
+One review pass, four outcomes
+
+Unproved downstream promotion and delivery remain in view as contracts, not passes.
+
+FEAT-0005 · WEEKLY
+
+Weekly operating reports
+
+Daily evidence becomes Project reports, then Area rollups, then one Company rollup.
+
+LOCAL PASS · 7 ASSERTIONS
+
+FEAT-0006 · WEEKLY
+
+Weekly knowledge promotion
+
+Reviewed candidates route to Work Items, Decisions, Resources, or Skills/wiki only after their gates pass.
+
+DESIGNED · NOT YET PROVED · 0 ASSERTIONS
+
+FEAT-0007 · WEEKLY
+
+Weekly next-week planning
+
+Unresolved work and approved commitments update Project context and linked Tasks.
+
+DESIGNED · NOT YET PROVED · 0 ASSERTIONS
+
+FEAT-0008 · WEEKLY
+
+Weekly executive distribution
+
+The Company report becomes an executive Telegram delivery only with a recorded receipt.
+
+DESIGNED · NOT YET PROVED · 0 ASSERTIONS
+
+SHARED CONTROLS
+
+Safety and receipts
+
+These checks limit what the automation can claim, regardless of score.
+
+FEAT-0009 · SHARED
+
+Automation safety and receipts
+
+Source routing, no-write mode, lifecycle protection, and idempotency remain inspectable.
+
+LOCAL PASS · 5 ASSERTIONS
+Developer evidence

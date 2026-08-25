@@ -1,0 +1,20 @@
+{
+  "kind": "goal-drift-review",
+  "ticket_id": "TASK-0001",
+  "reviewed_at": "2026-08-21T11:38:00+08:00",
+  "verdict": "complete_candidate",
+  "reason": "The evidence satisfies the Goal Packet at the bounded live POC boundary: live provider receipts, deterministic checks, UI/browser proof, visual QA, agent QA, demo review, and completion review are present and consistent. Production activation remains explicitly out of scope.",
+  "objective_delta": [],
+  "scope_delta": [],
+  "evidence_gaps": [],
+  "contract_refs": [
+    "tickets/TASK-0001/ticket.md#scope",
+    "tickets/TASK-0001/ticket.md#done--proof",
+    "tickets/TASK-0001/program.md#proof-policy",
+    "tickets/TASK-0001/artifacts/qa/live-proof/report.md",
+    "tickets/TASK-0001/artifacts/qa/live-proof/visual-review.md",
+    "tickets/TASK-0001/artifacts/qa/agent-qa/evidence-review.md",
+    "tickets/TASK-0001/artifacts/demo/2026-08-21-live-proof/demo-review.md"
+  ],
+  "next_action_constraint": "Do not convert this into production scheduling, gateway activation, cleanup, public sharing, broader employee contact, or non-POC writes without a separate ticket."
+}

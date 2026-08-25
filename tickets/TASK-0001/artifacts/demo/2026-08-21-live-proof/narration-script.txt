@@ -1,0 +1,7 @@
+This is the Kamdar manager proof in Live POC mode. The original workflow was spread across prose and separate mock cases. It is now one inspectable scenario with Notion, Drive, email, and Telegram readiness visible up front.
+
+The Run view shows thirteen recorded connector receipts. The evaluator itself never makes hidden network calls: it scores only the explicit, redacted evidence returned by the bounded live adapter.
+
+The Results view passes all thirty-seven assertions. It verifies source selection, area reports with project subsections, a company rollup, Notion chases and quality comments, five Drive outputs, exactly two allowlisted emails, one Telegram summary, and idempotent reruns.
+
+The standalone showcase packages the reports and outreach for review. This proves the workflow and exposes the missing project memory structure. Production scheduling is still proposal-only and was not activated.

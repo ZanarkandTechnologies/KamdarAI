@@ -1,0 +1,216 @@
+{
+  "safety": {
+    "mocked": true,
+    "network_calls_by_processor": 0,
+    "external_writes_by_processor": 0,
+    "notice": "All connector-shaped actions are local planned calls. No provider request or mutation occurred."
+  },
+  "calls": [
+    {
+      "sequence": 1,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "query_work_items",
+      "args": {
+        "local_day": "2026-08-21"
+      },
+      "detail": "Bounded current-day read plus overdue unresolved commitments.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 2,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_full_page",
+      "args": {
+        "work_item_id": "TASK-101"
+      },
+      "detail": "Full page read before documentation or Meeting extraction.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 3,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_full_page",
+      "args": {
+        "work_item_id": "TASK-102"
+      },
+      "detail": "Full page read before documentation or Meeting extraction.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 4,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_full_page",
+      "args": {
+        "work_item_id": "TASK-103"
+      },
+      "detail": "Full page read before documentation or Meeting extraction.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 5,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_full_page",
+      "args": {
+        "work_item_id": "TASK-201"
+      },
+      "detail": "Full page read before documentation or Meeting extraction.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 6,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_projects",
+      "args": {
+        "project_ids": [
+          "PROJ-REPLENISH",
+          "PROJ-FESTIVE"
+        ]
+      },
+      "detail": "Resolve durable Project context.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 7,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "fetch_people_directory",
+      "args": {
+        "person_ids": [
+          "PERSON-AISHA",
+          "PERSON-DARREN"
+        ]
+      },
+      "detail": "Resolve owner before delivery route.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 8,
+      "phase": "daily",
+      "adapter": "drive",
+      "operation": "list_project_resources",
+      "args": {
+        "project_ids": [
+          "PROJ-REPLENISH",
+          "PROJ-FESTIVE"
+        ]
+      },
+      "detail": "Find available resources and preserve missing-source gaps.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 9,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "propose_comment",
+      "args": {
+        "work_item_id": "TASK-101",
+        "missing": [
+          "Next action",
+          "Revised commitment date"
+        ]
+      },
+      "detail": "Proposal only; no comment endpoint called.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 10,
+      "phase": "daily",
+      "adapter": "email",
+      "operation": "draft_followup",
+      "args": {
+        "person_id": "PERSON-AISHA",
+        "work_item_id": "TASK-101"
+      },
+      "detail": "Proposal only; no delivery endpoint called.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 11,
+      "phase": "daily",
+      "adapter": "notion",
+      "operation": "propose_comment",
+      "args": {
+        "work_item_id": "TASK-102",
+        "missing": [
+          "Evidence"
+        ]
+      },
+      "detail": "Proposal only; no comment endpoint called.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 12,
+      "phase": "daily",
+      "adapter": "telegram",
+      "operation": "draft_followup",
+      "args": {
+        "person_id": "PERSON-DARREN",
+        "work_item_id": "TASK-102"
+      },
+      "detail": "Proposal only; no delivery endpoint called.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 13,
+      "phase": "daily",
+      "adapter": "telegram",
+      "operation": "draft_company_summary",
+      "args": {
+        "week": "2026-W34"
+      },
+      "detail": "Proposal only; no message endpoint called.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 14,
+      "phase": "weekly",
+      "adapter": "filesystem",
+      "operation": "load_daily_receipts",
+      "args": {
+        "paths": [
+          "daily/projects/replenishment-accuracy-2026-08-21.md",
+          "daily/projects/festive-ecommerce-2026-08-21.md",
+          "daily/outreach/employee-followups-2026-08-21.md",
+          "daily/receipt-2026-08-21.md"
+        ]
+      },
+      "detail": "Weekly consumes successful Daily evidence first.",
+      "status": "planned",
+      "mocked": true
+    },
+    {
+      "sequence": 15,
+      "phase": "weekly",
+      "adapter": "notion",
+      "operation": "read_project_reports",
+      "args": {
+        "project_ids": [
+          "PROJ-REPLENISH",
+          "PROJ-FESTIVE"
+        ]
+      },
+      "detail": "Locate Draft and Final lifecycle records.",
+      "status": "planned",
+      "mocked": true
+    }
+  ]
+}
