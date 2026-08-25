@@ -1,0 +1,30 @@
+{
+  "help_checked": [
+    "ntn --help",
+    "ntn datasources --help",
+    "ntn pages --help",
+    "ntn api --help"
+  ],
+  "projects_resolved": {
+    "database_id": "1ca0558505044497bf7690e793526092",
+    "data_source_id": "4c089f96-3e5e-40cc-ab81-1f476df82ba4",
+    "query_example_result_id": "3c7d43a2-3942-81f1-82e7-c1154f8459de"
+  },
+  "work_resolved": {
+    "database_id": "40a1894851e3451794bcc7afef45901a",
+    "data_source_id": "a9e97691-8ddc-459c-9ff7-ec1241bb1382",
+    "query_example_result_id": "3c7d43a2-3942-817d-aa53-e8722aec3974"
+  },
+  "project_page_read": {
+    "page_id": "3c7d43a2-3942-81f1-82e7-c1154f8459de",
+    "template": "project",
+    "title": "DTC Customer Care Playbook"
+  },
+  "work_page_read": {
+    "page_id": "3c7d43a2-3942-817d-aa53-e8722aec3974",
+    "template": "issue",
+    "title": "Supplier-format remapping delays Penang replenishment"
+  },
+  "writes_attempted": false,
+  "blocker": null
+}

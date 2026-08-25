@@ -1,0 +1,11 @@
+{
+  "ticket_id": "TASK-0008",
+  "phase": "demo",
+  "verdict": "blocked",
+  "summary": "Spend-free recap plan, script, and evidence map are complete; MP4 production is withheld because no narration route was authorized and no independent demo reviewer is available in this run.",
+  "artifacts": [
+    "tickets/TASK-0008/artifacts/demo/2026-08-25-eval-dashboard/content-plan.md",
+    "tickets/TASK-0008/artifacts/demo/2026-08-25-eval-dashboard/narration-script.txt",
+    "tickets/TASK-0008/artifacts/demo/2026-08-25-eval-dashboard/evidence-map.json"
+  ]
+}

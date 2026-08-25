@@ -1,0 +1,30 @@
+{
+  "ticket_id": "TASK-0008",
+  "claims": [
+    {
+      "id": "before",
+      "claim": "The prior evidence site was a narrow stacked narrative.",
+      "source": "tickets/TASK-0006/artifacts/qa/deployments/seed-v2-2026-08-25-02/dossier-first-viewport.jpg"
+    },
+    {
+      "id": "after",
+      "claim": "The generated dashboard renders seven feature groups and thirteen feature-scoped cases in a list and inspector.",
+      "source": "tickets/TASK-0008/artifacts/qa/2026-08-25/screens/desktop-eval-list.png"
+    },
+    {
+      "id": "mobile",
+      "claim": "The selected case opens as a full-screen mobile inspector without horizontal overflow.",
+      "source": "tickets/TASK-0008/artifacts/qa/2026-08-25/screens/mobile-eval-inspector.png"
+    },
+    {
+      "id": "visual_qa",
+      "claim": "Desktop and mobile states pass the accepted design comparison.",
+      "source": "tickets/TASK-0008/artifacts/qa/2026-08-25/visual-qa.md"
+    },
+    {
+      "id": "tests",
+      "claim": "All seventy-three filesystem tests pass.",
+      "source": "tickets/TASK-0008/progress.md"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "kamdar-operated-evidence@1.0.0",
+  "deployment": "seed-v2-2026-08-26-04",
+  "root_url": "https://app.notion.com/p/EVAL-Kamdar-Company-OS-clean-current-seed-2026-08-26-3c7d43a23942811eb7b1ca97034b11ce",
+  "features": [
+    {
+      "feature_id": "FEAT-0001",
+      "summary": "Penang Project sections were replaced and read back.",
+      "urls": [
+        "https://app.notion.com/p/Penang-Replenishment-Accuracy-3c7d43a2394281dbaa4be3405dd58d15"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "summary": "The precise documentation question was added to TASK-115, read back, and the Work item was marked daily-review-v1.",
+      "urls": [
+        "https://app.notion.com/p/Attach-campaign-attribution-methodology-3c7d43a2394281d8b333e0e1e34fe070"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "summary": "The TASK-101 chase was prepared but not sent; the source Work remains inspectable and unprocessed.",
+      "urls": [
+        "https://app.notion.com/p/Resolve-Penang-replenishment-variance-3c7d43a23942819fa7a5dc6eb4fa3883"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "summary": "The Penang W34 Draft received PM attention and source-keyed knowledge entries; TASK-201 was then marked daily-review-v1.",
+      "urls": [
+        "https://app.notion.com/p/Penang-Replenishment-Accuracy-Week-of-2026-08-17-3c7d43a2394281029947eb40ad258f0d"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "summary": "Three Project and three Area reports are Final; the Company report is visibly Blocked.",
+      "urls": [
+        "https://app.notion.com/p/Penang-Replenishment-Accuracy-Week-of-2026-08-17-3c7d43a2394281029947eb40ad258f0d",
+        "https://app.notion.com/p/CMT-Week-of-2026-08-17-3c7d43a2394281c2b0dbe858f1b309be",
+        "https://app.notion.com/p/Kamdar-Week-of-2026-08-17-3c7d43a239428156b393fb05f88c91b4"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "summary": "The approved Issue, Decision, and SOP promotions were created and read back.",
+      "urls": [
+        "https://app.notion.com/p/Supplier-format-remapping-delays-Penang-replenishment-3c7d43a23942817daa53e8722aec3974",
+        "https://app.notion.com/p/Use-the-signed-baseline-for-Penang-comparisons-3c7d43a2394281d9963fd2b08d5f26d9",
+        "https://app.notion.com/p/Normalize-a-Penang-supplier-extract-3c7d43a2394281fd9054e122078a8d12"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "summary": "The Penang next-week checklist replaced the prior checklist after its conflict guard matched.",
+      "urls": [
+        "https://app.notion.com/p/Penang-Replenishment-Accuracy-3c7d43a2394281dbaa4be3405dd58d15"
+      ]
+    }
+  ]
+}

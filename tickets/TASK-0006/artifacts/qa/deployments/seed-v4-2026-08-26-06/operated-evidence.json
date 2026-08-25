@@ -1,0 +1,55 @@
+{
+  "schema_version": "kamdar-operated-evidence@1.0.0",
+  "deployment": "seed-v4-2026-08-26-06",
+  "root_url": "https://app.notion.com/p/EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26-3c7d43a23942810caff1d937e577ae91",
+  "features": [
+    {
+      "feature_id": "FEAT-0001",
+      "summary": "CMT Project knowledge and weekly attention were replaced from the grounded Work evidence and read back.",
+      "urls": ["https://app.notion.com/p/CMT-Pipeline-3c7d43a2394281f7be79e5ae725443f7"]
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "summary": "Precise missing-information questions were posted as real Notion comments on two completed Work records.",
+      "urls": [
+        "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c7d43a2394281ccb190f23cbd73662f",
+        "https://app.notion.com/p/Fix-missing-guest-order-confirmation-3c7d43a2394281b0ad05c2a1375fcf0e"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "summary": "The overdue CMT blocker was routed to the operator-owned Telegram eval sink with an explicit intended-recipient envelope; this is not claimed as employee delivery.",
+      "urls": ["https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c7d43a23942811faebbfa53987f5150"]
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "summary": "Documented Daily evidence was accumulated into source-linked Project and Weekly report sections, then processed exactly once.",
+      "urls": ["https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c7d43a2394281a08a3df67615229094"]
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "summary": "Three Final Project reports, three Department reports, and one Final Company report were applied and read back.",
+      "urls": [
+        "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c7d43a23942812fbeedc78e9427f174",
+        "https://app.notion.com/p/CMT-Week-of-2026-08-17-3c7d43a23942814e9fcfd07002800e5e",
+        "https://app.notion.com/p/Marketing-Week-of-2026-08-17-3c7d43a2394281569d1dd3daffb18879",
+        "https://app.notion.com/p/Ecommerce-Week-of-2026-08-17-3c7d43a2394281789c5ada0e805a3422",
+        "https://app.notion.com/p/Kamdar-Week-of-2026-08-17-3c7d43a2394281f18485d143543b4e23"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "summary": "A detailed CMT Issue, a durable CMT Decision, and a proven Ecommerce SOP were promoted into their destination databases and read back.",
+      "urls": [
+        "https://app.notion.com/p/CMT-production-handoff-lacks-one-approved-source-3c7d43a239428142849bdd6077cd4ee1",
+        "https://app.notion.com/p/Use-the-signed-sample-as-construction-baseline-3c7d43a2394281db906fe0f3ef99b365",
+        "https://app.notion.com/p/Prepare-a-publish-ready-product-listing-handoff-3c7d43a23942810bbd2ee4a3a662e569"
+      ]
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "summary": "The next-week CMT attention checklist was replaced only after the expected-current guard matched.",
+      "urls": ["https://app.notion.com/p/CMT-Pipeline-3c7d43a2394281f7be79e5ae725443f7"]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+Before, the evidence site was a long dossier. The eval result itself was hard
+to find and the page repeated environment and system detail before the user
+could inspect a case.
+
+The new dashboard is generated from the typed Daily and Weekly suites, feature
+documents, seed entities, and completed judged run artifacts. Seven feature
+groups expand into thirteen case rows. Selecting a row opens its starting data,
+expected result, actual JSON slice, and judge checks without leaving the list.
+
+For example, the Weekly report hierarchy case exposes the seeded reports, the
+expected finalization and rollup behavior, seven actual report results, and the
+five evidence-backed checks that produced its verdict.
+
+The renderer owns only interface labels, layout, and interaction. Mutation
+tests prove that changing a suite prompt, feature title, judge tier, or run
+result changes the page without renderer edits. All seventy-three filesystem
+tests pass, and desktop and mobile visual QA pass. The current deployment stays
+untouched until a separate deployment decision.
