@@ -1,0 +1,13 @@
+{
+  "schema_version": "kamdar-private-seed-manifest@1.0.0",
+  "compiler": "scripts/compile_private_kamdar_seed.mjs",
+  "source_capture_sha256": "26ec0188a4dbf1a527e70de11dbc07e18d554c909684e7969861de7df7e5535d",
+  "input_schema_version": "0.1.0",
+  "aggregate": {
+    "rendered_rows": 49,
+    "named_projects": 39,
+    "source_gaps": 10,
+    "observed_departments": 7
+  },
+  "manifest_sha256": "01d91cecd2c54c8b4e0821e141d03f087f6eada5cea9402a83ab5636b1beb7a0"
+}

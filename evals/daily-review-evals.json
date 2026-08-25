@@ -1,0 +1,221 @@
+{
+  "schema_version": "kamdar-daily-review-evals@1.0.0",
+  "suite": "kamdar-unified-daily-review",
+  "target": {
+    "automation": "automations/daily-operating-update.md",
+    "schema": "automations/schemas/daily-review-result.zod.mjs",
+    "seed": "evals/seed/kamdar-company-os.seed.json",
+    "golden_result": "automations/examples/golden/daily-review-result-2026-08-25.json"
+  },
+  "run_artifacts": [
+    {
+      "path": "daily/context/daily-context-diff-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-context"
+    },
+    {
+      "path": "daily/review/daily-review-result-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-review-result"
+    },
+    {
+      "path": "daily/receipts/daily-integration-receipt-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-integration-receipt"
+    },
+    {
+      "path": "eval/deterministic.json",
+      "stage": "judged",
+      "kind": "deterministic-checks"
+    },
+    {
+      "path": "eval/judges/FEAT-0001.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0001"
+    },
+    {
+      "path": "eval/judges/FEAT-0002.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0002"
+    },
+    {
+      "path": "eval/judges/FEAT-0003.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0003"
+    },
+    {
+      "path": "eval/judges/FEAT-0004.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0004"
+    },
+    {
+      "path": "eval/evidence-review.json",
+      "stage": "judged",
+      "kind": "evidence-review"
+    },
+    {
+      "path": "eval/artifact-quality-review.json",
+      "stage": "judged",
+      "kind": "artifact-quality-review"
+    },
+    {
+      "path": "eval/integrations.json",
+      "stage": "judged",
+      "kind": "integration-checks"
+    },
+    {
+      "path": "eval/result.json",
+      "stage": "judged",
+      "kind": "suite-result"
+    }
+  ],
+  "artifact_policy": {
+    "all_manifest_rows_required": true,
+    "unexpected_intermediate_files": "fail",
+    "json_files_must_parse": true,
+    "review_result_must_validate_with_target_schema": true
+  },
+  "features": [
+    {
+      "feature_id": "FEAT-0001",
+      "result_path": "project_updates",
+      "entity_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "claim": "CMT Pipeline receives conflict-safe section replacements that reconcile sample and capacity checks and preserve production blockers.",
+      "assertions": [
+        "Exactly one Project update targets PROJ-CMT-CMT_PIPELINE.",
+        "All three complete sections have expected-current and replacement text.",
+        "The checklist checks sample and capacity evidence and retains tech-pack and collar gates.",
+        "Every construction and production fact is source-linked."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "result_path": "completed_ticket_comments",
+      "entity_ids": [
+        "TASK-115",
+        "TASK-116",
+        "PERSON-JUN"
+      ],
+      "claim": "Only the incomplete Done record receives a precise completion-quality question; the documented control receives no comment.",
+      "assertions": [
+        "TASK-115 receives one precise comment.",
+        "It asks for spend, revenue, attribution window, comparison period, source report, and rationale.",
+        "TASK-116 is absent because the control is complete.",
+        "No generic request or invented metric appears."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "result_path": "weekly_progress_chases",
+      "entity_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-109",
+        "PERSON-AISHA"
+      ],
+      "claim": "The stale CMT tech-pack gate produces one production recovery request while healthy India Sourcing work is suppressed.",
+      "assertions": [
+        "One chase targets PERSON-AISHA for TASK-101 under CMT Pipeline.",
+        "It states the pack blocker, expiring line hold, recovery step, revised commitment, and capacity question.",
+        "TASK-109 is absent because it is healthy.",
+        "Extraction contains no delivery claim."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "result_path": "knowledge_updates",
+      "entity_ids": [
+        "TASK-201",
+        "TASK-203",
+        "TASK-102",
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      ],
+      "claim": "Complete Done work yields source-linked problem, decision, and SOP Draft entries, while insufficient evidence yields a source-record question instead of invented knowledge.",
+      "assertions": [
+        "TASK-201 yields a campaign problem, decision, and repeated handoff method.",
+        "TASK-203 yields the approved repeated listing-handoff candidate.",
+        "TASK-102 yields no knowledge and one precise defect-evidence question.",
+        "Every entry has a routable anchor and source ID."
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "unified-daily-review-happy-path",
+      "prompt": "Run the bounded Daily operating update for the seeded active Projects and prepare the resulting changes and follow-ups.",
+      "feature_ids": [
+        "FEAT-0001",
+        "FEAT-0002",
+        "FEAT-0003",
+        "FEAT-0004"
+      ],
+      "entity_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "PROJ-MERCH-INDIA_SOURCING",
+        "PROJ-MKT-DEEPAVALI_MARKETING",
+        "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+        "PROJ-ECOM-LISTING_PIPELINE",
+        "TASK-101",
+        "TASK-102",
+        "TASK-115",
+        "TASK-116",
+        "TASK-201",
+        "TASK-203"
+      ],
+      "hidden_assertions": [
+        "The shared DailyReviewResult is schema-valid and uses only stable IDs present in the seed, including embedded commitment IDs.",
+        "Each feature subagent writes its verdict to the manifest path for that feature and cites the exact result path it judged.",
+        "Only an A verdict passes; missing evidence is D rather than an inferred pass."
+      ]
+    },
+    {
+      "id": "missing-information-and-blocked-route",
+      "prompt": "Run the same Daily review where completed records may still be missing important operating context.",
+      "feature_ids": [
+        "FEAT-0002",
+        "FEAT-0004"
+      ],
+      "entity_ids": [
+        "TASK-102",
+        "TASK-115",
+        "TASK-116",
+        "PERSON-JUN"
+      ],
+      "hidden_assertions": [
+        "Incomplete TASK-115 receives a specific question and complete TASK-116 receives none.",
+        "TASK-203 produces no knowledge entry when authority and reuse evidence are absent.",
+        "No integration receipt may claim an applied Draft entry for TASK-203; its truthful outcome is blocked pending source clarification."
+      ]
+    },
+    {
+      "id": "processing-after-effects-canary",
+      "prompt": "Apply the prepared Daily result through the configured test integrations and record what was actually completed.",
+      "feature_ids": [
+        "FEAT-0001",
+        "FEAT-0002",
+        "FEAT-0003",
+        "FEAT-0004"
+      ],
+      "entity_ids": [
+        "TASK-101",
+        "TASK-102",
+        "TASK-115",
+        "TASK-116",
+        "TASK-201",
+        "TASK-203"
+      ],
+      "hidden_assertions": [
+        "Every claimed applied or duplicate effect has a target ID, operation, payload hash, provider record ID or URL, outcome, and read-back evidence in the integration receipt.",
+        "A Work item is marked reviewed only after all of its required effects are applied, duplicate, or truthfully no_finding.",
+        "TASK-203 remains unprocessed while its missing-information effect is blocked, conflicted, or failed.",
+        "A repeated unchanged run creates no duplicate provider row, comment, message, Draft entry, or processing transition."
+      ]
+    }
+  ]
+}

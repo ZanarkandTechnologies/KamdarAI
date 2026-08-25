@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "company": {
+    "name": "Northstar Textiles Demo",
+    "timezone": "Asia/Kuala_Lumpur",
+    "owner_name": "Company Owner Demo",
+    "telegram_chat": "mock:owner-operations"
+  },
+  "frozen_at": "2026-08-21T09:00:00+08:00",
+  "local_date": "2026-08-21",
+  "week": "2026-W34",
+  "week_start": "2026-08-17T00:00:00+08:00",
+  "week_end": "2026-08-24T00:00:00+08:00"
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "PERSON-AISHA",
+    "name": "Aisha Demo",
+    "role": "Retail Operations Lead",
+    "email": "aisha.operations@example.test",
+    "notion_user_id": "mock-user-aisha"
+  },
+  {
+    "id": "PERSON-DARREN",
+    "name": "Darren Demo",
+    "role": "Digital Commerce Lead",
+    "email": "darren.commerce@example.test",
+    "notion_user_id": "mock-user-darren"
+  },
+  {
+    "id": "PERSON-OWNER",
+    "name": "Company Owner Demo",
+    "role": "Company Owner",
+    "email": "owner@example.test",
+    "notion_user_id": "mock-user-owner"
+  }
+]

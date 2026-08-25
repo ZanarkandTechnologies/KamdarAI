@@ -1,0 +1,29 @@
+[
+  {
+    "id": "REPORT-RETAIL-W34",
+    "area": "Retail Operations",
+    "week": "2026-W34",
+    "modified_time": "2026-08-20T18:00:00+08:00",
+    "path": "reports/areas/retail-operations/weekly-report-2026-W34.md",
+    "source_file": "existing-retail-operations-report.md",
+    "url": "https://drive.example.test/reports/retail-operations-2026-W34"
+  },
+  {
+    "id": "REPORT-RETAIL-W33",
+    "area": "Retail Operations",
+    "week": "2026-W33",
+    "modified_time": "2026-08-14T18:00:00+08:00",
+    "path": "reports/areas/retail-operations/weekly-report-2026-W33.md",
+    "source_file": null,
+    "url": "https://drive.example.test/reports/retail-operations-2026-W33"
+  },
+  {
+    "id": "REPORT-DIGITAL-W33",
+    "area": "Digital Commerce",
+    "week": "2026-W33",
+    "modified_time": "2026-08-14T17:00:00+08:00",
+    "path": "reports/areas/digital-commerce/weekly-report-2026-W33.md",
+    "source_file": null,
+    "url": "https://drive.example.test/reports/digital-commerce-2026-W33"
+  }
+]

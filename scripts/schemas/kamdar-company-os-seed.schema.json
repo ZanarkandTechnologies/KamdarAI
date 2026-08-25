@@ -1,0 +1,544 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kamdar-company-os-seed@4.0.0",
+  "title": "Grounded, template-bodied Kamdar Company OS eval seed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "seed_id",
+    "environments",
+    "capture",
+    "clock",
+    "entities",
+    "pipeline_cases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kamdar-company-os-seed@4.0.0"
+    },
+    "seed_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frozen",
+        "notion_eval"
+      ],
+      "properties": {
+        "frozen": {
+          "$ref": "#/$defs/environment"
+        },
+        "notion_eval": {
+          "$ref": "#/$defs/environment"
+        }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "manifest",
+        "departments",
+        "source_gap_count",
+        "material_source_gaps"
+      ],
+      "properties": {
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "departments": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_gap_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "material_source_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "company",
+        "timezone",
+        "frozen_at",
+        "local_day",
+        "week",
+        "week_start",
+        "week_end"
+      ],
+      "properties": {
+        "company": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frozen_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_day": {
+          "$ref": "#/$defs/date"
+        },
+        "week": {
+          "type": "string",
+          "pattern": "^\\d{4}-W\\d{2}$"
+        },
+        "week_start": {
+          "$ref": "#/$defs/date"
+        },
+        "week_end": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "entities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projects",
+        "people",
+        "work_items",
+        "meetings",
+        "reports"
+      ],
+      "properties": {
+        "projects": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        },
+        "people": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        },
+        "work_items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        },
+        "meetings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        },
+        "reports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        }
+      }
+    },
+    "pipeline_cases": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "feature_id",
+          "name",
+          "entity_ids",
+          "shows"
+        ],
+        "properties": {
+          "feature_id": {
+            "type": "string",
+            "pattern": "^FEAT-000[1-7]$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entity_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/id"
+            }
+          },
+          "shows": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "template", "properties", "body"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "template": {
+          "enum": ["project", "person", "task", "meeting", "project_report"]
+        },
+        "properties": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": ["string", "number", "boolean"]
+          }
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^## "
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]+$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reset_marker"
+      ],
+      "properties": {
+        "reset_marker": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "department"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "department": {
+          "type": "string",
+          "minLength": 1
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "owner": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string"
+        },
+        "progress": {
+          "type": "string"
+        },
+        "overview": {
+          "type": "object"
+        },
+        "knowledge": {
+          "type": "object"
+        },
+        "attention": {
+          "type": "object"
+        }
+      }
+    },
+    "person": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "department",
+        "role",
+        "status",
+        "manager",
+        "timezone",
+        "expertise",
+        "operating_notes",
+        "contact"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "department": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": { "type": "string", "minLength": 1 },
+        "manager": { "type": "string", "minLength": 1 },
+        "timezone": { "type": "string", "minLength": 1 },
+        "expertise": { "type": "string", "minLength": 1 },
+        "operating_notes": { "type": "string", "minLength": 1 },
+        "contact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "channel",
+            "approved_channels",
+            "route",
+            "instructions"
+          ],
+          "properties": {
+            "channel": {
+              "type": "string"
+            },
+            "approved_channels": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "route": {
+              "type": "string"
+            },
+            "instructions": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "work": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "project",
+        "owner",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project": {
+          "$ref": "#/$defs/id"
+        },
+        "owner": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "type": "string"
+        },
+        "start": {
+          "$ref": "#/$defs/date"
+        },
+        "due": {
+          "$ref": "#/$defs/date"
+        },
+        "progress": {
+          "type": "string"
+        },
+        "updated": {
+          "$ref": "#/$defs/date"
+        },
+        "daily": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "object"
+        },
+        "completed_at": {
+          "type": "string"
+        },
+        "processed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "meeting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "project",
+        "owner",
+        "date",
+        "attendees",
+        "facilitator",
+        "completed_at",
+        "processed",
+        "purpose",
+        "problem",
+        "decision",
+        "commitments",
+        "follow_up"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "project": {
+          "$ref": "#/$defs/id"
+        },
+        "owner": {
+          "$ref": "#/$defs/id"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "attendees": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "facilitator": {
+          "type": "string"
+        },
+        "completed_at": {
+          "type": "string"
+        },
+        "processed": {
+          "type": "boolean"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "problem": {
+          "type": "object"
+        },
+        "decision": {
+          "type": "object"
+        },
+        "commitments": {
+          "type": "array"
+        },
+        "follow_up": {
+          "type": "object"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "project",
+        "week_start",
+        "status",
+        "version",
+        "sections"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "project": {
+          "$ref": "#/$defs/id"
+        },
+        "week_start": {
+          "$ref": "#/$defs/date"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "finalized_at": {
+          "type": "string"
+        },
+        "previous_report": {
+          "$ref": "#/$defs/id"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "sections": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

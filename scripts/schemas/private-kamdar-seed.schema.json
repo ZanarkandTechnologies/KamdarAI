@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kamdar-private-seed@1.0.0",
+  "title": "Private Kamdar capture seed",
+  "type": "object",
+  "required": ["schema_version", "source_capture_sha256", "public_manifest_sha256", "aggregate", "projects", "source_gaps", "departments"],
+  "properties": {
+    "schema_version": {"const": "kamdar-private-seed@1.0.0"},
+    "source_capture_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "public_manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "aggregate": {
+      "type": "object",
+      "required": ["rendered_rows", "named_projects", "source_gaps", "observed_departments"]
+    },
+    "projects": {"type": "array"},
+    "source_gaps": {"type": "array"},
+    "departments": {"type": "array"}
+  },
+  "additionalProperties": false
+}

@@ -1,6 +1,8 @@
 {
   "suite": "kamdar-company-os",
   "version": "0.1.0",
+  "status": "superseded",
+  "replacement": "evals/evals.json",
   "timezone": "Asia/Kuala_Lumpur",
   "cases": [
     {
