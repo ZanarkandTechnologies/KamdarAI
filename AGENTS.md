@@ -19,6 +19,11 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
   `.hermes.md` in the live runtime.
 - `automations/`: readable automation contracts; scheduling and generated runs
   remain runtime concerns.
+- `docs/features/` and `docs/systems/`: stable capability contracts and the
+  Company OS composition map. Eval rows reference feature IDs; features do not
+  create separate runtime scans.
+- `templates/`: Kamdar-owned record/report contracts installed into the runtime
+  workspace. Canonical imports retain an upstream template ID and version.
 - `skills/`: Kamdar-owned skill source, including the explicit workspace setup
   path. Installed profile copies are derived artifacts.
 - `evals/`: behavioral cases, filesystem assertions, local authoring UI, and
@@ -31,7 +36,7 @@ here.
 
 ## Development flow
 
-1. Edit the workspace context, automations, skills, and eval cases in this repository first.
+1. Edit the workspace context, automations, templates, skills, and eval cases in this repository first.
 2. Run the narrow deterministic tests and filesystem eval tests locally.
 3. Preview source-to-runtime changes with
    `skills/setup-kamdar-workspace/scripts/setup_workspace.py`.

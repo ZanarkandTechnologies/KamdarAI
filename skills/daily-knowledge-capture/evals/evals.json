@@ -1,0 +1,62 @@
+{
+  "skill_name": "daily-knowledge-capture",
+  "artifact_contract": "kamdar-current-weekly-draft@0.1.0",
+  "evals": [
+    {
+      "id": "daily_knowledge_direct_draft_normal_01",
+      "kind": "normal",
+      "prompt": "Use the supplied Daily context and current Weekly Draft. Directly update the Draft with the grounded Decision and SOP candidates.",
+      "expected_output": "The existing Draft gains source-keyed Proposed Decision/SOP entries and reports its applied keys; no contribution file or provider action is created.",
+      "files": [
+        "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "../../automations/templates/current-weekly-draft.md",
+        "examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md"
+      ],
+      "assertions": [
+        "Cites source URLs and SRC-MEETING-042/SRC-WORK-124 evidence from the context",
+        "Adds Decisions and SOPs only with source-ID/kind keys",
+        "Preserves missing authority and repeat-use proof as explicit gaps",
+        "Edits the supplied current Draft directly and creates no contribution or diff file",
+        "Does not write PM control, Project memory, promotion, or provider effects"
+      ],
+      "metadata": {"farplane": {"title": "Daily evidence enters the current Weekly Draft directly", "tags": ["skill", "pipeline", "daily", "knowledge-capture"], "feature_id": "FEAT-0004"}}
+    },
+    {
+      "id": "daily_knowledge_direct_draft_hard_01",
+      "kind": "hard",
+      "prompt": "The context contains an AI-summary suggestion but no concrete choice, method recurrence, authority, or proof. Update the current Weekly Draft correctly.",
+      "expected_output": "Returns no_finding or a named source gap and leaves the Draft unchanged; it does not invent a Decision, SOP, authority, or generic wiki item.",
+      "files": ["../../automations/templates/current-weekly-draft.md"],
+      "assertions": [
+        "Rejects the generic suggestion as neither a Decision nor a repeatable SOP",
+        "Names missing choice, recurrence, authority, and proof without filling them in",
+        "Leaves every Draft anchor unchanged and creates no intermediate artifact or provider action"
+      ],
+      "metadata": {"farplane": {"title": "Weak ideas do not pollute the Weekly Draft", "tags": ["skill", "hard", "grounding"], "feature_id": "FEAT-0004"}}
+    },
+    {
+      "id": "daily_knowledge_direct_draft_boundary_01",
+      "kind": "boundary",
+      "prompt": "The Daily context is valid but the supplied current Weekly Draft path is missing. Produce the correct result.",
+      "expected_output": "Returns configuration_gap: missing_current_weekly_draft, retains the source IDs, and changes no file.",
+      "files": ["examples/blocked/current-weekly-draft-missing.md"],
+      "assertions": [
+        "Does not search for or infer another Weekly Draft",
+        "Preserves the exact missing-target gap and source context",
+        "Does not write, promote, send, or claim a provider receipt"
+      ],
+      "metadata": {"farplane": {"title": "A missing local Draft blocks direct Daily capture", "tags": ["skill", "boundary", "configuration-gap"], "feature_id": "FEAT-0004"}}
+    }
+  ],
+  "extensions": {
+    "calibration": {
+      "status": "draft_unrun",
+      "runner": "profile-backed skill evaluation",
+      "candidate": "daily-knowledge-capture",
+      "baseline": "direct unstructured Daily prompt",
+      "required_artifacts": ["candidate-draft.md", "baseline-draft.md", "judge-verdict.json"],
+      "readiness_rule": "Run the normal case with identical context, Draft, model, sandbox, and budget; fix and rerun the smallest failing eval before readiness."
+    }
+  },
+  "rerun_rule": "fix and rerun the smallest failing eval before readiness"
+}

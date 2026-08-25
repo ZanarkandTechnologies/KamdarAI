@@ -1,0 +1,306 @@
+{
+  "schema_version": "kamdar-daily-integration-receipt@1.0.0",
+  "receipt_id": "DAILY-INTEGRATION-2026-08-25-V4",
+  "source_context_id": "daily-context-2026-08-25",
+  "daily_result_id": "daily-review-result-2026-08-25",
+  "daily_result_sha256": "d066c090c3929d995ff36032a25ccf7385f44aaf7ca0f45a62e1f68324d92c9f",
+  "recorded_at": "2026-08-25T17:12:00+08:00",
+  "effects": [
+    {
+      "effect_id": "E-CMT",
+      "required": true,
+      "feature_id": "FEAT-0001",
+      "result_pointer": "/project_updates/0",
+      "source_record_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "work_item_ids": [
+        "TASK-110"
+      ],
+      "integration": "notion",
+      "operation": "replace_project_sections",
+      "target": {
+        "target_id": "PROJ-CMT-CMT_PIPELINE",
+        "target_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE"
+      },
+      "payload_hash": "a6919b4212b6b7a233963f76a3f1566dcfd87d6d2c114107b36db4a75626ed81",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJ-CMT-CMT_PIPELINE",
+          "response_url": "https://notion.example.test/receipts/PROJ-CMT-CMT_PIPELINE",
+          "recorded_at": "2026-08-25T17:10:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-CMT-CMT_PIPELINE",
+          "target_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE",
+          "provider_response_id": "RESP-PROJ-CMT-CMT_PIPELINE",
+          "checked_at": "2026-08-25T17:10:04+08:00",
+          "payload_hash": "a6919b4212b6b7a233963f76a3f1566dcfd87d6d2c114107b36db4a75626ed81",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-META-Q",
+      "required": true,
+      "feature_id": "FEAT-0002",
+      "result_pointer": "/completed_ticket_comments/0",
+      "source_record_ids": [
+        "TASK-115"
+      ],
+      "work_item_ids": [
+        "TASK-115"
+      ],
+      "integration": "notion",
+      "operation": "add_work_comment",
+      "target": {
+        "target_id": "TASK-115",
+        "target_url": "https://notion.example.test/work/TASK-115"
+      },
+      "payload_hash": "951394a49b3ef219f4a155deb4021a57f66f03e491472cd9fb2396bfe295bb50",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-TASK-115",
+          "response_url": "https://notion.example.test/receipts/TASK-115",
+          "recorded_at": "2026-08-25T17:10:00+08:00"
+        },
+        "read_back": {
+          "target_id": "TASK-115",
+          "target_url": "https://notion.example.test/work/TASK-115",
+          "provider_response_id": "RESP-TASK-115",
+          "checked_at": "2026-08-25T17:10:04+08:00",
+          "payload_hash": "951394a49b3ef219f4a155deb4021a57f66f03e491472cd9fb2396bfe295bb50",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-META-OK",
+      "required": true,
+      "feature_id": "FEAT-0002",
+      "result_pointer": "/completed_ticket_comments",
+      "source_record_ids": [
+        "TASK-116"
+      ],
+      "work_item_ids": [
+        "TASK-116"
+      ],
+      "integration": "none",
+      "operation": "record_no_finding",
+      "target": {
+        "target_id": "TASK-116",
+        "target_url": "https://notion.example.test/work/TASK-116"
+      },
+      "payload_hash": "6a83eceea0cae97e764367b7c566bb8effe343ad7310d8531e0e412d06e02b0b",
+      "outcome": {
+        "state": "no_finding",
+        "reason": "The control contains a complete measurement basis and approval.",
+        "provider_response": null,
+        "read_back": null
+      }
+    },
+    {
+      "effect_id": "E-CMT-CHASE",
+      "required": false,
+      "feature_id": "FEAT-0003",
+      "result_pointer": "/weekly_progress_chases/0",
+      "source_record_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "PERSON-AISHA"
+      ],
+      "work_item_ids": [
+        "TASK-101"
+      ],
+      "integration": "telegram",
+      "operation": "send_owner_chase",
+      "target": {
+        "target_id": "PERSON-AISHA",
+        "target_url": "https://telegram.example.test/eval-sink/PERSON-AISHA"
+      },
+      "payload_hash": "27ef2ec5ae937d718af19e4847c81a099d3c36968981e0eb7da7db531e8c194c",
+      "outcome": {
+        "state": "duplicate",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PERSON-AISHA",
+          "response_url": "https://notion.example.test/receipts/PERSON-AISHA",
+          "recorded_at": "2026-08-25T17:10:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PERSON-AISHA",
+          "target_url": "https://telegram.example.test/eval-sink/PERSON-AISHA",
+          "provider_response_id": "RESP-PERSON-AISHA",
+          "checked_at": "2026-08-25T17:10:04+08:00",
+          "payload_hash": "27ef2ec5ae937d718af19e4847c81a099d3c36968981e0eb7da7db531e8c194c",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-DEEP-DRAFT",
+      "required": true,
+      "feature_id": "FEAT-0004",
+      "result_pointer": "/knowledge_updates/0",
+      "source_record_ids": [
+        "TASK-201",
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      ],
+      "work_item_ids": [
+        "TASK-201"
+      ],
+      "integration": "notion",
+      "operation": "replace_weekly_report_draft",
+      "target": {
+        "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+        "target_url": "https://notion.example.test/reports/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      },
+      "payload_hash": "d52355a0b146c1b8eee3089b9f1e9320509c0b1e5040705dbd22c8175a0dadb2",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "response_url": "https://notion.example.test/receipts/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "recorded_at": "2026-08-25T17:10:00+08:00"
+        },
+        "read_back": {
+          "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "target_url": "https://notion.example.test/reports/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "provider_response_id": "RESP-RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "checked_at": "2026-08-25T17:10:04+08:00",
+          "payload_hash": "d52355a0b146c1b8eee3089b9f1e9320509c0b1e5040705dbd22c8175a0dadb2",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-LISTING-DRAFT",
+      "required": true,
+      "feature_id": "FEAT-0004",
+      "result_pointer": "/knowledge_updates/1",
+      "source_record_ids": [
+        "TASK-203",
+        "PROJ-ECOM-LISTING_PIPELINE"
+      ],
+      "work_item_ids": [
+        "TASK-203"
+      ],
+      "integration": "notion",
+      "operation": "replace_weekly_report_draft",
+      "target": {
+        "target_id": "PROJ-ECOM-LISTING_PIPELINE",
+        "target_url": "https://notion.example.test/projects/PROJ-ECOM-LISTING_PIPELINE"
+      },
+      "payload_hash": "4e8dd9c455e0a2a7a6c3c56c71c42847646134c8ec7b97e5618df038ae02864c",
+      "outcome": {
+        "state": "blocked",
+        "reason": "The required provider confirmation is unavailable in this branch.",
+        "provider_response": null,
+        "read_back": null
+      }
+    },
+    {
+      "effect_id": "E-ORDER-Q",
+      "required": true,
+      "feature_id": "FEAT-0004",
+      "result_pointer": "/knowledge_updates/2",
+      "source_record_ids": [
+        "TASK-102"
+      ],
+      "work_item_ids": [
+        "TASK-102"
+      ],
+      "integration": "notion",
+      "operation": "add_work_comment",
+      "target": {
+        "target_id": "TASK-102",
+        "target_url": "https://notion.example.test/work/TASK-102"
+      },
+      "payload_hash": "a0f106627c80793767c7c4cc2135398518bd11d125c2592d7380dca8b16d7e9c",
+      "outcome": {
+        "state": "failed",
+        "reason": "The required provider confirmation is unavailable in this branch.",
+        "provider_response": null,
+        "read_back": null
+      }
+    }
+  ],
+  "work_processing": [
+    {
+      "work_item_id": "TASK-110",
+      "required_effect_ids": [
+        "E-CMT"
+      ],
+      "state": "processed",
+      "processed_at": "2026-08-25T17:12:00+08:00",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "reason": "All required effects settled safely."
+    },
+    {
+      "work_item_id": "TASK-115",
+      "required_effect_ids": [
+        "E-META-Q"
+      ],
+      "state": "processed",
+      "processed_at": "2026-08-25T17:12:00+08:00",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "reason": "All required effects settled safely."
+    },
+    {
+      "work_item_id": "TASK-116",
+      "required_effect_ids": [
+        "E-META-OK"
+      ],
+      "state": "processed",
+      "processed_at": "2026-08-25T17:12:00+08:00",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "reason": "All required effects settled safely."
+    },
+    {
+      "work_item_id": "TASK-201",
+      "required_effect_ids": [
+        "E-DEEP-DRAFT"
+      ],
+      "state": "processed",
+      "processed_at": "2026-08-25T17:12:00+08:00",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "reason": "All required effects settled safely."
+    },
+    {
+      "work_item_id": "TASK-203",
+      "required_effect_ids": [
+        "E-LISTING-DRAFT"
+      ],
+      "state": "unprocessed",
+      "processed_at": null,
+      "status_after": null,
+      "daily_review_version_after": null,
+      "reason": "At least one required effect lacks provider confirmation."
+    },
+    {
+      "work_item_id": "TASK-102",
+      "required_effect_ids": [
+        "E-ORDER-Q"
+      ],
+      "state": "unprocessed",
+      "processed_at": null,
+      "status_after": null,
+      "daily_review_version_after": null,
+      "reason": "At least one required effect lacks provider confirmation."
+    }
+  ],
+  "run_notes": "Telegram duplicate means the same payload already existed in the eval sink; it is not proof of employee delivery. Listing Draft and order-defect comment branches remain unprocessed."
+}

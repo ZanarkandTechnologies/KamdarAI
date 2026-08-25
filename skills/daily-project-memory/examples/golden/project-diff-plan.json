@@ -1,0 +1,52 @@
+{
+  "artifact_type": "kamdar-project-diff-plan",
+  "artifact_version": "0.1.0",
+  "context": {
+    "context_diff_id": "daily-context-2026-08-24",
+    "context_diff_path": "automations/examples/golden/daily-context-diff-2026-08-24.json",
+    "local_day": "2026-08-24",
+    "evidence_window": "2026-08-24T00:00:00+08:00..2026-08-24T23:59:59+08:00"
+  },
+  "state": "proposed",
+  "patches": [
+    {
+      "patch_id": "PROJ-REPLENISH:project_knowledge:normalised-comparison",
+      "project": {
+        "project_id": "PROJ-REPLENISH",
+        "project_source_id": "SRC-PROJECT-REPLENISH",
+        "project_url": "notion://PROJ-REPLENISH"
+      },
+      "target_section": "project_knowledge",
+      "operation": "append",
+      "before_excerpt": "### Existing pilot finding\n- **Known:** Manual count evidence is pending.",
+      "proposed_markdown": "### Normalised comparison constraint\n- **Known:** Supplier updates arrive in three formats; the five-store decision requires a normalised comparison rather than raw feeds.\n- **Impact:** Expansion remains blocked until the comparison is complete.\n- **Evidence:** [Variance task](notion://TASK-201) (`SRC-WORK-201`) · [Pilot review](notion://MEETING-041) (`SRC-MEETING-041`)\n- **Review:** Reassess after the five-store count sample is complete.",
+      "source_ids": ["SRC-WORK-201", "SRC-MEETING-041"],
+      "attention_reset": {"requested": false, "week": null, "reason": null, "source_id": null},
+      "gaps": ["The supplier's normalisation completion date is not present in the context diff."],
+      "idempotency_key": "project-memory:2026-08-24:PROJ-REPLENISH:project_knowledge:normalised-comparison"
+    },
+    {
+      "patch_id": "PROJ-REPLENISH:this_weeks_attention:2026-W35",
+      "project": {
+        "project_id": "PROJ-REPLENISH",
+        "project_source_id": "SRC-PROJECT-REPLENISH",
+        "project_url": "notion://PROJ-REPLENISH"
+      },
+      "target_section": "this_weeks_attention",
+      "operation": "replace",
+      "before_excerpt": "- [x] **P1 · Complete** — Start the Penang pilot.",
+      "proposed_markdown": "- [ ] **P0 · Blocked · due 2026-08-26** — Publish the normalised variance comparison.\n  **Owner:** Aisha Rahman · **Why now:** expansion cannot be decided from raw supplier feeds.\n  **Evidence:** [Task TASK-201](notion://TASK-201) (`SRC-WORK-201`)\n- [ ] **P1 · Active · due 2026-08-27** — Upload the five-store count sample.\n  **Owner:** Darren Lim · **Why now:** it is the review condition for the rollout decision.\n  **Evidence:** [Task TASK-202](notion://TASK-202) (`SRC-WORK-202`)",
+      "source_ids": ["SRC-WORK-201", "SRC-WORK-202", "SRC-MEETING-041"],
+      "attention_reset": {"requested": true, "week": "2026-W35", "reason": "The approved 2026-W35 planning window replaces completed prior-week attention.", "source_id": "SRC-PROJECT-REPLENISH"},
+      "gaps": [],
+      "idempotency_key": "project-memory:2026-08-24:PROJ-REPLENISH:this_weeks_attention:2026-W35"
+    }
+  ],
+  "no_change_project_ids": [],
+  "source_gaps": [],
+  "integration_handoff": {
+    "owner": "apply-project-diffs",
+    "application_state": "proposal-only",
+    "receipt_required_before_applied_claim": true
+  }
+}

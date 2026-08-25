@@ -1,0 +1,60 @@
+---
+template_id: kamdar-area-operating-rollup
+template_version: "0.5.0"
+name: "{{AREA_NAME}} — Week of {{WEEK_START}}"
+report_type: "Area"
+area: "{{AREA_NAME}}"
+week_start: "{{WEEK_START}}"
+report_status: "{{REPORT_STATUS}}"
+report_version: "{{REPORT_VERSION}}"
+finalized_at: "{{FINALIZED_AT}}"
+previous_report: "{{PREVIOUS_REPORT}}"
+source_report_ids: "{{PROJECT_REPORTS}}"
+---
+
+# {{AREA_NAME}} — Week of {{WEEK_START}}
+
+## Summary
+
+<!-- Exactly three evidence-backed sentences: material change across Projects,
+highest-leverage attention, and next Area priority. -->
+
+{{SUMMARY}}
+
+## Outcomes and open attention
+
+| Project | Current result | Open attention | Next owner action | Source report |
+| --- | --- | --- | --- | --- |
+{{PROJECT_RESULT_ROWS}}
+
+## Problems and inefficiencies
+
+<!-- Group only problems whose evidence crosses Projects or is material to the
+Area. Each row has a bounded first test, never a generic AI wish.
+
+GOLDEN EXAMPLE — replace every fact below; it demonstrates useful detail.
+| Store-count evidence is absent in two inventory Projects | Penang Replenishment, Allocation Rules | [Project reports](report://W34) both identify the same missing count source | Produce one exception brief that links the two source reports and names the evidence owner | Trial at the next department review; success = the lead assigns one owner and date without reopening raw Work. |
+END GOLDEN EXAMPLE -->
+
+| Problem | Projects | Evidence and recurrence | Narrow intervention | First test and success signal |
+| --- | --- | --- | --- | --- |
+{{PROBLEM_OPPORTUNITY_ROWS}}
+
+## Decisions
+
+{{DECISIONS_VIEW_OR_LIST}}
+
+## SOPs
+
+{{SOPS_VIEW_OR_LIST}}
+
+## Next-week priorities
+
+{{NEXT_WEEK_HANDOFF}}
+
+## Automation receipt
+
+- `evidence_window:` {{START_TIMESTAMP}}..{{END_TIMESTAMP}}
+- `project_reports:` {{Canonical Project report locators}}
+- `source_gaps:` {{Missing Project reports or source evidence, or none}}
+- `previous_area_report:` {{Report locator or none}}

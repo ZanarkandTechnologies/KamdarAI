@@ -1,0 +1,83 @@
+{
+  "skill_name": "daily-project-memory",
+  "artifact_contract": "kamdar-project-diff-plan@0.1.0",
+  "evals": [
+    {
+      "id": "daily_project_memory_normal_01",
+      "kind": "normal",
+      "prompt": "Use the supplied Daily context diff to write the Project diff plan at the requested output path.",
+      "files": [
+        "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "examples/golden/project-diff-plan.json",
+        "templates/project-diff-plan.json",
+        "../../templates/project.md"
+      ],
+      "expected_output": "One valid proposal-only plan with a source-linked Project knowledge append and a weekly-attention reset for PROJ-REPLENISH.",
+      "assertions": [
+        "Cites only input source IDs and uses the embedded PROJ-REPLENISH snapshot",
+        "Appends a decision-changing normalised-comparison constraint to project_knowledge",
+        "Replaces the weekly checklist only because the context explicitly marks a reset",
+        "Makes each attention row actionable with owner, due state, why-now, and source evidence",
+        "Preserves the absent normalisation date as a gap and makes no provider/receipt claim"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Project knowledge and reset attention become minimal source-linked patches",
+          "tags": ["skill", "artifact", "daily", "project-memory"],
+          "feature_id": "FEAT-0001"
+        }
+      }
+    },
+    {
+      "id": "daily_project_memory_hard_01",
+      "kind": "hard",
+      "prompt": "A context says a Work item's suspected cause is unconfirmed and the current attention checklist already has a source-linked row for the same Work item. Produce the safe diff plan.",
+      "files": ["templates/project-diff-plan.json", "../../templates/project.md"],
+      "expected_output": "A minimal plan that does not promote the suspected cause to Project knowledge, avoids a duplicate attention item, and records the missing confirmation as a gap.",
+      "assertions": [
+        "Does not write the unconfirmed cause as a known Project fact",
+        "Uses append or named-row replace only when a material source-backed change exists",
+        "Records duplicate/uncertain evidence in gaps rather than producing conflicting patches",
+        "Does not fetch a Project or call an application integration"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Unconfirmed and duplicate evidence cannot overwrite Project truth",
+          "tags": ["skill", "hard", "evidence-boundary"],
+          "feature_id": "FEAT-0001"
+        }
+      }
+    },
+    {
+      "id": "daily_project_memory_boundary_01",
+      "kind": "boundary",
+      "prompt": "Changed Work evidence names a Project ID, but the context diff contains no Project snapshot or Project source ID. Produce the appropriate result.",
+      "files": ["templates/project-diff-plan.json"],
+      "expected_output": "Returns configuration_gap: missing_project_snapshot with no patch plan, provider read, or invented Project body.",
+      "assertions": [
+        "Names the missing embedded Project snapshot and preserves the Work source ID",
+        "Creates no Project patch or child memory file",
+        "Does not compensate with a provider read or guessed Project content",
+        "Does not claim application or a provider receipt"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Missing Project snapshots stop safe Project-memory proposal",
+          "tags": ["skill", "boundary", "configuration-gap"],
+          "feature_id": "FEAT-0001"
+        }
+      }
+    }
+  ],
+  "extensions": {
+    "calibration": {
+      "status": "draft_unrun",
+      "runner": "local artifact-skill evaluation",
+      "candidate": "daily-project-memory",
+      "baseline": "direct unstructured Daily prompt",
+      "required_artifacts": ["context-diff.json", "candidate-project-diff-plan.json", "baseline-project-diff-plan.json", "judge-verdict.json"],
+      "readiness_rule": "Run the normal case with identical context, model, and budget; fix and rerun the smallest failing eval before readiness."
+    }
+  },
+  "rerun_rule": "fix and rerun the smallest failing eval before readiness"
+}

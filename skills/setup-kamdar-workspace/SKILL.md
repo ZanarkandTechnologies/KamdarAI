@@ -18,18 +18,20 @@ not the live workspace. Runtime reports, memory, sessions, credentials, and
 caches stay under the Hermes profile and workspace.
 
 The deterministic helper manages only the reviewed workspace context,
-`automations/`, and project-owned `skills/`. It previews by default and never
-deletes target files. Connector installation and credentials are separate setup
-steps. Do not create a profile overlay or link the runtime back to this repo.
+`automations/`, `templates/`, and project-owned `skills/`. It previews by
+default and never deletes target files. Connector installation and credentials
+are separate setup steps. Do not create a profile overlay or link the runtime
+back to this repo.
 
 ## Skill Signature
 
 ```text
 setup_kamdar_workspace(workspace, profile_home, apply = false)
   -> setup_receipt + native_cwd_check
-reads: workspace.hermes.md, automations/, skills/, target state
+reads: workspace.hermes.md, automations/, templates/, skills/, target state
 does: validates separation, previews or copies allowlisted source files
-writes: workspace/.hermes.md, workspace/automations/, profile_home/skills/
+writes: workspace/.hermes.md, workspace/automations/, workspace/templates/,
+        profile_home/skills/
 returns: JSON state, changed or pending paths, deletion count, next gate
 ```
 

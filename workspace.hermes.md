@@ -1,11 +1,15 @@
 ---
 template_id: hermes-company-workspace
-template_version: "0.2.0"
+template_version: "0.3.0"
 kind: hermes-project-context
 company_name: "Kamdar AI"
 company_description: "AI transformation workspace for Kamdar, a Malaysian fabrics, furnishings, home-decor, and ready-to-wear retailer established in 1972."
 company_timezone: "Asia/Kuala_Lumpur"
-status: proposed-owner-review
+status: active
+execution_modes:
+  - frozen
+  - isolated-eval
+production_write_mode: proposal-only
 ---
 
 # Kamdar AI Workspace
@@ -16,39 +20,120 @@ Kamdar AI is the AI transformation workspace for Kamdar, a Malaysian fabrics, fu
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `notion` skill via `ntn` | [Projects](https://app.notion.com/p/b2e2f5f3d6b14d01961a2bef0696d744) · [Tasks](https://app.notion.com/p/638d85a858b04d038d8b97be1a879a1f) · [Kamdar AI](https://app.notion.com/p/Kamdar-AI-3b7d43a2394280e6ae73fcadf3c5c748) | Projects contain objectives, context, collaborators, linked tasks, resources, and status. Tasks contain name, project relation, status, People relation, dates, and description. Documentation policy: proposal-only. **Record type/template mapping: blocked**—Tasks has no `Type` property and no approved Kamdar Task/Issue/Meeting template. |
+| Notion | `kamdar-company-os` skill via `ntn` | [Grounded v4 eval workspace](https://app.notion.com/p/EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26-3c7d43a23942810caff1d937e577ae91) → [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) | These isolated databases are the active evaluation sources. Projects are canonical manager memory; Work contains the seeded Tasks and Meetings used by the Daily and Weekly automations. Fetch each selected page in full. Production Kamdar records are outside this route. |
+
+## Daily source catalog
+
+The Daily automation names these keys; it does not repeat their URLs, authority,
+or query rules. Each run records the actual source link, scope, fetch result,
+and gap in `daily-context-diff.json`.
+
+| Source key | Configured source | Default collection | Boundary |
+| --- | --- | --- | --- |
+| `notion.projects` | [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) | Active seeded Projects related to selected Work | Read the Project's `Project knowledge` and `This week's attention` sections. |
+| `notion.work_items_this_week` | [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) | Unprocessed seeded Work completed or changed from local-week start through the current local day | Fetch each selected Work page in full. |
+| `notion.embedded_meetings` | Full selected Work pages | Meeting blocks and `Meeting notes and updates` found in selected Work | This is not a second database query. |
+| `notion.people` | [People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) | Only seeded people referenced by selected Projects or Work | Use contact preferences for routing decisions; sending remains proposal-only unless a run explicitly authorizes it. |
+| `gmail.kamdar` | `kenji@znrknd.com` | Disabled unless a run explicitly enables a bounded Kamdar query | Never infer a recipient, route, or send authority from a search result. |
+| `drive.kamdar` | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Disabled unless a run explicitly enables a bounded file query | Retrieval only; no file creation or publishing. |
+
+## Isolated eval proof environment
+
+| Platform | Use via | Pages or sources | How it is structured |
+| --- | --- | --- | --- |
+| Notion | current-seed operator and `kamdar-company-os` skill via `ntn` | [Grounded seven-project seed](https://app.notion.com/p/EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26-3c7d43a23942810caff1d937e577ae91) → [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) · [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) · [Decisions](https://app.notion.com/p/6fb5b0c509414d5ca503cdd0804ecb61) · [SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) · [Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Automation artifacts](https://app.notion.com/p/4062c8a0c6804841a33f9be92561acd0) | This dated root is the active operated eval environment. It contains 30 template-complete seeded records plus receipt-backed Daily updates, three Project reports, three Department reports, and one Company report. Daily and Weekly may write only inside these databases. `frozen` remains local-only; production Kamdar sources are not active. |
 
 ## People
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `notion` skill via `ntn` | [People](https://app.notion.com/p/d2bf0d7776594a4982909e618aad8d98) | Existing personal CRM with name, email, tags, project relation, and task/appointment relation. It is a discovery source only; it is not yet an approved Kamdar internal directory. Use named owner/collaborator relations on work records where present. |
+| Notion | `kamdar-company-os` skill via `ntn` | [Eval People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) | Isolated seeded directory for evaluation. Use only stored preferred and approved contact channels; never infer a route. Contact remains proposal-only unless the run explicitly authorizes a test send. |
 
 ## Knowledge
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
 | Google Drive | profile-scoped `google-workspace` skill | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Canonical root for Kamdar files. Keep retrieval and new company files inside this folder unless explicitly approved otherwise. |
-| Notion | `notion` skill via `ntn` | [Kamdar AI project](https://app.notion.com/p/Kamdar-AI-3b7d43a2394280e6ae73fcadf3c5c748) | Project narrative, business pain points, AI initiatives, linked tasks, and linked resources. |
+| Notion | `kamdar-company-os` skill via `ntn` | [Eval Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Eval Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Eval SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) | During evaluation, Project pages hold canonical project knowledge, Reports hold the current Draft and finalized rollups, and SOPs receive promoted procedures. Do not read or write the production Kamdar root. |
+| Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. The skill resolves template ID/version here; it never relies on a profile-local copy. |
 
 ## Communications
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Gmail | profile-scoped `google-workspace` skill | `kenji@znrknd.com` | Search company communication by participant, Kamdar, project, or initiative. This is the only currently authorized send identity. |
+| Telegram eval sink | `$telegram-message` / `kamdar send` | `telegram` route alias stored on every fictional Eval Person | Operated eval messages go to the operator-owned sink, include the intended Person in the message, and are receipted as `delivered_to_eval_sink`—never as employee delivery. |
+| Email | unavailable | No configured provider | Do not prepare or claim an email send. Record `channel_unavailable` until a provider and approved recipient route exist. |
+
+## Communication channel aliases
+
+`dispatch-employee-messages` resolves a person's approved preferred channel
+through this table. It never picks a fallback channel.
+
+| Preferred channel | Channel skill | Availability and scope |
+| --- | --- | --- |
+| `telegram` | `$telegram-message` | Available only for Kenji; the skill's own recipient and gateway rules apply. |
+| `email` | `email-message` | Planned. No Kamdar-owned email sender is enabled yet. |
+| `whatsapp` | `whatsapp-message` via Baileys | Planned. It remains disabled until the Baileys integration is installed and approved. |
 
 ## Decisions
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `notion` skill via `ntn` | [Kamdar AI project](https://app.notion.com/p/Kamdar-AI-3b7d43a2394280e6ae73fcadf3c5c748) and approved related records | Use the project narrative and linked work as the current decision context. A dedicated Kamdar decision-record data source and template are not yet approved. |
+| Notion | `kamdar-company-os` skill via `ntn` | [Eval Decisions](https://app.notion.com/p/6fb5b0c509414d5ca503cdd0804ecb61) | Promote source-backed decisions from the current Weekly Draft into this isolated database. Preserve the source Work or Report link and never invent rationale. |
 
 ## Notion mention and comment policy
 
 - A Notion API mention requires a Notion `user_id`; an email address alone cannot be resolved or mentioned through the API.
 - A guest can be mentioned only after they are already a guest of the connected workspace and their Notion user ID is known.
 - Do not invite guests, create Notion users, or post comments automatically.
-- Internal comments are **proposal-only**. The daily documentation check must return `unmapped_template` until the owner maps applicable Kamdar record types to approved Notion templates.
+- Production internal comments are **proposal-only**. In an explicit
+  `isolated-eval` run, the installed template map may apply one exact comment to
+  the named Eval Work record only after its source, template, verified mention,
+  action key, and receipt checks pass. If a source or required template cannot
+  be resolved, return `unmapped_template`; never guess a recipient or fall back
+  to a production record.
+
+## Intended manager memory model
+
+The manager's reviewed target hierarchy is:
+
+```text
+canonical Projects + Work Items + People
+  -> in-place Daily Project memory and proprietary knowledge patch + linked Task proposals
+  -> Weekly Project report (canonical weekly-report template)
+  -> Area rollup (derived template)
+  -> Company rollup (derived template)
+  -> selective Decisions / Problems / SOPs promotion
+```
+
+Each Work Item memory entry preserves exact progress, blocker, documentation
+quality, next action, owner, dates, native source URLs, and any embedded Meeting
+blocks. When a plan exists it also preserves planned versus actual hours,
+schedule variance, estimated versus actual cost in MYR, the calculation basis,
+and a source-backed explanation of the problem. Unknown causes stay explicitly
+`unconfirmed`; the manager must not convert a hypothesis into a fact.
+
+A stale or overdue Work Item produces one deduplicated progress-comment proposal
+on the source record before any off-platform chase. The comment asks for the
+current state, blocker owner, root-cause evidence, revised commitment, and effort
+variance. Reports summarize and link; they do not replace canonical Project or
+Work Item records. The isolated evaluation workspace provides Projects, Work
+Items, People, Decisions, SOPs, Reports, and Automation artifacts as separate
+databases.
+
+## Template and meeting-block routing
+
+- The source template registry is KamdarAI `templates/`; the runtime copy is
+  `workspace/templates/`, installed only through `setup-kamdar-workspace`.
+- Projects use `project.md`; ordinary Work uses `task.md`; value opportunities
+  use `feature.md`; issue-like Work uses `issue.md`; embedded Meetings use
+  `meeting.md`; Decisions, Skills, and Reports use their
+  correspondingly named files.
+- A modified Task must be fetched as a complete page before Daily extraction.
+  Inspect embedded Meeting blocks and `Meeting notes and updates`; do not depend
+  on a missing database `Type` property to discover meeting evidence.
+- If the Notion representation cannot identify the block content safely, return
+  `meeting_block_parse_gap` and preserve the page URL for review.
 
 ## Operating guidance
 
@@ -56,12 +141,21 @@ Kamdar AI is the AI transformation workspace for Kamdar, a Malaysian fabrics, fu
 - Treat the Kamdar AI Drive folder as the canonical root for company files.
 - Treat `kenji@znrknd.com` as the only currently authorized Gmail read/send identity.
 - Keep Google OAuth profile-scoped under `$HERMES_HOME`; do not rely on machine-global `gws` credentials.
-- Links prove reachability, not authority. Ask before extending source scope or write authority.
+- Links prove reachability, not authority. `isolated-eval` is the sole source of
+  eval write authority and must name the dated namespace; extending production
+  scope still needs a separate owner authorization.
+- The isolated eval links above are the active Daily/Weekly sources for this
+  deployment. They grant no authority over production Kamdar records.
 
 ## Boundaries
 
 - Never store credentials, tokens, passwords, private keys, or transient connection health in the live context.
-- Confirm before email, calendar, Drive, or Notion writes, including comments, task/project changes, sharing, deletion, and record creation.
-- Do not treat the general Notion People CRM as the Kamdar internal directory without approval.
+- `frozen` performs no email, Drive, or Notion write. `isolated-eval` may apply
+  only reviewed effects inside the dated eval root with a redacted
+  receipt and idempotency proof. Production email, calendar, Drive, or Notion
+  writes remain separately authorized.
+- Do not use the general Notion People CRM; the isolated Eval People database is the only configured directory.
 - Do not infer employee abilities, work email addresses, departments, or guest/mention mappings from names alone.
-- Automations are maintained as Markdown in `automations/`; proposal-only is the current maximum authority.
+- Automations are maintained as Markdown in `automations/`; `isolated-eval` is
+  the current maximum authority for the dated eval only, while production
+  remains proposal-only and unscheduled.

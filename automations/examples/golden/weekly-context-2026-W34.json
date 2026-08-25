@@ -1,0 +1,191 @@
+{
+  "schema_version": "kamdar-weekly-context@1.0.0",
+  "artifact_type": "kamdar-weekly-context",
+  "context_id": "weekly-context-2026-W34",
+  "week": "2026-W34",
+  "collected_at": "2026-08-24T17:30:00+08:00",
+  "runtime_input_policy": {
+    "work_items_loaded": false,
+    "meetings_loaded": false,
+    "source": "Project Draft reports only"
+  },
+  "projects": [
+    {
+      "id": "PROJ-CMT-CMT_PIPELINE",
+      "name": "CMT Pipeline",
+      "area": "CMT",
+      "this_weeks_attention": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]"
+    },
+    {
+      "id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "name": "Deepavali Marketing",
+      "area": "Marketing",
+      "this_weeks_attention": "Complete channel-ready asset folders."
+    },
+    {
+      "id": "PROJ-ECOM-ECOM_FIXES",
+      "name": "Ecom Fixes",
+      "area": "Ecommerce",
+      "this_weeks_attention": "Verify order confirmation and apply listing handoff."
+    }
+  ],
+  "reports": [
+    {
+      "id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "report_level": "Project",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "area": "CMT",
+      "status": "Final",
+      "version": 2,
+      "finalized_at": "2026-08-17T09:00:00+08:00",
+      "previous_report_id": null,
+      "source_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W33"
+      ],
+      "content": {
+        "summary": "First sample entered review.",
+        "outcomes_and_open_attention": [
+          "Sample review"
+        ],
+        "problems_and_inefficiencies": [
+          "Split handoff"
+        ],
+        "decisions": [
+          "Use signed sample"
+        ],
+        "sops": [
+          "None"
+        ],
+        "next_week_priorities": [
+          "Approve checks"
+        ]
+      }
+    },
+    {
+      "id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "area": "CMT",
+      "status": "Draft",
+      "version": 3,
+      "finalized_at": null,
+      "previous_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "source_ids": [
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "content": {
+        "summary": "Checks approved; pack blocked.",
+        "outcomes_and_open_attention": [
+          "Sample approved"
+        ],
+        "problems_and_inefficiencies": [
+          "PROMOTE split handoff [TASK-101]"
+        ],
+        "decisions": [
+          "PROMOTE baseline [TASK-110]"
+        ],
+        "sops": [
+          "None"
+        ],
+        "next_week_priorities": [
+          "Approve pack"
+        ]
+      }
+    },
+    {
+      "id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "area": "Marketing",
+      "status": "Draft",
+      "version": 1,
+      "finalized_at": null,
+      "previous_report_id": null,
+      "source_ids": [
+        "TASK-201"
+      ],
+      "content": {
+        "summary": "Themes approved; folders open.",
+        "outcomes_and_open_attention": [
+          "Calendar approved"
+        ],
+        "problems_and_inefficiencies": [
+          "PROJECT_ONLY separate handoff [TASK-201]"
+        ],
+        "decisions": [
+          "Themes approved [TASK-201]"
+        ],
+        "sops": [
+          "PROJECT_ONLY asset folder [TASK-201]"
+        ],
+        "next_week_priorities": [
+          "Complete folders"
+        ]
+      }
+    },
+    {
+      "id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "area": "Ecommerce",
+      "status": "Draft",
+      "version": 1,
+      "finalized_at": null,
+      "previous_report_id": null,
+      "source_ids": [
+        "TASK-102",
+        "TASK-114",
+        "TASK-203"
+      ],
+      "content": {
+        "summary": "Verified fixes plus confirmation gap.",
+        "outcomes_and_open_attention": [
+          "Page checks pass"
+        ],
+        "problems_and_inefficiencies": [
+          "MONITOR missing cause [TASK-102]"
+        ],
+        "decisions": [
+          "Reopen confirmation [TASK-102]"
+        ],
+        "sops": [
+          "PROMOTE listing handoff [TASK-203]"
+        ],
+        "next_week_priorities": [
+          "Verify confirmation"
+        ]
+      }
+    }
+  ],
+  "draft_candidate_refs": [
+    {
+      "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "source_ids": [
+        "TASK-101",
+        "TASK-110"
+      ]
+    },
+    {
+      "source_report_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "source_ids": [
+        "TASK-201"
+      ]
+    },
+    {
+      "source_report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "source_ids": [
+        "TASK-102",
+        "TASK-203"
+      ]
+    }
+  ],
+  "expected_areas": [
+    "CMT",
+    "Marketing",
+    "Ecommerce"
+  ],
+  "source_gaps": []
+}

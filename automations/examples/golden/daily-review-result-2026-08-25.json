@@ -1,0 +1,107 @@
+{
+  "schema_version": "kamdar-daily-review-result@1.0.0",
+  "context_id": "daily-context-2026-08-25",
+  "project_updates": [
+    {
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "source_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "section_replacements": [
+        {
+          "section": "Overview",
+          "expected_current_text": "**Goal:** Move approved seasonal styles from sample review into CMT production with complete construction instructions.\n\nThe first sample checks are complete, but the production tech pack is still awaiting approval and the reserved line cannot be confirmed.",
+          "replacement_text": "**Goal:** Move approved seasonal styles from sample review into CMT production with complete construction instructions.\n\nThe first baju kurung sample passed measurement, seam, and colour checks, and production capacity is held through 27 August. Main blocker: the consolidated tech pack is not approved and the collar correction remains open, so the line cannot be booked. [TASK-101] [TASK-104] [TASK-105] [TASK-110]"
+        },
+        {
+          "section": "Project knowledge",
+          "expected_current_text": "- **Current context:** Sample review is underway for the seasonal baju kurung run.\n- **Blocker:** The approved production tech pack is not yet linked.",
+          "replacement_text": "### Current operating knowledge\n- **Sample result:** The first baju kurung sample passed measurement, seam, and colour checks; its signed measurement sheet is the construction baseline. [TASK-105]\n- **Production constraint:** Capacity is held only through 2026-08-27 and cannot be booked without the approved tech pack. [TASK-110]\n- **Decision:** Consolidate measurement, stitching, trim, and colour instructions into one versioned pack before production booking. [TASK-110]\n- **Blocker:** Aisha must approve the pack and Nur must close the collar correction. [TASK-101] [TASK-104]"
+        },
+        {
+          "section": "This week's attention",
+          "expected_current_text": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]",
+          "replacement_text": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20. [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21; held through 2026-08-27. [TASK-110]\n- [ ] **P0 · Blocked · overdue** — Approve the consolidated production tech pack. **Owner:** Aisha · **Due:** 2026-08-22 · **Why now:** the line cannot be booked without one approved construction source. [TASK-101]\n- [ ] **P0 · At risk** — Close the collar correction. **Owner:** Nur · **Due:** 2026-08-23 · **Why now:** the corrected sample must match the signed baseline. [TASK-104]\n- [ ] **P1 · Follow-up** — Confirm the production line and fabric handoff. **Owner:** Aisha · **Due:** before 2026-08-27. [TASK-110]"
+        }
+      ],
+      "change_summary": "Reconcile approved sample and capacity checks, retain the tech-pack and collar-correction blockers, and expose the expiring production hold."
+    }
+  ],
+  "completed_ticket_comments": [
+    {
+      "work_item_id": "TASK-115",
+      "owner_person_id": "PERSON-JUN",
+      "source_ids": [
+        "TASK-115"
+      ],
+      "comment_text": "I understand that the Weekly Meta Ads update reports stronger Deepavali performance and recommends retaining the current creative.\n\nWhat is still missing: spend, attributed revenue, attribution window, comparison period, source report, and the reason this creative was retained.\n\nPlease add this under Notes > Measurement and Notes > Decision:\n1. What spend and attributed revenue produced the result?\n2. Which attribution window and comparison period were used?\n3. Which Ads Manager report contains the source figures?\n4. Why was this creative retained over the alternatives?\n\nWhy this matters: the update cannot support budget or creative decisions without an auditable measurement basis."
+    }
+  ],
+  "weekly_progress_chases": [
+    {
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "owner_person_id": "PERSON-AISHA",
+      "related_work_item_ids": [
+        "TASK-101"
+      ],
+      "source_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101"
+      ],
+      "message_text": "Aisha, the CMT Pipeline target \"Approve the consolidated production tech pack\" was due 2026-08-22.\n\nCurrent evidence: TASK-101 remains blocked, the approved pack is absent, and production capacity is held only through 27 August. The line cannot be booked while construction instructions remain split.\n\nPlease reply with:\n1. What is blocking approval?\n2. Which construction sections remain unresolved?\n3. What is the recovery step and revised commitment date?\n4. Can the line hold still be protected?\n\nUpdate the linked Work item here: TASK-101."
+    }
+  ],
+  "knowledge_updates": [
+    {
+      "work_item_id": "TASK-201",
+      "source_ids": [
+        "TASK-201"
+      ],
+      "draft_entries": [
+        {
+          "kind": "problem",
+          "anchor": "Problems and inefficiencies",
+          "markdown": "- Deepavali photography, offer copy, and branch-size exports were handed off separately. Three asset batches required correction and branch preparation time fell by two days; no grounded monetary cost was supplied. [TASK-201]"
+        },
+        {
+          "kind": "decision",
+          "anchor": "Decisions",
+          "markdown": "- Feature coordinated family apparel, festive fabrics, and home-furnishing offers; the Marketing Lead approved the selection on 2026-08-21 to cover branch and online themes. Review after seven campaign days. [TASK-201]"
+        },
+        {
+          "kind": "sop",
+          "anchor": "SOPs",
+          "markdown": "- For each campaign asset batch, publish one folder containing approved product IDs, final photography, offer copy, channel dimensions, and branch variants. Marketing checks it before scheduling. The method corrected three batches this week. [TASK-201]"
+        }
+      ],
+      "missing_information_comment": null
+    },
+    {
+      "work_item_id": "TASK-203",
+      "source_ids": [
+        "TASK-203"
+      ],
+      "draft_entries": [
+        {
+          "kind": "sop",
+          "anchor": "SOPs",
+          "markdown": "- Before publishing a listing, verify sample approval, front/back/detail photography, copy, dimensions, fabric composition, care, price, stock allocation, and category placement in one handoff. The Ecommerce Lead approved this after two listing batches reused it. [TASK-203]"
+        }
+      ],
+      "missing_information_comment": null
+    },
+    {
+      "work_item_id": "TASK-102",
+      "source_ids": [
+        "TASK-102"
+      ],
+      "draft_entries": [],
+      "missing_information_comment": "I understand that the missing order-confirmation defect was marked complete.\n\nWhat is still missing: the root cause, affected order cases, customer impact, and end-to-end verification.\n\nPlease add this under Diagnosis and Resolution and verification:\n1. What caused confirmations to be omitted?\n2. Which orders or customer journeys were affected?\n3. What changed, and who verified checkout through confirmation delivery?\n\nWhy this matters: without cause, impact, and verification, the fix cannot support recurrence monitoring."
+    }
+  ],
+  "run_notes": "TASK-203 has no current Listing Pipeline Weekly Draft relation, so its SOP remains unapplied. TASK-102 needs source verification before knowledge extraction."
+}

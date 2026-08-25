@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 SURFACES = ("Work", "People", "Knowledge", "Communications", "Decisions")
 TABLE_HEADER = "| Platform | Use via | Pages or sources | How it is structured |"
+EVAL_PROOF_SURFACE = "Isolated eval proof environment"
 
 
 def main() -> int:
@@ -30,7 +31,12 @@ def main() -> int:
     for surface in SURFACES:
         if content.count(f"## {surface}\n") != 1:
             errors.append(f"surface_invalid:{surface}")
-    if content.count(TABLE_HEADER) != len(SURFACES):
+    # The five production surfaces each own one integration table.  The v4
+    # eval workspace is deliberately documented in a sixth, isolated table so
+    # receipt-backed links never get mistaken for production routing.
+    if content.count(f"## {EVAL_PROOF_SURFACE}\n") != 1:
+        errors.append("eval_proof_surface_invalid")
+    if content.count(TABLE_HEADER) != len(SURFACES) + 1:
         errors.append("surface_table_count_invalid")
     forbidden = ("NOTION_API_KEY=", "GOOGLE_CLIENT_SECRET=", "refresh_token", "BEGIN PRIVATE KEY")
     if any(item in content for item in forbidden):

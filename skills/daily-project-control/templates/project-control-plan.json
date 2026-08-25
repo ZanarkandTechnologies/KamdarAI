@@ -1,0 +1,28 @@
+{
+  "artifact_type": "kamdar-project-control-plan",
+  "artifact_version": "0.2.0",
+  "state": "{{proposal_only | no_finding | configuration_gap | conflict}}",
+  "generated_at": "{{ISO_8601_TIMESTAMP}}",
+  "local_day": "{{YYYY-MM-DD}}",
+  "source_context": {
+    "path": "{{CONTEXT_DIFF_PATH}}",
+    "collector_run_id": "{{COLLECTOR_RUN_ID}}",
+    "evidence_window": "{{EVIDENCE_WINDOW}}",
+    "source_ids": [],
+    "source_gaps": []
+  },
+  "control_findings": [],
+  "weekly_draft_update": {
+    "path": "{{CURRENT_WEEKLY_DRAFT_PATH}}",
+    "state": "{{applied | duplicate | conflict | no_finding | configuration_gap}}",
+    "owned_anchors": ["PM attention", "Problems and inefficiencies"],
+    "source_keys": [],
+    "conflicts": []
+  },
+  "message_proposals": [],
+  "unresolved_facts": [],
+  "provider_effects": {
+    "performed": false,
+    "reason": "The local Weekly Draft update is part of this pipeline; only the channel dispatcher and selected channel skill own sends and receipts."
+  }
+}

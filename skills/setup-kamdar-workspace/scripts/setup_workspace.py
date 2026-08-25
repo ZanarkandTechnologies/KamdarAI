@@ -60,6 +60,7 @@ def source_files() -> list[tuple[Path, str, Path]]:
     files: list[tuple[Path, str, Path]] = [(CONFIG, "workspace", Path(".hermes.md"))]
     for owner, source_root, destination_root in (
         ("workspace", PROJECT / "automations", Path("automations")),
+        ("workspace", PROJECT / "templates", Path("templates")),
         ("profile", PROJECT / "skills", Path("skills")),
     ):
         for source in sorted(source_root.rglob("*")):

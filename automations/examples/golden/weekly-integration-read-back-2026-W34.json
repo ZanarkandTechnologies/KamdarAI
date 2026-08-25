@@ -1,0 +1,274 @@
+{
+  "schema_version": "kamdar-weekly-integration-read-back@1.0.0",
+  "receipt_id": "WEEKLY-INTEGRATION-2026-W34-V4",
+  "weekly_result_sha256": "9d64471b003e80a7b74a60cf49249ea10317d500b5f60c114410167af1f24e65",
+  "checked_at": "2026-08-24T18:16:00+08:00",
+  "live_provider_calls": false,
+  "observations": [
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/0",
+      "target_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "observed_payload": {
+        "report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "report_level": "Project",
+        "project_id": "PROJ-CMT-CMT_PIPELINE",
+        "area": "CMT",
+        "report_version": 4,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+        ],
+        "report_markdown_sha256": "823f86bf906b01279543dda70d6b5aaf7ef700e087b881788a31fbb095bc0bf6",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "e8449e200951ba52a40c2b2faf6a88a906f325e6d0c0e1dc0f8657f2e851dd11",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/1",
+      "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "observed_payload": {
+        "report_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+        "report_level": "Project",
+        "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+        "area": "Marketing",
+        "report_version": 2,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+        ],
+        "report_markdown_sha256": "4fc0df26abc0fcfb87eb67e4d38bad76372ca2f3ba99ccbd577900822b2dce2a",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "0b2b64e38d63c108cb479bdeed87f83a24cf54fce9cc5c2f8210aefe82d9a6f6",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/2",
+      "target_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "observed_payload": {
+        "report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+        "report_level": "Project",
+        "project_id": "PROJ-ECOM-ECOM_FIXES",
+        "area": "Ecommerce",
+        "report_version": 2,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+        ],
+        "report_markdown_sha256": "b1cec0bd249795b5522de4c1d01ab65129b548ae2af4f2058b1312d62f99bce5",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "29a96c71abcfb967a2dcb56f6aa723dd667ca01b188cefa9ca8234cbeede8d19",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/3",
+      "target_id": "RPT-AREA-CMT-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-CMT-W34",
+      "observed_payload": {
+        "report_id": "RPT-AREA-CMT-W34",
+        "report_level": "Area",
+        "project_id": null,
+        "area": "CMT",
+        "report_version": 1,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+        ],
+        "report_markdown_sha256": "109348aa58567c3697ca21379d597b94fcdad016bb41e109192ca42a279a7116",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "cde095f692a73d4d279fb825496a0403bdbf7b99cd55459574e1f4d74e7a2a1d",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/4",
+      "target_id": "RPT-AREA-MARKETING-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-MARKETING-W34",
+      "observed_payload": {
+        "report_id": "RPT-AREA-MARKETING-W34",
+        "report_level": "Area",
+        "project_id": null,
+        "area": "Marketing",
+        "report_version": 1,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+        ],
+        "report_markdown_sha256": "13c102599f8bdd8f0f2d0e6c372a35e2700ea9fbe8c71f8c688b966b4b9aa088",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "be230fbc894c14da91f1fbbd201e4123946aa76eef4ecb36a9cbcb2c5a6c05bb",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/5",
+      "target_id": "RPT-AREA-ECOMMERCE-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-ECOMMERCE-W34",
+      "observed_payload": {
+        "report_id": "RPT-AREA-ECOMMERCE-W34",
+        "report_level": "Area",
+        "project_id": null,
+        "area": "Ecommerce",
+        "report_version": 1,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:05:00+08:00",
+        "source_report_ids": [
+          "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+        ],
+        "report_markdown_sha256": "87dfc8c0f1b08ae8599c062f993ee226c7a62a5fe489a87f7e2aa7bbbfb24486",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "6e0a87f327930b60b9b46978dc07ccd04f95223dac7860218d3e838378798b84",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/6",
+      "target_id": "RPT-COMPANY-W34",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-COMPANY-W34",
+      "observed_payload": {
+        "report_id": "RPT-COMPANY-W34",
+        "report_level": "Company",
+        "project_id": null,
+        "area": null,
+        "report_version": 1,
+        "report_status": "Final",
+        "finalized_at": "2026-08-24T18:08:00+08:00",
+        "source_report_ids": [
+          "RPT-AREA-CMT-W34",
+          "RPT-AREA-MARKETING-W34",
+          "RPT-AREA-ECOMMERCE-W34"
+        ],
+        "report_markdown_sha256": "05373015f7c02226d41087480e3348839ed561630ee0a92704bb1cb016794578",
+        "configuration_gaps": []
+      },
+      "observed_sha256": "14d8597b395679cbe54cb7f52a72506fbc7163e6ff57e2bd2e3ab91b5ff790d6",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/0",
+      "target_id": "ISSUE-CMT-TECH-PACK-01",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/ISSUE-CMT-TECH-PACK-01",
+      "observed_payload": {
+        "candidate_id": "TASK-101",
+        "kind": "problem",
+        "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "source_ids": [
+          "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+          "TASK-101"
+        ],
+        "disposition": "promoted",
+        "reason": "Production-blocking handoff has owner, impact, and proof path.",
+        "destination_id": "ISSUE-CMT-TECH-PACK-01",
+        "rendered_markdown": "---\ntemplate_id: kamdar-issue\ntemplate_version: \"0.3.0\"\nname: \"CMT production handoff lacks one approved source\"\nwork_item_id: \"ISSUE-CMT-TECH-PACK-01\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\nowner: \"PERSON-AISHA\"\ntype: \"Issue\"\nstatus: \"Blocked\"\npriority: \"High\"\nstart_date: \"2026-08-18\"\ndue_date: \"2026-08-27\"\nprogress: \"Line 3 cannot be booked until one signed baju kurung construction pack replaces the split fitting notes.\"\nlast_meaningful_update: \"2026-08-21\"\nseverity: \"High\"\ndetected_at: \"2026-08-18\"\nnext_review: \"2026-08-27\"\n---\n\n# CMT production handoff lacks one approved source\n\n## Problem and impact\n\n- The issued baju kurung pack and fitting notes disagree on the collar tolerance.\n- TASK-101 has no signed approver, so the sample room cannot treat either value as final.\n- Line 3 capacity for 1,200 pieces is held only through 27 August; continued delay risks losing that slot.\n\n## Evidence and reproduction\n\n1. Open TASK-101 and compare the issued measurement table with the 18 August fitting note.\n2. Confirm the collar value differs by 1.5 cm and the proposed correction has no signature.\n3. Cross-check TASK-104, TASK-105, and TASK-110 for the pending correction, approved baseline, and capacity hold.\n\n## Diagnosis\n\nThe fitting change was recorded beside the physical sample but never transferred to the canonical construction pack. Separate files and no named approval step allowed the handoff to be marked ready before the source was complete. Confidence is high; a signed corrected page would confirm the diagnosis.\n\n## Containment and next action\n\n- Keep bulk cutting blocked.\n- Aisha consolidates the measurement, stitching, trim, and colour instructions and signs the approved version by 27 August.\n- Nur rechecks the corrected collar against the signed baseline before the line is booked.\n\n## Resolution and verification\n\nResolve only when one versioned pack contains the approved collar tolerance, approver, affected sizes, corrected sample evidence, and production handoff. Verify that the sample room can book Line 3 using that page without searching chat or separate fitting notes.\n\n## Related records\n\n- Project: PROJ-CMT-CMT_PIPELINE\n- Work: TASK-101, TASK-104, TASK-105, TASK-110\n- Report: RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "gaps": []
+      },
+      "observed_sha256": "e2acfffc4e8bb86fc0677a523995eb0f700d5caccbd9920cfd39bda9b3f77e0b",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/1",
+      "target_id": "DECISION-CMT-SAMPLE-BASELINE-01",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/DECISION-CMT-SAMPLE-BASELINE-01",
+      "observed_payload": {
+        "candidate_id": "TASK-110",
+        "kind": "decision",
+        "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "source_ids": [
+          "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+          "TASK-110"
+        ],
+        "disposition": "promoted",
+        "reason": "CMT Lead approved the baseline with review trigger.",
+        "destination_id": "DECISION-CMT-SAMPLE-BASELINE-01",
+        "rendered_markdown": "---\ntemplate_id: company-os-decision\ntemplate_version: \"0.5.0\"\nname: \"Use the signed sample as construction baseline\"\ndecision_id: \"DECISION-CMT-SAMPLE-BASELINE-01\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\nproposer: \"PERSON-AISHA\"\napprover: \"CMT Lead\"\nstatus: \"Approved\"\ndecided_at: \"2026-08-21\"\nreview_date: \"2026-08-29\"\n---\n\n# Use the signed sample as construction baseline\n\n## Context\n\nThe first pre-production baju kurung sample passed fabric, colour, seam, trim, and measurement checks in TASK-105. Production still needs one baseline because the issued pack and later fitting notes disagree on the collar tolerance.\n\n## Options and tradeoffs\n\n- **Use the signed first-sample sheet:** traceable and already checked, but the collar correction must be incorporated before bulk cutting.\n- **Use the latest fitting note:** faster, but it has no approver and would weaken change control.\n- **Pause and rebuild every specification:** highest certainty, but would forfeit the current Line 3 hold.\n\n## Decision rationale\n\nUse the signed first-sample measurement sheet as the construction baseline. Aisha owns the consolidated pack; Nur may change a measurement only through a signed correction linked to the affected sizes. This preserves the verified sample while closing the known exception.\n\n## Consequences and review trigger\n\nLine 3 may be booked only after the corrected collar is approved in the same versioned pack. Reopen this decision if the corrected sample changes another approved measurement or the first production batch fails the same construction check. Review after that batch on 29 August.\n\n## Evidence and related records\n\n- TASK-105: signed pre-production sample check\n- TASK-101: missing pack approval\n- TASK-104: collar correction and recheck\n- TASK-110: capacity hold\n- RPT-PROJ-CMT-CMT_PIPELINE-W34: weekly disposition",
+        "gaps": []
+      },
+      "observed_sha256": "4dc2ed71ec4956fd264110f454e37733c619206701a9ea7f5f9a0673662bdec5",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/3",
+      "target_id": "SOP-ECOM-LISTING-HANDOFF-01",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/SOP-ECOM-LISTING-HANDOFF-01",
+      "observed_payload": {
+        "candidate_id": "TASK-203",
+        "kind": "sop",
+        "source_report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+        "source_ids": [
+          "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+          "TASK-203"
+        ],
+        "disposition": "promoted",
+        "reason": "Approved and reused across two listing batches.",
+        "destination_id": "SOP-ECOM-LISTING-HANDOFF-01",
+        "rendered_markdown": "---\ntemplate_id: company-os-skill\ntemplate_version: \"0.4.0\"\nname: \"Prepare a publish-ready product listing handoff\"\nskill_id: \"SOP-ECOM-LISTING-HANDOFF-01\"\nproject: \"PROJ-ECOM-ECOM_FIXES\"\ndepartment: \"Ecommerce\"\nowner: \"PERSON-DARREN\"\nstatus: \"Approved\"\nsource_path: \"notion://TASK-203\"\nlatest_eval: \"two listing batches\"\nlast_reviewed: \"2026-08-21\"\n---\n\n# Prepare a publish-ready product listing handoff\n\n## Capability\n\n**Trigger:** A merchandising batch has an approved physical sample and is ready for Ecommerce publication.\n\n**Input → output:** Approved sample, product facts, images, price, and stock → one receiver-acknowledged listing handoff with every required field.\n\n**Value:** Ecommerce can publish without reconstructing product facts across chat, spreadsheets, and image folders.\n\n## Proven use\n\nThe checklist was used for two listing batches. In the second batch it caught missing fabric composition and mobile image crops before publication; both were corrected in the handoff instead of after the pages went live. Darren approved the method in TASK-203.\n\n## Boundaries and dependencies\n\n- Requires an approved sample and final commercial terms; it does not approve product, price, or stock.\n- Confirm product ID, title, category, dimensions, composition, care, price, stock, photography, alt text, and mobile crop.\n- The receiver must acknowledge that files open and required fields are usable.\n- Reopen the handoff if a catalog sync removes a required value; sample ten pages after the next sync.\n\n## Source and proof\n\n- TASK-203: listing handoff review and two-batch reuse evidence\n- RPT-PROJ-ECOM-ECOM_FIXES-W34: weekly promotion decision\n- Owner: Darren Lim (Ecommerce Lead)",
+        "gaps": []
+      },
+      "observed_sha256": "5a11a4acd2ce6524096a2c2de2173935878b54c56c67b36db1bb0c64a376813f",
+      "matched": true,
+      "created": true
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "result_pointer": "/next_week_project_replacements/0",
+      "target_id": "PROJ-CMT-CMT_PIPELINE",
+      "provider_id_or_url": "https://notion.example.test/next_week_project_replacements/PROJ-CMT-CMT_PIPELINE",
+      "observed_payload": {
+        "project_id": "PROJ-CMT-CMT_PIPELINE",
+        "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "section": "This week's attention",
+        "expected_current_text": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]",
+        "replacement_text": "- [ ] **P0 · due 2026-08-27** — Approve consolidated tech pack. **Owner:** Aisha. **Evidence:** TASK-101\n- [ ] **P0 · due 2026-08-27** — Approve collar correction. **Owner:** Nur. **Evidence:** TASK-104\n- [ ] **P1 · after both gates** — Confirm line and fabric handoff. **Owner:** Aisha. **Evidence:** TASK-110",
+        "source_ids": [
+          "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+          "TASK-101",
+          "TASK-104",
+          "TASK-110"
+        ]
+      },
+      "observed_sha256": "137105d85923ba9e246aa8373ef3fe06babb8d41a454ee7412dfcedcd524fc43",
+      "matched": true,
+      "created": true
+    }
+  ],
+  "source_invariants": [
+    {
+      "id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "observed_sha256": "3567d175128beb59aa1af0430d4423e76b171bf97ad5e9f7c50833677867f16b",
+      "changed": false
+    }
+  ],
+  "rerun": {
+    "idempotent": true,
+    "duplicate_effects_created": 0
+  }
+}

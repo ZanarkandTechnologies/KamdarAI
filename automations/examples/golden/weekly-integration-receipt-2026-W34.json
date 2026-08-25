@@ -1,0 +1,140 @@
+{
+  "schema_version": "kamdar-weekly-integration-receipt@1.0.0",
+  "receipt_id": "WEEKLY-INTEGRATION-2026-W34-V4",
+  "context_id": "weekly-context-2026-W34",
+  "weekly_result_sha256": "9d64471b003e80a7b74a60cf49249ea10317d500b5f60c114410167af1f24e65",
+  "recorded_at": "2026-08-24T18:15:00+08:00",
+  "live_provider_calls": false,
+  "effects": [
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/0",
+      "operation": "finalize_project_report",
+      "target_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "action_key": "weekly:v4:report_results:RPT-PROJ-CMT-CMT_PIPELINE-W34:0",
+      "payload_sha256": "e8449e200951ba52a40c2b2faf6a88a906f325e6d0c0e1dc0f8657f2e851dd11",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-CMT-CMT_PIPELINE-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/1",
+      "operation": "finalize_project_report",
+      "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "action_key": "weekly:v4:report_results:RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34:1",
+      "payload_sha256": "0b2b64e38d63c108cb479bdeed87f83a24cf54fce9cc5c2f8210aefe82d9a6f6",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/2",
+      "operation": "finalize_project_report",
+      "target_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "action_key": "weekly:v4:report_results:RPT-PROJ-ECOM-ECOM_FIXES-W34:2",
+      "payload_sha256": "29a96c71abcfb967a2dcb56f6aa723dd667ca01b188cefa9ca8234cbeede8d19",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-ECOM-ECOM_FIXES-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/3",
+      "operation": "upsert_area_report",
+      "target_id": "RPT-AREA-CMT-W34",
+      "action_key": "weekly:v4:report_results:RPT-AREA-CMT-W34:3",
+      "payload_sha256": "cde095f692a73d4d279fb825496a0403bdbf7b99cd55459574e1f4d74e7a2a1d",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-CMT-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/4",
+      "operation": "upsert_area_report",
+      "target_id": "RPT-AREA-MARKETING-W34",
+      "action_key": "weekly:v4:report_results:RPT-AREA-MARKETING-W34:4",
+      "payload_sha256": "be230fbc894c14da91f1fbbd201e4123946aa76eef4ecb36a9cbcb2c5a6c05bb",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-MARKETING-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/5",
+      "operation": "upsert_area_report",
+      "target_id": "RPT-AREA-ECOMMERCE-W34",
+      "action_key": "weekly:v4:report_results:RPT-AREA-ECOMMERCE-W34:5",
+      "payload_sha256": "6e0a87f327930b60b9b46978dc07ccd04f95223dac7860218d3e838378798b84",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-ECOMMERCE-W34"
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "result_pointer": "/report_results/6",
+      "operation": "upsert_company_report",
+      "target_id": "RPT-COMPANY-W34",
+      "action_key": "weekly:v4:report_results:RPT-COMPANY-W34:6",
+      "payload_sha256": "14d8597b395679cbe54cb7f52a72506fbc7163e6ff57e2bd2e3ab91b5ff790d6",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/report_results/RPT-COMPANY-W34"
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/0",
+      "operation": "upsert_problem",
+      "target_id": "ISSUE-CMT-TECH-PACK-01",
+      "action_key": "weekly:v4:promotion_dispositions:ISSUE-CMT-TECH-PACK-01:0",
+      "payload_sha256": "e2acfffc4e8bb86fc0677a523995eb0f700d5caccbd9920cfd39bda9b3f77e0b",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/ISSUE-CMT-TECH-PACK-01"
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/1",
+      "operation": "upsert_decision",
+      "target_id": "DECISION-CMT-SAMPLE-BASELINE-01",
+      "action_key": "weekly:v4:promotion_dispositions:DECISION-CMT-SAMPLE-BASELINE-01:1",
+      "payload_sha256": "4dc2ed71ec4956fd264110f454e37733c619206701a9ea7f5f9a0673662bdec5",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/DECISION-CMT-SAMPLE-BASELINE-01"
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/2",
+      "operation": "record_disposition",
+      "target_id": "TASK-201",
+      "action_key": "weekly:v4:promotion_dispositions:TASK-201:2",
+      "payload_sha256": "79b4d245ccaaabf9a5fa01aecd4f066d2769c09c77727065c27a57d2a3053b72",
+      "outcome": "project_only",
+      "provider_id_or_url": null
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/3",
+      "operation": "upsert_sop",
+      "target_id": "SOP-ECOM-LISTING-HANDOFF-01",
+      "action_key": "weekly:v4:promotion_dispositions:SOP-ECOM-LISTING-HANDOFF-01:3",
+      "payload_sha256": "5a11a4acd2ce6524096a2c2de2173935878b54c56c67b36db1bb0c64a376813f",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/promotion_dispositions/SOP-ECOM-LISTING-HANDOFF-01"
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "result_pointer": "/promotion_dispositions/4",
+      "operation": "record_disposition",
+      "target_id": "TASK-102",
+      "action_key": "weekly:v4:promotion_dispositions:TASK-102:4",
+      "payload_sha256": "cb6c777c487bf4f147d74de75790441ea061e1dab011a42d9d0eb3ed5dd2cdf0",
+      "outcome": "monitor",
+      "provider_id_or_url": null
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "result_pointer": "/next_week_project_replacements/0",
+      "operation": "replace_project_attention",
+      "target_id": "PROJ-CMT-CMT_PIPELINE",
+      "action_key": "weekly:v4:next_week_project_replacements:PROJ-CMT-CMT_PIPELINE:0",
+      "payload_sha256": "137105d85923ba9e246aa8373ef3fe06babb8d41a454ee7412dfcedcd524fc43",
+      "outcome": "applied",
+      "provider_id_or_url": "https://notion.example.test/next_week_project_replacements/PROJ-CMT-CMT_PIPELINE"
+    }
+  ]
+}

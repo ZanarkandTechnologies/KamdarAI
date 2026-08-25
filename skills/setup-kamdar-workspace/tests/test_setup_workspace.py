@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import io
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -38,6 +40,8 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertEqual(receipt["state"], "changes_pending")
             self.assertIn("workspace:.hermes.md", receipt["pending"])
+            self.assertTrue(any(item.startswith("workspace:templates/")
+                                for item in receipt["pending"]))
             self.assertTrue(any(item.startswith("profile:skills/setup-kamdar-workspace/")
                                 for item in receipt["pending"]))
             self.assertFalse((workspace / ".hermes.md").exists())
@@ -46,10 +50,20 @@ class SetupWorkspaceTests(unittest.TestCase):
     def test_apply_refuses_unapproved_context(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
+            source = root / "source"
             workspace, profile_home = root / "workspace", root / "profile"
+            source.mkdir()
+            (source / "automations").mkdir()
+            (source / "templates").mkdir()
+            (source / "skills").mkdir()
             workspace.mkdir()
             profile_home.mkdir()
-            code, receipt = self.run_setup(workspace, profile_home, "--apply")
+            config = source / "workspace.hermes.md"
+            config.write_text("---\nstatus: proposed-owner-review\n---\n# Workspace\n", encoding="utf-8")
+            output = io.StringIO()
+            with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config), redirect_stdout(output):
+                code = SETUP.run(workspace, profile_home, apply=True)
+            receipt = json.loads(output.getvalue())
             self.assertEqual(code, 2)
             self.assertEqual(receipt["blocker"], "workspace_context_requires_owner_approval")
             self.assertFalse((workspace / ".hermes.md").exists())
@@ -62,17 +76,20 @@ class SetupWorkspaceTests(unittest.TestCase):
             profile_home = workspace.parent
             source.mkdir(parents=True)
             (source / "automations").mkdir()
+            (source / "templates").mkdir()
             (source / "skills/example").mkdir(parents=True)
             workspace.mkdir(parents=True)
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
+            (source / "templates/project.md").write_text("project\n", encoding="utf-8")
             (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
             with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config):
                 code = SETUP.run(workspace, profile_home, apply=True)
             self.assertEqual(code, 0)
             self.assertEqual((workspace / ".hermes.md").read_text(encoding="utf-8"), config.read_text(encoding="utf-8"))
             self.assertEqual((workspace / "automations/daily.md").read_text(encoding="utf-8"), "daily\n")
+            self.assertEqual((workspace / "templates/project.md").read_text(encoding="utf-8"), "project\n")
             self.assertEqual((profile_home / "skills/example/SKILL.md").read_text(encoding="utf-8"), "# Example\n")
 
     def test_apply_preflights_all_destinations_before_copying(self) -> None:
@@ -83,11 +100,13 @@ class SetupWorkspaceTests(unittest.TestCase):
             profile_home = workspace.parent
             source.mkdir(parents=True)
             (source / "automations").mkdir()
+            (source / "templates").mkdir()
             (source / "skills/example").mkdir(parents=True)
             (workspace / "automations/daily.md").mkdir(parents=True)
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
+            (source / "templates/project.md").write_text("project\n", encoding="utf-8")
             (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
             with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config):
                 code = SETUP.run(workspace, profile_home, apply=True)

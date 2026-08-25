@@ -1,0 +1,214 @@
+{
+  "schema_version": "kamdar-weekly-review-result@1.0.0",
+  "context_id": "weekly-context-2026-W34",
+  "week": "2026-W34",
+  "report_results": [
+    {
+      "report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "area": "CMT",
+      "previous_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "source_report_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+      ],
+      "prior_version": 3,
+      "report_version": 4,
+      "report_markdown": "# CMT Pipeline — Week of 2026-08-17\n\n## Summary\n\nThe first baju kurung sample passed measurement, seam, and colour checks, and capacity is held through 27 August. Production remains at risk because the consolidated tech pack is not approved and one collar correction remains open. Next week must close both gates and confirm the CMT line and fabric handoff.\n\n## Outcomes and open attention\n\n| Outcome or attention | Current state | Evidence | Next owner action |\n| --- | --- | --- | --- |\n| First sample | Construction checks approved | TASK-105 | Retain signed measurement sheet |\n| Tech pack | Awaiting approval | TASK-101 | Aisha approves one versioned pack |\n| Collar correction | Open | TASK-104 | Nur attaches corrected sample |\n| Production capacity | Held through 27 Aug | TASK-110 | Aisha confirms after gates close |\n\n## Problems and inefficiencies\n\n| Problem definition | Operating impact | Cost consequence | Next proof / intervention | Evidence |\n| --- | --- | --- | --- | --- |\n| Construction instructions are split across handoff files | The line cannot be booked from one approved source | Not established | Approve one pack and attach corrected sample | TASK-101, TASK-104 |\n\n## Decisions\n\n- Use the signed first-sample measurement sheet as the construction baseline.\n- Consolidate measurements, stitching, trim, and colour in one versioned tech pack.\n- Release the line hold if both gates remain open after 27 August.\n- Reopen the baseline only if the corrected collar changes an approved measurement.\n- Aisha owns capacity and pack approval; Nur owns sample correction.\n- Evidence: TASK-101, TASK-104, TASK-105, TASK-110.\n\n## SOPs\n\n- No Company SOP is promoted from this Project this week.\n- Keep the tech-pack handoff at Project level until production proves the full sequence.\n- Retain the signed measurement sheet, corrected sample, approved pack, and capacity confirmation together.\n- Review after the first production batch.\n- Evidence: TASK-105, TASK-110.\n\n## Next-week priorities\n\n- [ ] **P0 · due 2026-08-27** — Approve the tech pack. **Owner:** Aisha. **Success:** one approved construction source. [TASK-101]\n- [ ] **P0 · due 2026-08-27** — Approve the collar correction. **Owner:** Nur. **Success:** corrected sample matches baseline. [TASK-104]\n- [ ] **P1 · after both gates** — Confirm the line and fabric handoff. **Owner:** Aisha. [TASK-110]\n\n## Automation receipt\n\nSources: TASK-101, TASK-104, TASK-105, TASK-110.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "area": "Marketing",
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      ],
+      "prior_version": 1,
+      "report_version": 2,
+      "report_markdown": "# Deepavali Marketing — Week of 2026-08-17\n\n## Summary\n\nDeepavali product themes, branch activation dates, and the online calendar are approved. Photography, offer copy, and branch exports arrived separately, forcing corrections across three batches and reducing branch preparation time by two days. Next week must finish one channel-ready folder per batch and review response after seven live days.\n\n## Outcomes and open attention\n\n| Outcome or attention | Current state | Evidence | Next owner action |\n| --- | --- | --- | --- |\n| Product themes | Family apparel, festive fabrics, and home furnishing approved | TASK-201 | Protect approved selection |\n| Activation calendar | Branch and online dates agreed | TASK-201 | Publish one calendar |\n| Asset batches | Three corrected; final variants remain | TASK-201 | Complete channel-ready folders |\n\n## Problems and inefficiencies\n\n| Problem definition | Operating impact | Cost consequence | Next proof / intervention | Evidence |\n| --- | --- | --- | --- | --- |\n| Photography, copy, and branch variants arrived separately | Three batches needed correction; branches lost two preparation days | Not established | Require one complete folder before scheduling | TASK-201 |\n\n## Decisions\n\n- Feature coordinated family apparel, festive fabrics, and home-furnishing offers.\n- Use the same approved themes across branch and online formats.\n- Marketing Lead approved the selection on 21 August.\n- Review sales and campaign response after seven live days.\n- Reopen the mix if a theme materially underperforms.\n- Evidence: TASK-201.\n\n## SOPs\n\n- Trigger: an approved campaign asset batch is ready for channel preparation.\n- Publish one folder with product IDs, photography, offer copy, channel dimensions, and branch variants.\n- Marketing checks completeness before scheduling.\n- Keep approval and final exports together.\n- The corrected method was reused for three batches.\n- Evidence: TASK-201.\n\n## Next-week priorities\n\n- [ ] **P0 · due 2026-08-26** — Complete channel-ready asset folders. **Owner:** Jun. [TASK-201]\n- [ ] **P1** — Activate branches and online placements to the approved calendar. **Owner:** Maya. [TASK-201]\n- [ ] **P1 · after seven live days** — Review sales and campaign response by theme. **Owner:** Maya. [TASK-201]\n\n## Automation receipt\n\nSource: TASK-201; monetary cost was not established.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "report_level": "Project",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "area": "Ecommerce",
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+      ],
+      "prior_version": 1,
+      "report_version": 2,
+      "report_markdown": "# Ecom Fixes — Week of 2026-08-17\n\n## Summary\n\nProduct-page fabric attributes and mobile checkout validation were repaired on named storefront cases. The completed order-confirmation fix lacks root cause, affected-order impact, and end-to-end verification. Next week must close that evidence gap, monitor customer enquiries, and apply the approved listing handoff to the next product batch.\n\n## Outcomes and open attention\n\n| Outcome or attention | Current state | Evidence | Next owner action |\n| --- | --- | --- | --- |\n| Product attributes | Restored on affected pages | TASK-114 | Sample after next catalog sync |\n| Checkout validation | Verified on named cases | TASK-114 | Monitor failed-order enquiries |\n| Order confirmations | Claimed fixed; cause and verification missing | TASK-102 | Record cases and end-to-end proof |\n| Listing handoff | Approved after two batches | TASK-203 | Apply to next batch |\n\n## Problems and inefficiencies\n\n| Problem definition | Operating impact | Cost consequence | Next proof / intervention | Evidence |\n| --- | --- | --- | --- | --- |\n| Order-confirmation defects can close without cause or affected cases | Customer impact and recurrence cannot be measured | Not established | Record cause, cases, impact, and end-to-end verification | TASK-102 |\n| Listing inputs arrived inconsistently before publication | Pages required post-publication correction | Not established | Use approved listing checklist | TASK-203 |\n\n## Decisions\n\n- Keep fabric-attribute and checkout fixes closed because named cases were verified.\n- Reopen order confirmation until cause and end-to-end evidence are attached.\n- Treat customer enquiries as monitoring signals, not proof of completeness.\n- Sample ten pages after the next catalog sync.\n- Darren owns the reopen decision.\n- Evidence: TASK-102, TASK-114.\n\n## SOPs\n\n- Verify sample approval, photography, copy, dimensions, composition, care, price, stock, and category before publication.\n- Record the check in one listing handoff.\n- Ecommerce Lead approved the method after two batches reused it.\n- Reopen if catalog sync drops a required value.\n- Apply it to the next batch and sample ten pages.\n- Evidence: TASK-203.\n\n## Next-week priorities\n\n- [ ] **P0 · due 2026-08-26** — Record order-confirmation cause, cases, and end-to-end proof. **Owner:** Darren. [TASK-102]\n- [ ] **P1** — Sample ten pages after catalog sync. **Owner:** Darren. [TASK-114]\n- [ ] **P1** — Apply the approved listing handoff to the next batch. **Owner:** Darren. [TASK-203]\n\n## Automation receipt\n\nSources: TASK-102, TASK-114, TASK-203.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-AREA-CMT-W34",
+      "report_level": "Area",
+      "project_id": null,
+      "area": "CMT",
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+      ],
+      "prior_version": null,
+      "report_version": 1,
+      "report_markdown": "# CMT — Week of 2026-08-17\n\n## Summary\n\nFirst sample checks are approved. Tech-pack and collar gates threaten the line hold. Close both gates and confirm the line.\n\n## Outcomes and open attention\n\n| Project | Current result | Open attention | Source report |\n| --- | --- | --- | --- |\n| CMT Pipeline | First sample checks are approved. | Tech-pack and collar gates threaten the line hold. | RPT-PROJ-CMT-CMT_PIPELINE-W34 |\n\n## Problems and inefficiencies\n\n| Problem | Project | Narrow intervention | Success signal |\n| --- | --- | --- | --- |\n| Construction handoff lacks one source. | CMT Pipeline | Approve one pack before booking. | Close both gates and confirm the line. |\n\n## Decisions\n\n- Approve one pack before booking.\n- Review at the next weekly operating review.\n\n## SOPs\n\n- Retain the handoff at Project level until production proof.\n- Keep weaker candidates at Project level.\n\n## Next-week priorities\n\n- Close both gates and confirm the line.\n\n## Automation receipt\n\nSource report: RPT-PROJ-CMT-CMT_PIPELINE-W34.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-AREA-MARKETING-W34",
+      "report_level": "Area",
+      "project_id": null,
+      "area": "Marketing",
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      ],
+      "prior_version": null,
+      "report_version": 1,
+      "report_markdown": "# Marketing — Week of 2026-08-17\n\n## Summary\n\nDeepavali themes and dates are approved. Final asset folders remain. Finish folders and begin seven-day response review.\n\n## Outcomes and open attention\n\n| Project | Current result | Open attention | Source report |\n| --- | --- | --- | --- |\n| Deepavali Marketing | Deepavali themes and dates are approved. | Final asset folders remain. | RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34 |\n\n## Problems and inefficiencies\n\n| Problem | Project | Narrow intervention | Success signal |\n| --- | --- | --- | --- |\n| Separate inputs cost two preparation days. | Deepavali Marketing | Require one complete batch folder. | Finish folders and begin seven-day response review. |\n\n## Decisions\n\n- Require one complete batch folder.\n- Review at the next weekly operating review.\n\n## SOPs\n\n- Use the five-part campaign asset handoff.\n- Keep weaker candidates at Project level.\n\n## Next-week priorities\n\n- Finish folders and begin seven-day response review.\n\n## Automation receipt\n\nSource report: RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-AREA-ECOMMERCE-W34",
+      "report_level": "Area",
+      "project_id": null,
+      "area": "Ecommerce",
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+      ],
+      "prior_version": null,
+      "report_version": 1,
+      "report_markdown": "# Ecommerce — Week of 2026-08-17\n\n## Summary\n\nProduct-page and checkout fixes are verified. Order-confirmation cause and proof are missing. Verify confirmation, sample pages, and apply the handoff.\n\n## Outcomes and open attention\n\n| Project | Current result | Open attention | Source report |\n| --- | --- | --- | --- |\n| Ecom Fixes | Product-page and checkout fixes are verified. | Order-confirmation cause and proof are missing. | RPT-PROJ-ECOM-ECOM_FIXES-W34 |\n\n## Problems and inefficiencies\n\n| Problem | Project | Narrow intervention | Success signal |\n| --- | --- | --- | --- |\n| Defect closure lacks customer-impact evidence. | Ecom Fixes | Require cases and end-to-end verification. | Verify confirmation, sample pages, and apply the handoff. |\n\n## Decisions\n\n- Require cases and end-to-end verification.\n- Review at the next weekly operating review.\n\n## SOPs\n\n- Promote the approved listing handoff.\n- Keep weaker candidates at Project level.\n\n## Next-week priorities\n\n- Verify confirmation, sample pages, and apply the handoff.\n\n## Automation receipt\n\nSource report: RPT-PROJ-ECOM-ECOM_FIXES-W34.",
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:05:00+08:00",
+      "configuration_gaps": []
+    },
+    {
+      "report_id": "RPT-COMPANY-W34",
+      "report_level": "Company",
+      "project_id": null,
+      "area": null,
+      "previous_report_id": null,
+      "source_report_ids": [
+        "RPT-AREA-CMT-W34",
+        "RPT-AREA-MARKETING-W34",
+        "RPT-AREA-ECOMMERCE-W34"
+      ],
+      "prior_version": null,
+      "report_version": 1,
+      "report_status": "Final",
+      "finalized_at": "2026-08-24T18:08:00+08:00",
+      "report_markdown": "# Kamdar — Week of 2026-08-17\n\n## Summary\n\nCMT has an approved seasonal sample, Marketing has approved Deepavali themes and dates, and Ecommerce has verified product-page and checkout repairs. The main constraints are an unapproved production pack, incomplete campaign asset handoffs, and an order-confirmation fix without cause or end-to-end proof. Next week leadership must protect the CMT line, finish channel-ready campaign assets, and require evidence-backed ecommerce closure.\n\n## Outcomes and open attention\n\n| Area | Current result | Open attention | Source report |\n| --- | --- | --- | --- |\n| CMT | Sample checks approved | Tech pack and collar correction | RPT-AREA-CMT-W34 |\n| Marketing | Themes and calendar approved | Final asset folders | RPT-AREA-MARKETING-W34 |\n| Ecommerce | Page and checkout fixes verified | Order-confirmation evidence | RPT-AREA-ECOMMERCE-W34 |\n\n## Problems and inefficiencies\n\n| Problem | Areas | Narrow intervention | Success signal |\n| --- | --- | --- | --- |\n| Critical handoffs do not always resolve to one complete source | CMT, Marketing, Ecommerce | Require one named source package at approval or publication | Next review completes without searching across threads |\n\n## Decisions\n\n- Protect the CMT line only through the approval deadline.\n- Keep Deepavali themes while completing channel assets.\n- Reopen order confirmation until named evidence is attached.\n- Review all three at the next weekly operating review.\n\n## SOPs\n\n- Promote the approved Ecommerce listing handoff.\n- Keep CMT handoff at Project level until production proof.\n- Reuse the Deepavali folder method for remaining batches.\n\n## Next-week priorities\n\n- CMT: approve pack, corrected sample, and production booking.\n- Marketing: complete folders and review seven-day response.\n- Ecommerce: verify confirmation and apply listing handoff.\n\n## Automation receipt\n\nSource reports: RPT-AREA-CMT-W34, RPT-AREA-MARKETING-W34, RPT-AREA-ECOMMERCE-W34. Status: Final.",
+      "configuration_gaps": []
+    }
+  ],
+  "promotion_dispositions": [
+    {
+      "candidate_id": "TASK-101",
+      "kind": "problem",
+      "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "source_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "TASK-101"
+      ],
+      "disposition": "promoted",
+      "reason": "Production-blocking handoff has owner, impact, and proof path.",
+      "destination_id": "ISSUE-CMT-TECH-PACK-01",
+    "rendered_markdown": "---\ntemplate_id: kamdar-issue\ntemplate_version: \"0.3.0\"\nname: \"CMT production handoff lacks one approved source\"\nwork_item_id: \"ISSUE-CMT-TECH-PACK-01\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\nowner: \"PERSON-AISHA\"\ntype: \"Issue\"\nstatus: \"Blocked\"\npriority: \"High\"\nstart_date: \"2026-08-18\"\ndue_date: \"2026-08-27\"\nprogress: \"Line 3 cannot be booked until one signed baju kurung construction pack replaces the split fitting notes.\"\nlast_meaningful_update: \"2026-08-21\"\nseverity: \"High\"\ndetected_at: \"2026-08-18\"\nnext_review: \"2026-08-27\"\n---\n\n# CMT production handoff lacks one approved source\n\n## Problem and impact\n\n- The issued baju kurung pack and fitting notes disagree on the collar tolerance.\n- TASK-101 has no signed approver, so the sample room cannot treat either value as final.\n- Line 3 capacity for 1,200 pieces is held only through 27 August; continued delay risks losing that slot.\n\n## Evidence and reproduction\n\n1. Open TASK-101 and compare the issued measurement table with the 18 August fitting note.\n2. Confirm the collar value differs by 1.5 cm and the proposed correction has no signature.\n3. Cross-check TASK-104, TASK-105, and TASK-110 for the pending correction, approved baseline, and capacity hold.\n\n## Diagnosis\n\nThe fitting change was recorded beside the physical sample but never transferred to the canonical construction pack. Separate files and no named approval step allowed the handoff to be marked ready before the source was complete. Confidence is high; a signed corrected page would confirm the diagnosis.\n\n## Containment and next action\n\n- Keep bulk cutting blocked.\n- Aisha consolidates the measurement, stitching, trim, and colour instructions and signs the approved version by 27 August.\n- Nur rechecks the corrected collar against the signed baseline before the line is booked.\n\n## Resolution and verification\n\nResolve only when one versioned pack contains the approved collar tolerance, approver, affected sizes, corrected sample evidence, and production handoff. Verify that the sample room can book Line 3 using that page without searching chat or separate fitting notes.\n\n## Related records\n\n- Project: PROJ-CMT-CMT_PIPELINE\n- Work: TASK-101, TASK-104, TASK-105, TASK-110\n- Report: RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "gaps": []
+    },
+    {
+      "candidate_id": "TASK-110",
+      "kind": "decision",
+      "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "source_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "TASK-110"
+      ],
+      "disposition": "promoted",
+      "reason": "CMT Lead approved the baseline with review trigger.",
+      "destination_id": "DECISION-CMT-SAMPLE-BASELINE-01",
+    "rendered_markdown": "---\ntemplate_id: company-os-decision\ntemplate_version: \"0.5.0\"\nname: \"Use the signed sample as construction baseline\"\ndecision_id: \"DECISION-CMT-SAMPLE-BASELINE-01\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\nproposer: \"PERSON-AISHA\"\napprover: \"CMT Lead\"\nstatus: \"Approved\"\ndecided_at: \"2026-08-21\"\nreview_date: \"2026-08-29\"\n---\n\n# Use the signed sample as construction baseline\n\n## Context\n\nThe first pre-production baju kurung sample passed fabric, colour, seam, trim, and measurement checks in TASK-105. Production still needs one baseline because the issued pack and later fitting notes disagree on the collar tolerance.\n\n## Options and tradeoffs\n\n- **Use the signed first-sample sheet:** traceable and already checked, but the collar correction must be incorporated before bulk cutting.\n- **Use the latest fitting note:** faster, but it has no approver and would weaken change control.\n- **Pause and rebuild every specification:** highest certainty, but would forfeit the current Line 3 hold.\n\n## Decision rationale\n\nUse the signed first-sample measurement sheet as the construction baseline. Aisha owns the consolidated pack; Nur may change a measurement only through a signed correction linked to the affected sizes. This preserves the verified sample while closing the known exception.\n\n## Consequences and review trigger\n\nLine 3 may be booked only after the corrected collar is approved in the same versioned pack. Reopen this decision if the corrected sample changes another approved measurement or the first production batch fails the same construction check. Review after that batch on 29 August.\n\n## Evidence and related records\n\n- TASK-105: signed pre-production sample check\n- TASK-101: missing pack approval\n- TASK-104: collar correction and recheck\n- TASK-110: capacity hold\n- RPT-PROJ-CMT-CMT_PIPELINE-W34: weekly disposition",
+      "gaps": []
+    },
+    {
+      "candidate_id": "TASK-201",
+      "kind": "sop",
+      "source_report_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "source_ids": [
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+        "TASK-201"
+      ],
+      "disposition": "project_only",
+      "reason": "Reused inside one campaign but not across campaigns.",
+      "destination_id": null,
+      "rendered_markdown": null,
+      "gaps": [
+        "Cross-campaign reuse not established."
+      ]
+    },
+    {
+      "candidate_id": "TASK-203",
+      "kind": "sop",
+      "source_report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "source_ids": [
+        "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+        "TASK-203"
+      ],
+      "disposition": "promoted",
+      "reason": "Approved and reused across two listing batches.",
+      "destination_id": "SOP-ECOM-LISTING-HANDOFF-01",
+    "rendered_markdown": "---\ntemplate_id: company-os-skill\ntemplate_version: \"0.4.0\"\nname: \"Prepare a publish-ready product listing handoff\"\nskill_id: \"SOP-ECOM-LISTING-HANDOFF-01\"\nproject: \"PROJ-ECOM-ECOM_FIXES\"\ndepartment: \"Ecommerce\"\nowner: \"PERSON-DARREN\"\nstatus: \"Approved\"\nsource_path: \"notion://TASK-203\"\nlatest_eval: \"two listing batches\"\nlast_reviewed: \"2026-08-21\"\n---\n\n# Prepare a publish-ready product listing handoff\n\n## Capability\n\n**Trigger:** A merchandising batch has an approved physical sample and is ready for Ecommerce publication.\n\n**Input → output:** Approved sample, product facts, images, price, and stock → one receiver-acknowledged listing handoff with every required field.\n\n**Value:** Ecommerce can publish without reconstructing product facts across chat, spreadsheets, and image folders.\n\n## Proven use\n\nThe checklist was used for two listing batches. In the second batch it caught missing fabric composition and mobile image crops before publication; both were corrected in the handoff instead of after the pages went live. Darren approved the method in TASK-203.\n\n## Boundaries and dependencies\n\n- Requires an approved sample and final commercial terms; it does not approve product, price, or stock.\n- Confirm product ID, title, category, dimensions, composition, care, price, stock, photography, alt text, and mobile crop.\n- The receiver must acknowledge that files open and required fields are usable.\n- Reopen the handoff if a catalog sync removes a required value; sample ten pages after the next sync.\n\n## Source and proof\n\n- TASK-203: listing handoff review and two-batch reuse evidence\n- RPT-PROJ-ECOM-ECOM_FIXES-W34: weekly promotion decision\n- Owner: Darren Lim (Ecommerce Lead)",
+      "gaps": []
+    },
+    {
+      "candidate_id": "TASK-102",
+      "kind": "problem",
+      "source_report_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "source_ids": [
+        "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+        "TASK-102"
+      ],
+      "disposition": "monitor",
+      "reason": "Relevant but recurrence not established.",
+      "destination_id": null,
+      "rendered_markdown": null,
+      "gaps": [
+        "Recurrence not established."
+      ]
+    }
+  ],
+  "next_week_project_replacements": [
+    {
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "section": "This week's attention",
+      "expected_current_text": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]",
+      "replacement_text": "- [ ] **P0 · due 2026-08-27** — Approve consolidated tech pack. **Owner:** Aisha. **Evidence:** TASK-101\n- [ ] **P0 · due 2026-08-27** — Approve collar correction. **Owner:** Nur. **Evidence:** TASK-104\n- [ ] **P1 · after both gates** — Confirm line and fabric handoff. **Owner:** Aisha. **Evidence:** TASK-110",
+      "source_ids": [
+        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "TASK-101",
+        "TASK-104",
+        "TASK-110"
+      ]
+    }
+  ],
+  "configuration_gaps": [],
+  "run_notes": "Three Project reports finalized into three Area reports and one Final Company report."
+}

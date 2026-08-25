@@ -1,0 +1,82 @@
+{
+  "skill_name": "daily-documentation-quality",
+  "artifact_contract": "kamdar-employee-message-plan@0.1.0",
+  "evals": [
+    {
+      "id": "daily_documentation_quality_normal_01",
+      "kind": "normal",
+      "prompt": "Use the supplied Daily context diff to produce the documentation-quality message plan at the requested output path.",
+      "files": [
+        "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "examples/golden/employee-message-plan.md",
+        "templates/employee-message-plan.md"
+      ],
+      "expected_output": "One proposal-only grouped message plan for Nur Iqbal that requests only TASK-102 Evidence and Reviewer and records TASK-103 as no finding.",
+      "assertions": [
+        "Cites SRC-WORK-102 and SRC-PERSON-NUR from the input context",
+        "Uses the Task template mapping and requests exactly Evidence and Reviewer at the named update location",
+        "Groups TASK-102 under PERSON-NUR without claiming a send or receipt",
+        "Keeps TASK-103 out of a recipient message and records it as sufficient",
+        "Uses a documentation-quality idempotency key and proposal-only delivery state"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Mapped documentation gap becomes one useful grouped plan",
+          "tags": ["skill", "artifact", "daily", "documentation"],
+          "feature_id": "FEAT-0002"
+        }
+      }
+    },
+    {
+      "id": "daily_documentation_quality_hard_01",
+      "kind": "hard",
+      "prompt": "The context has a fully read Issue with a missing Root cause field and PERSON-SAM as owner, but the People snapshot lists no approved channel or endpoint. Render the safe message plan.",
+      "files": ["templates/employee-message-plan.md"],
+      "expected_output": "A proposal-only plan that preserves the source-linked Root cause request in Blocked delivery entries and never invents a recipient route.",
+      "assertions": [
+        "Names the exact missing mapped Issue field and update location",
+        "Uses blocked_delivery with the known person ID and missing route facts",
+        "Does not select email, chat, Notion, or a guessed endpoint",
+        "Does not fold in unrelated stale-work or cost diagnosis"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Missing People routing blocks delivery without losing the request",
+          "tags": ["skill", "hard", "routing-boundary"],
+          "feature_id": "FEAT-0002"
+        }
+      }
+    },
+    {
+      "id": "daily_documentation_quality_boundary_01",
+      "kind": "boundary",
+      "prompt": "Every fully read Work record in the context satisfies its resolved template. Produce the appropriate output.",
+      "files": ["templates/employee-message-plan.md"],
+      "expected_output": "A no_finding message-plan artifact with zero recipient groups and the reviewed records named; no messages, delivery choice, or provider claim.",
+      "assertions": [
+        "Renders state no_finding rather than generic reminders",
+        "Creates no empty recipient group or fabricated question",
+        "Preserves source IDs for reviewed sufficient records",
+        "Does not send, post, fetch, or claim an integration receipt"
+      ],
+      "metadata": {
+        "farplane": {
+          "title": "Sufficient records suppress low-value documentation outreach",
+          "tags": ["skill", "boundary", "no-finding"],
+          "feature_id": "FEAT-0002"
+        }
+      }
+    }
+  ],
+  "extensions": {
+    "calibration": {
+      "status": "draft_unrun",
+      "runner": "local artifact-skill evaluation",
+      "candidate": "daily-documentation-quality",
+      "baseline": "direct unstructured Daily prompt",
+      "required_artifacts": ["context-diff.json", "candidate-plan.md", "baseline-plan.md", "judge-verdict.json"],
+      "readiness_rule": "Run the normal case with identical context, model, and budget; fix and rerun the smallest failing eval before readiness."
+    }
+  },
+  "rerun_rule": "fix and rerun the smallest failing eval before readiness"
+}
