@@ -11,6 +11,7 @@ google_client_secret.json
 
 # Generated evaluation and helper output
 evals/filesystem/runs/
+evals/filesystem/.vercel-static/
 runs/
 receipts/
 reports/
@@ -27,3 +28,4 @@ __pycache__/
 *.py[cod]
 .DS_Store
 node_modules/
+.farplane/
