@@ -89,6 +89,125 @@ function markdownSections(body) {
   return Object.fromEntries(Object.entries(sections).map(([key, value]) => [key, value.trim()]));
 }
 
+function markdownSection(body, heading, level = 2) {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const source = String(body || "");
+  const match = new RegExp(`^#{${level}} ${escaped}\\s*$`, "m").exec(source);
+  if (!match) return "";
+  const start = match.index + match[0].length;
+  const next = new RegExp(`^#{1,${level}}\\s+`, "m").exec(source.slice(start));
+  return source.slice(start, next ? start + next.index : source.length).trim();
+}
+
+function boldField(body, label) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return String(body || "").match(new RegExp(`(?:^- )?\\*\\*${escaped}:\\*\\*\\s*([^\\n]+)`, "mi"))?.[1]?.trim() || "";
+}
+
+function listLines(body) {
+  return String(body || "").split("\n")
+    .map((line) => line.match(/^[-*]\s+(.+)$/)?.[1]?.trim())
+    .filter(Boolean);
+}
+
+function checklistLines(body) {
+  return String(body || "").split("\n")
+    .map((line) => line.match(/^-\s+(\[[x ]\]\s*.+)$/i)?.[1]?.trim())
+    .filter(Boolean);
+}
+
+function plainText(body) {
+  return String(body || "").split("\n")
+    .filter((line) => line.trim() && !/^[-|#]/.test(line.trim()) && !/^\*\*.+:\*\*/.test(line.trim()))
+    .join(" ").replace(/\*\*/g, "").trim();
+}
+
+function reportSection(body) {
+  const lines = String(body || "").split("\n").map((line) => line.trim()).filter(Boolean);
+  const items = lines
+    .filter((line) => /^[-*]\s+/.test(line) || (/^\|/.test(line) && !/^\|\s*[-:]+/.test(line)))
+    .filter((line, index) => !(line.startsWith("|") && index === 0))
+    .map((line) => line.replace(/^[-*]\s+/, "").replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim()).filter(Boolean).join(" · "));
+  return { text: plainText(body), items };
+}
+
+export function normalizeDashboardEntity(type, row) {
+  const properties = row.properties || {};
+  const base = {
+    ...row,
+    ...properties,
+    entity_type: type,
+    id: row.id,
+    name: properties.name || row.name || row.id,
+    owner: properties.owner || row.owner,
+    project: properties.project || row.project,
+    status: properties.status || properties.report_status || row.status,
+    priority: properties.priority || row.priority,
+    due: properties.due_date || row.due,
+  };
+  if (type === "projects") {
+    const overview = markdownSection(row.body, "Overview");
+    const knowledge = markdownSection(row.body, "Project knowledge");
+    const attention = markdownSection(row.body, "This week's attention");
+    return {
+      ...base,
+      overview: {
+        objective: boldField(overview, "Goal"),
+        current_position: boldField(overview, "Current position"),
+        main_blocker: boldField(overview, "Main blocker"),
+      },
+      knowledge: {
+        health: boldField(knowledge, "Health"),
+        current_context: boldField(knowledge, "Conclusion"),
+        research: listLines(markdownSection(knowledge, "Research and evidence", 3)),
+        decisions: listLines(markdownSection(knowledge, "Current decisions", 3)),
+        blockers: listLines(markdownSection(knowledge, "Blockers and review condition", 3)),
+      },
+      attention: {
+        targets: checklistLines(attention),
+        last_meaningful_update: boldField(attention, "Last meaningful update"),
+      },
+    };
+  }
+  if (type === "work_items") {
+    const notes = markdownSection(row.body, "Notes");
+    return {
+      ...base,
+      completed_at: row.metadata?.completed_at,
+      processed: row.metadata?.daily_review_version ? true : false,
+      notes: {
+        completion_summary: plainText(markdownSection(notes, "Completion summary", 3)),
+        blocker: plainText(markdownSection(notes, "Blocker", 3)),
+        next_action: plainText(markdownSection(notes, "Next action", 3)),
+        missing: listLines(markdownSection(notes, "Documentation missing", 3)),
+      },
+    };
+  }
+  if (type === "meetings") {
+    const decisions = markdownSection(row.body, "Decisions");
+    return {
+      ...base,
+      completed_at: row.metadata?.completed_at,
+      attendees: String(properties.attendees || "").split(";").map((value) => value.trim()).filter(Boolean),
+      purpose: plainText(markdownSection(row.body, "Purpose and agenda")),
+      problem: { cause: plainText(markdownSection(row.body, "Notes")) },
+      decision: { summary: boldField(decisions, "Decision") || plainText(decisions) },
+      commitments: listLines(markdownSection(row.body, "Commitments")),
+      follow_up: { next_action: plainText(markdownSection(row.body, "Follow-up")) },
+    };
+  }
+  if (type === "reports") {
+    return {
+      ...base,
+      week_start: properties.week_start,
+      version: properties.report_version,
+      finalized_at: properties.finalized_at,
+      sections: Object.fromEntries(Object.entries(markdownSections(row.body || "")).filter(([name]) => name !== "Introduction").map(([name, content]) => [name, reportSection(content)])),
+    };
+  }
+  return base;
+}
+
 function loadFeatureDoc(featureId, featureDocsRoot) {
   const filename = readdirSync(featureDocsRoot).find((name) => name.startsWith(`${featureId}-`) && name.endsWith(".md"));
   if (!filename) throw new Error(`Missing feature document for ${featureId} under ${featureDocsRoot}`);
@@ -111,13 +230,7 @@ function entityIndex(seed) {
   const index = new Map();
   for (const [type, rows] of Object.entries(seed.entities || {})) {
     if (!Array.isArray(rows)) continue;
-    for (const row of rows) {
-      if (row && typeof row.id === "string") index.set(row.id, {
-        entity_type: type,
-        ...row,
-        name: row.properties?.name || row.name || row.id,
-      });
-    }
+    for (const row of rows) if (row && typeof row.id === "string") index.set(row.id, normalizeDashboardEntity(type, row));
   }
   return index;
 }

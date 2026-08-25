@@ -18,6 +18,12 @@ function resolveLabel(value, labels = {}) {
   return labels[value] || value;
 }
 
+function displayText(value) {
+  return String(value || "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\*\*|`/g, "");
+}
+
 function renderState(value) {
   return present(value) ? `<span class="entity-state state-${statusClass(value)}">${escapeHtml(value)}</span>` : "";
 }
@@ -36,7 +42,7 @@ function renderFacts(items) {
 
 function renderList(items, className = "entity-list") {
   const visible = asArray(items).filter(present);
-  return visible.length ? `<ul class="${className}">${visible.map((item) => `<li>${escapeHtml(typeof item === "string" ? item : item.action || item.summary || item.id)}</li>`).join("")}</ul>` : "";
+  return visible.length ? `<ul class="${className}">${visible.map((item) => `<li>${escapeHtml(displayText(typeof item === "string" ? item : item.action || item.summary || item.id))}</li>`).join("")}</ul>` : "";
 }
 
 function renderChecklist(items) {
@@ -45,7 +51,7 @@ function renderChecklist(items) {
   return `<ul class="entity-checklist">${visible.map((item) => {
     const checked = /^\[x\]/i.test(item);
     const text = item.replace(/^\[[x ]\]\s*/i, "");
-    return `<li class="${checked ? "complete" : "open"}"><span aria-hidden="true">${checked ? "✓" : ""}</span><span>${escapeHtml(text)}</span></li>`;
+    return `<li class="${checked ? "complete" : "open"}"><span aria-hidden="true">${checked ? "✓" : ""}</span><span>${escapeHtml(displayText(text))}</span></li>`;
   }).join("")}</ul>`;
 }
 
@@ -65,7 +71,7 @@ function renderSubsection(title, content, { accent = false } = {}) {
 }
 
 function renderRawDisclosure(entity) {
-  return `<details class="raw-entity-data"><summary>View raw JSON</summary>${renderJsonBlock(entity, `${entity.entity_type || "entity"} JSON`)}</details>`;
+  return `<details class="raw-entity-data"><summary>Technical source data</summary>${renderJsonBlock(entity, `${entity.entity_type || "entity"} JSON`)}</details>`;
 }
 
 function renderShell(entity, index, { meta = "", body = "" } = {}) {

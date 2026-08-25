@@ -103,7 +103,7 @@ Starting records render as typed operational cards, not open JSON blocks.
 | Report | week, status, version, PM attention, section counts and expandable report sections |
 
 Every value comes from the generated entity payload or its seed-backed ID label
-map. Empty sections disappear. `View raw JSON` remains closed at the bottom of
+map. Empty sections disappear. `Technical source data` remains closed at the bottom of
 each card. The same card becomes full-width inside the mobile inspector.
 
 ### Reference-faithful visual rules

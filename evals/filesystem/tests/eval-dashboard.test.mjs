@@ -43,6 +43,27 @@ test("dashboard expands the typed suites into every feature-case membership", ()
   assert.ok(model.features[0].cases[0].checks.every(({ met }) => met));
 });
 
+test("compact seed records normalize into populated typed cards", () => {
+  const model = build();
+  const entities = model.features.flatMap((feature) => feature.cases.flatMap((row) => row.starting_entities));
+  const project = entities.find((entity) => entity.entity_type === "projects" && entity.id === "PROJ-CMT-CMT_PIPELINE");
+  const work = entities.find((entity) => entity.entity_type === "work_items");
+  const meeting = entities.find((entity) => entity.entity_type === "meetings");
+  const report = entities.find((entity) => entity.entity_type === "reports");
+  assert.ok(project.overview.objective);
+  assert.ok(project.overview.main_blocker);
+  assert.ok(project.attention.targets.length);
+  assert.ok(work.notes.next_action || work.notes.completion_summary);
+  assert.ok(meeting.purpose);
+  assert.ok(report.sections.Summary.text);
+  const projectCard = renderEntityCard(project, 0, { labels: model.features[0].cases[0].entity_labels });
+  assert.match(projectCard, /<h4>Objective<\/h4>/);
+  assert.match(projectCard, /<h4>This week<\/h4>/);
+  assert.match(projectCard, /class="raw-entity-data"/);
+  assert.match(projectCard, /Technical source data/);
+  assert.doesNotMatch(projectCard, /View raw JSON/);
+});
+
 test("case prompt and feature title mutations flow through without renderer edits", () => {
   const root = mkdtempSync(resolve(tmpdir(), "kamdar-dashboard-source-"));
   try {

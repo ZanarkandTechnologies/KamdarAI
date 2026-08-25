@@ -92,3 +92,19 @@ template_version: "0.1.1"
 - `drift_verdict:` aligned
 - `next_action:` none
 - `blocker:` none
+
+## 2026-08-26 - compact seed card repair
+
+- `trigger:` human_feedback_received
+- `intent:` restore the typed operational cards after the compact seed migration
+- `root_cause:` the dashboard model passed canonical `properties` and Markdown
+  `body` through unchanged while the card components expected a flattened view
+  model, leaving only the raw JSON disclosure populated
+- `action:` added one source-derived normalization adapter for Project, Work,
+  Person, Meeting, and Report records; rebuilt the static dossier
+- `proof:` `eval-dashboard.test.mjs` 11/11; generated model reports every one of
+  21 Project, 44 Work, 2 Person, 18 Meeting, and 8 Report case appearances as
+  populated; live browser capture shows the expanded CMT Project card
+- `decision:` preserve raw JSON only as closed optional evidence; typed card
+  content remains the primary view
+- `blocker:` none
