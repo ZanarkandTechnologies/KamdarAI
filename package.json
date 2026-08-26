@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "ui": "npm run evals:ui",
+    "evals:ui": "node evals/filesystem/scripts/serve-eval-dashboard.mjs"
+  },
   "dependencies": {
     "zod": "^4.0.0"
   }

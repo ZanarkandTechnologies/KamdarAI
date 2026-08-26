@@ -12,6 +12,15 @@ The active acceptance surface uses one immutable run per automation:
   per feature, a separate evidence-review subagent, and one end-user artifact
   quality review covering every generated result row.
 
+Both active suites author each scenario with the canonical Farplane case
+fields: `id`, `prompt`, `expected_output`, `files`, `assertions`, and flat
+`metadata`. Human labels live at `metadata.title`; Kamdar-only feature, entity,
+result-path, and integration-gate joins live at
+`metadata.extensions.kamdar`. The dashboard derives Given/When/Expected from
+that case and joins Observed/Result to the immutable run artifacts. Output-file
+existence and content checks remain suite evidence; `files` is reserved for
+case input fixtures.
+
 Daily deterministic validation is owned by
 `filesystem/scripts/unified-daily-review-eval.mjs`. It rejects undeclared
 intermediate files, validates the result and receipt with Zod, verifies exact
@@ -29,15 +38,28 @@ Retained comparison material:
 
 - `kamdar-company-os.json` contains superseded connector-routing and safety
   sanity cases.
-- `evals.json` and `template-first-kamdar.mjs` retain the v4 buyer showcase.
+- `evals.json` and `template-first-kamdar.mjs` retain the v4 buyer showcase;
+  that legacy DSL is not an input to the active Daily/Weekly dashboard.
 - `filesystem/cases/` and `filesystem/scripts/mock-kamdar-automation.mjs`
   preserve the earlier reduced-fixture proof; they are not acceptance evidence.
 
+The customer presentation is fail-closed: it accepts one explicit, hash-bound
+Daily/Weekly eligibility manifest from a real agent execution and never
+discovers a latest run. Reference fixtures may calibrate the evaluator but are
+not presentation eligible. There is currently no customer-valid deployment.
+
 ```bash
-cd evals/filesystem
-npm test
-HERMES_EVAL_PROFILE=vishan-kamdar-ai npm run ui
+# Internal diagnostics: may discover the latest completed runs and expose proof plumbing.
+EVAL_DASHBOARD_MODE=internal npm run evals:ui
+
+# Complete filesystem regression suite.
+node --test evals/filesystem/tests/*.test.mjs
 ```
+
+A valid presentation shows assertion-derived completeness, independently
+judged qualitative metrics, readable generated business content, and row-level
+file review. It omits local paths, JSON pointers, judge packets, gates, and raw
+diagnostic JSON. The internal view retains those details for debugging.
 
 The active evals never write to live Notion, Gmail, Drive, messaging, or
 schedules. Operated provider tests remain separately authorized proof edges.

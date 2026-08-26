@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import test from "node:test";
 
 import { latestRun, loadCase, loadContract, loadFrozenSnapshot, readRunFile, runTemplateFirstProof } from "../scripts/template-first-kamdar.mjs";
-import { buildVercelShowcase } from "../scripts/build-vercel-showcase.mjs";
+import { buildVercelShowcase, writePresentationEligibilityManifest } from "../scripts/build-vercel-showcase.mjs";
 import { writePrivateSeed } from "../../../scripts/compile_private_kamdar_seed.mjs";
 
 function temporaryRoot(t) {
@@ -15,6 +16,7 @@ function temporaryRoot(t) {
 }
 
 function checkById(result, id) { return result.assertions.checks.find((check) => check.id === id); }
+function sha256File(path) { return createHash("sha256").update(readFileSync(path)).digest("hex"); }
 
 test("the record-and-file contract resolves feature docs and compiles the sanctioned portfolio shape", () => {
   const contract = loadContract();
@@ -147,26 +149,101 @@ test.skip("Daily then Weekly updates canonical records, produces deliberate arti
 
 test("the shareable static build is generated from the typed suites and judged runs", (t) => {
   const outputDirectory = resolve(temporaryRoot(t), "static");
-  const built = buildVercelShowcase({ outputDirectory });
+  const built = buildVercelShowcase({ outputDirectory, mode: "internal" });
   const html = readFileSync(built.index_html, "utf8");
   assert.equal(built.totals.features, 7);
-  assert.equal(built.totals.cases, 13);
-  assert.equal(built.totals.statuses.PASSED, 13);
-  assert.equal((html.match(/class="feature-group"/g) || []).length, 7);
-  assert.equal((html.match(/class="case-row(?: selected)?" type/g) || []).length, 13);
-  assert.match(html, /Technical evidence/);
+  assert.equal(built.totals.cases, 11);
+  assert.equal(built.totals.statuses.PASSED, 11);
+  assert.equal(built.totals.statuses.FAILED, 0);
+  assert.equal(built.totals.statuses["NOT RUN"], 0);
+  assert.equal((html.match(/class="feature-group"/g) || []).length, 2);
+  assert.equal((html.match(/class="case-row(?: selected)?" type/g) || []).length, 11);
+  assert.match(html, /Technical proof/);
   assert.doesNotMatch(html, /Primary seeded case|Frozen proof:/);
 });
 
 test("the static builder accepts explicit completed run roots", (t) => {
   const dailyRunRoot = resolve("evals/filesystem/runs/deployments/seed-v2-2026-08-25-01/daily-eval");
   const weeklyRunRoot = resolve("evals/filesystem/runs/deployments/seed-v2-2026-08-25-02/weekly-eval");
-  const built = buildVercelShowcase({ outputDirectory: resolve(temporaryRoot(t), "static"), dailyRunRoot, weeklyRunRoot });
+  const built = buildVercelShowcase({ outputDirectory: resolve(temporaryRoot(t), "static"), mode: "internal", dailyRunRoot, weeklyRunRoot });
   assert.deepEqual(built.run_roots, [
     "evals/filesystem/runs/deployments/seed-v2-2026-08-25-01/daily-eval",
     "evals/filesystem/runs/deployments/seed-v2-2026-08-25-02/weekly-eval"
   ]);
   assert.match(readFileSync(built.index_html, "utf8"), /Kamdar Company OS evals/);
+});
+
+test("presentation build requires a paired hash-bound eligibility manifest and emits only public proof", (t) => {
+  const root = temporaryRoot(t);
+  const deploymentRoot = resolve(root, "presentation-deployment");
+  cpSync(resolve("evals/filesystem/runs/deployments/seed-v4-2026-08-26-06"), deploymentRoot, { recursive: true });
+  for (const lane of ["daily-eval", "weekly-eval"]) {
+    const qualityPath = resolve(deploymentRoot, lane, "eval/artifact-quality-review.json");
+    const quality = JSON.parse(readFileSync(qualityPath, "utf8"));
+    quality.review_path = qualityPath;
+    for (const artifact of quality.artifacts) {
+      const reference = artifact.checks.readability.evidence_refs[0];
+      artifact.checks.workflow_reconstructability = { pass: true, evidence_refs: [reference], findings: [] };
+      artifact.checks.baseline_integrity = { pass: true, evidence_refs: [reference], findings: [] };
+    }
+    writeFileSync(qualityPath, JSON.stringify(quality));
+    const judgeRoot = resolve(deploymentRoot, lane, "eval/judges");
+    for (const featureId of lane === "daily-eval" ? ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"] : ["FEAT-0005", "FEAT-0006", "FEAT-0007"]) {
+      const judgePath = resolve(judgeRoot, `${featureId}.json`);
+      const judge = JSON.parse(readFileSync(judgePath, "utf8"));
+      judge.rubric = { groundedness: "A", completeness: "A", usefulness: "A", repeatability: "A", length_balance: "A" };
+      writeFileSync(judgePath, JSON.stringify(judge));
+    }
+  }
+  const provenancePath = resolve(deploymentRoot, "candidate-provenance.json");
+  writeFileSync(provenancePath, `${JSON.stringify({
+    schema_version: "kamdar-eval-candidate-provenance@1.0.0",
+    origin: "agent_execution",
+    producer: "test-agent-runner",
+    generated_at: "2026-08-26T11:59:00.000Z",
+    daily_result_sha256: sha256File(resolve(deploymentRoot, "daily-eval/daily/review/daily-review-result-2026-08-25.json")),
+    weekly_result_sha256: sha256File(resolve(deploymentRoot, "weekly-eval/weekly/review/weekly-review-result-2026-W34.json")),
+  }, null, 2)}\n`);
+  const eligibility = writePresentationEligibilityManifest({ deploymentRoot, generatedAt: "2026-08-26T12:00:00.000Z" });
+  const publicRoot = resolve(root, "public");
+  mkdirSync(publicRoot);
+  writeFileSync(resolve(publicRoot, "dashboard.json"), "stale internal diagnostics");
+  const built = buildVercelShowcase({ outputDirectory: publicRoot, presentationManifestPath: eligibility.path });
+  const html = readFileSync(built.index_html, "utf8");
+  const publicModel = readFileSync(built.public_model, "utf8");
+  const receipt = JSON.parse(readFileSync(built.build_receipt, "utf8"));
+  assert.doesNotMatch(html, /Technical proof|Technical source data|Result slices|Receipt JSON|judge_path|integration_gate/);
+  assert.match(html, /Kamdar Company OS evaluation/);
+  assert.match(html, /Validated 26 Aug 2026/);
+  for (const label of ["Answer quality", "Assertion review", "Actual agent output", "Expected criteria", "Agent output"]) assert.match(html, new RegExp(label));
+  assert.match(html, /100% complete|expected criteria found/);
+  assert.match(html, />MET</);
+  assert.match(html, />Evidence</);
+  assert.doesNotMatch(html, />Agent read</);
+  assert.doesNotMatch(html, />Completion checks<|>Reviewed output</);
+  assert.doesNotMatch(html, /Quality grades|Required checks|>Observed<|<h5>(?:Actual current|Agent expected current|Current Project|Proposed update|Proposed replacement)<\/h5>|Current text verified — safe to apply|effects-match-receipt/);
+  assert.doesNotMatch(publicModel, /judge_paths|result_paths|receipt_rows|integration_gate_ids|raw-entity-data/);
+  assert.equal(receipt.eligibility_manifest_sha256, eligibility.sha256);
+  assert.equal(receipt.public_model_sha256, built.public_model_sha256);
+  assert.match(built.build_receipt_sha256, /^[a-f0-9]{64}$/);
+  assert.equal(existsSync(resolve(publicRoot, "dashboard.json")), false);
+  assert.throws(() => buildVercelShowcase({ outputDirectory: resolve(root, "missing") }), /eligibility manifest/);
+
+  const ineligiblePath = resolve(deploymentRoot, "ineligible-presentation.json");
+  writeFileSync(ineligiblePath, JSON.stringify({ ...eligibility.manifest, daily: { ...eligibility.manifest.daily, pass: false } }));
+  assert.throws(() => buildVercelShowcase({ outputDirectory: resolve(root, "ineligible"), presentationManifestPath: ineligiblePath }), /daily.pass/);
+
+  const dailyResultPath = resolve(deploymentRoot, eligibility.manifest.daily.run_root, "eval/result.json");
+  writeFileSync(dailyResultPath, `${readFileSync(dailyResultPath, "utf8")}\n`);
+  assert.throws(() => buildVercelShowcase({ outputDirectory: resolve(root, "tampered"), presentationManifestPath: eligibility.path }), /suite-result hash/);
+
+  const referenceRoot = resolve(root, "reference-deployment");
+  cpSync(deploymentRoot, referenceRoot, { recursive: true });
+  const referenceProvenancePath = resolve(referenceRoot, "candidate-provenance.json");
+  const referenceProvenance = JSON.parse(readFileSync(referenceProvenancePath, "utf8"));
+  referenceProvenance.origin = "reference_fixture";
+  writeFileSync(referenceProvenancePath, JSON.stringify(referenceProvenance));
+  assert.throws(() => writePresentationEligibilityManifest({ deploymentRoot: referenceRoot }), /reference fixtures cannot be presented/);
 });
 
 test.skip("operated mode overlays only matching downstream receipts without changing frozen scoring", (t) => {

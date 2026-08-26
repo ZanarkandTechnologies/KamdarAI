@@ -8,6 +8,20 @@ owner: KamdarAI
 
 # Kamdar template-first proof
 
+## Customer presentation status
+
+There is no customer-valid deployment. The prior `task0011-...-05` run copied
+reference outputs and is retained only as evaluator-calibration evidence. A
+presentation build now requires hash-bound `agent_execution` provenance and
+refuses reference fixtures, missing provenance, stale evidence, or red runs.
+
+For the internal diagnostic view, which retains artifact paths, raw proof, and
+technical reconciliation detail, run:
+
+```bash
+EVAL_DASHBOARD_MODE=internal npm run evals:ui
+```
+
 This is the current local proof for TASK-0006. It consumes the canonical root
 contract at `../evals.json`, the repository-owned templates at `../../templates/`,
 and a sanitized frozen fixture. It runs Daily before Weekly and writes only
@@ -26,23 +40,19 @@ The runner never calls Notion, Drive, email, Telegram, or Hermes. Its
 connector-shaped trace records planned operations only; `network_calls` and
 `external_writes` must remain zero.
 
-## Share the buyer proof
+## Build the customer artifact
 
 Build the exact frozen buyer proof as one static HTML page, then deploy that
 directory to the existing Vercel project. The generated deployment contains no
 profile state, capture rows, credentials, API route, or provider capability.
 
-```bash
-node scripts/build-vercel-showcase.mjs
-# First deploy only: creates ignored .vercel-static/.vercel/project.json.
-vercel link --cwd .vercel-static --yes --scope kenjipcxs-projects --project kamdar-company-os-evidence
-vercel deploy .vercel-static --yes --scope kenjipcxs-projects
-vercel deploy .vercel-static --prod --yes --scope kenjipcxs-projects
-```
+Run `node scripts/build-vercel-showcase.mjs --presentation-manifest <manifest>`
+only after a real agent candidate has produced a v2 eligibility manifest.
 
-Verify the production page shows `49/49 checks pass`, seven visible `Example
-from the frozen seed` walkthroughs, and the frozen no-write boundary. The
-destination is ignored and can be regenerated at any time.
+The ignored `.vercel-static/` output contains `index.html`, a stripped
+`public-model.json`, and `build-receipt.json`. The receipt binds the exact
+eligibility manifest and public-model bytes. Deployment remains a separate,
+explicitly authorized action and is not part of this local proof.
 
 ## Run
 

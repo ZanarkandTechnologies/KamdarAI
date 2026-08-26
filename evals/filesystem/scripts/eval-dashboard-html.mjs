@@ -9,13 +9,13 @@ import { dashboardStyles } from "./eval-dashboard-theme.mjs";
 
 /** Render a self-contained dashboard from normalized eval data. */
 export function renderEvalDashboardHtml(model) {
-  const rows = model.features.flatMap((feature, featureIndex) =>
+  const rows = model.groups.flatMap((feature, featureIndex) =>
     feature.cases.map((row) => ({ row, feature, featureIndex }))
   );
   if (!rows.length) throw new Error("Dashboard model has no case rows");
 
   const selectedRowId = rows[0].row.row_id;
-  const groups = model.features
+  const groups = model.groups
     .map((feature, featureIndex) => renderFeatureGroup(feature, { selectedRowId, featureIndex }))
     .join("");
   const templates = rows
@@ -36,7 +36,7 @@ export function renderEvalDashboardHtml(model) {
     ${renderTopBar(model)}
     <div class="workspace">
       <section class="list-panel">
-        <div class="list-head"><span>test cases · grouped by feature</span><span>result</span></div>
+        <div class="list-head"><span>scenarios · grouped by workflow</span><span>result</span></div>
         ${groups}
       </section>
       <aside class="inspector" aria-live="polite">${renderInspector(rows[0].row, rows[0].feature, rows[0].featureIndex)}</aside>

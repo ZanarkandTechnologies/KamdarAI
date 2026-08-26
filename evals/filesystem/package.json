@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "ui": "node scripts/serve.mjs",
+    "dashboard": "node scripts/serve-eval-dashboard.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "engines": {

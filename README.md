@@ -52,9 +52,60 @@ this repository owns the reviewed inputs used to configure and test it.
    python3 "$KAMDAR_NOTION_ONBOARD" preflight
    ```
 
-   Follow the preflight output for Doppler, ngrok, credentials, and the Notion
-   subscription. It is not a one-command setup because login and webhook
-   verification need human input.
+   Follow the JSON receipt's `next_action` through each phase. Login, sharing,
+   subscription creation, and webhook verification remain human gates:
+
+   ```bash
+   export NOTION_ROOT_URL="https://www.notion.so/<root-page-id>"
+
+   python3 "$KAMDAR_NOTION_ONBOARD" configure \
+     --root-page-url "$NOTION_ROOT_URL" \
+     --mention @vishanai
+   python3 "$KAMDAR_NOTION_ONBOARD" verification
+   # Paste the one-time token into Notion and verify the subscription.
+   python3 "$KAMDAR_NOTION_ONBOARD" discover
+   # Leave one harmless comment beginning with @vishanai.
+   python3 "$KAMDAR_NOTION_ONBOARD" finalize
+   python3 "$KAMDAR_NOTION_ONBOARD" status
+   ```
+
+   Before `discover`, share the root page and every database that may receive
+   an agent comment with the same Notion connection used by `NOTION_TOKEN`.
+   Sharing a sibling page or a similarly named database is not sufficient:
+   Hermes authorizes the exact parent data-source ID of the commented page.
+   Rerun `discover` after granting a new database access so the active
+   `NOTION_ALLOWED_DATA_SOURCES` catalog is refreshed.
+
+   Setup is complete only when `status` reports all of these conditions:
+
+   - `hermes_health=true` and `ngrok_online=true`
+   - `verification_token_captured=true`
+   - `data_sources_configured=true`
+   - `workspace_locked=true`
+   - `reply_observed=true`
+
+   Poll `verification` after requesting a token and poll `finalize` after the
+   test comment until each phase advances. Do not treat the first
+   `human_required` receipt as an error.
+
+## Notion comment bridge troubleshooting
+
+The onboarding script is the current Notion-specific doctor. Run its `status`
+phase first; transport health alone does not prove that a page is authorized or
+that Hermes posted a reply.
+
+| Symptom | Likely boundary | Next action |
+| --- | --- | --- |
+| No webhook request arrives | Paused subscription or stale public URL | Confirm the Notion subscription is active and uses the current ngrok `/notion/webhook` endpoint. Free ngrok URLs can change after a tunnel restart. |
+| Verification returns HTTP 401 | Stale verification token or signature state | Run `hermes -p "$KAMDAR_PROFILE" notion-webhook reset-token`, use Notion's **Resend token**, and complete `verification` again. Never paste credentials into chat or logs. |
+| Webhook returns 200 but no reply appears | The event was accepted but failed during enrichment or reply generation | Check the gateway log and the connector state instead of recreating the subscription immediately. |
+| Log says the page is outside the configured data-source scope | The exact database is not shared or its data source is absent from the allowlist | Share the database containing the commented page with the token's Notion connection, then rerun `discover` and leave a new test comment. |
+| Notion adapter is unavailable after a restart | The gateway started without the Doppler-scoped `NOTION_TOKEN` | Restart the managed, Doppler-backed Hermes service; do not replace it with a bare `hermes gateway restart`. |
+
+The generic Hermes doctor does not currently validate Notion subscription URL
+drift or per-page data-source access. Until a unified `kamdar notion doctor
+--page <url>` command exists, use `status`, the exact test page, and one observed
+reply as the acceptance path.
 
 ## Layout
 
@@ -99,8 +150,11 @@ The command is preview-only unless `--apply` is supplied, refuses an
 unapproved workspace context, manages only `.hermes.md`, `automations/`,
 `templates/`, and project-owned `skills/`, and never deletes target files.
 
-`evals/evals.json` is the frozen comparison assertion contract rendered by
-the filesystem UI. The current TASK-0007 direct-Draft proof is separate: it
+`evals/evals.json` is the frozen comparison assertion contract for the legacy
+template-first runner. The active filesystem dashboard renders the canonical
+cases in `evals/daily-review-evals.json` and `evals/weekly-review-evals.json`,
+then joins their Kamdar proof bindings to saved run evidence. The current
+TASK-0007 direct-Draft proof is separate: it
 updates one local Weekly Draft through its two Daily owners, verifies a
 zero-write rerun, then finalizes that same file. Every assertion is owned by
 one [documented feature](docs/features/README.md); neither lane makes provider
@@ -127,13 +181,18 @@ node scripts/compile_private_kamdar_seed.mjs \
   --output "$HERMES_HOME/state/kamdar-eval/private-seed.json" \
   --manifest "$HERMES_HOME/state/kamdar-eval/private-seed-manifest.json"
 
-KAMDAR_PRIVATE_SEED_PATH="$HERMES_HOME/state/kamdar-eval/private-seed.json" \
-  node evals/filesystem/scripts/template-first-kamdar.mjs
+# The private seed remains input to the isolated legacy v4 showcase only.
+# Current Daily/Weekly acceptance is owned by the unified golden-run validators:
+node --test evals/filesystem/tests/unified-daily-review-eval.test.mjs \
+  evals/filesystem/tests/weekly-review-evals.test.mjs
 ```
 
 The runner records only the source hash and `private_seed_verified` boolean in
 its result. It never renders raw capture names or contacts. Private compilation
-does not authorize a Notion mutation or provider delivery.
+does not authorize a Notion mutation or provider delivery. The old
+`template-first-kamdar.mjs` runner and operated v4 showcase are retained for
+historical comparison; they are not current feature-acceptance or TASK-0009
+proof surfaces.
 
 ## Private Company OS application seed
 

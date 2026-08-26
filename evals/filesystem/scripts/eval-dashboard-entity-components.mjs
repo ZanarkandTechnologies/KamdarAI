@@ -1,6 +1,5 @@
 import {
   escapeHtml,
-  renderJsonBlock,
   renderPastelSquare,
   statusClass,
   toneFor
@@ -70,8 +69,19 @@ function renderSubsection(title, content, { accent = false } = {}) {
   return content ? `<section class="entity-section${accent ? " entity-section-accent" : ""}"><h4>${escapeHtml(title)}</h4>${content}</section>` : "";
 }
 
-function renderRawDisclosure(entity) {
-  return `<details class="raw-entity-data"><summary>Technical source data</summary>${renderJsonBlock(entity, `${entity.entity_type || "entity"} JSON`)}</details>`;
+function safeSourceUrl(value) {
+  if (!present(value)) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderSourceLink(entity) {
+  const url = safeSourceUrl(entity.source_url);
+  return url ? `<a class="entity-source-link" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">Open source ↗</a>` : "";
 }
 
 function renderShell(entity, index, { meta = "", body = "" } = {}) {
@@ -79,10 +89,10 @@ function renderShell(entity, index, { meta = "", body = "" } = {}) {
   return `<details class="entity entity-card entity-${escapeHtml(entity.entity_type || "unknown")}">
     <summary>
       ${renderPastelSquare(tone, "entity-square")}
-      <span class="entity-identity"><b>${escapeHtml(entity.id)}</b><span>${escapeHtml(entity.name || entity.entity_type)}</span></span>
+      <span class="entity-identity"><b>${escapeHtml(entity.presentation ? (entity.name || entity.entity_type) : entity.id)}</b>${entity.presentation ? "" : `<span>${escapeHtml(entity.name || entity.entity_type)}</span>`}</span>
       ${renderState(entity.status)}
     </summary>
-    <div class="entity-card-body">${meta}${body}${renderRawDisclosure(entity)}</div>
+    <div class="entity-card-body">${meta}${body}${renderSourceLink(entity)}</div>
   </details>`;
 }
 
@@ -142,7 +152,9 @@ export function renderMeetingCard(entity, index, labels) {
   const decision = entity.decision || {};
   const problem = entity.problem || {};
   const followUp = entity.follow_up || {};
-  const commitments = asArray(entity.commitments).map((item) => `${resolveLabel(item.person_id, labels)} — ${item.action}${item.due_date ? ` · due ${item.due_date}` : ""}`);
+  const commitments = asArray(entity.commitments).map((item) => typeof item === "string"
+    ? item
+    : `${resolveLabel(item.person_id, labels)} — ${item.action}${item.due_date ? ` · due ${item.due_date}` : ""}`);
   const normalized = { ...entity, status: entity.completed_at ? "Complete" : entity.status };
   const body = [
     renderSubsection("Purpose", present(entity.purpose) ? `<p>${escapeHtml(entity.purpose)}</p>` : ""),
