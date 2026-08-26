@@ -1,0 +1,32 @@
+{
+  "work_type": "demo-video",
+  "search_scope": [
+    "tickets/TASK-0011/ticket.md",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/verification.md",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/"
+  ],
+  "rubrics_used": ["demo-quality", "video-quality", "evidence-quality"],
+  "adversarial_rejection_attempts": [
+    "Checked whether the MP4 invents unsupported claims; every factual claim maps to evidence-map.json.",
+    "Checked whether the video is only screenshots without narration; ffprobe shows an AAC audio stream and the narration script is present.",
+    "Checked whether the demo hides residual risk; narration and evidence map both state the frozen-scenario boundary."
+  ],
+  "overall_tas": "TAS-A",
+  "verdict": "pass",
+  "rerun_required": false,
+  "hard_gate_failures": [],
+  "failed_checks": [],
+  "finding_log": [
+    "The recap uses verified QA screenshots only and avoids generated visuals.",
+    "The MP4 is 82.04 seconds, within the 45-90 second target.",
+    "Representative frames show the Project inspector and mobile inspector states."
+  ],
+  "rubric_sections": {
+    "demo-quality": "Before, After, Example, Proof, and residual risk are present.",
+    "video-quality": "Playable MP4 with H.264 video and AAC mono narration.",
+    "evidence-quality": "Claims map to ticket, QA, manifest, public model, and screenshot artifacts."
+  },
+  "blocking_findings": [],
+  "next_action": "Use final.mp4 as the TASK-0011 demo artifact."
+}

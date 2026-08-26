@@ -1,0 +1,40 @@
+{
+  "work_type": "completion-review",
+  "search_scope": [
+    "tickets/TASK-0011/ticket.md",
+    "tickets/TASK-0011/program.md",
+    "tickets/TASK-0011/progress.md",
+    "tickets/TASK-0011/design.md",
+    "evals/filesystem/runs/deployments/task0011-presentation-2026-08-26-05/",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/"
+  ],
+  "rubrics_used": ["spec-contract", "eval-quality", "ui-quality", "evidence-quality", "demo-quality"],
+  "adversarial_rejection_attempts": [
+    "Tried to reject on red or stale scenario state; the eligibility manifest binds one Daily/Weekly deployment and both pass.",
+    "Tried to reject on hidden evaluator plumbing in presentation mode; leak scan and visual QA show stripped public output while internal diagnostics remain separate.",
+    "Tried to reject on weak assertions; assertion-change review exists and no source-supported behavior was weakened.",
+    "Tried to reject on missing UI evidence; desktop, mobile, report output, and internal-mode screenshots exist with design coverage.",
+    "Tried to reject on unplayable demo; media probe confirms an 82.04 second MP4 with video and narration."
+  ],
+  "overall_tas": "TAS-A",
+  "verdict": "pass",
+  "rerun_required": false,
+  "hard_gate_failures": [],
+  "failed_checks": [],
+  "finding_log": [
+    "All TASK-0011 Done items have direct artifact evidence.",
+    "Full test suite and explicit eval lint are green.",
+    "Presentation build is fail-closed on the exact eligibility manifest.",
+    "Residual risk is correctly bounded to the frozen synthetic scenario and excludes live provider reliability."
+  ],
+  "rubric_sections": {
+    "spec-contract": "The implemented deployment, inspector, docs, QA, and demo match the ticket scope.",
+    "eval-quality": "Seven current feature judges include the five A-D grade fields and reconcile with artifact-quality reviews.",
+    "ui-quality": "Visual QA passes S1-S4 and 375px/mobile checks.",
+    "evidence-quality": "Proof is hash-bound and current; stale/latest fallback paths are rejected.",
+    "demo-quality": "The recap is sourced, playable, and bounded."
+  },
+  "blocking_findings": [],
+  "next_action": "Close TASK-0011 after ticket writeback and QA receipt validation."
+}

@@ -1,0 +1,29 @@
+{
+  "ticket_id": "TASK-0011",
+  "phase": "demo",
+  "media": "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/final.mp4",
+  "sha256": "ed92efa69fa4aeb2908d0be06ab044af7fc04cbb4807de1c731109572b8b4098",
+  "duration_seconds": 82.04,
+  "size_bytes": 1046621,
+  "streams": {
+    "video": {
+      "codec": "h264",
+      "width": 1280,
+      "height": 720,
+      "duration_seconds": 82.04,
+      "frames": 7
+    },
+    "audio": {
+      "codec": "aac",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 82.01288,
+      "frames": 1767
+    }
+  },
+  "representative_frames": [
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/frame-18s.jpg",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/frame-50s.jpg"
+  ],
+  "verdict": "pass"
+}

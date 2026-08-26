@@ -1,0 +1,12 @@
+{
+  "ticket_id": "TASK-0011",
+  "phase": "demo",
+  "verdict": "pass",
+  "summary": "Narrated lead-engineer recap passed media probe and evidence review.",
+  "artifacts": [
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/final.mp4",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/evidence-map.json",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/media-probe.json",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/reviews/demo-video-review.json"
+  ]
+}

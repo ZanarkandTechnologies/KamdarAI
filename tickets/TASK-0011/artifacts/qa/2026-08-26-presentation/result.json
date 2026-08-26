@@ -1,0 +1,47 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0011",
+  "phase": "qa",
+  "proof_type": "ui",
+  "runtime_target": "http://127.0.0.1:4181",
+  "proof_policy": "Done + QA Strategy + design.md + explicit runtime handoff",
+  "verdict": "pass",
+  "summary": "QA proved the exact presentation deployment renders customer-safe business outputs, keeps internal diagnostics separate, and is backed by green full-suite proof.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "pass",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-top.png",
+  "artifacts": [
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/report.md",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/result.json",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/verification.md",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-top.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-middle.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-bottom.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-report-output.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/mobile-list.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/mobile-inspector-top.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/mobile-inspector-bottom.png",
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/internal-technical-proof.png",
+    "tickets/TASK-0011/artifacts/review/2026-08-26-completion-receipt.json",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/result.json"
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "The proof covers the frozen Company OS evaluation scenario, not live provider reliability or universal customer accuracy."
+  ],
+  "judgment_receipts": [
+    "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md",
+    "tickets/TASK-0011/artifacts/review/2026-08-26-completion-receipt.json",
+    "tickets/TASK-0011/artifacts/demo/2026-08-26_135525-presentation-recap/reviews/demo-video-review.json"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

@@ -1,0 +1,14 @@
+ffconcat version 1.0
+file '../../qa/2026-08-26-presentation/screens/desktop-top.png'
+duration 12
+file '../../qa/2026-08-26-presentation/screens/desktop-middle.png'
+duration 16
+file '../../qa/2026-08-26-presentation/screens/desktop-bottom.png'
+duration 14
+file '../../qa/2026-08-26-presentation/screens/desktop-report-output.png'
+duration 14
+file '../../qa/2026-08-26-presentation/screens/mobile-inspector-top.png'
+duration 14
+file '../../qa/2026-08-26-presentation/screens/desktop-top.png'
+duration 12
+file '../../qa/2026-08-26-presentation/screens/desktop-top.png'

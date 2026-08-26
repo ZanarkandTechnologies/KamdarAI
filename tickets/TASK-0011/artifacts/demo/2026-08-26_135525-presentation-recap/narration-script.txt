@@ -1,0 +1,11 @@
+Before this change, the eval view was not customer-ready: it mixed generated work with evaluator plumbing, and no paired Daily and Weekly deployment was eligible for presentation.
+
+After the repair, the public inspector is bound to one immutable deployment: task0011-presentation-2026-08-26-05. It shows eleven of eleven scenarios passing, seven features, three hundred forty checks, and a validation date.
+
+Here is the CMT Project example. The customer sees the pass state, four completion checks, and the five answer-quality grades: groundedness, completeness, usefulness, repeatability, and length balance. Below that, the actual Project update is rendered as current text, agent guard, and proposed replacement, with the file review beside it.
+
+The same pattern works for non-Project outputs. Weekly reports render as readable business documents with headings and tables, not raw JSON.
+
+The proof bundle is current: the Node filesystem suite has one hundred twenty-five tests with zero failures, the Python suites pass, eval lint passes, the stripped build leak scan passes, and desktop plus mobile visual QA passes.
+
+Remaining risk is bounded: this proves the frozen Company OS scenario and the presentation surface, not live provider reliability or every possible customer dataset.

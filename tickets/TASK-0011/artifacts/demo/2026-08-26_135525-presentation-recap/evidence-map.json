@@ -1,0 +1,50 @@
+{
+  "ticket_id": "TASK-0011",
+  "phase": "demo",
+  "sources": {
+    "ticket_contract": "tickets/TASK-0011/ticket.md",
+    "design_baseline": "tickets/TASK-0011/design.md",
+    "qa_verification": "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/verification.md",
+    "visual_qa": "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md",
+    "eligibility_manifest": "evals/filesystem/runs/deployments/task0011-presentation-2026-08-26-05/presentation-eligibility.json",
+    "public_model": "evals/filesystem/.vercel-static/public-model.json",
+    "build_receipt": "evals/filesystem/.vercel-static/build-receipt.json"
+  },
+  "claims": [
+    {
+      "id": "before",
+      "claim": "The prior customer surface exposed evaluator plumbing and did not have an eligible all-green paired run.",
+      "evidence": ["tickets/TASK-0011/ticket.md#Delta", "tickets/TASK-0011/progress.md"]
+    },
+    {
+      "id": "after",
+      "claim": "The final paired deployment is task0011-presentation-2026-08-26-05 and passes Daily and Weekly reconciliation.",
+      "evidence": ["evals/filesystem/runs/deployments/task0011-presentation-2026-08-26-05/presentation-eligibility.json", "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/verification.md"]
+    },
+    {
+      "id": "customer_ui",
+      "claim": "The presentation UI shows scenario status, completion checks, five answer-quality grades, generated business output, and row-level file review without public technical proof plumbing.",
+      "evidence": ["tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-top.png", "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md"]
+    },
+    {
+      "id": "example_project",
+      "claim": "The CMT Project update example shows the actual generated Project output and exact pass state.",
+      "evidence": ["tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-middle.png", "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-bottom.png"]
+    },
+    {
+      "id": "example_report",
+      "claim": "Non-Project outputs render as readable business reports and tables rather than raw JSON.",
+      "evidence": ["tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/screens/desktop-report-output.png", "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md"]
+    },
+    {
+      "id": "proof",
+      "claim": "The proof bundle includes 125 Node tests with 115 pass and 10 intentional skips, Python suites passing, eval lint passing, leak scan passing, and desktop/mobile visual QA passing.",
+      "evidence": ["tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/verification.md", "tickets/TASK-0011/artifacts/qa/2026-08-26-presentation/visual-qa.md"]
+    },
+    {
+      "id": "risk",
+      "claim": "The proof is a bounded frozen synthetic Company OS scenario and does not prove live provider reliability or general customer accuracy.",
+      "evidence": ["tickets/TASK-0011/ticket.md#QA Strategy"]
+    }
+  ]
+}
