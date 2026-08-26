@@ -106,17 +106,30 @@ test("captured Projects are grounded while synthetic operating facts stay explic
   assert.equal(JSON.stringify(raw).includes("release QA"), false);
 });
 
-test("every fictional Person resolves to the operator-owned Telegram eval sink", () => {
+test("fictional People use representative approved test routes without tracked addresses", () => {
   const people = fixture().entities.people;
   assert.equal(people.length, 6);
+  const emailRoutes = new Map([
+    ["PERSON-AISHA", "operator_primary_email"],
+    ["PERSON-JUN", "operator_secondary_email"]
+  ]);
   for (const person of people) {
-    assert.equal(person.properties.preferred_contact_channel, "Telegram");
-    assert.equal(person.properties.approved_contact_channels, "Telegram eval sink; Notion comment");
-    assert.equal(person.properties.contact_endpoint, "telegram");
-    assert.match(person.properties.contact_instructions, /operator-owned Telegram test sink/);
+    const emailAlias = emailRoutes.get(person.id);
+    if (emailAlias) {
+      assert.equal(person.properties.preferred_contact_channel, "Email");
+      assert.equal(person.properties.approved_contact_channels, "Email test sink; Telegram eval sink; Notion comment");
+      assert.equal(person.properties.contact_endpoint, emailAlias);
+      assert.match(person.properties.contact_instructions, new RegExp(emailAlias));
+    } else {
+      assert.equal(person.properties.preferred_contact_channel, "Telegram");
+      assert.equal(person.properties.approved_contact_channels, "Telegram eval sink; Notion comment");
+      assert.equal(person.properties.contact_endpoint, "telegram");
+      assert.match(person.properties.contact_instructions, /operator-owned Telegram test sink/);
+    }
     assert.match(person.properties.contact_instructions, new RegExp(`Intended for ${person.properties.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`));
     assert.match(person.body, /fictional eval Person, not a real employee contact/);
   }
+  assert.doesNotMatch(JSON.stringify(people), /@outlook\.com/i);
 });
 
 test("every Project checklist citation resolves to Work on that Project", () => {

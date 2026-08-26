@@ -10,7 +10,7 @@ const schemaPath = resolve(projectRoot, "automations/schemas/daily-integration-r
 const goldenPath = resolve(projectRoot, "automations/examples/golden/daily-integration-receipt-2026-08-25.json");
 const resultPath = resolve(projectRoot, "automations/examples/golden/daily-review-result-2026-08-25.json");
 const seedPath = resolve(projectRoot, "evals/seed/kamdar-company-os.seed.json");
-const settledStates = new Set(["applied", "duplicate", "no_finding"]);
+const settledStates = new Set(["applied", "duplicate", "delivered_to_eval_sink", "no_finding"]);
 
 function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
@@ -92,7 +92,7 @@ test("Daily integration contract exports the Zod schema and processing safety gu
   const source = readFileSync(schemaPath, "utf8");
   assert.match(source, /export const DailyIntegrationReceiptSchema = z/);
   assert.match(source, /export function assertDailyProcessingSafety\(receipt\)/);
-  for (const state of ["applied", "duplicate", "no_finding", "blocked", "conflicted", "failed"]) {
+  for (const state of ["applied", "duplicate", "delivered_to_eval_sink", "no_finding", "blocked", "conflicted", "failed"]) {
     assert.match(source, new RegExp(`"${state}"`));
   }
   assert.match(source, /\.superRefine\(/);
@@ -132,7 +132,7 @@ test("golden receipt is source-linked, provider-verifiable, and processing-safe"
       if (pointerTargetId(effect.result_pointer, row)) assert.equal(effect.target.target_id, pointerTargetId(effect.result_pointer, row));
     }
 
-    if (["applied", "duplicate"].includes(effect.outcome.state)) {
+    if (["applied", "duplicate", "delivered_to_eval_sink"].includes(effect.outcome.state)) {
       assert.ok(effect.outcome.provider_response.response_id);
       assertSyntheticUrl(effect.outcome.provider_response.response_url);
       assert.equal(effect.outcome.read_back.target_id, effect.target.target_id);
@@ -146,6 +146,11 @@ test("golden receipt is source-linked, provider-verifiable, and processing-safe"
       assert.ok(effect.outcome.reason);
     }
   }
+  const chase = receipt.effects.find((effect) => effect.feature_id === "FEAT-0003");
+  assert.equal(chase.outcome.state, "delivered_to_eval_sink");
+  assert.equal(chase.outcome.delivery_scope, "operator_owned_eval_sink");
+  assert.equal(chase.outcome.intended_recipient_person_id, "PERSON-AISHA");
+  assert.match(chase.outcome.provider_response.response_url, /^https:\/\/telegram\.example\.test\/messages\//);
   assert.deepEqual(processingSafetyErrors(receipt), []);
   assert.ok(receipt.work_processing.some((row) => row.state === "processed"));
   assert.ok(receipt.work_processing.some((row) => row.state === "unprocessed"));
@@ -157,7 +162,7 @@ test("golden receipt is source-linked, provider-verifiable, and processing-safe"
     assert.equal(row.status_after, null);
     assert.equal(row.daily_review_version_after, null);
   }
-  assert.deepEqual(new Set(receipt.effects.map((effect) => effect.outcome.state)), new Set(["applied", "duplicate", "no_finding", "blocked", "failed"]));
+  assert.deepEqual(new Set(receipt.effects.map((effect) => effect.outcome.state)), new Set(["applied", "delivered_to_eval_sink", "no_finding", "blocked", "failed"]));
 
   for (const section of ["project_updates", "completed_ticket_comments", "weekly_progress_chases", "knowledge_updates"]) {
     result[section].forEach((_row, index) => {

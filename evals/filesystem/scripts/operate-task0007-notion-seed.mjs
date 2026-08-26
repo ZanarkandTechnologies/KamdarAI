@@ -13,7 +13,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { loadKamdarSeedConfig, seedConfigPath } from "./kamdar-seed-config.mjs";
-import { loadAndValidateSeedRealismReview } from "./quality-review-contracts.mjs";
+import { loadAndValidateSeedRealismReview, validateArtifactQualityReview } from "./quality-review-contracts.mjs";
 import { runTask0007FixtureAutomation } from "./run-task0007-fixture-automation.mjs";
 import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
 
@@ -53,7 +53,7 @@ const databaseDefinitions = Object.freeze({
   },
   work_items: {
     title: "Work items",
-    properties: ["Name", "ID", "Project", "Department", "Owner", "Type", "Status", "Priority", "Start date", "Due date", "Progress", "Last meaningful update", "Meeting date", "Attendees", "Facilitator", "Daily review version", "Template", "Run key"],
+    properties: ["Name", "ID", "Project", "Department", "Owner", "Type", "Status", "Priority", "Start date", "Due date", "Progress", "Last meaningful update", "Workflow", "Workflow step", "Baseline date", "Meeting date", "Attendees", "Facilitator", "Daily review version", "Template", "Run key"],
     propertyTypes: { Type: "select", Status: "status" },
     propertyOptions: {
       Type: [{ name: "Task", color: "blue" }, { name: "Meeting", color: "purple" }, { name: "Issue", color: "red" }],
@@ -67,7 +67,7 @@ const databaseDefinitions = Object.freeze({
     }
   },
   decisions: { title: "Decisions", properties: ["Name", "ID", "Project", "Department", "Proposer", "Approver", "Status", "Decided at", "Review date", "Template", "Run key"] },
-  skills: { title: "SOPs", properties: ["Name", "ID", "Project", "Department", "Owner", "Status", "Source path", "Latest eval", "Last reviewed", "Template", "Run key"] },
+  skills: { title: "SOPs", properties: ["Name", "ID", "Project", "Department", "Owner", "Status", "Baseline version", "Effective date", "Last reviewed", "Next review", "Template", "Run key"] },
   reports: { title: "Reports", properties: ["Name", "ID", "Project", "Department", "Level", "Week start", "Status", "Report version", "Finalized at", "Previous report", "Source report IDs", "Template", "Run key"] },
   artifacts: { title: "Automation artifacts", properties: ["Name", "ID", "Pipeline", "Status", "Summary", "Artifact hash", "Output path", "Run key"] }
 });
@@ -440,7 +440,9 @@ function promotionTarget(disposition, seed, result) {
         Department: metadata.department, Owner: source.properties.owner, Type: "Issue",
         Status: "Blocked", Priority: metadata.priority, "Start date": metadata.start_date,
         "Due date": metadata.due_date, Progress: metadata.progress,
-        "Last meaningful update": metadata.last_meaningful_update, "Meeting date": "",
+        "Last meaningful update": metadata.last_meaningful_update,
+        Workflow: metadata.workflow, "Workflow step": metadata.workflow_step,
+        "Baseline date": metadata.baseline_date, "Meeting date": "",
         Attendees: "", Facilitator: "", "Daily review version": "", Template: metadata.template_id,
         "Run key": runKey
       },
@@ -454,7 +456,7 @@ function promotionTarget(disposition, seed, result) {
   };
   if (disposition.kind === "sop") return {
     databaseKey: "skills", operation: "promote_sop",
-    fields: { Name: metadata.name, ID: disposition.destination_id, Project: metadata.project, Department: metadata.department, Owner: metadata.owner, Status: metadata.status, "Source path": metadata.source_path, "Latest eval": metadata.latest_eval, "Last reviewed": metadata.last_reviewed, Template: metadata.template_id, "Run key": runKey },
+    fields: { Name: metadata.name, ID: disposition.destination_id, Project: metadata.project, Department: metadata.department, Owner: metadata.owner, Status: metadata.status, "Baseline version": metadata.baseline_version, "Effective date": metadata.effective_date, "Last reviewed": metadata.last_reviewed, "Next review": metadata.next_review, Template: metadata.template_id, "Run key": runKey },
     body
   };
   fail(`unsupported promoted destination kind ${disposition.kind}.`);
@@ -547,9 +549,20 @@ export function applyWeeklyReviewResultToNotion(options = {}) {
   const { environment, statePath, receiptPath, privateRoot } = paths;
   const sourcePath = options.resultPath;
   if (!sourcePath || !isAbsolute(sourcePath)) fail("weekly result path must be absolute.");
+  const resultBytes = readFileSync(sourcePath);
   const parsed = WeeklyReviewResultSchema.safeParse(readJson(sourcePath, "weekly review result"));
   if (!parsed.success) fail(`weekly review result does not match its Zod schema: ${parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
   const result = parsed.data;
+  const qualityReviewPath = options.qualityReviewPath;
+  if (!qualityReviewPath || !isAbsolute(qualityReviewPath)) fail("weekly artifact quality review path must be absolute.");
+  const quality = validateArtifactQualityReview({
+    rawReview: readJson(qualityReviewPath, "weekly artifact quality review"),
+    result,
+    resultBytes,
+    scope: "weekly",
+    expectedReviewPath: qualityReviewPath,
+  });
+  if (!quality.pass) fail(`weekly artifact quality review must pass at tier A; received ${quality.tier}.`);
   const ordered = validateWeeklyApplicationOrder(result);
   const preflight = preflightTask0007NotionSeed({ commandRunner, statePath, privateRoot, environment });
   const state = readState(statePath, privateRoot, environment);
@@ -633,6 +646,7 @@ export function applyWeeklyReviewResultToNotion(options = {}) {
     context_id: result.context_id,
     week: result.week,
     source_result: { path: sourcePath, sha256: sha256(readFileSync(sourcePath, "utf8")) },
+    artifact_quality_review: { path: qualityReviewPath, tier: quality.tier, sha256: sha256(readFileSync(qualityReviewPath, "utf8")) },
     root: preflight.root,
     applies_notion_writes: true,
     external_messages_sent: 0,
@@ -843,10 +857,12 @@ function main(argv = process.argv.slice(2)) {
   const useCurrent = argv.includes("--current");
   const weeklyIndex = argv.indexOf("--apply-weekly-result");
   const weeklyPath = weeklyIndex >= 0 ? argv[weeklyIndex + 1] : null;
-  const allowed = new Set([...knownModes, "--current", ...(weeklyPath ? [weeklyPath] : [])]);
-  if (modes.length !== 1 || argv.some((arg) => !allowed.has(arg)) || (weeklyIndex >= 0 && (!weeklyPath || !isAbsolute(weeklyPath)))) { process.stderr.write(stable({ status: "blocked", reason: "usage: node operate-task0007-notion-seed.mjs [--current] --provision | --preflight | --seed-only | --operate | --repair-template-ownership | --apply-weekly-result <absolute-json-path>" })); process.exitCode = 2; return; }
+  const qualityIndex = argv.indexOf("--quality-review");
+  const qualityReviewPath = qualityIndex >= 0 ? argv[qualityIndex + 1] : null;
+  const allowed = new Set([...knownModes, "--current", "--quality-review", ...(weeklyPath ? [weeklyPath] : []), ...(qualityReviewPath ? [qualityReviewPath] : [])]);
+  if (modes.length !== 1 || argv.some((arg) => !allowed.has(arg)) || (weeklyIndex >= 0 && (!weeklyPath || !isAbsolute(weeklyPath) || !qualityReviewPath || !isAbsolute(qualityReviewPath)))) { process.stderr.write(stable({ status: "blocked", reason: "usage: node operate-task0007-notion-seed.mjs [--current] --provision | --preflight | --seed-only | --operate | --repair-template-ownership | --apply-weekly-result <absolute-json-path> --quality-review <absolute-review-json-path>" })); process.exitCode = 2; return; }
   try {
-    const options = { ...(useCurrent ? { environment: currentEvalSeedEnvironment } : {}), ...(weeklyPath ? { resultPath: weeklyPath } : {}) };
+    const options = { ...(useCurrent ? { environment: currentEvalSeedEnvironment } : {}), ...(weeklyPath ? { resultPath: weeklyPath, qualityReviewPath } : {}) };
     const result = modes[0] === "--provision" ? provisionTask0007NotionSeed(options)
       : modes[0] === "--preflight" ? preflightTask0007NotionSeed(options)
         : modes[0] === "--seed-only" ? seedCurrentNotionEnvironment(options)

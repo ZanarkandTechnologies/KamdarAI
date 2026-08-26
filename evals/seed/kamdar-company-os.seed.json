@@ -39,6 +39,7 @@
     "projects": [
       {
         "id": "PROJ-CMT-CMT_PIPELINE",
+        "source_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE",
         "template": "project",
         "properties": {
           "name": "CMT Pipeline",
@@ -217,14 +218,14 @@
           "role": "CMT Lead",
           "status": "Active",
           "manager": "Kamdar leadership",
-          "preferred_contact_channel": "Telegram",
-          "approved_contact_channels": "Telegram eval sink; Notion comment",
-          "contact_endpoint": "telegram",
-          "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Aisha Rahman (CMT Lead)”. Use a Notion comment for record-specific questions.",
+          "preferred_contact_channel": "Email",
+          "approved_contact_channels": "Email test sink; Telegram eval sink; Notion comment",
+          "contact_endpoint": "operator_primary_email",
+          "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. Resolve operator_primary_email only from the private workspace route map and prefix the test email “Intended for Aisha Rahman (CMT Lead)”. Use a Notion comment for record-specific questions.",
           "timezone": "Asia/Kuala_Lumpur",
           "expertise": "tech packs; garment sampling; line planning; production handoff"
         },
-        "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns sample approval and the gate from corrected tech pack to bulk cutting.\n",
+        "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_primary_email test-sink alias and must name the intended recipient.\n\nOwns sample approval and the gate from corrected tech pack to bulk cutting.\n",
         "metadata": {
           "provenance": {
             "operating_scenario": "synthetic_eval"
@@ -265,14 +266,14 @@
           "role": "Marketing Analyst",
           "status": "Active",
           "manager": "PERSON-MAYA",
-          "preferred_contact_channel": "Telegram",
-          "approved_contact_channels": "Telegram eval sink; Notion comment",
-          "contact_endpoint": "telegram",
-          "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Jun Wong (Marketing Analyst)”. Use a Notion comment for record-specific questions.",
+          "preferred_contact_channel": "Email",
+          "approved_contact_channels": "Email test sink; Telegram eval sink; Notion comment",
+          "contact_endpoint": "operator_secondary_email",
+          "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. Resolve operator_secondary_email only from the private workspace route map and prefix the test email “Intended for Jun Wong (Marketing Analyst)”. Use a Notion comment for record-specific questions.",
           "timezone": "Asia/Kuala_Lumpur",
           "expertise": "Meta reporting; campaign assets; channel handoffs"
         },
-        "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nPrepares weekly Meta evidence and coordinates campaign asset delivery.\n",
+        "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_secondary_email test-sink alias and must name the intended recipient.\n\nPrepares weekly Meta evidence and coordinates campaign asset delivery.\n",
         "metadata": {
           "provenance": {
             "operating_scenario": "synthetic_eval"

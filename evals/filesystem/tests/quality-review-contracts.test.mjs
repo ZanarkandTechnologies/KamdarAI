@@ -16,7 +16,7 @@ test("the seed realism approval binds the exact seed and covers every entity and
   assert.deepEqual(validateSeedRealismReview({ rawReview: raw(), seed: loadKamdarSeedConfig(), seedBytes: readFileSync(seedPath), expectedReviewPath: reviewPath }), {
     pass: true,
     tier: "A",
-    seed_sha256: "6b9f89be76c154d3b2076f97fe33c8c638246a607938af17d995ad8962c91ff3",
+    seed_sha256: "a3a16c21568ccb5b25faf5e555e98b13f5cff0a5b7047257d89b39af60ceff7c",
   });
 });
 

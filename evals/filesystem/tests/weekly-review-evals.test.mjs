@@ -14,6 +14,7 @@ import {
   validateUnifiedWeeklyRun,
 } from "../scripts/unified-weekly-review-eval.mjs";
 import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
+import { ArtifactQualityReviewSchema } from "../../../automations/schemas/artifact-quality-review.zod.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const suitePath = resolve(projectRoot, "evals/weekly-review-evals.json");
@@ -59,11 +60,20 @@ function addJudgedEvidence(root, deterministic) {
     weekly_result_sha256: sha256(resultBytes),
     checks: ["manifest", "inventory", "zod", "source-closure", "mock-integrations"],
   });
-  for (const feature of suite.features) writeJson(resolve(root, `eval/judges/${feature.feature_id}.json`), {
+  for (const feature of suite.features) {
+    const packet = buildWeeklyFeatureJudgePacket({ featureId: feature.feature_id, result: deterministic.result, context: deterministic.context, runRoot: root, suite });
+    writeJson(resolve(root, `eval/judges/${feature.feature_id}.json`), {
     lane: "tester",
     target: feature.feature_id,
     claim_under_test: feature.claim,
     tier: "A",
+    rubric: {
+      groundedness: "A",
+      completeness: "A",
+      usefulness: "A",
+      repeatability: "A",
+      length_balance: "A",
+    },
     test_cases: [`${feature.feature_id}-golden-W34`],
     assertions: feature.assertions.map((assertion, index) => ({ assertion, met: true, evidence: [`${feature.result_path}#assertion-${index + 1}`] })),
     evidence: [`weekly/review/weekly-review-result-2026-W34.json:${feature.result_path}`],
@@ -71,7 +81,9 @@ function addJudgedEvidence(root, deterministic) {
     artifacts: ["weekly/run-manifest-2026-W34.json", "weekly/review/weekly-review-result-2026-W34.json"],
     blockers: [],
     verdict_path: resolve(root, `eval/judges/${feature.feature_id}.json`),
-  });
+    packet_sha256: packet.packet_sha256,
+    });
+  }
   writeJson(resolve(root, "eval/evidence-review.json"), {
     lane: "evidence-review",
     independent: true,
@@ -106,7 +118,7 @@ function addJudgedEvidence(root, deterministic) {
     rubric_path: "evals/rubrics/end-user-artifact-quality.md",
     tier: "A",
     verdict: "pass",
-    artifacts: pointers.map((pointer) => ({ artifact_pointer: pointer, checks: { referential_clarity: check(pointer), end_user_value: check(pointer), readability: check(pointer), template_fidelity: check(pointer), groundedness: check(pointer) } })),
+    artifacts: pointers.map((pointer) => ({ artifact_pointer: pointer, checks: { referential_clarity: check(pointer), end_user_value: check(pointer), readability: check(pointer), template_fidelity: check(pointer), groundedness: check(pointer), workflow_reconstructability: check(pointer), baseline_integrity: check(pointer) } })),
     hard_gate_failures: [],
     repair_route: "none",
     review_path: resolve(root, "eval/artifact-quality-review.json"),
@@ -123,9 +135,9 @@ function addJudgedEvidence(root, deterministic) {
 
 test("Weekly acceptance owns FEAT-0005 through FEAT-0007 from one immutable run", () => {
   const suite = loadSuite();
-  assert.equal(suite.schema_version, "kamdar-weekly-review-evals@1.0.0");
+  assert.equal(suite.schema_version, "kamdar-weekly-review-evals@2.0.0");
   assert.deepEqual(suite.features.map((feature) => feature.feature_id), ["FEAT-0005", "FEAT-0006", "FEAT-0007"]);
-  assert.deepEqual(suite.cases.flatMap((row) => row.feature_ids).sort(), ["FEAT-0005", "FEAT-0006", "FEAT-0007"]);
+  assert.deepEqual(suite.evals.flatMap((row) => row.metadata.extensions.kamdar.feature_ids).sort(), ["FEAT-0005", "FEAT-0006", "FEAT-0007"]);
   for (const feature of suite.features) {
     assert.ok(feature.result_path);
     assert.ok(feature.entity_ids.length);
@@ -140,13 +152,13 @@ test("Weekly feature evidence resolves to the reviewed seed", () => {
   const ids = new Set(["projects", "people", "work_items", "meetings", "reports"]
     .flatMap((group) => seed.entities[group].map((entity) => entity.id)));
   for (const feature of suite.features) for (const id of feature.entity_ids) assert.ok(ids.has(id), `${feature.feature_id}:${id}`);
-  for (const evaluationCase of suite.cases) for (const id of evaluationCase.entity_ids) assert.ok(ids.has(id), `${evaluationCase.id}:${id}`);
+  for (const evaluationCase of suite.evals) for (const id of evaluationCase.metadata.extensions.kamdar.entity_ids) assert.ok(ids.has(id), `${evaluationCase.id}:${id}`);
 });
 
 test("FEAT-0006 judges Draft-backed candidates without treating raw Work as runtime input", () => {
   const suite = loadSuite();
   const feature = suite.features.find((item) => item.feature_id === "FEAT-0006");
-  const evaluationCase = suite.cases.find((item) => item.feature_ids.includes("FEAT-0006"));
+  const evaluationCase = suite.evals.find((item) => item.metadata.extensions.kamdar.feature_ids.includes("FEAT-0006"));
   const reportIds = [
     "RPT-PROJ-CMT-CMT_PIPELINE-W34",
     "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
@@ -156,7 +168,7 @@ test("FEAT-0006 judges Draft-backed candidates without treating raw Work as runt
 
   assert.equal(suite.artifact_policy.seed_is_judge_reference_not_runtime_input, true);
   assert.deepEqual(feature.entity_ids, [...candidateSourceIds, ...reportIds]);
-  assert.deepEqual(evaluationCase.entity_ids, [...candidateSourceIds, ...reportIds]);
+  assert.deepEqual(evaluationCase.metadata.extensions.kamdar.entity_ids, [...candidateSourceIds, ...reportIds]);
   assert.match(feature.claim, /Project Drafts/);
   assert.match(feature.claim, /never rescans raw Work or Meetings/);
   assert.match(evaluationCase.prompt, /Project reports/);
@@ -187,7 +199,12 @@ test("Weekly Zod contract blocks false Company finalization", () => {
       report_version: 1,
       report_status: "Blocked",
       finalized_at: null,
-      report_markdown: "## Summary\n\nCompany rollup awaits the missing Content Area report.",
+      report_markdown: "## Summary\n\nCompany rollup awaits the missing Content Area report.\n\n## Problems and inefficiencies\n\nMissing Content report blocks the Company view\n\nLeadership cannot inspect the complete company week.\n\nOne expected Area report is absent; confidence is high.\n\nCreate the missing report and verify the Company source chain.\n\n## Decisions\n\nKeep the Company report blocked\n\nFinalizing would hide missing evidence.\n\nThe Weekly reviewer holds finalization now.\n\nFinalize only after every expected Area report exists.\n\n## SOPs\n\nDo not promote a workflow from incomplete evidence\n\nRetain candidates in the report until evidence is complete.\n\nThe Weekly reviewer owns this control.",
+      company_executive_context: {
+        problems: [{ title: "Missing Content report blocks the Company view", context_and_operating_impact: "Leadership cannot inspect the complete company week.", measurement_and_confidence: "One expected Area report is absent; confidence is high.", intervention_and_test: "Create the missing report and verify the Company source chain.", evidence_ids: ["RPT-AREA-CMT-W34"] }],
+        decisions: [{ title: "Keep the Company report blocked", context_rationale_and_tradeoff: "Finalizing would hide missing evidence.", authority_and_timing: "The Weekly reviewer holds finalization now.", consequence_and_review_trigger: "Finalize only after every expected Area report exists.", evidence_ids: ["RPT-AREA-CMT-W34"] }],
+        sops: [{ title: "Do not promote a workflow from incomplete evidence", workflow_and_output: "Retain candidates in the report until evidence is complete.", proof_scope_and_owner: "The Weekly reviewer owns this control.", disposition: "deferred", destination_id: null, evidence_ids: ["RPT-AREA-CMT-W34"] }],
+      },
       configuration_gaps: ["Content Area report missing"],
     }],
     promotion_dispositions: [],
@@ -207,14 +224,97 @@ test("promoted knowledge renders the complete destination template", () => {
     .filter((row) => row.disposition === "promoted")
     .map((row) => [row.kind, row.rendered_markdown]));
   const required = {
-    problem: ["template_id: kamdar-issue", "## Problem and impact", "## Evidence and reproduction", "## Diagnosis", "## Containment and next action", "## Resolution and verification", "## Related records"],
+    problem: ["template_id: kamdar-issue", "## Problem and impact", "## Before baseline and economics", "## Evidence and reproduction", "## Diagnosis", "## Containment and next action", "## Intervention and measurement plan", "## Resolution and verification", "## After measurement and verified value", "## Related records"],
     decision: ["template_id: company-os-decision", "## Context", "## Options and tradeoffs", "## Decision rationale", "## Consequences and review trigger", "## Evidence and related records"],
-    sop: ["template_id: company-os-skill", "## Capability", "## Proven use", "## Boundaries and dependencies", "## Source and proof"],
+    sop: ["template_id: kamdar-employee-sop", "## Purpose and outcome", "## Trigger, actors, and inputs", "## Current workflow", "## Timing and volume baseline", "## Exceptions and controls", "## Improvement and verification", "## Evidence and related records"],
   };
   for (const [kind, markers] of Object.entries(required)) {
     assert.ok(promoted[kind], `${kind} promotion is missing`);
     for (const marker of markers) assert.match(promoted[kind], new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+});
+
+test("Weekly promotion rejects software skill cards for employee workflows", () => {
+  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const invalid = structuredClone(result);
+  const workflow = invalid.promotion_dispositions.find((row) => row.kind === "sop" && row.disposition === "promoted");
+  workflow.rendered_markdown = workflow.rendered_markdown.replace("template_id: kamdar-employee-sop", "template_id: company-os-skill");
+  assert.equal(WeeklyReviewResultSchema.safeParse(invalid).success, false);
+});
+
+test("Weekly promotion rejects missing or placeholder problem baselines", () => {
+  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const missingProof = structuredClone(result);
+  missingProof.promotion_dispositions[0].problem_baseline_proof = null;
+  assert.equal(WeeklyReviewResultSchema.safeParse(missingProof).success, false);
+
+  const emptyProof = structuredClone(result);
+  emptyProof.promotion_dispositions[0].problem_baseline_proof.measured_metrics = [];
+  emptyProof.promotion_dispositions[0].problem_baseline_proof.measurement_gaps = [];
+  assert.equal(WeeklyReviewResultSchema.safeParse(emptyProof).success, false);
+
+  const placeholder = structuredClone(result);
+  placeholder.promotion_dispositions[0].rendered_markdown = placeholder.promotion_dispositions[0].rendered_markdown.replace(
+    /## Before baseline and economics[\s\S]*?## Evidence and reproduction/,
+    "## Before baseline and economics\n\nNo baseline.\n\n## Evidence and reproduction",
+  );
+  assert.equal(WeeklyReviewResultSchema.safeParse(placeholder).success, false);
+});
+
+test("Weekly promotion preserves only reusable or material Decisions with advise-style options", () => {
+  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const decision = result.promotion_dispositions.find((row) => row.kind === "decision" && row.disposition === "promoted");
+  assert.ok(decision.decision_preservation_proof);
+  assert.ok(decision.decision_preservation_proof.options_considered.length >= 2);
+
+  const missingProof = structuredClone(result);
+  missingProof.promotion_dispositions.find((row) => row.kind === "decision" && row.disposition === "promoted").decision_preservation_proof = null;
+  assert.equal(WeeklyReviewResultSchema.safeParse(missingProof).success, false);
+
+  const fakeSelection = structuredClone(result);
+  fakeSelection.promotion_dispositions.find((row) => row.kind === "decision" && row.disposition === "promoted").decision_preservation_proof.selected_option = "An option that was never considered";
+  assert.equal(WeeklyReviewResultSchema.safeParse(fakeSelection).success, false);
+
+  const missingOption = structuredClone(result);
+  const row = missingOption.promotion_dispositions.find((item) => item.kind === "decision" && item.disposition === "promoted");
+  row.rendered_markdown = row.rendered_markdown.replace(row.decision_preservation_proof.options_considered[1].option, "Unlabelled alternative");
+  assert.equal(WeeklyReviewResultSchema.safeParse(missingOption).success, false);
+});
+
+test("Company reports require structured executive context rendered into the report", () => {
+  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const company = result.report_results.find((row) => row.report_level === "Company");
+  assert.ok(company.company_executive_context.problems.length);
+  assert.ok(company.company_executive_context.decisions.length);
+  assert.ok(company.company_executive_context.sops.length);
+
+  const missing = structuredClone(result);
+  missing.report_results.find((row) => row.report_level === "Company").company_executive_context = null;
+  assert.equal(WeeklyReviewResultSchema.safeParse(missing).success, false);
+
+  const omitted = structuredClone(result);
+  const omittedCompany = omitted.report_results.find((row) => row.report_level === "Company");
+  omittedCompany.report_markdown = omittedCompany.report_markdown.replace(omittedCompany.company_executive_context.decisions[0].title, "Context-free directive");
+  assert.equal(WeeklyReviewResultSchema.safeParse(omitted).success, false);
+
+  const surfaceOnly = structuredClone(result);
+  const surfaceCompany = surfaceOnly.report_results.find((row) => row.report_level === "Company");
+  surfaceCompany.report_markdown = surfaceCompany.report_markdown.replace(surfaceCompany.company_executive_context.problems[0].measurement_and_confidence, "Impact exists.");
+  assert.equal(WeeklyReviewResultSchema.safeParse(surfaceOnly).success, false);
+});
+
+test("artifact quality review requires workflow reconstruction and baseline integrity", () => {
+  const pointer = "/report_results/0";
+  const check = { pass: true, evidence_refs: [`result.json#${pointer}`], findings: [] };
+  const review = {
+    schema_version: "kamdar-artifact-quality-review@1.0.0", lane: "artifact-quality-review", independent: true,
+    scope: "weekly", context_id: "weekly-context-2026-W34", result_sha256: "a".repeat(64), rubric_path: "evals/rubrics/end-user-artifact-quality.md",
+    tier: "A", verdict: "pass", artifacts: [{ artifact_pointer: pointer, checks: { referential_clarity: check, end_user_value: check, readability: check, template_fidelity: check, groundedness: check, workflow_reconstructability: check, baseline_integrity: check } }],
+    hard_gate_failures: [], repair_route: "none", review_path: "/tmp/review.json",
+  };
+  assert.equal(ArtifactQualityReviewSchema.safeParse(review).success, true);
+  delete review.artifacts[0].checks.workflow_reconstructability;
+  assert.equal(ArtifactQualityReviewSchema.safeParse(review).success, false);
 });
 
 test("golden Weekly run passes manifest, inventory, Zod, provenance, and mock integration checks", () => {
@@ -227,12 +327,57 @@ test("golden Weekly run passes manifest, inventory, Zod, provenance, and mock in
   assert.equal("meetings" in proof.context, false);
 });
 
-test("feature judge packets use Draft-backed result slices and named seed evidence", () => {
-  const proof = validateUnifiedWeeklyRun({ runRoot: goldenRun() });
-  const packets = ["FEAT-0005", "FEAT-0006", "FEAT-0007"].map((featureId) => buildWeeklyFeatureJudgePacket({ featureId, result: proof.result }));
+test("feature judge packets use exact frozen Draft-backed evidence", () => {
+  const root = goldenRun();
+  const rerunProof = validateUnifiedWeeklyRun({ runRoot: root });
+  const packets = ["FEAT-0005", "FEAT-0006", "FEAT-0007"].map((featureId) => buildWeeklyFeatureJudgePacket({ featureId, result: rerunProof.result, context: rerunProof.context, runRoot: root }));
   assert.deepEqual(packets.map((packet) => packet.candidate.length), [7, 5, 1]);
-  assert.ok(packets.every((packet) => packet.seed_evidence.every(Boolean)));
+  assert.ok(packets.every((packet) => packet.seed_controls.every(Boolean)));
+  assert.ok(packets.every((packet) => packet.frozen_context_evidence.reports.length > 0));
+  assert.ok(packets.every((packet) => !Object.hasOwn(packet, "seed_evidence")));
+  assert.ok(packets.every((packet) => /^[a-f0-9]{64}$/.test(packet.packet_sha256)));
+  assert.ok(packets.every((packet) => Object.keys(packet.judge_policy.output_shape.rubric).length === 5));
+  assert.equal("runtime_evidence" in packets[0], false);
+  assert.equal("runtime_evidence" in packets[1], false);
+  assert.deepEqual(packets[2].runtime_evidence.replacement_counts, { candidates: 1, receipt_effects: 1, read_back_observations: 1 });
+  assert.deepEqual(packets[2].runtime_evidence.work_target_boundary, { target_ids: ["TASK-101", "TASK-104", "TASK-110"], matching_effects: [] });
+  assert.equal(packets[2].runtime_evidence.replacement_read_back.matched, true);
+  assert.equal(packets[2].runtime_evidence.rerun.duplicate_effects_created, 0);
+  assert.match(packets[2].judge_policy.evidence_rule, /bound runtime_evidence/);
   assert.match(packets[1].claim, /never rescans raw Work or Meetings/);
+});
+
+test("FEAT-0007 packet rejects missing, stale, or extra runtime evidence", () => {
+  const baseRoot = goldenRun();
+  const base = validateUnifiedWeeklyRun({ runRoot: baseRoot });
+  const suite = loadWeeklyReviewEvalSuite();
+  const build = (root) => buildWeeklyFeatureJudgePacket({ featureId: "FEAT-0007", result: base.result, context: base.context, runRoot: root, suite });
+
+  const missing = goldenRun();
+  const missingReceiptPath = resolve(missing, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
+  const missingReceipt = json(missingReceiptPath);
+  missingReceipt.effects = missingReceipt.effects.filter((row) => row.feature_id !== "FEAT-0007");
+  writeJson(missingReceiptPath, missingReceipt);
+  assert.throws(() => build(missing), /exactly one matching receipt effect/);
+
+  const stale = goldenRun();
+  const staleReadBackPath = resolve(stale, "weekly/read-back/weekly-integration-read-back-2026-W34.json");
+  const staleReadBack = json(staleReadBackPath);
+  staleReadBack.observations.find((row) => row.feature_id === "FEAT-0007").observed_sha256 = "0".repeat(64);
+  writeJson(staleReadBackPath, staleReadBack);
+  assert.throws(() => build(stale), /read-back is stale/);
+
+  const extra = goldenRun();
+  const extraReceiptPath = resolve(extra, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
+  const extraReceipt = json(extraReceiptPath);
+  extraReceipt.effects.push({
+    ...structuredClone(extraReceipt.effects.find((row) => row.feature_id === "FEAT-0007")),
+    feature_id: "FEAT-0006",
+    result_pointer: "/promotion_dispositions/0",
+    target_id: "TASK-101",
+  });
+  writeJson(extraReceiptPath, extraReceipt);
+  assert.throws(() => build(extra), /forbidden Work-targeting effects: TASK-101/);
 });
 
 test("judged Weekly run requires three tier-A testers, a separate reviewer, and matching integration checks", () => {
@@ -344,4 +489,16 @@ test("judged Weekly runner rejects missing or wrong tester verdict_path", () => 
   writeJson(wrongVerdictPath, wrongVerdict);
   const wrongDeterministic = validateUnifiedWeeklyRun({ runRoot: wrong, stage: "judged" });
   assert.throws(() => reconcileJudgedWeeklyRun({ runRoot: wrong, deterministic: wrongDeterministic }), /exact absolute manifest verdict path/);
+});
+
+test("judged Weekly runner rejects a missing five-grade rubric", () => {
+  const root = goldenRun();
+  const base = validateUnifiedWeeklyRun({ runRoot: root });
+  addJudgedEvidence(root, base);
+  const verdictPath = resolve(root, "eval/judges/FEAT-0005.json");
+  const verdict = json(verdictPath);
+  delete verdict.rubric;
+  writeJson(verdictPath, verdict);
+  const deterministic = validateUnifiedWeeklyRun({ runRoot: root, stage: "judged" });
+  assert.throws(() => reconcileJudgedWeeklyRun({ runRoot: root, deterministic }), /missing the required five-grade rubric/);
 });

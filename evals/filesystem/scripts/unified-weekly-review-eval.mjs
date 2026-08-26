@@ -11,6 +11,11 @@ import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
+import { WeeklyContextSchema } from "../../../automations/schemas/weekly-context.zod.mjs";
+import {
+  validateCompanyOperatingEvalSuite,
+  validateJudgeRubric,
+} from "./company-operating-eval-contract.mjs";
 import { loadKamdarSeedConfig } from "./kamdar-seed-config.mjs";
 import { validateArtifactQualityReview } from "./quality-review-contracts.mjs";
 
@@ -51,7 +56,7 @@ function artifactByKind(suite, kind) {
 
 export function loadWeeklyReviewEvalSuite({ path = defaultSuitePath } = {}) {
   const suite = readJson(path);
-  if (suite.schema_version !== "kamdar-weekly-review-evals@1.0.0") fail("suite schema_version is unsupported.");
+  if (suite.schema_version !== "kamdar-weekly-review-evals@2.0.0") fail("suite schema_version is unsupported.");
   if (!Array.isArray(suite.run_artifacts) || !suite.run_artifacts.length) fail("suite needs run_artifacts.");
   const paths = new Set();
   for (const [index, artifact] of suite.run_artifacts.entries()) {
@@ -67,7 +72,7 @@ export function loadWeeklyReviewEvalSuite({ path = defaultSuitePath } = {}) {
     if (!feature.result_path || !Array.isArray(feature.entity_ids) || !feature.entity_ids.length || !feature.claim || !Array.isArray(feature.assertions) || !feature.assertions.length || !feature.falsifier) fail(`${feature.feature_id} is incomplete.`);
     artifactByKind(suite, `feature-judge:${feature.feature_id}`);
   }
-  return suite;
+  return validateCompanyOperatingEvalSuite(suite, { label: "Unified Weekly review eval" });
 }
 
 export function inventoryWeeklyRun(root) {
@@ -113,14 +118,114 @@ function contextEntityIds(context) {
   ]);
 }
 function validateWeeklyContext(context, seed) {
-  if (!isObject(context) || context.schema_version !== "kamdar-weekly-context@1.0.0" || context.artifact_type !== "kamdar-weekly-context" || !context.context_id || !/^\d{4}-W\d{2}$/.test(context.week)) fail("Weekly context has the wrong artifact contract.");
-  for (const key of ["projects", "reports", "draft_candidate_refs", "expected_areas", "source_gaps"]) if (!Array.isArray(context[key])) fail(`Weekly context ${key} must be an array.`);
-  if ("work_items" in context || "meetings" in context) fail("Weekly runtime context must not contain raw Work or Meeting records.");
+  if (isObject(context) && ("work_items" in context || "meetings" in context)) fail("Weekly runtime context must not contain raw Work or Meeting records.");
+  const parsed = WeeklyContextSchema.safeParse(context);
+  if (!parsed.success) fail(`Weekly context failed Zod validation: ${parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
+  context = parsed.data;
   const entities = seedEntityIndex(seed);
   for (const id of contextEntityIds(context)) if (!entities.has(id)) fail(`Weekly context references unknown seed entity ${id}.`);
   const draftIds = new Set(context.reports.filter((report) => report.status === "Draft").map((report) => report.id));
   for (const row of context.draft_candidate_refs) if (!draftIds.has(row.source_report_id)) fail(`candidate refs must come from an immutable Project Draft: ${row.source_report_id}.`);
-  return { ids: contextEntityIds(context), entities };
+  return { context, ids: contextEntityIds(context), entities };
+}
+
+function weeklyRowSourceIds(row) {
+  return [
+    row?.project_id,
+    row?.previous_report_id,
+    row?.candidate_id,
+    row?.source_report_id,
+    ...(row?.source_report_ids || []),
+    ...(row?.source_ids || []),
+  ].filter(Boolean);
+}
+
+function weeklyContextSlice(context, feature, candidate) {
+  const wanted = new Set([...feature.entity_ids, ...candidate.flatMap(weeklyRowSourceIds)]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const report of context.reports) {
+      if (!wanted.has(report.id) && !report.source_ids.some((id) => wanted.has(id))) continue;
+      for (const id of [report.id, report.project_id, report.previous_report_id, ...report.source_ids].filter(Boolean)) {
+        if (!wanted.has(id)) { wanted.add(id); changed = true; }
+      }
+    }
+    for (const ref of context.draft_candidate_refs) {
+      if (!wanted.has(ref.source_report_id) && !ref.source_ids.some((id) => wanted.has(id))) continue;
+      for (const id of [ref.source_report_id, ...ref.source_ids]) {
+        if (!wanted.has(id)) { wanted.add(id); changed = true; }
+      }
+    }
+  }
+  return {
+    schema_version: context.schema_version,
+    artifact_type: context.artifact_type,
+    context_id: context.context_id,
+    week: context.week,
+    collected_at: context.collected_at,
+    runtime_input_policy: context.runtime_input_policy,
+    projects: context.projects.filter((row) => wanted.has(row.id)),
+    reports: context.reports.filter((row) => wanted.has(row.id)),
+    draft_candidate_refs: context.draft_candidate_refs.filter((row) => wanted.has(row.source_report_id)),
+    expected_areas: context.expected_areas,
+    source_gaps: context.source_gaps,
+  };
+}
+
+function packetDigest(packetWithoutHash) { return sha256(stableJson(packetWithoutHash)); }
+
+function weeklyFeature7RuntimeEvidence({ runRoot, suite, feature, result }) {
+  const receiptPath = resolve(runRoot, artifactByKind(suite, "mock-integration-receipt"));
+  const readBackPath = resolve(runRoot, artifactByKind(suite, "mock-provider-read-back"));
+  const receiptBytes = readFileSync(receiptPath);
+  const readBackBytes = readFileSync(readBackPath);
+  const receipt = readJson(receiptPath, "Weekly integration receipt");
+  const readBack = readJson(readBackPath, "Weekly provider read-back");
+  const candidates = result.next_week_project_replacements;
+  if (!Array.isArray(candidates) || candidates.length !== 1) fail("FEAT-0007 runtime evidence requires exactly one Project replacement candidate.");
+  const pointer = "/next_week_project_replacements/0";
+  const effects = receipt.effects?.filter((row) => row.feature_id === feature.feature_id && row.result_pointer === pointer) ?? [];
+  if (effects.length !== 1) fail("FEAT-0007 runtime evidence requires exactly one matching receipt effect.");
+  const observations = readBack.observations?.filter((row) => row.feature_id === feature.feature_id && row.result_pointer === pointer) ?? [];
+  if (observations.length !== 1) fail("FEAT-0007 runtime evidence requires exactly one matching read-back observation.");
+  const effect = effects[0];
+  const observation = observations[0];
+  const candidateHash = payloadSha256(candidates[0]);
+  if (effect.operation !== "replace_project_attention"
+    || effect.target_id !== candidates[0].project_id
+    || effect.payload_sha256 !== candidateHash
+    || !["applied", "duplicate"].includes(effect.outcome)) fail("FEAT-0007 receipt effect is stale or does not describe the exact replacement.");
+  if (observation.target_id !== effect.target_id
+    || observation.provider_id_or_url !== effect.provider_id_or_url
+    || observation.observed_sha256 !== candidateHash
+    || payloadSha256(observation.observed_payload) !== candidateHash
+    || observation.matched !== true) fail("FEAT-0007 read-back is stale or does not match the exact replacement.");
+
+  const workTargetIds = feature.entity_ids.filter((id) => /^TASK-/.test(id));
+  const workTargetEffects = receipt.effects?.filter((row) => workTargetIds.includes(row.target_id)) ?? [];
+  if (workTargetEffects.length) fail(`FEAT-0007 runtime evidence found forbidden Work-targeting effects: ${workTargetEffects.map((row) => row.target_id).join(", ")}.`);
+  if (!Array.isArray(readBack.source_invariants) || !readBack.source_invariants.length
+    || readBack.source_invariants.some((row) => row.changed !== false || !/^[a-f0-9]{64}$/.test(row.observed_sha256))) {
+    fail("FEAT-0007 runtime evidence requires unchanged source invariants.");
+  }
+  if (readBack.rerun?.idempotent !== true || readBack.rerun?.duplicate_effects_created !== 0) {
+    fail("FEAT-0007 runtime evidence requires an idempotent rerun with zero duplicate effects.");
+  }
+
+  return {
+    receipt_sha256: sha256(receiptBytes),
+    read_back_sha256: sha256(readBackBytes),
+    replacement_counts: { candidates: 1, receipt_effects: 1, read_back_observations: 1 },
+    replacement_effect: effect,
+    replacement_read_back: observation,
+    work_target_boundary: { target_ids: workTargetIds, matching_effects: [] },
+    source_invariants: readBack.source_invariants,
+    rerun: {
+      idempotent: true,
+      duplicate_effects_created: 0,
+    },
+  };
 }
 function reportPayload(report) {
   return {
@@ -231,14 +336,16 @@ export function validateUnifiedWeeklyRun({ runRoot, suite = loadWeeklyReviewEval
   const inventoryPaths = assertExactWeeklyRunArtifacts(runRoot, suite, { stage });
   const inventory = inventoryWeeklyRun(runRoot);
   const manifest = readJson(resolve(runRoot, artifactByKind(suite, "immutable-run-manifest")), "Weekly manifest");
-  const context = readJson(resolve(runRoot, artifactByKind(suite, "weekly-context")), "Weekly context");
+  const contextPath = resolve(runRoot, artifactByKind(suite, "weekly-context"));
+  const contextBytes = readFileSync(contextPath);
+  const rawContext = readJson(contextPath, "Weekly context");
   const resultPath = resolve(runRoot, artifactByKind(suite, "weekly-review-result"));
   const resultBytes = readFileSync(resultPath);
   const rawResult = readJson(resultPath, "Weekly review result");
   const receipt = readJson(resolve(runRoot, artifactByKind(suite, "mock-integration-receipt")), "Weekly integration receipt");
   const readBack = readJson(resolve(runRoot, artifactByKind(suite, "mock-provider-read-back")), "Weekly provider read-back");
   const manifestRows = validateManifest({ runRoot, suite, manifest, inventory });
-  const { ids: contextIds } = validateWeeklyContext(context, seed);
+  const { context, ids: contextIds } = validateWeeklyContext(rawContext, seed);
   const parsed = WeeklyReviewResultSchema.safeParse(rawResult);
   if (!parsed.success) fail(`Weekly review result failed Zod validation: ${parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
   if (parsed.data.context_id !== context.context_id || parsed.data.week !== context.week) fail("Weekly result context or week does not match collected context.");
@@ -249,26 +356,72 @@ export function validateUnifiedWeeklyRun({ runRoot, suite = loadWeeklyReviewEval
     return { feature_id: feature.feature_id, result_path: feature.result_path, rows: slice.length };
   });
   const integrations = validateMockIntegrations({ result: parsed.data, context, receipt, readBack, resultBytes });
-  return { pass: true, stage, inventory: inventoryPaths, immutable_inputs: manifestRows, context, result: parsed.data, receipt, read_back: readBack, feature_checks: featureChecks, integrations };
+  return {
+    pass: true,
+    stage,
+    inventory: inventoryPaths,
+    immutable_inputs: manifestRows,
+    context,
+    context_sha256: sha256(contextBytes),
+    result: parsed.data,
+    result_sha256: sha256(resultBytes),
+    receipt,
+    read_back: readBack,
+    feature_checks: featureChecks,
+    integrations,
+  };
 }
 
-export function buildWeeklyFeatureJudgePacket({ featureId, result, suite = loadWeeklyReviewEvalSuite(), seed = loadKamdarSeedConfig() }) {
+export function buildWeeklyFeatureJudgePacket({ featureId, result, context, runRoot, suite = loadWeeklyReviewEvalSuite(), seed = loadKamdarSeedConfig() }) {
   const feature = suite.features.find((item) => item.feature_id === featureId);
   if (!feature) fail(`unknown judge feature ${featureId}.`);
+  if (!runRoot) fail("Weekly judge packet construction requires the exact run root.");
   const entities = seedEntityIndex(seed);
-  return {
-    schema_version: "kamdar-weekly-feature-judge-packet@1.0.0",
+  const contextPath = resolve(runRoot, artifactByKind(suite, "weekly-context"));
+  const resultPath = resolve(runRoot, artifactByKind(suite, "weekly-review-result"));
+  const frozenContext = validateWeeklyContext(readJson(contextPath, "Weekly context"), seed).context;
+  const fileResult = readJson(resultPath, "Weekly result");
+  if (context && stableJson(context) !== stableJson(frozenContext)) fail("Weekly judge packet context does not match the exact frozen context bytes.");
+  if (stableJson(result) !== stableJson(fileResult)) fail("Weekly judge packet candidate does not match the exact frozen result bytes.");
+  const candidate = resultSlice(result, feature.result_path);
+  const runtimeEvidence = feature.feature_id === "FEAT-0007"
+    ? weeklyFeature7RuntimeEvidence({ runRoot, suite, feature, result })
+    : undefined;
+  const packet = {
+    schema_version: "kamdar-weekly-feature-judge-packet@2.0.0",
     feature_id: feature.feature_id,
     claim: feature.claim,
     falsifier: feature.falsifier,
-    candidate: resultSlice(result, feature.result_path),
-    configuration_gaps: feature.feature_id === "FEAT-0005" ? result.configuration_gaps : undefined,
-    seed_evidence: feature.entity_ids.map((id) => entities.get(id)),
+    context_id: frozenContext.context_id,
+    context_sha256: sha256(readFileSync(contextPath)),
+    result_sha256: sha256(readFileSync(resultPath)),
+    candidate,
+    ...(feature.feature_id === "FEAT-0005" ? { configuration_gaps: result.configuration_gaps } : {}),
+    ...(runtimeEvidence ? { runtime_evidence: runtimeEvidence } : {}),
+    frozen_context_evidence: weeklyContextSlice(frozenContext, feature, candidate),
+    seed_controls: feature.entity_ids.map((id) => ({ id, group: entities.get(id)?.group })).filter((row) => row.group),
     assertions: feature.assertions,
-    judge_policy: { tiers: ["A", "B", "C", "D"], passing_tier: "A", evidence_rule: "Cite immutable JSON pointers and exact seed/template IDs; missing evidence is tier D." },
+    judge_policy: {
+      tiers: ["A", "B", "C", "D"],
+      passing_tier: "A",
+      evidence_rule: feature.feature_id === "FEAT-0007"
+        ? "Judge the candidate against both exact frozen Project-Draft evidence and the bound runtime_evidence receipt/read-back slice. Seed controls establish identity only; missing frozen or runtime evidence is tier D."
+        : "Judge only the candidate and exact frozen Project-Draft evidence in this packet. Seed controls establish identity only; missing runtime evidence is tier D.",
+      output_shape: {
+        packet_sha256: "exact packet_sha256 supplied by this packet",
+        rubric: {
+          groundedness: "A|B|C|D",
+          completeness: "A|B|C|D",
+          usefulness: "A|B|C|D",
+          repeatability: "A|B|C|D",
+          length_balance: "A|B|C|D",
+        },
+      },
+    },
   };
+  return { ...packet, packet_sha256: packetDigest(packet) };
 }
-function validateFeatureVerdict(verdict, feature, { runRoot, verdictPath }) {
+export function validateWeeklyFeatureJudgeVerdict(verdict, feature, { runRoot, verdictPath, expectedPacketSha256 }) {
   const expectedVerdictPath = resolve(runRoot, verdictPath);
   if (!isObject(verdict)
     || verdict.lane !== "tester"
@@ -286,7 +439,11 @@ function validateFeatureVerdict(verdict, feature, { runRoot, verdictPath }) {
     || !Array.isArray(verdict.blockers)
     || typeof verdict.verdict_path !== "string"
     || !isAbsolute(verdict.verdict_path)
-    || verdict.verdict_path !== expectedVerdictPath) fail(`${feature.feature_id} tester verdict is malformed or lacks the exact absolute manifest verdict path ${expectedVerdictPath}.`);
+    || verdict.verdict_path !== expectedVerdictPath
+    || typeof verdict.packet_sha256 !== "string") fail(`${feature.feature_id} tester verdict is malformed or lacks the exact absolute manifest verdict path ${expectedVerdictPath}.`);
+  if (verdict.packet_sha256 !== expectedPacketSha256) fail(`${feature.feature_id} tester verdict is not bound to the current packet hash.`);
+  if (verdict.rubric === undefined) fail(`${feature.feature_id} tester verdict is missing the required five-grade rubric.`);
+  validateJudgeRubric(verdict.rubric, `${feature.feature_id} judge rubric`);
   if (verdict.assertions.length !== feature.assertions.length) fail(`${feature.feature_id} must return one check per assertion.`);
   for (const assertion of feature.assertions) {
     const check = verdict.assertions.find((row) => row.assertion === assertion);
@@ -301,7 +458,8 @@ export function reconcileJudgedWeeklyRun({ runRoot, deterministic, suite = loadW
   if (deterministicArtifact.pass !== true || deterministicArtifact.context_id !== deterministic.context.context_id || deterministicArtifact.weekly_result_sha256 !== sha256(readFileSync(resolve(runRoot, artifactByKind(suite, "weekly-review-result"))))) fail("saved deterministic evidence does not match the validated immutable run.");
   const featureVerdicts = suite.features.map((feature) => {
     const verdictPath = artifactByKind(suite, `feature-judge:${feature.feature_id}`);
-    return validateFeatureVerdict(readJson(resolve(runRoot, verdictPath)), feature, { runRoot, verdictPath });
+    const packet = buildWeeklyFeatureJudgePacket({ featureId: feature.feature_id, result: deterministic.result, context: deterministic.context, runRoot, suite });
+    return validateWeeklyFeatureJudgeVerdict(readJson(resolve(runRoot, verdictPath)), feature, { runRoot, verdictPath, expectedPacketSha256: packet.packet_sha256 });
   });
   const review = readJson(resolve(runRoot, artifactByKind(suite, "independent-evidence-review")));
   if (!isObject(review)

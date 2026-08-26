@@ -269,7 +269,7 @@ export function loadCase() {
       { key: "people", name: "People", purpose: "Owners, approved delivery routes, and expertise used before any chase or collaborator selection.", sample_id: "PERSON-JUN", sample: "Jun Wong · approved private eval route · fictional sandbox identity", template: "company-os-person@0.1.0" },
       { key: "decisions", name: "Decisions", purpose: "Approved precedents with authority, rationale, and source evidence.", sample_id: "DEC-001", sample: "Use a 2% pilot variance threshold · Approved", template: "company-os-decision@0.2.0" },
       { key: "reports", name: "Reports", purpose: "Project reports, Department rollups, and one Company rollup.", sample_id: "RPT-PROJ-PENANG-W34", sample: "12 Project + 7 Department + 1 Company report", template: "company-os-weekly-report" },
-      { key: "skills", name: "Skills", purpose: "Reviewed repeated workflows promoted from SOP signals.", sample_id: "SOP-001", sample: "Three-store pilot variance verification · Reviewed", template: "company-os-skill@0.1.0" },
+      { key: "skills", name: "SOPs", purpose: "Reviewed employee workflows with a dated operating baseline.", sample_id: "SOP-001", sample: "Three-store pilot variance verification · Reviewed", template: "kamdar-employee-sop@1.0.0" },
       { key: "templates", name: "Templates", purpose: "Pinned record contracts used to generate and score automation artifacts.", sample_id: "TPL-TASK", sample: "Task record contract · company-os-task@0.7.0", template: "company-os-task@0.7.0" }
     ],
     template_registry: contract.template_registry,
@@ -327,7 +327,7 @@ function projectEvidence(snapshot, project, items, templates) {
     ? [
       ...meeting.meeting_block.commitments.map((commitment) => `- ${commitment.proposal_id}: proposed linked Task for ${commitment.action} by ${commitment.due_date}.`),
       `- ${meeting.meeting_block.decision_candidate.id}: proposed Decision; authority ${meeting.meeting_block.decision_candidate.authority}.`,
-      `- ${meeting.meeting_block.sop_candidate.id}: proposed SOP/Skill; authority ${meeting.meeting_block.sop_candidate.authority}.`
+      `- ${meeting.meeting_block.sop_candidate.id}: proposed employee SOP; authority ${meeting.meeting_block.sop_candidate.authority}.`
     ].join("\n")
     : "- No embedded Meeting block in this Project's selected Work Items.";
   const followUps = items.filter((item) => !item.healthy && !item.meeting_block).map((item) =>
@@ -519,7 +519,7 @@ function issueRecord(meeting, templates) {
     Diagnosis: `${meeting.problem_analysis.cause} Confidence: ${meeting.problem_analysis.confidence}. Confirm with: ${meeting.problem_analysis.confirmation_needed}`,
     "Containment and next action": `${meeting.next_action} Owner: ${meeting.owner_id}. Review by ${meeting.due_date}.`,
     "Resolution and verification": "Track until the evidence and owner action are reviewed.",
-    "Related records": `${meeting.project_id}; ${meeting.url}; Decision ${meeting.meeting_block.decision_candidate.id}; proposed Skill ${meeting.meeting_block.sop_candidate.id}.`
+    "Related records": `${meeting.project_id}; ${meeting.url}; Decision ${meeting.meeting_block.decision_candidate.id}; proposed SOP ${meeting.meeting_block.sop_candidate.id}.`
   });
 }
 
@@ -540,26 +540,30 @@ function decisionRecord(meeting, templates) {
     "Options and tradeoffs": "- **2% threshold:** measurable across the three verified count samples; it may miss a smaller local anomaly.\n- **No shared threshold:** preserves local judgment but makes expansion decisions incomparable.",
     "Decision rationale": `A 2% threshold won because it is measurable across the three verified store-count samples. ${candidate.authority} approved it on ${candidate.decided_at}.`,
     "Consequences and review trigger": "Use the threshold for the linked Project until a new sample or risk model requires review. Reopen if verified counts show that the threshold no longer represents the operating risk.",
-    "Evidence and related records": `Source Meeting: ${meeting.url}. Project: ${meeting.project_id}. Proposed Skill: ${meeting.meeting_block.sop_candidate.id}.`
+    "Evidence and related records": `Source Meeting: ${meeting.url}. Project: ${meeting.project_id}. Proposed SOP: ${meeting.meeting_block.sop_candidate.id}.`
   });
 }
 
-function skillRecord(meeting, templates) {
+function sopRecord(meeting, templates) {
   const candidate = meeting.meeting_block.sop_candidate;
-  return renderTemplate(templates.skill, {
-    SKILL_NAME: candidate.summary,
-    SKILL_ID: candidate.id,
+  return renderTemplate(templates.sop, {
+    SOP_NAME: candidate.summary,
+    SOP_ID: candidate.id,
     PROJECT: meeting.project_id,
     DEPARTMENT: "Source gap: not supplied by this fixture.",
     OWNER: meeting.owner_id,
     STATUS: "Proposed",
-    SOURCE_PATH: `skills/${slug(candidate.summary)}/SKILL.md (proposed; not yet executable)`,
-    LATEST_EVAL: "No eval yet — proposal only.",
+    BASELINE_VERSION: "1",
+    EFFECTIVE_DATE: "Not effective until reviewed.",
     LAST_REVIEWED: "2026-08-21",
-    CAPABILITY: "**Trigger:** A repeat operating review needs consistent evidence before a decision.\n**Input → output:** ERP extract + manual counts + approved threshold → one linked comparison and exception record.\n**Value:** The owner gets a comparable expansion recommendation instead of an unstructured review.",
-    PROVEN_USE: `${candidate.repetition_evidence}. This proposed registry card is grounded in ${meeting.url}; it has no executed eval yet.`,
-    BOUNDARIES_AND_DEPENDENCIES: "Does not approve expansion or write to a provider. Requires representative count evidence, the approved threshold, and a named owner; hands the reviewable result to the Project and Decision workflow.",
-    SOURCE_AND_PROOF: `Proposed executable source: skills/${slug(candidate.summary)}/SKILL.md. Evidence: ${meeting.url}. Authority: ${candidate.authority}; related Decision ${meeting.meeting_block.decision_candidate.id}.`
+    NEXT_REVIEW: "After the next representative pilot review.",
+    PURPOSE_AND_OUTCOME: "Produce one comparable variance review with a linked exception record so the Project owner can make an evidence-backed expansion decision.",
+    TRIGGER_ACTORS_AND_INPUTS: `**Trigger:** A repeat operating review needs consistent evidence before a decision.\n**Owner:** ${meeting.owner_id}.\n**Inputs:** ERP extract, manual counts, approved threshold, and named review owner.`,
+    ORDERED_WORKFLOW_STEPS: "1. Export the ERP counts.\n2. Collect the matching manual counts.\n3. Compare each location against the approved threshold.\n4. Record every exception and hand the result to the Project owner.",
+    TIMING_AND_VOLUME_BASELINE: `${candidate.repetition_evidence}. Active time, waiting time, weekly volume, and loaded labour cost remain measurement gaps for the next run.`,
+    EXCEPTIONS_AND_CONTROLS: "Do not recommend expansion when representative count evidence or the approved threshold is missing. Record the gap and owner instead.",
+    IMPROVEMENT_AND_VERIFICATION: "Run the same workflow for the next representative sample; capture active time, waiting time, exception count, and whether the owner can decide without reconstructing evidence.",
+    EVIDENCE_AND_RELATED_RECORDS: `Evidence: ${meeting.url}. Authority: ${candidate.authority}; related Decision ${meeting.meeting_block.decision_candidate.id}.`
   });
 }
 
@@ -654,7 +658,7 @@ function areaReport(snapshot, area, projects, reports, templates) {
       ? `| Incomplete source evidence blocks confident cross-Project decisions | ${projects.map((project) => project.id).join(", ")} | ${sourceList} | Draft a source-linked department exception brief; do not create or update canonical records. | Trial at the next review; success = owners identify the one blocked decision without opening raw Work. |`
       : `| No Project source captured | ${area} | no Project report | Resolve source access before proposing automation. | Capture the source; success = one reviewable Project report. |`,
     DECISIONS_VIEW_OR_LIST: "- Native linked Decision view filtered to this Department and week; fallback: candidates stay proposed until authority is complete.",
-    SOPS_VIEW_OR_LIST: "- Native linked Skill view filtered to this Department and week; candidates stay proposed until source, authority, and repetition evidence are complete.",
+    SOPS_VIEW_OR_LIST: "- Native linked SOP view filtered to this Department and week; candidates stay proposed until source, authority, and repetition evidence are complete.",
     NEXT_WEEK_HANDOFF: "Update each canonical Project's This week's attention only after owner approval; do not duplicate the plan in this Department rollup.",
     START_TIMESTAMP: `${snapshot.week_start}T00:00:00+08:00`,
     END_TIMESTAMP: `${snapshot.week_end}T23:59:59+08:00`,
@@ -678,7 +682,7 @@ function companyReport(snapshot, areaReports, templates) {
     DEPARTMENT_RESULT_ROWS: departmentRows,
     PROBLEM_OPPORTUNITY_ROWS: `| Incomplete source evidence delays cross-department decisions | ${areaReports.map((report) => report.area).join(", ") || "none"} | ${sourceList} | Draft one source-linked portfolio exception brief; do not mutate canonical records. | Trial at the next company review; success = leadership names the decision owner and source gap in under 10 minutes. |`,
     DECISIONS_VIEW_OR_LIST: "- Native linked Decision view filtered to this reporting week; candidates remain proposed until authority is complete.",
-    SOPS_VIEW_OR_LIST: "- Native linked Skill view filtered to this reporting week; candidates remain proposed until source, authority, and repetition evidence are complete.",
+    SOPS_VIEW_OR_LIST: "- Native linked SOP view filtered to this reporting week; candidates remain proposed until source, authority, and repetition evidence are complete.",
     NEXT_WEEK_HANDOFF: "Promote only owner-approved Department handoffs; the Company report does not copy Project task plans.",
     START_TIMESTAMP: `${snapshot.week_start}T00:00:00+08:00`,
     END_TIMESTAMP: `${snapshot.week_end}T23:59:59+08:00`,
@@ -852,7 +856,7 @@ function checkBehavior({ snapshot, contract, root, events, calls, selected, area
       evidence: "Daily stages ISSUE-001, DEC-001, and SOP-001 with their gate evidence; promotion occurs only in Weekly."
     },
     "daily-candidates-staged": {
-      pass: Boolean(meeting && candidateOutput.includes(meeting.url) && ["Problems", "Decisions", "SOP / Skill signals"].every((section) => candidateOutput.includes(`## ${section}`))),
+      pass: Boolean(meeting && candidateOutput.includes(meeting.url) && ["Problems", "Decisions", "SOP signals"].every((section) => candidateOutput.includes(`## ${section}`))),
       evidence: "One Daily candidate bundle preserves all three promotion signal types and the originating Meeting URL."
     },
     "directory-before-route": {
@@ -897,14 +901,14 @@ function checkBehavior({ snapshot, contract, root, events, calls, selected, area
       evidence: "The W33 Final is absent from write events; only the existing W34 Draft is modified."
     },
     "promotion-destination-routing": {
-      pass: ["upsert_issue", "upsert_decision", "upsert_skill"].every((operation) => calls.some((call) => call.feature_id === "FEAT-0006" && call.operation === operation)),
-      evidence: "Weekly owns three distinct destination calls: Work Items, Decisions, and Skills/wiki."
+      pass: ["upsert_issue", "upsert_decision", "upsert_sop"].every((operation) => calls.some((call) => call.feature_id === "FEAT-0006" && call.operation === operation)),
+      evidence: "Weekly owns three distinct destination calls: Work/Issues, Decisions, and SOPs."
     },
     "promotion-source-authority": {
       pass: [
         "weekly/promotions/issues/ISSUE-001.md",
         "weekly/promotions/decisions/DEC-001.md",
-        "weekly/promotions/skills/SOP-001.md"
+        "weekly/promotions/sops/SOP-001.md"
       ].every((path) => read(path).includes(meeting.url)) && !read("weekly/promotions/decisions/DEC-001.md").includes(meeting.meeting_block.title),
       evidence: "Every promoted record retains source and authority evidence without copying the Meeting transcript."
     },
@@ -971,7 +975,7 @@ function checkBehaviorV4({ snapshot, contract, root, events, calls, selected, ac
     "precise-documentation": { pass: incomplete.every((item) => workComments.get(item.id)?.after?.missing_fields?.every((field) => item.documentation_missing.includes(field))) && incomplete.every((item) => workComments.get(item.id)?.after?.update_location), evidence: `${incomplete.length} documentation requests name only the source record’s missing fields and exact update location.` },
     "combined-comment-deduped": { pass: stale.every((item) => comments.filter((comment) => comment.record_id === item.id).length === 1), evidence: "Each stale and incomplete Work record receives one combined source comment, not separate progress and documentation spam." },
     "promotion-gates": { pass: candidateOutput.includes("Daily performs no canonical promotion") && meetings.every((meeting) => ["problem_candidate", "decision_candidate", "sop_candidate"].every((key) => candidateOutput.includes(meeting.meeting_block[key].id))), evidence: "Nine Daily candidates are staged before Weekly promotion." },
-    "daily-candidates-staged": { pass: ["Problems", "Decisions", "SOP / Skill signals"].every((section) => candidateOutput.includes(`## ${section}`)), evidence: "The candidate bundle contains every signal class and its Meeting source." },
+    "daily-candidates-staged": { pass: ["Problems", "Decisions", "SOP signals"].every((section) => candidateOutput.includes(`## ${section}`)), evidence: "The candidate bundle contains every signal class and its Meeting source." },
     "directory-before-route": { pass: directoryIndex >= 0 && firstFollowup > directoryIndex && byOperation("send_owner_followup").every((call) => ["PERSON-JUN", "PERSON-NUR"].includes(call.args.person_id)), evidence: "People resolution happens before the two allowlisted sandbox email routes are drafted." },
     "stale-source-comment-first": { pass: stale.every((item) => calls.findIndex((call) => call.operation === "create_owner_action_comment" && call.args.work_item_id === item.id) < calls.findIndex((call) => call.operation === "send_owner_followup" && call.args.work_item_ids?.includes(item.id))), evidence: "Each source-record comment is prepared before its grouped owner email." },
     "healthy-work-no-chase": { pass: selected.filter((item) => item.healthy).every((item) => !workComments.has(item.id) && !byOperation("send_owner_followup").some((call) => call.args.work_item_ids?.includes(item.id))), evidence: `${selected.filter((item) => item.healthy).length} healthy controls receive neither comment nor off-platform chase.` },
@@ -980,7 +984,7 @@ function checkBehaviorV4({ snapshot, contract, root, events, calls, selected, ac
     "weekly-evidence-rollup": { pass: projectReportPaths.every((path) => /## Outcomes and open attention/.test(read(path)) && /## Problems and inefficiencies/.test(read(path))) && departmentOutput.every((content) => /## Outcomes and open attention/.test(content)) && /## Problems and inefficiencies/.test(companyOutput), evidence: "Project reports retain source-linked outcomes, open attention, and testable problems; Area and Company rollups aggregate those report links without copying raw Work." },
     "final-report-immutable": { pass: !events.some((event) => event.path.includes("W33")), evidence: "The prior final report is never reopened; only current W34 drafts are rendered." },
     "content-gap-not-fabricated": { pass: departmentReports.some((report) => report.department === "Content" && read(report.path).includes("Content source gap")), evidence: "Content receives an explicit source-gap report without a fabricated Project." },
-    "promotion-destination-routing": { pass: promotion.length === 9 && ["work_items", "decisions", "skills"].every((database) => promotion.filter((record) => record.database === database).length === 3), evidence: "Three Issues, Decisions, and Skills each route to their own canonical record type." },
+    "promotion-destination-routing": { pass: promotion.length === 9 && ["work_items", "decisions", "skills"].every((database) => promotion.filter((record) => record.database === database).length === 3), evidence: "Three Issues, Decisions, and SOPs each route to their own canonical record type." },
     "promotion-source-authority": { pass: promotion.every((record) => record.after?.source_meeting_id && record.after?.authority), evidence: "Every promoted record retains a Meeting source, authority, and review state." },
     "next-week-carry-forward": { pass: recordChanges.filter((change) => change.assertion_ids?.includes("weekly-project-carry-forward")).length === 1 && noProjectPlanFiles, evidence: "One Project record carries unresolved work forward in place; zero Project-plan Markdown files are created." },
     "planning-application-order": { pass: calls.findIndex((call) => call.operation === "update_project_plan") < calls.findIndex((call) => call.operation === "upsert_planned_task") && proposalRecords.length === 6, evidence: "Project context is prepared before linked commitment records; source Work is preserved." },
@@ -1170,7 +1174,7 @@ body{background-color:#020302;background-image:linear-gradient(#ffffff025 1px,tr
 .columns{grid-template-columns:1fr;gap:0}.columns section{border-bottom:1px solid var(--line)}.columns section:last-child{border-bottom:0}
 </style>
 <main class=wrap><nav class=consolebar><strong>Kamdar · ${result.run.mode === "operated-showcase" ? "operated" : "frozen"} proof</strong><div><a href=#story>story</a><a href=#company-os>company os</a><a href=#templates>templates</a><a href=#daily>daily</a><a href=#weekly>weekly</a><a href=#features>features</a><a href=#gaps>gaps</a></div></nav><header class=hero><p class=eyebrow>${escapeHtml(mode)}</p><h1>Kamdar Company OS proof</h1><p>${escapeHtml(result.case.story)}</p><b class="score ${result.assertions.pass ? "pass" : "fail"}">7/7 workflows covered · ${result.assertions.counts.pass}/${result.assertions.counts.total} assertions pass</b>${result.tools.calls.some((call) => call.status === "blocked") ? `<p class=planned>${result.tools.calls.filter((call) => call.status === "blocked").length} provider actions blocked — inspect affected features below.</p>` : ""}${workspaceUrl ? `<p><a href="${escapeHtml(workspaceUrl)}" target=_blank rel=noreferrer>Open operated Notion workspace ↗</a></p>` : ""}</header>
-<section id=story><p class=eyebrow>1 · STORY AND ENVIRONMENT</p><h2>What the manager must resolve</h2><p>One bounded scan turns scattered operating signals into Daily evidence and Weekly outcomes.</p><table class=signal-table><thead><tr><th>record</th><th>signal</th><th>stage</th><th>expected result</th></tr></thead><tbody><tr><td>TASK-101</td><td><span>STALE</span></td><td>Daily</td><td>Show +6h / +MYR 720, keep the suspected cause unconfirmed, comment on the source record, then chase</td></tr><tr><td>TASK-102</td><td><span>GAP</span></td><td>Daily</td><td>Request only the missing linked evidence</td></tr><tr><td>TASK-103</td><td><span>HEALTHY</span></td><td>Daily</td><td>No chase or duplicate message</td></tr><tr><td>TASK-201</td><td><span>MEETING</span></td><td>Daily</td><td>Extract commitments and promotion candidates</td></tr><tr><td>Project memory</td><td><span>UPDATE</span></td><td>Daily</td><td>Write current context and proprietary knowledge from changed Work</td></tr><tr><td>Project reports</td><td><span>ROLLUP</span></td><td>Weekly</td><td>Project → Area → Company hierarchy with time/cost variance</td></tr><tr><td>Knowledge</td><td><span>PROMOTE</span></td><td>Weekly</td><td>Decision, Issue, and Skill records</td></tr><tr><td>Company result</td><td><span>DISTRIBUTE</span></td><td>Weekly</td><td>Receipt-backed executive summary</td></tr></tbody></table><pre class=flow>sources → Daily evidence → stale-record comment → Weekly review → Project reports → Area rollups → Company result</pre></section>
+<section id=story><p class=eyebrow>1 · STORY AND ENVIRONMENT</p><h2>What the manager must resolve</h2><p>One bounded scan turns scattered operating signals into Daily evidence and Weekly outcomes.</p><table class=signal-table><thead><tr><th>record</th><th>signal</th><th>stage</th><th>expected result</th></tr></thead><tbody><tr><td>TASK-101</td><td><span>STALE</span></td><td>Daily</td><td>Show +6h / +MYR 720, keep the suspected cause unconfirmed, comment on the source record, then chase</td></tr><tr><td>TASK-102</td><td><span>GAP</span></td><td>Daily</td><td>Request only the missing linked evidence</td></tr><tr><td>TASK-103</td><td><span>HEALTHY</span></td><td>Daily</td><td>No chase or duplicate message</td></tr><tr><td>TASK-201</td><td><span>MEETING</span></td><td>Daily</td><td>Extract commitments and promotion candidates</td></tr><tr><td>Project memory</td><td><span>UPDATE</span></td><td>Daily</td><td>Write current context and proprietary knowledge from changed Work</td></tr><tr><td>Project reports</td><td><span>ROLLUP</span></td><td>Weekly</td><td>Project → Area → Company hierarchy with time/cost variance</td></tr><tr><td>Knowledge</td><td><span>PROMOTE</span></td><td>Weekly</td><td>Decision, Issue, and SOP records</td></tr><tr><td>Company result</td><td><span>DISTRIBUTE</span></td><td>Weekly</td><td>Receipt-backed executive summary</td></tr></tbody></table><pre class=flow>sources → Daily evidence → stale-record comment → Weekly review → Project reports → Area rollups → Company result</pre></section>
 <section id=company-os><p class=eyebrow>2 · COMPANY OS</p><h2>Databases, templates, and samples</h2><div class=grid>${databaseCards}</div></section>
 <section id=templates><p class=eyebrow>2B · TEMPLATE LIBRARY</p><h2>Every enforced record contract</h2><p>Expand any template to inspect its exact source, required properties, and complete Markdown body.${workspace?.templates ? ` <a href="${escapeHtml(workspace.templates)}" target=_blank rel=noreferrer>Open installed templates in Notion ↗</a>` : ""}</p><div class=template-list>${templateCards}</div></section>
 <section id=daily><p class=eyebrow>3 · DAILY WALKTHROUGH</p><h2>Prompt first, then observed files</h2><p>Read changed Work Items in full; update Project memory; request exact missing documentation; resolve approved owner routes; stage knowledge candidates; preserve gaps.</p>${fileList(result.daily.files)}</section>
@@ -1264,8 +1268,8 @@ function buyerShowcaseHtml(result) {
         title: "Only evidence-backed Meeting knowledge earns a permanent home",
         setup: "Three-store variance review · embedded Meeting",
         before: "The 2% threshold and three-store method were useful, but still just source-bound Meeting signals with no approved canonical destination.",
-        action: "Check evidence, authority, destination, dedupe, and review state before creating the appropriate Issue, Decision, and Skill records.",
-        after: "An Issue, Decision, and Skill are linked to the same Project and Meeting with an approved-for-weekly-promotion state.",
+        action: "Check evidence, authority, destination, dedupe, and review state before creating the appropriate Issue, Decision, and SOP records.",
+        after: "An Issue, Decision, and SOP are linked to the same Project and Meeting with an approved-for-weekly-promotion state.",
         proof: "Four canonical promotion records"
       },
       "FEAT-0007": {
@@ -1383,7 +1387,7 @@ Notion record applications · Drive publication plan · owner delivery prepared
                                            │
                                            ▼
 provider receipt only after an actual send</pre></section>
-<section id=project-record><p class=eyebrow>4 · What one Project entry looks like</p><h2>${escapeHtml(project?.name || "Canonical Project memory")}</h2><p>Daily updates this Project entry in place. Proprietary Project knowledge lives here, while linked Work, Decisions, Reports, and Skills remain separate relations; no duplicate memory page or Project-plan file is created.</p><ul class=project-grid>${projectFields || "<li>No Project diff was captured.</li>"}</ul></section>
+<section id=project-record><p class=eyebrow>4 · What one Project entry looks like</p><h2>${escapeHtml(project?.name || "Canonical Project memory")}</h2><p>Daily updates this Project entry in place. Proprietary Project knowledge lives here, while linked Work, Decisions, Reports, and SOPs remain separate relations; no duplicate memory page or Project-plan file is created.</p><ul class=project-grid>${projectFields || "<li>No Project diff was captured.</li>"}</ul></section>
 <section id=daily><p class=eyebrow>5 · Daily features</p><h2>Turn today’s scattered evidence into clear owner actions</h2>${featureGroup("Daily")}</section>
 <section id=weekly><p class=eyebrow>6 · Weekly features</p><h2>Turn Daily evidence into a durable operating review</h2>${featureGroup("Weekly")}</section>
 <section id=safety><p class=eyebrow>7 · Safety and receipts</p><h2>The proof distinguishes a good plan from a completed external action</h2><ul class=safety-list><li><b>${result.safety.network_calls_by_processor}</b> processor network calls and <b>${result.safety.external_writes_by_processor}</b> external writes in the deterministic planner.</li><li><b>${result.idempotency.second_run_file_events.length}</b> file changes on the unchanged second run; duplicate actions are prevented.</li><li>${operated ? `${result.safety.external_receipts} validated receipt-backed application${result.safety.external_receipts === 1 ? "" : "s"} appear in the feature proof; every other provider action is visibly planned or blocked.` : `${safetyCalls.length} email, Telegram, or Drive application calls are present as plans.`} A provider success state needs a matching redacted receipt, route hash, payload hash, and idempotency key.</li><li>Content has a Department report that says the source Project is missing; the fixture does not manufacture one.</li></ul>${safetyWalkthrough}</section>
@@ -1402,7 +1406,7 @@ function runTemplateFirstProofLegacy({ outputRoot = defaultOutputRoot, reset = t
     daily: templateMeta("daily-operating-evidence.md"), followups: templateMeta("employee-followups.md"), receipt: templateMeta("automation-receipt.md"),
     documentation: templateMeta("documentation-request.md"), candidates: templateMeta("knowledge-candidates.md"),
     weekly: templateMeta("weekly-report.md"), area: templateMeta("area-operating-rollup.md"), company: templateMeta("company-operating-rollup.md"),
-    task: templateMeta("task.md"), feature: templateMeta("feature.md"), decision: templateMeta("decision.md"), skill: templateMeta("skill.md"),
+    task: templateMeta("task.md"), feature: templateMeta("feature.md"), decision: templateMeta("decision.md"), sop: templateMeta("sop.md"),
     project: templateMeta("project.md"), executive: templateMeta("executive-distribution.md")
   };
   prepareRunRoot(root, reset);
@@ -1483,7 +1487,7 @@ function runTemplateFirstProofLegacy({ outputRoot = defaultOutputRoot, reset = t
       Notes: `Open issue; manual count evidence arrived late in three pilot reviews. PERSON-AISHA owns the process correction before the next pilot.\n\n- **Decision / observation:** The same evidence gap appeared in three pilot reviews.\n  **Why / evidence:** Recurrence is recorded in ${meeting.url}.\n  **Unknown / follow-up:** Confirm whether the correction works across all pilot sites.\n\n**Done when:** The process correction is reviewed before the next pilot.\n\n**Completion note:** Track until the evidence arrives before the scheduled variance review.`
     }, templates), templates.task, "upsert_issue", "ISSUE-001"],
     ["weekly/promotions/decisions/DEC-001.md", decisionRecord(meeting, templates), templates.decision, "upsert_decision", "DEC-001"],
-    ["weekly/promotions/skills/SOP-001.md", skillRecord(meeting, templates), templates.skill, "upsert_skill", "SOP-001"]
+    ["weekly/promotions/sops/SOP-001.md", sopRecord(meeting, templates), templates.sop, "upsert_sop", "SOP-001"]
   ];
   for (const [path, content, template, operation, recordId] of promotionFiles) {
     upsert(root, path, content, events); weeklyFiles.push(path); generatedFiles.push(`${path} (${template.id}@${template.version})`);
@@ -1552,7 +1556,7 @@ export function runTemplateFirstProof({ outputRoot = defaultOutputRoot, reset = 
   const templates = {
     followups: templateMeta("employee-followups.md"), receipt: templateMeta("automation-receipt.md"), documentation: templateMeta("documentation-request.md"), candidates: templateMeta("knowledge-candidates.md"),
     weekly: templateMeta("weekly-report.md"), area: templateMeta("area-operating-rollup.md"), company: templateMeta("company-operating-rollup.md"),
-    task: templateMeta("task.md"), feature: templateMeta("feature.md"), issue: templateMeta("issue.md"), decision: templateMeta("decision.md"), skill: templateMeta("skill.md"), executive: templateMeta("executive-distribution.md")
+    task: templateMeta("task.md"), feature: templateMeta("feature.md"), issue: templateMeta("issue.md"), decision: templateMeta("decision.md"), sop: templateMeta("sop.md"), executive: templateMeta("executive-distribution.md")
   };
   prepareRunRoot(root, reset);
   const events = [];
@@ -1667,12 +1671,12 @@ export function runTemplateFirstProof({ outputRoot = defaultOutputRoot, reset = 
     const promotions = [
       { kind: "issues", record_id: block.problem_candidate.id, database: "work_items", template: templates.issue, operation: "upsert_issue", content: issueRecord(meeting, templates) },
       { kind: "decisions", record_id: block.decision_candidate.id, database: "decisions", template: templates.decision, operation: "upsert_decision", content: decisionRecord(meeting, templates) },
-      { kind: "skills", record_id: block.sop_candidate.id, database: "skills", template: templates.skill, operation: "upsert_skill", content: skillRecord(meeting, templates) }
+      { kind: "sops", record_id: block.sop_candidate.id, database: "skills", template: templates.sop, operation: "upsert_sop", content: sopRecord(meeting, templates) }
     ];
     for (const promotion of promotions) {
       const path = `weekly/promotions/${promotion.kind}/${promotion.record_id}.md`;
       upsert(root, path, promotion.content, events); weeklyFiles.push(path); generatedFiles.push(`${path} (${promotion.template.id}@${promotion.template.version})`); promotionFiles.push(path);
-      const assertionId = { work_items: "weekly-promoted-issues", decisions: "weekly-promoted-decisions", skills: "weekly-promoted-skills" }[promotion.database];
+      const assertionId = { work_items: "weekly-promoted-issues", decisions: "weekly-promoted-decisions", skills: "weekly-promoted-sops" }[promotion.database];
       recordChanges.push({ assertion_ids: [assertionId], database: promotion.database, record_id: promotion.record_id, event: "created", before: null, after: { project_id: meeting.project_id, source_meeting_id: meeting.id, review_state: "approved-for-weekly-promotion", authority: promotion.database === "work_items" ? block.problem_candidate.authority : promotion.database === "decisions" ? block.decision_candidate.authority : block.sop_candidate.authority }, relations: { project: [meeting.project_id], work: [meeting.id] } });
       makeCall(calls, "weekly", "notion", promotion.operation, { record_id: promotion.record_id, action_key: `promotion:${snapshot.week}:${promotion.record_id}`, artifact_path: path }, `Apply ${promotion.record_id} to its canonical Weekly record destination.`, "FEAT-0006");
     }

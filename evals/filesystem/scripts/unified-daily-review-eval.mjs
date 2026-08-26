@@ -10,10 +10,16 @@ import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { DailyReviewResultSchema } from "../../../automations/schemas/daily-review-result.zod.mjs";
+import { DailyContextDiffSchema } from "../../../automations/schemas/daily-context-diff.zod.mjs";
 import {
   DailyIntegrationReceiptSchema,
   assertDailyProcessingSafety,
 } from "../../../automations/schemas/daily-integration-receipt.zod.mjs";
+import { DailyIdempotencyRerunReceiptSchema } from "../../../automations/schemas/daily-idempotency-rerun-receipt.zod.mjs";
+import {
+  validateCompanyOperatingEvalSuite,
+  validateJudgeRubric,
+} from "./company-operating-eval-contract.mjs";
 import { loadKamdarSeedConfig } from "./kamdar-seed-config.mjs";
 import { validateArtifactQualityReview } from "./quality-review-contracts.mjs";
 
@@ -35,6 +41,11 @@ function readJson(path, label = relative(projectRoot, path)) {
 }
 function isObject(value) { return Boolean(value) && typeof value === "object" && !Array.isArray(value); }
 function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
+function stableJson(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(",")}}`;
+}
 function safeRelativePath(value, label) {
   if (typeof value !== "string" || !value || isAbsolute(value)) fail(`${label} must be a non-empty relative path.`);
   const normalized = value.replaceAll("\\", "/");
@@ -48,7 +59,7 @@ function ensureInside(root, path, label) {
 
 export function loadDailyReviewEvalSuite({ path = defaultSuitePath } = {}) {
   const suite = readJson(path);
-  if (suite.schema_version !== "kamdar-daily-review-evals@1.0.0") fail("suite schema_version is unsupported.");
+  if (suite.schema_version !== "kamdar-daily-review-evals@2.0.0") fail("suite schema_version is unsupported.");
   if (!Array.isArray(suite.run_artifacts) || !suite.run_artifacts.length) fail("suite needs run_artifacts.");
   const artifactPaths = new Set();
   for (const [index, artifact] of suite.run_artifacts.entries()) {
@@ -65,7 +76,10 @@ export function loadDailyReviewEvalSuite({ path = defaultSuitePath } = {}) {
       fail(`${feature.feature_id} needs result_path, entity_ids, claim, and assertions.`);
     }
   }
-  return suite;
+  return validateCompanyOperatingEvalSuite(suite, {
+    knownIntegrationGateIds: integrationGateIds,
+    label: "Unified Daily review eval",
+  });
 }
 
 export function inventoryRun(root) {
@@ -118,27 +132,157 @@ function rowSourceIds(row) {
   const ids = new Set(Array.isArray(row?.source_ids) ? row.source_ids : []);
   for (const key of ["project_id", "work_item_id", "owner_person_id"]) if (row?.[key]) ids.add(row[key]);
   for (const id of row?.related_work_item_ids || []) ids.add(id);
+  for (const entry of row?.draft_entries || []) {
+    for (const id of entry.workflow_observation?.actor_person_ids || []) ids.add(id);
+    for (const id of entry.problem_baseline?.affected_people || []) ids.add(id);
+    if (entry.problem_baseline?.measurement_owner_person_id) ids.add(entry.problem_baseline.measurement_owner_person_id);
+  }
   return [...ids];
+}
+
+function parsedOrFail(schema, value, label) {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) fail(`${label} failed Zod validation: ${parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
+  return parsed.data;
+}
+
+function currentSectionText(project, section) {
+  return {
+    Overview: project.current_sections.overview,
+    "Project knowledge": project.current_sections.project_knowledge,
+    "This week's attention": project.current_sections.this_weeks_attention,
+  }[section];
+}
+
+function dailyContextSlice(context, feature, candidate) {
+  const wanted = new Set([...feature.entity_ids, ...candidate.flatMap(rowSourceIds)]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const row of [...context.projects, ...context.work_items, ...context.meetings, ...context.people]) {
+      if (!wanted.has(row.id) && !wanted.has(row.source_id)) continue;
+      for (const id of [row.id, row.source_id, row.project_id, row.owner_person_id].filter(Boolean)) {
+        if (!wanted.has(id)) { wanted.add(id); changed = true; }
+      }
+    }
+  }
+  const select = (rows) => rows.filter((row) => wanted.has(row.id) || wanted.has(row.source_id));
+  const sourceManifest = context.source_manifest.filter((row) => row.source_ids.some((id) => wanted.has(id)));
+  return {
+    artifact_type: context.artifact_type,
+    artifact_version: context.artifact_version,
+    context_id: context.context_id,
+    local_day: context.local_day,
+    evidence_window: context.evidence_window,
+    source_manifest: sourceManifest,
+    projects: select(context.projects),
+    work_items: select(context.work_items),
+    meetings: select(context.meetings),
+    people: select(context.people),
+  };
+}
+
+function packetDigest(packetWithoutHash) { return sha256(stableJson(packetWithoutHash)); }
+
+export function validateDailyIdempotencyRerun({
+  rawRerun,
+  originalReceipt,
+  originalReceiptBytes,
+  contextBytes,
+  resultBytes,
+  context,
+}) {
+  const rerun = parsedOrFail(DailyIdempotencyRerunReceiptSchema, rawRerun, "Daily idempotency rerun receipt");
+  if (rerun.original_receipt_id !== originalReceipt.receipt_id
+    || rerun.original_receipt_sha256 !== sha256(originalReceiptBytes)
+    || rerun.source_context_id !== context.context_id
+    || rerun.source_context_sha256 !== sha256(contextBytes)
+    || rerun.daily_result_id !== originalReceipt.daily_result_id
+    || rerun.daily_result_sha256 !== sha256(resultBytes)) {
+    fail("Daily idempotency rerun receipt is not bound to the exact context, result, and original receipt bytes.");
+  }
+
+  const audits = new Map(rerun.audit_effects.map((row) => [row.original_effect_id, row]));
+  if (audits.size !== originalReceipt.effects.length) fail("Daily idempotency rerun must audit every and only original effect.");
+  for (const effect of originalReceipt.effects) {
+    const audit = audits.get(effect.effect_id);
+    if (!audit) fail(`Daily idempotency rerun lacks original effect ${effect.effect_id}.`);
+    if (audit.result_pointer !== effect.result_pointer
+      || audit.target_id !== effect.target.target_id
+      || audit.payload_hash !== effect.payload_hash) fail(`Daily idempotency rerun evidence is stale for ${effect.effect_id}.`);
+    if (audit.original_outcome !== effect.outcome.state) fail(`Daily idempotency rerun does not bind the original outcome for ${effect.effect_id}.`);
+    const expectedOutcome = ["applied", "duplicate", "delivered_to_eval_sink"].includes(effect.outcome.state)
+      ? "duplicate"
+      : effect.outcome.state;
+    if (audit.outcome !== expectedOutcome) fail(`Daily idempotency rerun outcome does not match original effect ${effect.effect_id}.`);
+    if (expectedOutcome === "duplicate") {
+      if (!audit.lookup_read_back
+        || audit.lookup_read_back.provider_response_id !== effect.outcome.provider_response?.response_id
+        || audit.lookup_read_back.target_id !== effect.target.target_id
+        || audit.lookup_read_back.payload_hash !== effect.payload_hash
+        || audit.lookup_read_back.matched !== true
+        || audit.lookup_read_back.created !== false) fail(`Daily duplicate audit lacks matching lookup/read-back for ${effect.effect_id}.`);
+    }
+  }
+
+  const processing = new Map(rerun.work_processing.map((row) => [row.work_item_id, row]));
+  if (processing.size !== originalReceipt.work_processing.length) fail("Daily idempotency rerun must audit every and only Work processing row.");
+  for (const original of originalReceipt.work_processing) {
+    const observed = processing.get(original.work_item_id);
+    if (!observed
+      || observed.original_state !== original.state
+      || observed.rerun_state !== original.state
+      || observed.status_after !== original.status_after
+      || observed.daily_review_version_after !== original.daily_review_version_after
+      || observed.changed !== false) fail(`Daily idempotency rerun changed processing state for ${original.work_item_id}.`);
+  }
+  return {
+    pass: true,
+    rerun_receipt_sha256: sha256(stableJson(rerun)),
+    audited_effects: rerun.audit_effects.length,
+    duplicate_effects: rerun.summary.duplicate_count,
+    no_findings: rerun.summary.no_finding_count,
+    unresolved_nonmutating_effects: rerun.summary.blocked_count + rerun.summary.conflicted_count + rerun.summary.failed_count,
+    new_provider_mutations: 0,
+    processing_changes: 0,
+  };
 }
 
 export function validateUnifiedDailyRun({ runRoot, suite = loadDailyReviewEvalSuite(), seed = loadKamdarSeedConfig(), stage = "base" }) {
   const inventory = assertExactRunArtifacts(runRoot, suite, { stage });
   const artifact = (kind) => suite.run_artifacts.find((item) => item.kind === kind)?.path;
-  for (const kind of ["daily-context", "daily-review-result", "daily-integration-receipt"]) if (!artifact(kind)) fail(`suite lacks ${kind} artifact.`);
-  const context = readJson(resolve(runRoot, artifact("daily-context")), "Daily context");
+  for (const kind of ["daily-context", "daily-review-result", "daily-integration-receipt", "daily-idempotency-rerun-receipt"]) if (!artifact(kind)) fail(`suite lacks ${kind} artifact.`);
+  const contextPath = resolve(runRoot, artifact("daily-context"));
+  const contextBytes = readFileSync(contextPath);
+  const context = parsedOrFail(DailyContextDiffSchema, readJson(contextPath, "Daily context"), "Daily context");
   const resultPath = resolve(runRoot, artifact("daily-review-result"));
   const resultBytes = readFileSync(resultPath);
   const rawResult = readJson(resultPath, "Daily review result");
-  const rawReceipt = readJson(resolve(runRoot, artifact("daily-integration-receipt")), "Daily integration receipt");
+  const receiptPath = resolve(runRoot, artifact("daily-integration-receipt"));
+  const receiptBytes = readFileSync(receiptPath);
+  const rawReceipt = readJson(receiptPath, "Daily integration receipt");
+  const rawRerun = readJson(resolve(runRoot, artifact("daily-idempotency-rerun-receipt")), "Daily idempotency rerun receipt");
   const parsedResult = DailyReviewResultSchema.safeParse(rawResult);
   if (!parsedResult.success) fail(`Daily review result failed Zod validation: ${parsedResult.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
   const parsedReceipt = DailyIntegrationReceiptSchema.safeParse(rawReceipt);
   if (!parsedReceipt.success) fail(`Daily integration receipt failed Zod validation: ${parsedReceipt.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ")}`);
   assertDailyProcessingSafety(parsedReceipt.data);
-  if (!isObject(context) || context.artifact_type !== "kamdar-daily-context-diff" || !context.context_id) fail("Daily context has the wrong artifact contract.");
-  for (const key of ["projects", "work_items", "meetings", "people"]) if (!Array.isArray(context[key])) fail(`Daily context ${key} must be an array.`);
   if (parsedResult.data.context_id !== context.context_id) fail("Daily result context_id does not match the collected context.");
   if (parsedReceipt.data.source_context_id !== context.context_id || parsedReceipt.data.daily_result_sha256 !== sha256(resultBytes)) fail("receipt linkage does not match the exact context/result artifacts.");
+  const idempotency = validateDailyIdempotencyRerun({
+    rawRerun,
+    originalReceipt: parsedReceipt.data,
+    originalReceiptBytes: receiptBytes,
+    contextBytes,
+    resultBytes,
+    context,
+  });
+  for (const [index, chase] of parsedResult.data.weekly_progress_chases.entries()) {
+    const effect = parsedReceipt.data.effects.find((row) => row.result_pointer === `/weekly_progress_chases/${index}`);
+    if (!effect || effect.feature_id !== "FEAT-0003" || effect.integration !== "telegram" || effect.operation !== "send_owner_chase") fail(`FEAT-0003 chase ${index} lacks its Telegram integration effect.`);
+    if (effect.target.target_id !== chase.owner_person_id || effect.outcome.state !== "delivered_to_eval_sink" || effect.outcome.delivery_scope !== "operator_owned_eval_sink" || effect.outcome.intended_recipient_person_id !== chase.owner_person_id || effect.outcome.destination_matched !== true || effect.outcome.configured_destination_hash !== effect.outcome.provider_destination_hash) fail(`FEAT-0003 chase ${index} lacks destination-bound eval-sink provider proof.`);
+    if (!effect.outcome.provider_response.response_id || !effect.outcome.read_back.matched || effect.outcome.read_back.payload_hash !== effect.payload_hash) fail(`FEAT-0003 chase ${index} lacks a matching provider receipt and read-back.`);
+  }
 
   const entities = entityIndex(seed);
   const contextIds = new Set(["projects", "work_items", "meetings", "people"]
@@ -154,41 +298,84 @@ export function validateUnifiedDailyRun({ runRoot, suite = loadDailyReviewEvalSu
     if (![...usedIds].some((id) => feature.entity_ids.includes(id))) fail(`${feature.feature_id} output is not grounded in its declared seed case.`);
     return { feature_id: feature.feature_id, result_path: feature.result_path, rows: slice.length, source_ids: [...usedIds].sort() };
   });
-  return { pass: true, stage, inventory, context, result: parsedResult.data, receipt: parsedReceipt.data, feature_checks: featureChecks };
+  const projects = new Map(context.projects.map((row) => [row.id, row]));
+  for (const update of parsedResult.data.project_updates) {
+    const project = projects.get(update.project_id);
+    if (!project) fail(`Project update ${update.project_id} has no frozen Project source.`);
+    for (const replacement of update.section_replacements) {
+      if (replacement.expected_current_text !== currentSectionText(project, replacement.section)) {
+        fail(`${update.project_id} ${replacement.section} expected-current text does not match the frozen Project section.`);
+      }
+    }
+  }
+  return {
+    pass: true,
+    stage,
+    inventory,
+    context,
+    context_sha256: sha256(contextBytes),
+    result: parsedResult.data,
+    result_sha256: sha256(resultBytes),
+    receipt: parsedReceipt.data,
+    idempotency,
+    feature_checks: featureChecks,
+  };
 }
 
-export function buildFeatureJudgePacket({ featureId, result, runRoot = "<run_root>", suite = loadDailyReviewEvalSuite(), seed = loadKamdarSeedConfig() }) {
+export function buildFeatureJudgePacket({ featureId, result, context, runRoot, suite = loadDailyReviewEvalSuite(), seed = loadKamdarSeedConfig() }) {
   const feature = suite.features.find((item) => item.feature_id === featureId);
   if (!feature) fail(`unknown judge feature ${featureId}.`);
+  if (!runRoot) fail("judge packet construction requires the exact run root.");
   const entities = entityIndex(seed);
   const verdictArtifact = suite.run_artifacts.find((item) => item.kind === `feature-judge:${feature.feature_id}`);
   if (!verdictArtifact) fail(`suite lacks judge artifact for ${feature.feature_id}.`);
-  const verdictPath = runRoot === "<run_root>" ? `<run_root>/${verdictArtifact.path}` : resolve(runRoot, verdictArtifact.path);
-  return {
-    schema_version: "kamdar-feature-judge-packet@1.0.0",
+  const verdictPath = resolve(runRoot, verdictArtifact.path);
+  const contextPath = resolve(runRoot, suite.run_artifacts.find((item) => item.kind === "daily-context").path);
+  const resultPath = resolve(runRoot, suite.run_artifacts.find((item) => item.kind === "daily-review-result").path);
+  const fileContext = parsedOrFail(DailyContextDiffSchema, readJson(contextPath, "Daily context"), "Daily context");
+  const fileResult = readJson(resultPath, "Daily result");
+  if (context && stableJson(context) !== stableJson(fileContext)) fail("judge packet context does not match the exact frozen context bytes.");
+  if (stableJson(result) !== stableJson(fileResult)) fail("judge packet candidate does not match the exact frozen result bytes.");
+  const frozenContext = fileContext;
+  const candidate = resultSlice(result, feature.result_path);
+  const packet = {
+    schema_version: "kamdar-feature-judge-packet@2.0.0",
     feature_id: feature.feature_id,
     claim: feature.claim,
-    candidate: resultSlice(result, feature.result_path),
-    seed_evidence: feature.entity_ids.map((id) => entities.get(id)),
+    context_id: frozenContext.context_id,
+    context_sha256: sha256(readFileSync(contextPath)),
+    result_sha256: sha256(readFileSync(resultPath)),
+    candidate,
+    frozen_context_evidence: dailyContextSlice(frozenContext, feature, candidate),
+    seed_controls: feature.entity_ids.map((id) => ({ id, group: entities.get(id)?.group })).filter((row) => row.group),
     assertions: feature.assertions,
     judge_policy: {
       tiers: ["A", "B", "C", "D"],
       pass_tier: "A",
-      evidence_rule: "Judge visible seeded evidence and candidate JSON only; cite exact entity IDs and JSON paths.",
+      evidence_rule: "Judge only the candidate and exact frozen-context evidence in this packet. Seed controls establish identity only and cannot support a factual claim.",
       output_shape: {
         feature_id: feature.feature_id,
         tier: "A|B|C|D",
         verdict: "pass|fail|blocked",
+        rubric: {
+          groundedness: "A|B|C|D",
+          completeness: "A|B|C|D",
+          usefulness: "A|B|C|D",
+          repeatability: "A|B|C|D",
+          length_balance: "A|B|C|D",
+        },
         assertions: [{ assertion: "exact authored assertion", met: true, evidence_refs: ["seed ID plus candidate JSON path"] }],
         evidence_refs: ["all unique evidence references cited by assertions"],
         failures: [],
         verdict_path: verdictPath,
+        packet_sha256: "exact packet_sha256 supplied by this packet",
       },
     },
   };
+  return { ...packet, packet_sha256: packetDigest(packet) };
 }
 
-export function validateFeatureJudgeVerdict(verdict, feature, { expectedVerdictPath } = {}) {
+export function validateFeatureJudgeVerdict(verdict, feature, { expectedVerdictPath, expectedPacketSha256 } = {}) {
   if (!isObject(verdict)
     || verdict.feature_id !== feature.feature_id
     || !["A", "B", "C", "D"].includes(verdict.tier)
@@ -196,10 +383,14 @@ export function validateFeatureJudgeVerdict(verdict, feature, { expectedVerdictP
     || !Array.isArray(verdict.assertions)
     || !Array.isArray(verdict.evidence_refs)
     || !Array.isArray(verdict.failures)
-    || typeof verdict.verdict_path !== "string") {
+    || typeof verdict.verdict_path !== "string"
+    || typeof verdict.packet_sha256 !== "string") {
     fail(`${feature.feature_id} judge verdict is malformed.`);
   }
+  if (verdict.rubric === undefined) fail(`${feature.feature_id} judge verdict is missing the required five-grade rubric.`);
+  validateJudgeRubric(verdict.rubric, `${feature.feature_id} judge rubric`);
   if (verdict.verdict_path !== expectedVerdictPath) fail(`${feature.feature_id} judge verdict_path must equal ${expectedVerdictPath}.`);
+  if (verdict.packet_sha256 !== expectedPacketSha256) fail(`${feature.feature_id} judge verdict is not bound to the current packet hash.`);
   if (!verdict.evidence_refs.length || verdict.evidence_refs.some((reference) => typeof reference !== "string" || !reference.trim())) fail(`${feature.feature_id} judge evidence_refs must contain non-empty references.`);
   if (verdict.failures.some((failure) => typeof failure !== "string" || !failure.trim())) fail(`${feature.feature_id} judge failures must contain non-empty strings.`);
   if (verdict.assertions.length !== feature.assertions.length) fail(`${feature.feature_id} judge must return one result per assertion.`);
@@ -230,11 +421,20 @@ export function validateIntegrationChecks(integrations) {
 }
 
 export function reconcileJudgedRun({ runRoot, deterministic, suite = loadDailyReviewEvalSuite() }) {
+  const deterministicArtifact = suite.run_artifacts.find((item) => item.kind === "deterministic-checks");
+  if (!deterministicArtifact) fail("suite lacks a deterministic-checks artifact.");
+  const savedDeterministic = readJson(resolve(runRoot, deterministicArtifact.path));
+  if (savedDeterministic.pass !== true
+    || savedDeterministic.context_id !== deterministic.context.context_id
+    || savedDeterministic.daily_result_sha256 !== sha256(readFileSync(resolve(runRoot, suite.run_artifacts.find((item) => item.kind === "daily-review-result").path)))) {
+    fail("saved deterministic evidence does not match the validated Daily run.");
+  }
   const featureVerdicts = suite.features.map((feature) => {
     const artifact = suite.run_artifacts.find((item) => item.kind === `feature-judge:${feature.feature_id}`);
     if (!artifact) fail(`suite lacks judge artifact for ${feature.feature_id}.`);
     const verdictPath = resolve(runRoot, artifact.path);
-    return validateFeatureJudgeVerdict(readJson(verdictPath), feature, { expectedVerdictPath: verdictPath });
+    const packet = buildFeatureJudgePacket({ featureId: feature.feature_id, result: deterministic.result, context: deterministic.context, runRoot, suite });
+    return validateFeatureJudgeVerdict(readJson(verdictPath), feature, { expectedVerdictPath: verdictPath, expectedPacketSha256: packet.packet_sha256 });
   });
   const reviewArtifact = suite.run_artifacts.find((item) => item.kind === "evidence-review");
   if (!reviewArtifact) fail("suite lacks an independent evidence-review artifact.");
@@ -258,7 +458,12 @@ export function reconcileJudgedRun({ runRoot, deterministic, suite = loadDailyRe
     expectedReviewPath: qualityPath,
   });
   const pass = deterministic.pass && featureVerdicts.every((item) => item.pass) && review.verdict === "pass" && quality.pass && integrations.pass;
-  return { pass, deterministic: deterministic.pass, feature_verdicts: featureVerdicts, evidence_review: review.verdict, artifact_quality_review: quality, integrations };
+  const expected = { pass, deterministic: deterministic.pass, feature_verdicts: featureVerdicts, evidence_review: review.verdict, artifact_quality_review: quality, integrations };
+  const suiteResultArtifact = suite.run_artifacts.find((item) => item.kind === "suite-result");
+  if (!suiteResultArtifact) fail("suite lacks a suite-result artifact.");
+  const saved = readJson(resolve(runRoot, suiteResultArtifact.path));
+  if (stableJson(saved) !== stableJson(expected)) fail("saved suite result does not match reconciled evidence.");
+  return expected;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

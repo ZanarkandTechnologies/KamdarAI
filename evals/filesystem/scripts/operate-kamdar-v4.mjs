@@ -647,7 +647,7 @@ export function operateKamdarV4({
     remember(redactedAction({ action_key: actionKey, database: "reports", operation: call.operation, feature_id: call.feature_id, adapter: call.adapter, result: applied, payload }));
   }
 
-  const promotionDatabaseByOperation = { upsert_issue: "work_items", upsert_decision: "decisions", upsert_skill: "skills" };
+  const promotionDatabaseByOperation = { upsert_issue: "work_items", upsert_decision: "decisions", upsert_sop: "skills" };
   for (const call of notionCalls.filter((entry) => Object.hasOwn(promotionDatabaseByOperation, entry.operation))) {
     const databaseKey = promotionDatabaseByOperation[call.operation];
     const recordId = call.args.record_id;
@@ -661,7 +661,7 @@ export function operateKamdarV4({
       Project: change.after?.project_id || "",
       Projects: projectKey ? [projectPages.get(projectKey)] : [],
       Status: "Approved",
-      Template: databaseKey === "work_items" ? "kamdar-issue@0.3.0" : databaseKey === "skills" ? "company-os-skill@0.3.0" : `company-os-${databaseKey.slice(0, -1)}@0.3.0`,
+      Template: databaseKey === "work_items" ? "kamdar-issue@1.0.0" : databaseKey === "skills" ? "kamdar-employee-sop@1.0.0" : `company-os-${databaseKey.slice(0, -1)}@0.3.0`,
       Source: sourceUrl(),
       ...(databaseKey === "decisions" ? { Approver: change.after?.authority || "recorded", Decided: loadedSnapshot.local_day } : {})
     };

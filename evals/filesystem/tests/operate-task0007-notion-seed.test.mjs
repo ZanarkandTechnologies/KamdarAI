@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -22,6 +23,11 @@ test("Notion table serialization preserves the report's canonical text", () => {
 });
 
 function weeklyResult() {
+  const companyExecutiveContext = {
+    problems: [{ title: "Company source completeness", context_and_operating_impact: "An incomplete source chain prevents an accountable company view.", measurement_and_confidence: "All three expected Area reports are present with high confidence.", intervention_and_test: "Retain exact source IDs and verify them before finalization.", evidence_ids: ["RPT-AREA-CMT-W34"] }],
+    decisions: [{ title: "Publish only a complete Company rollup", context_rationale_and_tradeoff: "Completeness is preferred over an earlier partial summary.", authority_and_timing: "The Weekly reviewer decides at cutoff.", consequence_and_review_trigger: "Block publication whenever an expected Area report is absent.", evidence_ids: ["RPT-AREA-CMT-W34"] }],
+    sops: [{ title: "Keep source-chain verification in the Weekly review", workflow_and_output: "Verify Project to Area to Company source IDs before delivery.", proof_scope_and_owner: "The Weekly reviewer owns this control.", disposition: "bounded", destination_id: "SOP-WEEKLY-SOURCE-CHECK", evidence_ids: ["RPT-AREA-CMT-W34"] }],
+  };
   const report = (report_id, report_level, project_id, area, source_report_ids, minute) => ({
     report_id,
     report_level,
@@ -33,7 +39,8 @@ function weeklyResult() {
     report_version: 1,
     report_status: "Final",
     finalized_at: `2026-08-24T18:${minute}:00+08:00`,
-    report_markdown: `# ${report_level === "Company" ? "Kamdar" : project_id || area} — Week of 2026-08-17\n\n## Summary\n\nGrounded weekly result for ${report_id}.`,
+    report_markdown: `# ${report_level === "Company" ? "Kamdar" : project_id || area} — Week of 2026-08-17\n\n## Summary\n\nGrounded weekly result for ${report_id}.${report_level === "Company" ? `\n\n## Problems and inefficiencies\n\n${companyExecutiveContext.problems.flatMap((entry) => [entry.title, entry.context_and_operating_impact, entry.measurement_and_confidence, entry.intervention_and_test]).join("\n\n")}\n\n## Decisions\n\n${companyExecutiveContext.decisions.flatMap((entry) => [entry.title, entry.context_rationale_and_tradeoff, entry.authority_and_timing, entry.consequence_and_review_trigger]).join("\n\n")}\n\n## SOPs\n\n${companyExecutiveContext.sops.flatMap((entry) => [entry.title, entry.workflow_and_output, entry.proof_scope_and_owner]).join("\n\n")}` : ""}`,
+    company_executive_context: report_level === "Company" ? companyExecutiveContext : null,
     configuration_gaps: []
   });
   const projects = [
@@ -46,20 +53,79 @@ function weeklyResult() {
     report("RPT-AREA-MARKETING-W34", "Area", null, "Marketing", [projects[1].report_id], "05"),
     report("RPT-AREA-ECOMMERCE-W34", "Area", null, "Ecommerce", [projects[2].report_id], "06")
   ];
-  return {
+  const weeklyResult = {
     schema_version: "kamdar-weekly-review-result@1.0.0",
     context_id: "weekly-context-2026-W34",
     week: "2026-W34",
     report_results: [...projects, ...areas, report("RPT-COMPANY-W34", "Company", null, null, areas.map((row) => row.report_id), "07")],
     promotion_dispositions: [
-      { candidate_id: "TASK-101", kind: "problem", source_report_id: projects[0].report_id, source_ids: [projects[0].report_id, "TASK-101"], disposition: "promoted", reason: "Production blocker is actionable.", destination_id: "ISSUE-CMT-01", rendered_markdown: "---\ntemplate_id: kamdar-issue\nname: \"Approve CMT production pack\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\npriority: \"High\"\nstart_date: \"2026-08-18\"\ndue_date: \"2026-08-27\"\nprogress: \"Production booking is blocked.\"\nlast_meaningful_update: \"2026-08-21\"\n---\n\n# Approve CMT production pack\n\n## Problem and impact\n\nThe production line cannot be booked from one approved pack.\n\n## Evidence and reproduction\n\nTASK-101.\n\n## Diagnosis\n\nApproval is missing.\n\n## Containment and next action\n\nAisha approves the pack.\n\n## Resolution and verification\n\nBook from the approved pack.\n\n## Related records\n\nPROJ-CMT-CMT_PIPELINE.", gaps: [] },
+      { candidate_id: "TASK-101", kind: "problem", source_report_id: projects[0].report_id, source_ids: [projects[0].report_id, "TASK-101"], disposition: "promoted", reason: "Production blocker is actionable.", destination_id: "ISSUE-CMT-01", rendered_markdown: "---\ntemplate_id: kamdar-issue\ntemplate_version: \"1.0.0\"\nname: \"Approve CMT production pack\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\npriority: \"High\"\nstart_date: \"2026-08-18\"\ndue_date: \"2026-08-27\"\nprogress: \"Production booking is blocked.\"\nlast_meaningful_update: \"2026-08-21\"\nworkflow: \"Pre-production handoff\"\nworkflow_step: \"Approve the canonical pack\"\nbaseline_date: \"2026-08-21\"\n---\n\n# Approve CMT production pack\n\n## Problem and impact\n\nThe production line cannot be booked from one approved pack.\n\n## Before baseline and economics\n\nFour rework hours at MYR 90/hour = MYR 360. Idle-line cost remains a measurement gap owned by Aisha.\n\n## Evidence and reproduction\n\nTASK-101.\n\n## Diagnosis\n\nApproval is missing.\n\n## Containment and next action\n\nAisha approves the pack.\n\n## Intervention and measurement plan\n\nUse one approved pack and measure rework and booking delay.\n\n## Resolution and verification\n\nBook from the approved pack.\n\n## After measurement and verified value\n\nNot measured yet.\n\n## Related records\n\nPROJ-CMT-CMT_PIPELINE.", gaps: [] },
       { candidate_id: "TASK-110", kind: "decision", source_report_id: projects[0].report_id, source_ids: [projects[0].report_id, "TASK-110"], disposition: "promoted", reason: "Baseline is approved.", destination_id: "DECISION-CMT-01", rendered_markdown: "---\ntemplate_id: company-os-decision\nname: \"Use signed sample baseline\"\nproject: \"PROJ-CMT-CMT_PIPELINE\"\ndepartment: \"CMT\"\nproposer: \"PERSON-AISHA\"\napprover: \"CMT Lead\"\nstatus: \"Approved\"\ndecided_at: \"2026-08-21\"\nreview_date: \"2026-08-29\"\n---\n\n# Use signed sample baseline\n\n## Context\n\nThe sample passed.\n\n## Options and tradeoffs\n\nOne pack or split files.\n\n## Decision rationale\n\nUse one source.\n\n## Consequences and review trigger\n\nReview after production.\n\n## Evidence and related records\n\nTASK-110.", gaps: [] },
-      { candidate_id: "TASK-203", kind: "sop", source_report_id: projects[2].report_id, source_ids: [projects[2].report_id, "TASK-203"], disposition: "promoted", reason: "Method was reused.", destination_id: "SOP-ECOM-01", rendered_markdown: "---\ntemplate_id: company-os-skill\nname: \"Prepare listing handoff\"\nproject: \"PROJ-ECOM-ECOM_FIXES\"\ndepartment: \"Ecommerce\"\nowner: \"PERSON-DARREN\"\nstatus: \"Approved\"\nsource_path: \"notion://TASK-203\"\nlatest_eval: \"two batches\"\nlast_reviewed: \"2026-08-21\"\n---\n\n# Prepare listing handoff\n\n## Capability\n\nPrepare one complete listing record.\n\n## Proven use\n\nReused twice.\n\n## Boundaries and dependencies\n\nRequires approved sample.\n\n## Source and proof\n\nTASK-203.", gaps: [] }
+      { candidate_id: "TASK-203", kind: "sop", source_report_id: projects[2].report_id, source_ids: [projects[2].report_id, "TASK-203"], disposition: "promoted", reason: "Method was reused.", destination_id: "SOP-ECOM-01", rendered_markdown: "---\ntemplate_id: kamdar-employee-sop\ntemplate_version: \"1.0.0\"\nname: \"Prepare listing handoff\"\nproject: \"PROJ-ECOM-ECOM_FIXES\"\ndepartment: \"Ecommerce\"\nowner: \"PERSON-DARREN\"\nstatus: \"Approved\"\nbaseline_version: \"1\"\neffective_date: \"2026-08-21\"\nlast_reviewed: \"2026-08-21\"\nnext_review: \"2026-08-29\"\n---\n\n# Prepare listing handoff\n\n## Purpose and outcome\n\nPrepare one complete listing record.\n\n## Trigger, actors, and inputs\n\nAn approved sample moves from Merchandising to Darren.\n\n## Current workflow\n\n1. Verify the approved sample.\n2. Assemble required facts and assets.\n3. Record receiver acceptance.\n\n## Timing and volume baseline\n\nReused twice; time and weekly volume require measurement.\n\n## Exceptions and controls\n\nRequires an approved sample.\n\n## Improvement and verification\n\nMeasure the next two batches.\n\n## Evidence and related records\n\nTASK-203.", gaps: [] }
     ],
     next_week_project_replacements: [],
     configuration_gaps: [],
     run_notes: "Provider-edge application fixture."
   };
+  weeklyResult.promotion_dispositions[0].problem_baseline_proof = {
+    workflow_name: "Pre-production handoff",
+    affected_step: "Approve the canonical pack",
+    baseline_date: "2026-08-21",
+    measurement_window: "2026-08-18 through 2026-08-21",
+    measured_metrics: ["Four rework hours at MYR 90/hour = MYR 360."],
+    measurement_gaps: ["Idle-line cost remains unmeasured."],
+    confidence: "high",
+    measurement_owner_person_id: "PERSON-AISHA",
+    intervention_plan: "Use one approved pack and measure rework and booking delay.",
+    after_state: "not_measured"
+  };
+  weeklyResult.promotion_dispositions[1].decision_preservation_proof = {
+    preservation_reasons: ["project_operating_standard", "costly_to_reverse"],
+    reuse_value: "Future production handoffs can reuse the signed-source precedence rule.",
+    materiality: "The choice controls production booking; the amount is not established.",
+    options_considered: [
+      { option: "Use one signed pack", upside: "One traceable source.", downside: "Requires controlled corrections." },
+      { option: "Use split files", upside: "No consolidation delay.", downside: "Weak change control." }
+    ],
+    selected_option: "Use one signed pack",
+    rationale: "It preserves one approved source.",
+    authority_person_id: "PERSON-AISHA",
+    decided_at: "2026-08-21",
+    accepted_tradeoff: "Requires controlled corrections.",
+    consequences: "Production uses only the signed source.",
+    review_trigger: "Review after production."
+  };
+  weeklyResult.promotion_dispositions[1].rendered_markdown = weeklyResult.promotion_dispositions[1].rendered_markdown
+    .replace("One pack or split files.", "- Use one signed pack — One traceable source; Requires controlled corrections.\n- Use split files — No consolidation delay; Weak change control.")
+    .replace("Use one source.", "Use one signed pack because it preserves one approved source. Requires controlled corrections.");
+  return weeklyResult;
+}
+
+function writeTierAWeeklyReview(privateRoot, resultPath, result) {
+  const qualityReviewPath = resolve(privateRoot, "weekly-artifact-quality-review.json");
+  const pointers = ["report_results", "promotion_dispositions", "next_week_project_replacements", "configuration_gaps"]
+    .flatMap((key) => result[key].map((_, index) => `/${key}/${index}`));
+  const check = { pass: true, evidence_refs: ["reviewed exact result payload"], findings: [] };
+  writeFileSync(qualityReviewPath, JSON.stringify({
+    schema_version: "kamdar-artifact-quality-review@1.0.0",
+    lane: "artifact-quality-review",
+    independent: true,
+    scope: "weekly",
+    context_id: result.context_id,
+    result_sha256: createHash("sha256").update(JSON.stringify(result)).digest("hex"),
+    rubric_path: "evals/rubrics/end-user-artifact-quality.md",
+    tier: "A",
+    verdict: "pass",
+    artifacts: pointers.map((artifact_pointer) => ({ artifact_pointer, checks: {
+      referential_clarity: check, end_user_value: check, readability: check,
+      template_fidelity: check, groundedness: check, workflow_reconstructability: check,
+      baseline_integrity: check,
+    } })),
+    hard_gate_failures: [],
+    repair_route: "none",
+    review_path: qualityReviewPath,
+  }));
+  return qualityReviewPath;
 }
 
 function textProperty(type, value) {
@@ -247,8 +313,8 @@ test("the current environment can seed only canonical entities without legacy au
     .find((payload) => payload.properties?.ID?.rich_text?.[0]?.text?.content === "PERSON-JUN");
   assert.match(personCreate.markdown, /^## Operating notes$/m);
   assert.doesNotMatch(personCreate.markdown, /sandbox-email-route-a/);
-  assert.equal(personCreate.properties["Contact endpoint"].rich_text[0].text.content, "telegram");
-  assert.equal(personCreate.properties["Preferred contact channel"].select.name, "Telegram");
+  assert.equal(personCreate.properties["Contact endpoint"].rich_text[0].text.content, "operator_secondary_email");
+  assert.equal(personCreate.properties["Preferred contact channel"].select.name, "Email");
   const meetingCreate = mock.calls
     .filter((args) => args[0] === "api" && args[1] === "v1/pages" && args.includes("-d"))
     .map((args) => JSON.parse(args[args.indexOf("-d") + 1]))
@@ -263,8 +329,10 @@ test("an extracted Weekly result is applied Project then Area then Company with 
   const mock = mockedNtn();
   provisionTask0007NotionSeed({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment });
   const resultPath = resolve(privateRoot, "weekly-result.json");
-  writeFileSync(resultPath, JSON.stringify(weeklyResult()));
-  const applied = applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath });
+  const result = weeklyResult();
+  writeFileSync(resultPath, JSON.stringify(result));
+  const qualityReviewPath = writeTierAWeeklyReview(privateRoot, resultPath, result);
+  const applied = applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath, qualityReviewPath });
   assert.deepEqual(applied.counts, { expected: 10, applied: 10, skipped: 0, project_reports: 3, area_reports: 3, company_reports: 1, promotions: 3 });
   assert.equal(applied.external_messages_sent, 0);
   assert.deepEqual(applied.reports.map((entry) => entry.report_level), ["Project", "Project", "Project", "Area", "Area", "Area", "Company"]);
@@ -279,7 +347,7 @@ test("an extracted Weekly result is applied Project then Area then Company with 
   assert.equal(company.properties.Template.rich_text[0].text.content, "kamdar-company-operating-rollup");
   assert.equal(company.properties["Source report IDs"].rich_text[0].text.content, "RPT-AREA-CMT-W34, RPT-AREA-MARKETING-W34, RPT-AREA-ECOMMERCE-W34");
   assert.equal(company.markdown, weeklyResult().report_results.at(-1).report_markdown);
-  const rerun = applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath });
+  const rerun = applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath, qualityReviewPath });
   assert.deepEqual(rerun.counts, { expected: 10, applied: 0, skipped: 10, project_reports: 3, area_reports: 3, company_reports: 1, promotions: 3 });
 });
 
@@ -292,10 +360,26 @@ test("Weekly application refuses incomplete Area coverage before Notion writes",
   incomplete.report_results = incomplete.report_results.filter((report) => report.report_id !== "RPT-AREA-MARKETING-W34");
   const resultPath = resolve(privateRoot, "weekly-result.json");
   writeFileSync(resultPath, JSON.stringify(incomplete));
+  const qualityReviewPath = writeTierAWeeklyReview(privateRoot, resultPath, incomplete);
+  const before = mock.calls.length;
+  assert.throws(
+    () => applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath, qualityReviewPath }),
+    /Area reports must exactly cover Project areas/
+  );
+  assert.equal(mock.calls.length, before);
+});
+
+test("Weekly application refuses an unreviewed result before Notion writes", (t) => {
+  const privateRoot = mkdtempSync(resolve(tmpdir(), "weekly-quality-gate-"));
+  t.after(() => rmSync(privateRoot, { recursive: true, force: true }));
+  const mock = mockedNtn();
+  const result = weeklyResult();
+  const resultPath = resolve(privateRoot, "weekly-result.json");
+  writeFileSync(resultPath, JSON.stringify(result));
   const before = mock.calls.length;
   assert.throws(
     () => applyWeeklyReviewResultToNotion({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment, resultPath }),
-    /Area reports must exactly cover Project areas/
+    /artifact quality review path must be absolute/
   );
   assert.equal(mock.calls.length, before);
 });

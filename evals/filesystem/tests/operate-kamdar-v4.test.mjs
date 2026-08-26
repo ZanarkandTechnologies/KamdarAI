@@ -164,7 +164,7 @@ test.skip("the full frozen plan maps capture Projects, generated reports, promot
   assert.ok(applied.counts.applied > 90, "full plan should include seed, patch, report, promotion, and comment writes");
   assert.equal(applied.actions.some((entry) => entry.operation === "create_owner_action_comment"), true);
   assert.equal(applied.actions.some((entry) => entry.operation === "upsert_company_report"), true);
-  assert.equal(applied.actions.some((entry) => entry.operation === "upsert_skill"), true);
+  assert.equal(applied.actions.some((entry) => entry.operation === "upsert_sop"), true);
   assert.equal(applied.actions.some((entry) => entry.action_key.includes("seed-project")), true);
 });
 

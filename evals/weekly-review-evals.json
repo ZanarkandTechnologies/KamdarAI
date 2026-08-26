@@ -1,5 +1,5 @@
 {
-  "schema_version": "kamdar-weekly-review-evals@1.0.0",
+  "schema_version": "kamdar-weekly-review-evals@2.0.0",
   "suite": "kamdar-weekly-operating-review",
   "target": {
     "automation": "automations/weekly-operating-review.md",
@@ -13,7 +13,7 @@
       "templates/company-operating-rollup.md",
       "templates/issue.md",
       "templates/decision.md",
-      "templates/skill.md",
+      "templates/sop.md",
       "templates/project.md"
     ]
   },
@@ -119,7 +119,7 @@
         "CMT Pipeline, Deepavali Marketing, and Ecom Fixes Drafts become Final and increment once.",
         "RPT-PROJ-CMT-CMT_PIPELINE-W33 remains unchanged.",
         "CMT, Marketing, and Ecommerce reports cite immediate Project reports, never raw Work.",
-        "The Final Company report cites all three Final Area reports and provides substantive operating content.",
+        "The Blocked Company report cites all three Final Area reports, provides substantive operating content, and refuses Final status while the Content input is missing.",
         "All reports use grounded textile, campaign, catalog, storefront, customer, sample, or production language; generic software release and QA wording is absent."
       ],
       "falsifier": "Any changed prior Final report, invented source relation, missing shared section, raw Work copied into an Area or Company rollup, or Company report marked Final despite the Content gap."
@@ -137,16 +137,17 @@
         "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
         "RPT-PROJ-ECOM-ECOM_FIXES-W34"
       ],
-      "claim": "Every candidate already recorded in the three current Project Drafts receives an evidence-backed disposition, and only candidates that pass source, authority, reuse, relation, destination, and dedupe gates become canonical records; Weekly never rescans raw Work or Meetings.",
+      "claim": "Every candidate already recorded in the three current Project Drafts receives an evidence-backed disposition. Promoted problems preserve their workflow baseline, promoted workflows become employee SOP records, and only reusable or materially consequential decisions become canonical Decisions with advise-style options and rationale. Weekly never rescans raw Work or Meetings.",
       "assertions": [
-        "CMT promotes the production problem and approved baseline decision.",
+        "CMT promotes the production problem as an Issue preserving the workflow step, four-hour and MYR 360 Before baseline, formula, confidence, measurement gap, intervention, and empty After state.",
+        "The CMT sample-baseline choice is promoted only because it establishes a reusable production standard; it records 2–3 real options, selected option, rationale, authority, accepted tradeoff, consequences, and review trigger.",
         "Deepavali's folder method remains project_only until cross-campaign reuse.",
-        "Ecom promotes only the approved repeated listing handoff and monitors the one-occurrence defect gap.",
+        "Ecom promotes the approved repeated listing handoff with the employee SOP template and monitors the one-occurrence defect gap.",
         "Candidates come through immutable Drafts; Weekly never rescans Work or Meetings.",
         "Every candidate has one disposition and required destination or gap.",
-        "Promoted records render complete destination templates."
+        "Promoted records render complete destination templates; no employee workflow uses the Farplane software-skill registry template."
       ],
-      "falsifier": "A missing candidate disposition, a duplicate applied as new, a blocked candidate with a destination write, a wrong destination template, or a promoted record without source, authority, Project relation, and dedupe evidence."
+      "falsifier": "A missing candidate disposition, a routine choice promoted as a Decision, a promoted Decision without preservation reason or real alternatives, a duplicate applied as new, a blocked candidate with a destination write, a wrong destination template, or a promoted record without source, authority, Project relation, and dedupe evidence."
     },
     {
       "feature_id": "FEAT-0007",
@@ -167,67 +168,6 @@
         "No parallel plan or duplicate checklist is created."
       ],
       "falsifier": "A lost unresolved item, an unsourced new priority, a partial append instead of complete guarded replacement, changed source Work, or any parallel plan artifact."
-    }
-  ],
-  "cases": [
-    {
-      "id": "weekly-report-hierarchy-and-finalization-gate",
-      "prompt": "Finalize this week's eligible Project drafts and produce the Area and Company operating view from the seeded Reports workspace.",
-      "feature_ids": [
-        "FEAT-0005"
-      ],
-      "entity_ids": [
-        "RPT-PROJ-CMT-CMT_PIPELINE-W33",
-        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
-        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-        "RPT-PROJ-ECOM-ECOM_FIXES-W34"
-      ],
-      "hidden_assertions": [
-        "Only current Draft reports are eligible for finalization and each version increases by one.",
-        "Higher-level reports cite their immediate source reports and never rescan raw Work or Meetings.",
-        "The Content source gap remains visible and prevents a false Final Company status."
-      ]
-    },
-    {
-      "id": "weekly-promotion-disposition-matrix",
-      "prompt": "Review every candidate in the Project reports and promote only the knowledge that has enough evidence and authority for a canonical home.",
-      "feature_ids": [
-        "FEAT-0006"
-      ],
-      "entity_ids": [
-        "TASK-101",
-        "TASK-110",
-        "TASK-201",
-        "TASK-203",
-        "TASK-102",
-        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
-        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-        "RPT-PROJ-ECOM-ECOM_FIXES-W34"
-      ],
-      "hidden_assertions": [
-        "The result represents promoted, duplicate, project-only, monitor, dismissed, and blocked branches using candidates already present in the three Project Drafts.",
-        "Each promotion route uses the matching canonical template and carries its source and Project relation.",
-        "A duplicate or blocked disposition produces no new destination row in mocked provider read-back."
-      ]
-    },
-    {
-      "id": "weekly-canonical-project-carry-forward",
-      "prompt": "Apply the finalized CMT Pipeline priorities to the owning Project.",
-      "feature_ids": [
-        "FEAT-0007"
-      ],
-      "entity_ids": [
-        "PROJ-CMT-CMT_PIPELINE",
-        "TASK-101",
-        "TASK-104",
-        "TASK-110",
-        "RPT-PROJ-CMT-CMT_PIPELINE-W34"
-      ],
-      "hidden_assertions": [
-        "One complete conflict-safe Project section replacement carries forward unresolved priorities and adds the approved next priority.",
-        "Mock receipt and read-back prove the exact Project text; a URL alone is not evidence.",
-        "The run creates no alternate Project plan and leaves the source Work records unchanged."
-      ]
     }
   ],
   "judge_policy": {
@@ -284,5 +224,123 @@
       "A repeated unchanged application produces no duplicate report, canonical knowledge record, or Project replacement.",
       "The source Project reports and source Work records remain unchanged except for the explicitly targeted Draft finalization and Project checklist replacement."
     ]
-  }
+  },
+  "evals": [
+    {
+      "id": "weekly-report-hierarchy-and-finalization-gate",
+      "prompt": "Finalize this week's eligible Project drafts and produce the Area and Company operating view from the seeded Reports workspace.",
+      "expected_output": "Eligible Project reports finalize once, Department reports roll up their Projects, the Company report rolls up its Departments, and any missing Department remains visibly blocked.",
+      "files": [],
+      "assertions": [
+        "Only current Draft reports are eligible for finalization and each version increases by one.",
+        "Higher-level reports cite their immediate source reports and never rescan raw Work or Meetings.",
+        "The Content source gap remains visible and prevents a false Final Company status."
+      ],
+      "metadata": {
+        "title": "Creates Project, Department, and Company reports",
+        "context": "The seeded Reports workspace contains current Project drafts, a prior Final report, and a missing Content input for the Company rollup.",
+        "tags": [
+          "weekly",
+          "feature",
+          "reports",
+          "finalization"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0005"
+            ],
+            "entity_ids": [
+              "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+              "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+              "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+              "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+            ],
+            "result_paths": [
+              "$.report_results[*]"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "weekly-promotion-disposition-matrix",
+      "prompt": "Review every candidate in the Project reports and promote only the knowledge that has enough evidence and authority for a canonical home.",
+      "expected_output": "Every candidate receives one evidence-backed disposition, and only qualified knowledge creates a correctly templated canonical record.",
+      "files": [],
+      "assertions": [
+        "The result represents promoted, duplicate, project-only, monitor, dismissed, and blocked branches using candidates already present in the three Project Drafts.",
+        "Each promotion route uses the matching canonical template and carries its source and Project relation.",
+        "A duplicate or blocked disposition produces no new destination row in mocked provider read-back."
+      ],
+      "metadata": {
+        "title": "Promotes only knowledge with enough evidence and authority",
+        "context": "Current Project drafts contain workflow, problem, decision, duplicate, project-only, monitor, dismissed, and blocked knowledge candidates.",
+        "tags": [
+          "weekly",
+          "feature",
+          "knowledge",
+          "promotion"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0006"
+            ],
+            "entity_ids": [
+              "TASK-101",
+              "TASK-110",
+              "TASK-201",
+              "TASK-203",
+              "TASK-102",
+              "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+              "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+              "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+            ],
+            "result_paths": [
+              "$.promotion_dispositions[*]"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "weekly-canonical-project-carry-forward",
+      "prompt": "Apply the finalized CMT Pipeline priorities to the owning Project.",
+      "expected_output": "One guarded complete checklist replacement carries unresolved priorities forward without changing source Work or creating a parallel plan.",
+      "files": [],
+      "assertions": [
+        "One complete conflict-safe Project section replacement carries forward unresolved priorities and adds the approved next priority.",
+        "Mock receipt and read-back prove the exact Project text; a URL alone is not evidence.",
+        "The run creates no alternate Project plan and leaves the source Work records unchanged."
+      ],
+      "metadata": {
+        "title": "Carries unresolved priorities into the owning Project",
+        "context": "The finalized CMT Pipeline report contains unresolved priorities that belong in the existing canonical Project checklist.",
+        "tags": [
+          "weekly",
+          "feature",
+          "project-control",
+          "carry-forward"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0007"
+            ],
+            "entity_ids": [
+              "PROJ-CMT-CMT_PIPELINE",
+              "TASK-101",
+              "TASK-104",
+              "TASK-110",
+              "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+            ],
+            "result_paths": [
+              "$.next_week_project_replacements[*]"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

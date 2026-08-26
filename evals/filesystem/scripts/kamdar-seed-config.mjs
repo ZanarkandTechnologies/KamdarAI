@@ -82,8 +82,13 @@ function assertTemplateRecord(record, contract, group) {
 }
 
 function normalizeRecord(source, expectedTemplate, contract, group) {
-  assertOnlyKeys(source, ["id", "template", "properties", "body", "metadata"], `${group}.${source?.id || "unknown"}`);
+  assertOnlyKeys(source, ["id", "source_url", "template", "properties", "body", "metadata"], `${group}.${source?.id || "unknown"}`);
   assertStableId(source.id, `${group}.id`);
+  if (source.source_url !== undefined) {
+    let url;
+    try { url = new URL(source.source_url); } catch { fail(`${group}.${source.id}.source_url must be a valid URL.`); }
+    if (!url || !["http:", "https:"].includes(url.protocol)) fail(`${group}.${source.id}.source_url must use http or https.`);
+  }
   if (source.template !== expectedTemplate) fail(`${group}.${source.id} must use template ${expectedTemplate}.`);
   if (!isObject(source.properties)) fail(`${group}.${source.id}.properties must be an object.`);
   requiredString(source.properties.name, `${group}.${source.id}.properties.name`);
