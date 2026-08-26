@@ -46,9 +46,17 @@ export function createEvalDashboardServer() {
   });
 }
 
+export function resolveEvalDashboardMode(environment = process.env) {
+  const mode = environment.EVAL_DASHBOARD_MODE
+    || (environment.PRESENTATION_ELIGIBILITY_MANIFEST ? "presentation" : "internal");
+  if (!["presentation", "internal"].includes(mode)) {
+    throw new Error("EVAL_DASHBOARD_MODE must be presentation or internal.");
+  }
+  return mode;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const mode = process.env.EVAL_DASHBOARD_MODE || "presentation";
-  if (!['presentation', 'internal'].includes(mode)) throw new Error("EVAL_DASHBOARD_MODE must be presentation or internal.");
+  const mode = resolveEvalDashboardMode();
   const built = buildVercelShowcase({
     outputDirectory,
     mode,

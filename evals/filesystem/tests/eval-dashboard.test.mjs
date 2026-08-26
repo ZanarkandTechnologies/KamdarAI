@@ -16,6 +16,7 @@ import {
 } from "../scripts/eval-dashboard-components.mjs";
 import { renderEntityCard } from "../scripts/eval-dashboard-entity-components.mjs";
 import { renderEvalDashboardHtml } from "../scripts/eval-dashboard-html.mjs";
+import { resolveEvalDashboardMode } from "../scripts/serve-eval-dashboard.mjs";
 
 const filesystemRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = resolve(filesystemRoot, "../..");
@@ -58,6 +59,13 @@ function refreshDailyJudges(root) {
     writeFileSync(judgePath, JSON.stringify(judge), "utf8");
   }
 }
+
+test("local dashboard defaults to internal mode unless a presentation manifest is supplied", () => {
+  assert.equal(resolveEvalDashboardMode({}), "internal");
+  assert.equal(resolveEvalDashboardMode({ PRESENTATION_ELIGIBILITY_MANIFEST: "/tmp/eligibility.json" }), "presentation");
+  assert.equal(resolveEvalDashboardMode({ EVAL_DASHBOARD_MODE: "internal", PRESENTATION_ELIGIBILITY_MANIFEST: "/tmp/eligibility.json" }), "internal");
+  assert.throws(() => resolveEvalDashboardMode({ EVAL_DASHBOARD_MODE: "public" }), /must be presentation or internal/);
+});
 
 test("dashboard projects each typed scenario once with its own proof bindings", () => {
   const model = build();

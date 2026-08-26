@@ -50,7 +50,7 @@ not presentation eligible. There is currently no customer-valid deployment.
 
 ```bash
 # Internal diagnostics: may discover the latest completed runs and expose proof plumbing.
-EVAL_DASHBOARD_MODE=internal npm run evals:ui
+npm run evals:ui
 
 # Complete filesystem regression suite.
 node --test evals/filesystem/tests/*.test.mjs

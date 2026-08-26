@@ -19,8 +19,12 @@ For the internal diagnostic view, which retains artifact paths, raw proof, and
 technical reconciliation detail, run:
 
 ```bash
-EVAL_DASHBOARD_MODE=internal npm run evals:ui
+npm run evals:ui
 ```
+
+The launcher defaults to the internal local view. Supplying
+`PRESENTATION_ELIGIBILITY_MANIFEST=/absolute/path/presentation-eligibility.json`
+selects the fail-closed customer presentation instead.
 
 This is the current local proof for TASK-0006. It consumes the canonical root
 contract at `../evals.json`, the repository-owned templates at `../../templates/`,
