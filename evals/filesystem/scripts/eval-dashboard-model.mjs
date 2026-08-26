@@ -733,7 +733,9 @@ function loadSuiteRun({ suitePath, runRoot, featureDocsRoot, entities, entityLab
         feature_ids: bindings.feature_ids,
         integration_gate_ids: gateIds,
         receipt_rows: receiptRows,
-        urls: collectUrls(receiptRows)
+        // Mock receipt URLs are structured evidence, not navigable sources.
+        // Only an explicit operated-evidence overlay may add clickable links.
+        urls: []
       }
     };
   });

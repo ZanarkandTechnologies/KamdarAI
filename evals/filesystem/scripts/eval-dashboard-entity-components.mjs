@@ -73,6 +73,7 @@ function safeSourceUrl(value) {
   if (!present(value)) return null;
   try {
     const url = new URL(value);
+    if (url.hostname === "example.test" || url.hostname.endsWith(".example.test")) return null;
     return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
   } catch {
     return null;

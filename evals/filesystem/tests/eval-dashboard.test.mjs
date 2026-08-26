@@ -128,8 +128,8 @@ test("compact seed records normalize into populated typed cards", () => {
   const projectCard = renderEntityCard(project, 0, { labels: model.groups[0].cases[0].entity_labels });
   assert.match(projectCard, /<h4>Objective<\/h4>/);
   assert.match(projectCard, /<h4>This week<\/h4>/);
-  assert.match(projectCard, /Open source ↗/);
-  assert.doesNotMatch(projectCard, /Open source collection/);
+  assert.equal(project.source_url, null);
+  assert.doesNotMatch(projectCard, /Open source|example\.test/);
   assert.doesNotMatch(projectCard, /raw-entity-data|Technical source data|View raw JSON/);
 });
 
@@ -403,6 +403,8 @@ test("source input cards render safe source URLs and reject executable schemes",
   assert.match(linked, /target="_blank" rel="noreferrer"/);
   const unsafe = renderEntityCard({ entity_type: "work_items", id: "TASK-2", name: "Unsafe", source_url: "javascript:alert(1)" }, 0);
   assert.doesNotMatch(unsafe, /Open source|href="javascript:/);
+  const placeholder = renderEntityCard({ entity_type: "projects", id: "PROJ-1", name: "Placeholder", source_url: "https://notion.example.test/projects/PROJ-1" }, 0);
+  assert.doesNotMatch(placeholder, /Open source|example\.test/);
 });
 
 test("presentation report output renders business Markdown and hides front matter", () => {
@@ -486,6 +488,8 @@ test("meeting, person, and report cards use their own semantic layouts", () => {
 });
 
 test("operated evidence JSON replaces mock links without renderer literals", () => {
+  const baseModel = build();
+  assert.deepEqual(baseModel.groups[0].cases[0].technical.urls, []);
   const root = mkdtempSync(resolve(tmpdir(), "kamdar-operated-evidence-"));
   try {
     const path = resolve(root, "operated-evidence.json");

@@ -39,7 +39,6 @@
     "projects": [
       {
         "id": "PROJ-CMT-CMT_PIPELINE",
-        "source_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE",
         "template": "project",
         "properties": {
           "name": "CMT Pipeline",
