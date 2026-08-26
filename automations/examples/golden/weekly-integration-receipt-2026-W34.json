@@ -2,7 +2,7 @@
   "schema_version": "kamdar-weekly-integration-receipt@1.0.0",
   "receipt_id": "WEEKLY-INTEGRATION-2026-W34-V4",
   "context_id": "weekly-context-2026-W34",
-  "weekly_result_sha256": "9d64471b003e80a7b74a60cf49249ea10317d500b5f60c114410167af1f24e65",
+  "weekly_result_sha256": "4e1960652063605428ce36dc03fefacaa9b95cefd4182f74bfc6a63271cf3e43",
   "recorded_at": "2026-08-24T18:15:00+08:00",
   "live_provider_calls": false,
   "effects": [
@@ -12,7 +12,7 @@
       "operation": "finalize_project_report",
       "target_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
       "action_key": "weekly:v4:report_results:RPT-PROJ-CMT-CMT_PIPELINE-W34:0",
-      "payload_sha256": "e8449e200951ba52a40c2b2faf6a88a906f325e6d0c0e1dc0f8657f2e851dd11",
+      "payload_sha256": "764306b0f9291329426eaec8bbc97986bae31dc2ef61affe64322db16c3e78c1",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-CMT-CMT_PIPELINE-W34"
     },
@@ -22,7 +22,7 @@
       "operation": "finalize_project_report",
       "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
       "action_key": "weekly:v4:report_results:RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34:1",
-      "payload_sha256": "0b2b64e38d63c108cb479bdeed87f83a24cf54fce9cc5c2f8210aefe82d9a6f6",
+      "payload_sha256": "f2fd95bad4512b45e6c49f356998cde6cd0dda7e95283fba8618c255aceec970",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
     },
@@ -32,7 +32,7 @@
       "operation": "finalize_project_report",
       "target_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
       "action_key": "weekly:v4:report_results:RPT-PROJ-ECOM-ECOM_FIXES-W34:2",
-      "payload_sha256": "29a96c71abcfb967a2dcb56f6aa723dd667ca01b188cefa9ca8234cbeede8d19",
+      "payload_sha256": "af61356e72a885ac97b8b10b348edd4cfaa7258fec712dc626ae80a40965dff5",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-PROJ-ECOM-ECOM_FIXES-W34"
     },
@@ -42,7 +42,7 @@
       "operation": "upsert_area_report",
       "target_id": "RPT-AREA-CMT-W34",
       "action_key": "weekly:v4:report_results:RPT-AREA-CMT-W34:3",
-      "payload_sha256": "cde095f692a73d4d279fb825496a0403bdbf7b99cd55459574e1f4d74e7a2a1d",
+      "payload_sha256": "9811b38c65f4092d9471f388962b06232b473a7d13dcfcb8a9bc73909bfcfd68",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-CMT-W34"
     },
@@ -52,7 +52,7 @@
       "operation": "upsert_area_report",
       "target_id": "RPT-AREA-MARKETING-W34",
       "action_key": "weekly:v4:report_results:RPT-AREA-MARKETING-W34:4",
-      "payload_sha256": "be230fbc894c14da91f1fbbd201e4123946aa76eef4ecb36a9cbcb2c5a6c05bb",
+      "payload_sha256": "fb53acac6c4ac46893253db05c54d88fd786379badb57e658c861b35cb7367f6",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-MARKETING-W34"
     },
@@ -62,7 +62,7 @@
       "operation": "upsert_area_report",
       "target_id": "RPT-AREA-ECOMMERCE-W34",
       "action_key": "weekly:v4:report_results:RPT-AREA-ECOMMERCE-W34:5",
-      "payload_sha256": "6e0a87f327930b60b9b46978dc07ccd04f95223dac7860218d3e838378798b84",
+      "payload_sha256": "f8104e0d22fd14fb94d2760b1804609b3580d278c514564305163e1219c10c2c",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-AREA-ECOMMERCE-W34"
     },
@@ -72,7 +72,7 @@
       "operation": "upsert_company_report",
       "target_id": "RPT-COMPANY-W34",
       "action_key": "weekly:v4:report_results:RPT-COMPANY-W34:6",
-      "payload_sha256": "14d8597b395679cbe54cb7f52a72506fbc7163e6ff57e2bd2e3ab91b5ff790d6",
+      "payload_sha256": "388aefeb14cbda11fdadd6f94b4746e92dcd8270c37d49f4b934fad4ab9c4ca4",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/report_results/RPT-COMPANY-W34"
     },
@@ -82,7 +82,7 @@
       "operation": "upsert_problem",
       "target_id": "ISSUE-CMT-TECH-PACK-01",
       "action_key": "weekly:v4:promotion_dispositions:ISSUE-CMT-TECH-PACK-01:0",
-      "payload_sha256": "e2acfffc4e8bb86fc0677a523995eb0f700d5caccbd9920cfd39bda9b3f77e0b",
+      "payload_sha256": "64d7b584c1fd219c5d3758c53f13c44765c7266a9a81e3e5e1776a443b1e1d14",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/promotion_dispositions/ISSUE-CMT-TECH-PACK-01"
     },
@@ -92,7 +92,7 @@
       "operation": "upsert_decision",
       "target_id": "DECISION-CMT-SAMPLE-BASELINE-01",
       "action_key": "weekly:v4:promotion_dispositions:DECISION-CMT-SAMPLE-BASELINE-01:1",
-      "payload_sha256": "4dc2ed71ec4956fd264110f454e37733c619206701a9ea7f5f9a0673662bdec5",
+      "payload_sha256": "64107c447d1b502eb65f952beffac62abc08ffc18e5ef2622d9031fd5e567dee",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/promotion_dispositions/DECISION-CMT-SAMPLE-BASELINE-01"
     },
@@ -112,7 +112,7 @@
       "operation": "upsert_sop",
       "target_id": "SOP-ECOM-LISTING-HANDOFF-01",
       "action_key": "weekly:v4:promotion_dispositions:SOP-ECOM-LISTING-HANDOFF-01:3",
-      "payload_sha256": "5a11a4acd2ce6524096a2c2de2173935878b54c56c67b36db1bb0c64a376813f",
+      "payload_sha256": "e3211d0239908244757bb91f511ebb743e737d2636dc741b77a71d34db27ffe1",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/promotion_dispositions/SOP-ECOM-LISTING-HANDOFF-01"
     },
@@ -132,7 +132,7 @@
       "operation": "replace_project_attention",
       "target_id": "PROJ-CMT-CMT_PIPELINE",
       "action_key": "weekly:v4:next_week_project_replacements:PROJ-CMT-CMT_PIPELINE:0",
-      "payload_sha256": "137105d85923ba9e246aa8373ef3fe06babb8d41a454ee7412dfcedcd524fc43",
+      "payload_sha256": "f60341dd4689e6843f5671a93deed4506c3d810add076daaf99f013ad124a7aa",
       "outcome": "applied",
       "provider_id_or_url": "https://notion.example.test/next_week_project_replacements/PROJ-CMT-CMT_PIPELINE"
     }

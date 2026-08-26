@@ -1,6 +1,6 @@
 ---
 template_id: company-os-decision
-template_version: "0.5.0"
+template_version: "0.6.0"
 name: "{{DECISION}}"
 decision_id: "{{DECISION_ID}}"
 project: "{{PROJECT}}"
@@ -16,9 +16,10 @@ review_date: "{{REVIEW_DATE}}"
 
 > **Promotion gate**
 >
-> Keep this only when the Decision is costly to reverse, affects several people,
-> establishes precedent, resolves a recurring tradeoff, or explains an important
-> constraint.
+> Keep this only when it establishes a reusable precedent or operating
+> standard, governs recurring customer handling, carries material monetary or
+> risk consequence, resolves a recurring cross-team tradeoff, or is costly to
+> reverse. Routine execution choices remain in the Project report.
 
 ## Context
 
@@ -34,20 +35,22 @@ END GOLDEN EXAMPLE -->
 
 ## Options and tradeoffs
 
-<!-- Include only realistic options and the decisive tradeoff. -->
+<!-- Compare two or three real options. For each, state the upside and downside;
+do not invent a third option merely to fill the template. -->
 
 {{OPTIONS_AND_TRADEOFFS}}
 
 ## Decision rationale
 
-<!-- Why this option won; authority, date, and status are frontmatter. -->
+<!-- State the selected option, why it won against the alternatives, who had
+authority, and the tradeoff explicitly accepted. -->
 
 {{RATIONALE}}
 
 ## Consequences and review trigger
 
-<!-- Expected tradeoffs, who is affected, and exactly what would reopen this
-decision. -->
+<!-- State the operational and monetary/risk consequences, who is affected,
+and exactly what evidence or threshold would reopen this decision. -->
 
 {{CONSEQUENCES_AND_REVIEW}}
 

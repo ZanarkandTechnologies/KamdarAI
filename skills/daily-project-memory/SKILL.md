@@ -54,6 +54,10 @@ returns: proposed | applied | duplicate | conflict | blocked | no_finding | conf
 
   Assert:
   - Every patch points to one known Project ID and one or more input source IDs.
+  - Every source ID on a patch directly substantiates that patch's stated
+    known fact or impact. A merely related Work record with only missing
+    documentation is not supporting evidence and must not be added to the
+    patch's `source_ids`, Evidence line, or idempotency key.
   - No provider handle or inferred Project identity enters the output.
 
 - [ ] **N2 — Classify memory versus weekly operational attention.**
@@ -64,6 +68,9 @@ returns: proposed | applied | duplicate | conflict | blocked | no_finding | conf
   action, accountable owner, due state, blocker/status, and evidence in
   `this_weeks_attention`. Keep raw transcripts, generic research, and full
   Work lists in their source records.
+  A record whose only new fact is a missing field belongs to documentation
+  quality, not Project knowledge, unless that absence itself changes a
+  Project-level decision or constraint and the patch states that impact.
 
   Assert:
   - Every attention item is a bounded action, not a copied status history.
@@ -83,12 +90,21 @@ returns: proposed | applied | duplicate | conflict | blocked | no_finding | conf
   Project section; preserve uncertainty in `gaps` rather than filling it with
   a confident sentence.
 
+  Render-time repair gate: reject any whole `this_weeks_attention`
+  replacement whose embedded `weekly_attention_reset.requested` is not exactly
+  `true`. When a source ID already appears in the current attention checklist
+  and no reset is requested, preserve that row and emit no attention patch
+  unless new evidence changes the bounded action itself. A date discrepancy or
+  documentation gap belongs in `gaps`, not in a reconstructed checklist.
+
   Assert:
   - Each patch declares `target_section`, `operation`, `before_excerpt`, and proposed Markdown.
   - Duplicate source IDs or a material contradiction produce one named gap, not competing patches.
   - A whole-checklist `replace` has `attention_reset.requested: true` and the
     exact embedded reset week, reason, and source; otherwise use append or a
     named-row replacement.
+  - The final plan contains zero whole-checklist replacements when every
+    embedded reset marker is false or absent; delete such a patch before output.
   - An absent commitment, normalisation, or review date is a named gap on the
     patch that depends on it, even when a related task has another due date.
 

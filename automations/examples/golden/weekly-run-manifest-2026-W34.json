@@ -1,32 +1,32 @@
 {
   "schema_version": "kamdar-weekly-run-manifest@1.0.0",
-  "run_id": "weekly-review-2026-W34-grounded-v4",
-  "created_at": "2026-08-24T18:16:30+08:00",
+  "run_id": "weekly-review-2026-W34-presentation-v1",
+  "created_at": "2026-08-26T13:40:00+08:00",
   "live_provider_calls": false,
   "immutable_inputs": [
     {
       "path": "weekly/context/weekly-context-2026-W34.json",
       "kind": "weekly-context",
-      "bytes": 5153,
-      "sha256": "9d9c228dbed88dd1d890a282c89a2208b09cdf0c4e5c048754fa6412a4133706"
+      "bytes": 33967,
+      "sha256": "ba78bfb84786c50ab19e08afac5c8e6b45693dd9e42a440e867c94fd7ca78146"
     },
     {
       "path": "weekly/read-back/weekly-integration-read-back-2026-W34.json",
       "kind": "mock-provider-read-back",
-      "bytes": 17096,
-      "sha256": "a784fa154e51f8ff4e99f1179a54bb4d19458cc40d1445b4c8fa663af94c4981"
+      "bytes": 22946,
+      "sha256": "ca56fb1ebf51bae6f2b1fa86ef53f94b554241a90f635e5264ca8ddc41056669"
     },
     {
       "path": "weekly/receipts/weekly-integration-receipt-2026-W34.json",
       "kind": "mock-integration-receipt",
       "bytes": 6474,
-      "sha256": "8cb6a2c3cb343750df0a8e7f232d350f212864931ae0cb652fc0b2c958d26e08"
+      "sha256": "261d6eefb410d6e0c79d095960fd991d849cc14461b1ce96fa209a35aedb8828"
     },
     {
       "path": "weekly/review/weekly-review-result-2026-W34.json",
       "kind": "weekly-review-result",
-      "bytes": 25856,
-      "sha256": "9d64471b003e80a7b74a60cf49249ea10317d500b5f60c114410167af1f24e65"
+      "bytes": 42886,
+      "sha256": "4e1960652063605428ce36dc03fefacaa9b95cefd4182f74bfc6a63271cf3e43"
     }
   ]
 }

@@ -13,7 +13,7 @@ template_version: "0.3.0"
 
 {{DECISIONS}}
 
-## SOP / Skill signals
+## SOP signals
 
 {{SOP_SIGNALS}}
 

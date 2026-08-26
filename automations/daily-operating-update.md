@@ -58,11 +58,17 @@ Write boundary: only the declared local output artifacts are allowed in `prepare
   | `project_updates[].section_replacements[]` | FEAT-0001 | Complete replacements for Project `Overview`, `Project knowledge`, and `This week's attention` |
   | `completed_ticket_comments[]` | FEAT-0002 | Complete clarification comments for Done Work whose important rationale or evidence is missing |
   | `weekly_progress_chases[]` | FEAT-0003 | Complete accountable-owner messages when weekly targets are stale, blocked, or unlikely to finish |
-  | `knowledge_updates[].draft_entries[]` | FEAT-0004 | Complete source-linked Weekly Draft entries for problems and inefficiencies, decisions, or SOPs |
+  | `knowledge_updates[].draft_entries[]` | FEAT-0004 | Complete source-linked Weekly Draft entries carrying structured current-workflow observations, measurable problem baselines or explicit measurement gaps, decisions, and SOP promotion candidates |
 
   Validate the result against `DailyReviewResultSchema` and write it unchanged
   to `daily/review/daily-review-result-YYYY-MM-DD.json`. On validation failure,
   stop before integrations.
+
+  Daily observation does not require an already-approved SOP. Capture the
+  current employee method first, including inefficient or informal steps. A
+  missing duration, volume, wage basis, or financial value stays as a named
+  measurement gap with an owner and a precise source-record question; never
+  substitute an estimate.
 
 - [ ] **3 — Pass the end-user artifact quality gate.**
 
@@ -84,7 +90,7 @@ Write boundary: only the declared local output artifacts are allowed in `prepare
   | --- | --- | --- |
   | `project_updates[].section_replacements[]` | Replace the named section on the exact Project only when `expected_current_text` still matches | `notion` skill via `ntn` on `notion.projects` |
   | `completed_ticket_comments[]` and `knowledge_updates[].missing_information_comment` | Add the rendered clarification comment to the exact Work item | `notion` skill via `ntn` on `notion.work_items_this_week` |
-  | Current Weekly Draft Report + `knowledge_updates[].draft_entries[]` + `weekly_progress_chases[]` | Return one complete replacement Draft: preserve still-current content, apply the JSON findings to the four sections, increment `draft_version` by one, and set `last_updated` to the run timestamp | `notion` skill via `ntn` on the exact current-week Report Draft |
+  | Current Weekly Draft Report + `knowledge_updates[].draft_entries[]` + `weekly_progress_chases[]` | Return one complete replacement Draft: preserve still-current content, render the structured workflow/problem payloads without losing baseline fields, apply the findings to the four sections, increment `draft_version` by one, and set `last_updated` to the run timestamp | `notion` skill via `ntn` on the exact current-week Report Draft |
   | `weekly_progress_chases[]` | Load the exact Person, resolve their approved preferred channel and safe route alias, then either prepare the chase or dispatch it under the mode rules below | `notion` skill via `ntn`, then `$telegram-message`, `email-message`, or `whatsapp-message` |
 
   Never infer a table, Report, person, route alias, or fallback channel. The current Report

@@ -5,7 +5,7 @@ execution_modes: [source-contract]
 production_mode: proposal-only
 owner: KamdarAI
 created_at: 2026-08-21
-updated_at: 2026-08-25
+updated_at: 2026-08-26
 tags: [kamdar, feature, daily, outreach]
 feature_id: FEAT-0003
 feature_key: daily.project-control
@@ -24,7 +24,7 @@ source_refs:
 evidence_refs:
   - skills/daily-project-control/evals/evals.json
   - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
-known_limits: "No delivery adapter is shipped. Production employee contact remains proposal-only."
+known_limits: "Fictional eval People have no personal endpoint. Isolated-eval delivery goes only to the operator-owned Telegram sink and never proves employee delivery."
 ---
 
 # Chase delayed work once, with context
@@ -57,7 +57,9 @@ alone is not enough.
 [Daily Project Control](../../skills/daily-project-control/SKILL.md) owns the
 control judgment and its nested
 [preferred-channel dispatcher](../../skills/dispatch-employee-messages/SKILL.md).
-Prepare makes no channel call; send can invoke only the selected channel skill.
+Prepare makes no channel call. `isolated-eval` may invoke Telegram only through
+the operator-owned eval-sink alias and must label the intended fictional Person.
+Production send can invoke only a configured, approved route.
 
 ## Flow
 
@@ -82,8 +84,11 @@ Prepare makes no channel call; send can invoke only the selected channel skill.
 ## Downstream application
 
 The current Weekly Draft is local Markdown, so this pipeline updates it
-directly. The dispatcher is the only communication boundary and returns a
-prepared result by default or a safe channel receipt after an observed send.
+directly. The dispatcher is the only communication boundary. It returns a
+prepared result by default, `delivered_to_eval_sink` only when the Telegram
+provider message ID and returned destination match the configured eval route,
+or a safe production-channel receipt after an authorized send. Provider
+acceptance is neither employee delivery nor proof that the operator saw it.
 
 ## Failure modes
 
@@ -95,8 +100,13 @@ message, provider URL, cost estimate, or contact endpoint.
 
 Local normal, hard, and boundary evals cover a dated blocked Work item with a
 sourced MYR variance, an unapproved route with unknown cost, and healthy-work
-suppression. The fixture proves direct Draft updates are idempotent and that no
-message is sent in prepare mode.
+suppression. The unified source-safe case requires one Aisha chase to be routed
+only after Person lookup and represented as an eval-sink delivery with an exact
+payload hash, provider message ID, and destination-bound route match, never as
+employee delivery or human-visible receipt. A real operated claim additionally
+requires the matching private Telegram receipt;
+the committed `example.test` golden is only the expected contract. Prepare mode
+still proves zero message sends.
 
 ## Example
 

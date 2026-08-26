@@ -70,6 +70,24 @@
       "source_url": "{{stable Meeting URL or source reference}}",
       "project_id": "{{PROJECT_ID | null}}",
       "statements": ["{{attributed/source-backed statement}}"],
+      "decision_observation": {
+        "choice": "{{concrete choice | null}}",
+        "authority": "{{decision authority | unknown}}",
+        "evidence": ["{{source-backed decision fact}}"]
+      },
+      "workflow_observation": {
+        "workflow_name": "{{observed workflow name | null}}",
+        "trigger": "{{observed trigger | unknown}}",
+        "actors_and_handoff": "{{observed actors and handoff | unknown}}",
+        "ordered_steps": ["{{observed step}}"],
+        "systems": ["{{observed system}}"],
+        "frequency_and_volume": "{{observed frequency and volume | unknown}}",
+        "active_and_wait_time": "{{measured timing | unknown}}",
+        "exceptions": ["{{observed exception}}"],
+        "output": "{{observed output | unknown}}",
+        "confidence": "{{high | medium | low}}",
+        "measurement_gaps": ["{{fact still requiring measurement}}"]
+      },
       "review_condition": "{{what would revisit the finding | null}}"
     }
   ],

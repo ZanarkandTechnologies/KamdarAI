@@ -164,32 +164,32 @@
       "id": "TASK-101",
       "source_id": "TASK-101",
       "source_url": "notion://TASK-101",
-      "project_id": "PROJ-MERCH-INDIA_SOURCING",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
       "record_type": "Task",
       "full_page_read": true,
-      "owner_person_id": "PERSON-NUR",
+      "owner_person_id": "PERSON-AISHA",
       "status": "blocked",
-      "due_date": null,
+      "due_date": "2026-08-20",
       "last_meaningful_update": "2026-08-18",
-      "blocker": "Sample ETA and commercial quote are missing.",
+      "blocker": "The sewn sample is 1.5 cm wider at the collar than the issued tech pack, but the proposed correction has no named approver.",
       "cause": {
-        "value": null,
-        "confidence": "unknown"
+        "value": "The fitting correction was discussed beside the sample but not transferred to the canonical tech pack.",
+        "confidence": "high"
       },
       "plan_actual": {
-        "currency": null,
-        "estimated_amount": null,
-        "actual_amount": null
+        "currency": "MYR",
+        "estimated_amount": 540,
+        "actual_amount": 900
       },
       "documentation": {
-        "known_context": "Grounded source context for TASK-101.",
-        "mapped_field_state": {},
+        "known_context": "The corrected baju kurung tech pack is overdue and still lacks the approved collar tolerance and approver.",
+        "mapped_field_state": {"planned_hours": 6, "actual_hours": 10, "loaded_hourly_cost_myr": 90},
         "update_location": [
           "Notes"
         ]
       },
       "evidence": [
-        "Source evidence for TASK-101."
+        "TASK-101 notes, due date, blocker, and recorded effort basis."
       ]
     },
     {
@@ -246,14 +246,19 @@
         "actual_amount": null
       },
       "documentation": {
-        "known_context": "Grounded source context for TASK-104.",
-        "mapped_field_state": {},
+        "known_context": "TASK-104 is marked blocked, but the canonical Task has no due date, named blocker, or next action.",
+        "mapped_field_state": {
+          "due_date": "missing",
+          "blocker": "missing",
+          "next_action": "missing"
+        },
         "update_location": [
-          "Notes"
+          "due_date property",
+          "Notes > current blocker and next action"
         ]
       },
       "evidence": [
-        "Source evidence for TASK-104."
+        "TASK-104 status, due date property, and full-page Notes read."
       ]
     },
     {
@@ -287,6 +292,27 @@
       "evidence": [
         "Source evidence for TASK-105."
       ]
+    },
+    {
+      "id": "TASK-109",
+      "source_id": "TASK-109",
+      "source_url": "notion://TASK-109",
+      "project_id": "PROJ-MERCH-INDIA_SOURCING",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-NUR",
+      "status": "on_track",
+      "due_date": "2026-08-23",
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {"value": "No current problem; this is the healthy no-chase control.", "confidence": "high"},
+      "plan_actual": {"currency": null, "estimated_amount": null, "actual_amount": null},
+      "documentation": {
+        "known_context": "The supplier sample, certificate, MOQ, and landed-cost quote are current for the sourcing decision.",
+        "mapped_field_state": {},
+        "update_location": ["Notes"]
+      },
+      "evidence": ["TASK-109 current progress and last meaningful update."]
     },
     {
       "id": "TASK-110",
@@ -491,6 +517,14 @@
         "Approve coordinated Deepavali themes.",
         "Use one campaign asset folder per batch."
       ],
+      "decision_observation": {
+        "choice": "Use one campaign asset folder per batch for the coordinated Deepavali campaign.",
+        "authority": "Campaign review participants approved the choice; the accountable approver is not named in the source.",
+        "evidence": [
+          "TASK-201 meeting statements record the approved theme and one-folder-per-batch choice."
+        ]
+      },
+      "workflow_observation": null,
       "review_condition": "Review after seven campaign days."
     },
     {
@@ -501,6 +535,8 @@
       "statements": [
         "Verify customer-facing fixes with named storefront cases."
       ],
+      "decision_observation": null,
+      "workflow_observation": null,
       "review_condition": "Review customer enquiries for recurrence."
     },
     {
@@ -509,8 +545,38 @@
       "source_url": "notion://TASK-203",
       "project_id": "PROJ-ECOM-LISTING_PIPELINE",
       "statements": [
-        "Approve the listing handoff after two reused batches."
+        "Nur prepared two product-listing batches using the same handoff sequence and Darren accepted each publish-ready package."
       ],
+      "decision_observation": null,
+      "workflow_observation": {
+        "workflow_name": "Prepare a publish-ready product-listing handoff",
+        "trigger": "An approved product batch is ready for Ecommerce listing.",
+        "actors_and_handoff": "Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.",
+        "ordered_steps": [
+          "Confirm the approved product IDs and samples in the batch.",
+          "Validate title, category, dimensions, composition, care, price, and stock fields.",
+          "Check approved images, crops, and alt text against each product ID.",
+          "Assemble the listing package in the shared handoff folder.",
+          "Darren confirms the package is publish-ready or returns named exceptions to Nur."
+        ],
+        "systems": [
+          "approved product record",
+          "shared asset folder",
+          "listing handoff checklist"
+        ],
+        "frequency_and_volume": "The same sequence was observed across two product batches; normal weekly batch and SKU volume is not recorded.",
+        "active_and_wait_time": "Active preparation, review time, and queue wait were not measured.",
+        "exceptions": [
+          "A missing approved sample or final commercial term stops the package before handoff.",
+          "A catalog sync that drops a required field returns the affected product to Nur for correction."
+        ],
+        "output": "A receiver-accepted, publish-ready listing package keyed to approved product IDs.",
+        "confidence": "high",
+        "measurement_gaps": [
+          "Measure active preparation and review time separately on the next two batches.",
+          "Record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost."
+        ]
+      },
       "review_condition": "Sample ten pages after the next catalog sync."
     }
   ],

@@ -21,8 +21,10 @@ cadence, procedure, and authority; feature pages own stable outcomes and proof.
 Runtime receipts and generated proposals go to ignored directories (`receipts/`, `proposals/`, `runs/`). They are not the editable specification and must not be committed.
 
 The active acceptance contracts are `evals/daily-review-evals.json` and
-`evals/weekly-review-evals.json`, both grounded in the reviewed seed. The
-retained `evals/evals.json` is the legacy template-first buyer showcase.
+`evals/weekly-review-evals.json`, both grounded in the reviewed seed and using
+canonical Farplane case fields with Kamdar proof bindings under
+`metadata.extensions.kamdar`. The retained `evals/evals.json` is the legacy
+template-first buyer showcase and does not feed the active dossier.
 
 `evals/filesystem/` retains the prior template-first and split-pipeline
 runner/UI as frozen comparison baselines. TASK-0007's earlier direct-Draft proof is owned by
@@ -31,9 +33,9 @@ writers, verifies a zero-write rerun, and finalizes the actual Draft. Neither
 lane changes the default `prepare` boundary or authorizes provider calls.
 
 An operated eval is not a mock and must not report proposed effects as applied.
-Notion writes require read-back evidence. Telegram delivery requires the real
-provider result and message ID when returned. A Telegram eval relay demonstrates
-delivery to the configured proof sink, not delivery to a seeded employee. An
+Notion writes require read-back evidence. Telegram provider acceptance requires
+the real provider result, message ID, and returned destination bound to the
+configured route. It does not prove a seeded employee or operator saw it. An
 unavailable employee email or WhatsApp channel remains a visible blocked route;
 it is never silently substituted.
 

@@ -1,5 +1,5 @@
 ---
-title: Accumulate grounded knowledge in the Weekly Draft
+title: Accumulate workflow and problem baselines in the Weekly Draft
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
@@ -29,10 +29,11 @@ known_limits: "Daily writes only its local Markdown anchors. It does not promote
 
 # Accumulate grounded knowledge in the Weekly Draft
 
-Kamdar extracts only source-backed Decision and SOP candidates from the Daily
-Work and Meeting context and writes them directly into the supplied current
-Weekly Draft. Project facts remain on the Project page; PM, risk, and cost
-findings belong to Project Control.
+Kamdar extracts source-backed Decisions, current employee workflow observations,
+and measurable problem baselines from Daily Work and Meeting context. It writes
+them into the supplied current Weekly Draft. A workflow may be observed before
+it is approved or reusable; Weekly owns promotion into canonical SOP and Issue
+records.
 
 ## Why it exists
 
@@ -70,8 +71,13 @@ Decisions and SOPs only. It uses the shared
 ## State changes and artifacts
 
 - Writes only the supplied local current Weekly Draft Markdown file.
-- A Decision needs a concrete choice plus an alternative or tradeoff. An SOP
-  needs a method, trigger or output, and recurrence evidence.
+- A Decision needs a concrete choice plus an alternative or tradeoff. A workflow
+  observation needs trigger, actors, ordered steps, systems/handoffs, timing and
+  volume or explicit measurement gaps, output, evidence window, and confidence.
+  Reuse and authority are Weekly promotion gates, not Daily observation gates.
+- A problem baseline names the affected workflow step, measurement window,
+  recurrence/volume, time or wait loss, direct-cost formula when grounded,
+  confidence, measurement owner, and any missing measurements.
 - Entries use decision:source_id or sop:source_id. Equal content is a
   duplicate; changed content under the same key is a conflict with no partial
   file update.

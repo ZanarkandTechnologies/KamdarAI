@@ -27,6 +27,7 @@ const FeatureIdSchema = z.enum(["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-000
 export const IntegrationEffectStateSchema = z.enum([
   "applied",
   "duplicate",
+  "delivered_to_eval_sink",
   "no_finding",
   "blocked",
   "conflicted",
@@ -68,6 +69,21 @@ const AppliedOrDuplicateOutcomeSchema = z
     read_back: ReadBackEvidenceSchema,
   })
   .strict();
+
+const EvalSinkDeliveryOutcomeSchema = z
+  .object({
+    state: z.literal("delivered_to_eval_sink"),
+    reason: z.null(),
+    delivery_scope: z.literal("operator_owned_eval_sink"),
+    intended_recipient_person_id: StableIdSchema,
+    configured_destination_hash: Sha256Schema.describe("Hash of the approved workspace route resolved before sending."),
+    provider_destination_hash: Sha256Schema.describe("Hash of the destination/chat returned by the provider."),
+    destination_matched: z.literal(true).describe("Confirms the provider destination equals the configured route; a message ID alone is insufficient."),
+    provider_response: ProviderResponseSchema,
+    read_back: ReadBackEvidenceSchema,
+  })
+  .strict()
+  .describe("A provider-accepted send whose returned destination matches the configured operator-owned eval sink. This does not prove employee delivery or that a human saw the message.");
 
 const NoFindingOutcomeSchema = z
   .object({
@@ -116,6 +132,7 @@ const IntegrationEffectSchema = z
     payload_hash: Sha256Schema,
     outcome: z.discriminatedUnion("state", [
       AppliedOrDuplicateOutcomeSchema,
+      EvalSinkDeliveryOutcomeSchema,
       NoFindingOutcomeSchema,
       UnsafeOutcomeSchema,
     ]),
@@ -138,7 +155,15 @@ const IntegrationEffectSchema = z
     if (effect.integration === "none" || effect.operation === "record_no_finding") {
       context.addIssue({ code: "custom", message: "Provider effects must name a real integration operation." });
     }
-    if (outcome.state !== "applied" && outcome.state !== "duplicate") return;
+    if (!["applied", "duplicate", "delivered_to_eval_sink"].includes(outcome.state)) return;
+    if (outcome.state === "delivered_to_eval_sink") {
+      if (effect.feature_id !== "FEAT-0003" || effect.integration !== "telegram" || effect.operation !== "send_owner_chase") {
+        context.addIssue({ code: "custom", message: "eval-sink delivery is valid only for a Telegram FEAT-0003 owner chase." });
+      }
+      if (outcome.intended_recipient_person_id !== effect.target.target_id) {
+        context.addIssue({ code: "custom", message: "eval-sink delivery must name the exact intended Person target." });
+      }
+    }
     const readBack = outcome.read_back;
     if (readBack.target_id !== effect.target.target_id || readBack.target_url !== effect.target.target_url) {
       context.addIssue({ code: "custom", message: "Read-back target must match the requested target." });
@@ -163,7 +188,7 @@ const WorkProcessingDecisionSchema = z
   })
   .strict();
 
-const settledStates = new Set(["applied", "duplicate", "no_finding"]);
+const settledStates = new Set(["applied", "duplicate", "delivered_to_eval_sink", "no_finding"]);
 
 function processingSafetyErrors(receipt) {
   const errors = [];
@@ -237,7 +262,7 @@ export const DailyIntegrationReceiptSchema = z
     }
   })
   .describe(
-    "Receipt for deterministic application of one Daily Review result. Applied and duplicate effects require provider read-back. Work becomes processed only after every required linked effect is applied, duplicate, or a truthful no_finding.",
+    "Receipt for deterministic application of one Daily Review result. Applied, duplicate, and eval-sink delivery effects require provider read-back. Work becomes processed only after every required linked effect is applied, duplicate, delivered to the approved eval sink, or a truthful no_finding.",
   );
 
 export const DailyIntegrationReceiptJsonSchema = z.toJSONSchema(DailyIntegrationReceiptSchema, {

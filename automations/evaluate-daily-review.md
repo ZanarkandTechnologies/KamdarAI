@@ -61,7 +61,7 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
   | FEAT-0001 | `project_updates[]` | Complete, evidence-grounded Project section replacements that preserve current facts and update weekly work, progress, and blockers |
   | FEAT-0002 | `completed_ticket_comments[]` | Precise questions on Done Work with important missing rationale or evidence; no generic documentation nag |
   | FEAT-0003 | `weekly_progress_chases[]` | Accountable, evidence-led chases only when weekly targets are stale, blocked, or unlikely to finish |
-  | FEAT-0004 | `knowledge_updates[]` | Source-linked problems and inefficiencies, decisions, and SOP candidates, plus a precise clarification request when evidence is insufficient |
+  | FEAT-0004 | `knowledge_updates[]` | Structured current-workflow observations, problem baselines linked to affected steps, decisions, and precise measurement requests for missing time/volume/cost evidence |
 
   Each tester must return exactly this machine shape (the parent supplies the
   absolute `verdict_path` in the judge packet):
@@ -71,6 +71,13 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
     "feature_id": "FEAT-0001",
     "tier": "A",
     "verdict": "pass",
+    "rubric": {
+      "groundedness": "A",
+      "completeness": "A",
+      "usefulness": "A",
+      "repeatability": "A",
+      "length_balance": "A"
+    },
     "assertions": [
       {
         "assertion": "exact authored assertion",
@@ -83,6 +90,9 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
     "verdict_path": "/absolute/run/root/eval/judges/FEAT-0001.json"
   }
   ```
+
+  Grade all five rubric dimensions from `A` through `D`. These grades describe
+  the candidate artifact itself; they do not restate the overall feature tier.
 
   Allow only `pass`, `fail`, or `blocked` verdicts and A/B/C/D tiers. Only a
   `pass` with tier A, every assertion met, cited evidence, and no failures can
@@ -107,7 +117,8 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
   frozen context, destination templates, and
   `evals/rubrics/end-user-artifact-quality.md`. It must inspect every row in all
   four result arrays for referential clarity, end-user value, readability,
-  template fidelity, and groundedness. The parent validates the response with
+  template fidelity, groundedness, workflow reconstructability, and baseline
+  integrity. The parent validates the response with
   `automations/schemas/artifact-quality-review.zod.mjs` and writes
   `<run_root>/eval/artifact-quality-review.json`. Only tier A proceeds. Route
   B/C prose findings through an `unslop` repair and regeneration; the reviewer
@@ -129,6 +140,15 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
   contains `gate_id`, boolean `pass`, `evidence_refs[]`, and `failures[]`; a
   passing gate requires evidence and no failures. The top-level pass must equal
   all gates passing with no top-level failures.
+
+  For FEAT-0003 in an isolated operated run, require the exact chase payload to
+  resolve through the seeded Person route and the receipt state to be
+  `delivered_to_eval_sink`. Require `delivery_scope = operator_owned_eval_sink`,
+  the intended Person ID, Telegram provider message ID, exact payload hash,
+  configured destination hash, matching provider destination hash, and matching
+  read-back. A message ID without destination binding fails. Reject `applied`,
+  `duplicate`, a Notion receipt URL, or wording that claims the fictional Person
+  or operator saw the message.
 
   Reconcile deterministic checks, independently reviewed feature verdicts,
   tier-A artifact quality, and integration checks into

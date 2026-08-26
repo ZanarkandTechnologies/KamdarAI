@@ -37,9 +37,14 @@ frozen showcase; active Daily documentation output lives with
 Decision/SOP accumulation lives in the shared current Weekly Draft template and
 is directly maintained by `skills/daily-knowledge-capture/`; Project Control
 owns the Draft's PM, risk, and cost anchors.
-`skill.md` is a thin registry card for promoted
-SOP/skill knowledge; the full executable workflow, golden nodes, and evals
-belong with the source `SKILL.md`, not in the Notion record.
+`skill.md` is a thin registry card for promoted Farplane software capabilities;
+the full executable workflow, golden nodes, and evals belong with the source
+`SKILL.md`, not in the Notion record. `sop.md` is the canonical employee workflow
+record installed into the existing SOPs database. It preserves the observed
+ordered method, timing and volume baseline, exceptions, controls, and
+Before/After verification. Material problems remain Issue records in the
+existing Work data model and link to the affected SOP and workflow step; there
+is intentionally no separate Problems database.
 
 Record and message templates do not begin with generic `Outcome` and `Why`
 callouts. A Project holds its durable memory, proprietary project knowledge,

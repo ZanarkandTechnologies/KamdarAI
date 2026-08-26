@@ -1,9 +1,9 @@
 ---
 artifact_type: kamdar-channel-dispatch-result
 artifact_version: "0.1.0"
-state: {{prepared | delivered | duplicate | conflict | blocked | configuration_gap | no_finding}}
+state: {{prepared | delivered_to_eval_sink | delivered_to_employee | duplicate | conflict | blocked | configuration_gap | no_finding}}
 generated_at: {{ISO_8601_TIMESTAMP}}
-dispatch_mode: {{prepare | send}}
+dispatch_mode: {{prepare | isolated-eval | send}}
 source_artifacts: [{{ARTIFACT_IDS}}]
 provider_effects: {{none | observed}}
 ---
@@ -16,7 +16,7 @@ provider_effects: {{none | observed}}
 
 ## Dispatches
 
-| Recipient ID | Preferred channel | Channel skill | Source records | State | Idempotency | Safe receipt reference |
+| Intended Person | Intended channel | Actual handler/sink | Source records | State | Idempotency | Safe receipt reference |
 | --- | --- | --- | --- | --- | --- | --- |
 {{ONE_ROW_PER_RECIPIENT}}
 
@@ -39,7 +39,7 @@ Prepared one Telegram handoff for Kenji. No channel skill or provider was called
 
 ## Dispatches
 
-| Recipient ID | Preferred channel | Channel skill | Source records | State | Idempotency | Safe receipt reference |
+| Intended Person | Intended channel | Actual handler/sink | Source records | State | Idempotency | Safe receipt reference |
 | --- | --- | --- | --- | --- | --- | --- |
 | PERSON-KENJI | telegram | telegram-message | TASK-101, TASK-102 | prepared | dispatch:v1:PERSON-KENJI:telegram:2026-08-24 | none |
 

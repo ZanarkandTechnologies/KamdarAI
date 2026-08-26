@@ -36,8 +36,8 @@ GOLDEN EXAMPLE — replace every fact below; it demonstrates useful detail.
 | Store-count evidence is absent in two inventory Projects | Penang Replenishment, Allocation Rules | [Project reports](report://W34) both identify the same missing count source | Produce one exception brief that links the two source reports and names the evidence owner | Trial at the next department review; success = the lead assigns one owner and date without reopening raw Work. |
 END GOLDEN EXAMPLE -->
 
-| Problem | Projects | Evidence and recurrence | Narrow intervention | First test and success signal |
-| --- | --- | --- | --- | --- |
+| Problem | Projects / workflows | Evidence and recurrence | Quantified baseline or measurement gap | Confidence | Narrow intervention | First test and success signal |
+| --- | --- | --- | --- | --- | --- | --- |
 {{PROBLEM_OPPORTUNITY_ROWS}}
 
 ## Decisions

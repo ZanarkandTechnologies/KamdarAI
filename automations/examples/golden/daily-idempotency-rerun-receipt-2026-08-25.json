@@ -1,0 +1,184 @@
+{
+  "schema_version": "kamdar-daily-idempotency-rerun-receipt@1.0.0",
+  "rerun_receipt_id": "DAILY-IDEMPOTENCY-RERUN-2026-08-25-V1",
+  "original_receipt_id": "DAILY-INTEGRATION-2026-08-25-V4",
+  "original_receipt_sha256": "8b2b358f2bfc4cd1fd11d820d396f10d5f9c1d96f9e521afb7c12b29f8e4592f",
+  "source_context_id": "daily-context-2026-08-25",
+  "source_context_sha256": "7cd1e261b3b8f6b9a44d8def9d26f38179e5b6f94db560aab50f4b99b5617d8d",
+  "daily_result_id": "daily-review-result-2026-08-25",
+  "daily_result_sha256": "8f807bde6b7f5cbe2d4b87a4a6e0197e2f65b9f30d438d74bc6711e036729830",
+  "recorded_at": "2026-08-25T17:20:00+08:00",
+  "live_provider_calls": false,
+  "audit_effects": [
+    {
+      "original_effect_id": "E-CMT",
+      "result_pointer": "/project_updates/0",
+      "action_key": "daily:v1:E-CMT",
+      "target_id": "PROJ-CMT-CMT_PIPELINE",
+      "payload_hash": "3a73704aaf8aef21fd2cd1803c0dc9135548261aa5e85a236bf35c227b20dc2f",
+      "original_outcome": "applied",
+      "outcome": "duplicate",
+      "new_provider_mutations": 0,
+      "lookup_read_back": {
+        "provider_response_id": "RESP-PROJ-CMT-CMT_PIPELINE",
+        "target_id": "PROJ-CMT-CMT_PIPELINE",
+        "payload_hash": "3a73704aaf8aef21fd2cd1803c0dc9135548261aa5e85a236bf35c227b20dc2f",
+        "matched": true,
+        "created": false
+      },
+      "reason": "Existing action-key lookup matched the original provider object; no new mutation was attempted."
+    },
+    {
+      "original_effect_id": "E-META-Q",
+      "result_pointer": "/completed_ticket_comments/0",
+      "action_key": "daily:v1:E-META-Q",
+      "target_id": "TASK-115",
+      "payload_hash": "79a21595eb73448b9af147a4577402531682810641b2c633080b7299fafac77c",
+      "original_outcome": "applied",
+      "outcome": "duplicate",
+      "new_provider_mutations": 0,
+      "lookup_read_back": {
+        "provider_response_id": "RESP-TASK-115",
+        "target_id": "TASK-115",
+        "payload_hash": "79a21595eb73448b9af147a4577402531682810641b2c633080b7299fafac77c",
+        "matched": true,
+        "created": false
+      },
+      "reason": "Existing action-key lookup matched the original provider object; no new mutation was attempted."
+    },
+    {
+      "original_effect_id": "E-META-OK",
+      "result_pointer": "/completed_ticket_comments",
+      "action_key": "daily:v1:E-META-OK",
+      "target_id": "TASK-116",
+      "payload_hash": "6a83eceea0cae97e764367b7c566bb8effe343ad7310d8531e0e412d06e02b0b",
+      "original_outcome": "no_finding",
+      "outcome": "no_finding",
+      "new_provider_mutations": 0,
+      "lookup_read_back": null,
+      "reason": "The unchanged source still requires no provider mutation."
+    },
+    {
+      "original_effect_id": "E-CMT-CHASE",
+      "result_pointer": "/weekly_progress_chases/0",
+      "action_key": "daily:v1:E-CMT-CHASE",
+      "target_id": "PERSON-AISHA",
+      "payload_hash": "c347cbc54712987233b1f884844427404de5e7c03f5cd2bd344da5306a8e447a",
+      "original_outcome": "delivered_to_eval_sink",
+      "outcome": "duplicate",
+      "new_provider_mutations": 0,
+      "lookup_read_back": {
+        "provider_response_id": "TELEGRAM-MSG-PERSON-AISHA-001",
+        "target_id": "PERSON-AISHA",
+        "payload_hash": "c347cbc54712987233b1f884844427404de5e7c03f5cd2bd344da5306a8e447a",
+        "matched": true,
+        "created": false
+      },
+      "reason": "Existing action-key lookup matched the original provider object; no new mutation was attempted."
+    },
+    {
+      "original_effect_id": "E-DEEP-DRAFT",
+      "result_pointer": "/knowledge_updates/0",
+      "action_key": "daily:v1:E-DEEP-DRAFT",
+      "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "payload_hash": "66bb267eaaa691418046255268bd850cbc85935cac87bce9bea47653d71193c0",
+      "original_outcome": "applied",
+      "outcome": "duplicate",
+      "new_provider_mutations": 0,
+      "lookup_read_back": {
+        "provider_response_id": "RESP-RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+        "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+        "payload_hash": "66bb267eaaa691418046255268bd850cbc85935cac87bce9bea47653d71193c0",
+        "matched": true,
+        "created": false
+      },
+      "reason": "Existing action-key lookup matched the original provider object; no new mutation was attempted."
+    },
+    {
+      "original_effect_id": "E-LISTING-DRAFT",
+      "result_pointer": "/knowledge_updates/1",
+      "action_key": "daily:v1:E-LISTING-DRAFT",
+      "target_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "payload_hash": "247ee138fbee8528cef57ec1270a55c595e52b0fff6a97bec75b893b405e300a",
+      "original_outcome": "blocked",
+      "outcome": "blocked",
+      "new_provider_mutations": 0,
+      "lookup_read_back": null,
+      "reason": "The unchanged rerun preserves the original blocked outcome and does not retry or mutate provider state."
+    },
+    {
+      "original_effect_id": "E-ORDER-Q",
+      "result_pointer": "/knowledge_updates/2",
+      "action_key": "daily:v1:E-ORDER-Q",
+      "target_id": "TASK-102",
+      "payload_hash": "b00e158007b0f27f1d95c5e858a7da2e3f496f2023177590686c51f54658897b",
+      "original_outcome": "failed",
+      "outcome": "failed",
+      "new_provider_mutations": 0,
+      "lookup_read_back": null,
+      "reason": "The unchanged rerun preserves the original failed outcome and does not retry or mutate provider state."
+    }
+  ],
+  "work_processing": [
+    {
+      "work_item_id": "TASK-110",
+      "original_state": "processed",
+      "rerun_state": "processed",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "changed": false
+    },
+    {
+      "work_item_id": "TASK-115",
+      "original_state": "processed",
+      "rerun_state": "processed",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "changed": false
+    },
+    {
+      "work_item_id": "TASK-116",
+      "original_state": "processed",
+      "rerun_state": "processed",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "changed": false
+    },
+    {
+      "work_item_id": "TASK-201",
+      "original_state": "processed",
+      "rerun_state": "processed",
+      "status_after": "Processed",
+      "daily_review_version_after": "daily-review-v1",
+      "changed": false
+    },
+    {
+      "work_item_id": "TASK-203",
+      "original_state": "unprocessed",
+      "rerun_state": "unprocessed",
+      "status_after": null,
+      "daily_review_version_after": null,
+      "changed": false
+    },
+    {
+      "work_item_id": "TASK-102",
+      "original_state": "unprocessed",
+      "rerun_state": "unprocessed",
+      "status_after": null,
+      "daily_review_version_after": null,
+      "changed": false
+    }
+  ],
+  "summary": {
+    "original_effect_count": 7,
+    "audited_effect_count": 7,
+    "duplicate_count": 4,
+    "no_finding_count": 1,
+    "blocked_count": 1,
+    "conflicted_count": 0,
+    "failed_count": 1,
+    "new_provider_mutations": 0,
+    "processing_changes": 0
+  },
+  "run_notes": "Immutable audit of an unchanged second run. Existing successful effects resolved by action-key lookup; prior no-finding and unresolved safe-failure outcomes remained non-mutating; processing state did not change."
+}

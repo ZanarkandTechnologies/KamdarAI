@@ -1,6 +1,6 @@
 ---
 name: daily-knowledge-capture
-description: "Capture source-linked Decisions and SOP candidates from one Daily context directly into the current local Weekly Draft."
+description: "Capture source-linked Decisions and current employee workflow observations from one Daily context directly into the current local Weekly Draft."
 tier: 3
 group: operations
 source: local
@@ -64,16 +64,20 @@ returns: direct Draft update outcome and changed/duplicate/conflict source keys
   - The entry states choice, authority state, evidence, and the source key.
   - It targets only `## Decisions`.
 
-- [ ] **N3 — Admit only reusable SOP candidates.**
+- [ ] **N3 — Observe current workflows; gate only promotion.**
   `method + trigger/output + repeat evidence -> SOP entry | no_finding`
 
-  Rule: Add a `sop:<source_id>` entry only for a repeatable method with its
-  trigger or output and recurrence evidence. If repeat use, owner, or proof is
-  absent, preserve the gap and mark it Proposed; never turn a one-off fix into
-  an SOP.
+  Rule: Add a `sop:<source_id>` observation when evidence establishes a current
+  employee method, even if it is informal, inefficient, or not yet reusable.
+  Preserve trigger, actors, ordered steps, systems, handoffs, frequency/volume,
+  active and waiting time, exceptions, output, evidence window, confidence, and
+  measurement gaps. Missing repeat use, authority, or proof keeps the entry
+  Proposed and blocks Weekly promotion; it does not erase the observed workflow.
 
   Assert:
-  - The entry states trigger/output, proof condition, evidence, and source key.
+  - The entry carries the structured workflow observation and states its current
+    trigger, ordered method, timing/volume baseline or gaps, proof condition,
+    evidence, and source key.
   - It targets only `## SOPs`; proprietary Project facts remain on the Project page.
 
 - [ ] **N4 — Edit the supplied Draft directly and atomically.**
@@ -111,7 +115,7 @@ returns: direct Draft update outcome and changed/duplicate/conflict source keys
 ## Gotchas
 
 - Do not make a provider call, an intermediate diff, a Docs/Research record, or a Decision/SOP promotion.
-- Do not write a generic idea, raw transcript, PM finding, cost figure, or Project fact into the Draft.
+- Do not write a generic idea, raw transcript, invented cost figure, or proprietary Project fact into the Draft. A sourced problem baseline or explicit measurement gap is allowed only in the control-owned Problems anchor.
 - Do not overwrite an existing source key; return the conflict and its repair condition.
 
 ## Output

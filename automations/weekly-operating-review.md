@@ -66,15 +66,26 @@ the automation must not invent another organizational layer.
   | Use this Draft section | To do this | With this integration |
   | --- | --- | --- |
   | Complete Project Report Draft | Validate the shared report structure, set `report_status = Final`, increment `report_version`, set `finalized_at`, and preserve source links | `notion` skill via `ntn` on the exact Report |
-  | `Problems and inefficiencies` | Promote an approved reusable problem into a source-linked Issue; keep weak, duplicate, or project-only findings in report history with their disposition | `notion` skill via `ntn` on the Work/Issue database |
-  | `Decisions` | Promote an approved choice with rationale, authority, tradeoff, review trigger, Project relation, and source provenance | `notion` skill via `ntn` on the Decisions database |
-  | `SOPs` | Promote an approved repeatable method with trigger, steps, output, owner, reuse proof, Project relation, and source provenance | `notion` skill via `ntn` on the Skills/SOP database |
+  | `Problems and inefficiencies` | Promote a recurring or materially costly problem into a source-linked Issue only when the affected workflow/step, dated Before baseline, cost calculation or explicit measurement gap, confidence, measurement owner, and next test are preserved; keep weaker findings in report history with their disposition | `notion` skill via `ntn` on the existing Work/Issue database |
+  | `Decisions` | Keep routine execution choices in the Project report. Promote only a reusable customer-handling precedent, Project operating standard, monetary commitment, material risk/compliance choice, recurring cross-team tradeoff, or costly-to-reverse choice. Compare 2–3 real options in the style of `advise`; preserve the selected option, rationale, authority, accepted tradeoff, consequences, review trigger, Project relation, and provenance | `notion` skill via `ntn` on the Decisions database |
+  | `SOPs` | Promote an approved employee workflow using `templates/sop.md`, preserving trigger, actors, ordered steps, systems, handoffs, timing/volume baseline, exceptions, output, owner, reuse proof, Project relation, and source provenance; never use the Farplane `skill.md` registry card | `notion` skill via `ntn` on the existing SOPs database |
   | `Next-week priorities` | Replace the related Project's complete `This week's attention` section for the new week | `notion` skill via `ntn` on `notion.projects` |
 
   Record one disposition for every candidate: `promoted`, `duplicate`,
   `project_only`, `monitor`, `dismissed`, or `blocked`. Missing authority,
   relation, destination URL, template, or dedupe evidence blocks promotion but
   does not block finalizing an otherwise valid Project report.
+
+  A report sentence is not automatically a Decision candidate. First ask what
+  future manager, customer-service owner, or Project lead would reuse. If the
+  answer is only “what this team will do next,” mark it `project_only`. Monetary
+  materiality may be an amount, exposure, budget boundary, or an explicit
+  measurement gap with an owner; never invent a value.
+
+  Reports are the interval staging and management view. The SOP record is the
+  canonical employee-workflow baseline; the Issue is the canonical problem and
+  economics baseline linked to the affected workflow step. Do not create a
+  separate Problems database.
 
 - [ ] **2 — Roll finalized Project reports into finalized Department reports.**
 

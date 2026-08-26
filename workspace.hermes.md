@@ -54,8 +54,8 @@ and gap in `daily-context-diff.json`.
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
 | Google Drive | profile-scoped `google-workspace` skill | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Canonical root for Kamdar files. Keep retrieval and new company files inside this folder unless explicitly approved otherwise. |
-| Notion | `kamdar-company-os` skill via `ntn` | [Eval Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Eval Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Eval SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) | During evaluation, Project pages hold canonical project knowledge, Reports hold the current Draft and finalized rollups, and SOPs receive promoted procedures. Do not read or write the production Kamdar root. |
-| Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. The skill resolves template ID/version here; it never relies on a profile-local copy. |
+| Notion | `kamdar-company-os` skill via `ntn` | [Eval Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Eval Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Eval SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) | During evaluation, Project pages hold canonical project knowledge, Reports stage Daily observations and finalized rollups, SOPs hold canonical employee workflow baselines, and material Problems remain Issue records in Work linked to the affected SOP step. Do not read or write the production Kamdar root. |
+| Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. `skill.md` is software-only; employee workflow baselines use `sop.md`. The skill resolves template ID/version here; it never relies on a profile-local copy. |
 
 ## Communications
 
@@ -127,8 +127,9 @@ databases.
   `workspace/templates/`, installed only through `setup-kamdar-workspace`.
 - Projects use `project.md`; ordinary Work uses `task.md`; value opportunities
   use `feature.md`; issue-like Work uses `issue.md`; embedded Meetings use
-  `meeting.md`; Decisions, Skills, and Reports use their
-  correspondingly named files.
+  `meeting.md`; Decisions use `decision.md`; employee procedures use `sop.md`;
+  Farplane capability cards use `skill.md`; Reports use their corresponding
+  report templates.
 - A modified Task must be fetched as a complete page before Daily extraction.
   Inspect embedded Meeting blocks and `Meeting notes and updates`; do not depend
   on a missing database `Type` property to discover meeting evidence.

@@ -35,8 +35,8 @@ GOLDEN EXAMPLE — replace every fact below; it demonstrates useful detail.
 | Supplier evidence reaches Merchandising and CMT in incompatible formats | Merchandising, CMT | Two Area reports cite the same reconciliation delay | Draft one source-linked exception brief with a proposed common intake format | Trial for the next two reviews; success = both leads identify a variance decision in under 10 minutes. |
 END GOLDEN EXAMPLE -->
 
-| Problem | Areas | Evidence and recurrence | Narrow intervention | First test and success signal |
-| --- | --- | --- | --- | --- |
+| Problem | Areas / workflows | Evidence and recurrence | Quantified baseline or measurement gap | Confidence | Narrow intervention | First test and success signal |
+| --- | --- | --- | --- | --- | --- | --- |
 {{PROBLEM_OPPORTUNITY_ROWS}}
 
 ## Decisions

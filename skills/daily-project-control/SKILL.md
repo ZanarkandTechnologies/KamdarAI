@@ -57,8 +57,11 @@ returns: plan, direct Draft outcome, and prepared/blocked/duplicate dispatch sta
   `Work state + dated evidence -> material control finding + duration basis | no_finding`
 
   Rule: Flag only an overdue commitment, explicit blocker, or threshold breach.
-  Calculate duration from named timestamps in the local timezone. A status label
-  alone never proves staleness; unknown cause/duration/due remains explicit.
+  Calculate duration as the whole elapsed calendar-day difference between each
+  named date and `context.local_day` in the local timezone; do not count the
+  starting date as an extra day. For example, 2026-08-24 minus 2026-08-20 is
+  four days, and minus 2026-08-18 is six days. A status label alone never proves
+  staleness; unknown cause/duration/due remains explicit.
 
   Assert:
   - Each finding preserves Work, Project, status, blocker, and calculation evidence.
@@ -93,12 +96,16 @@ returns: plan, direct Draft outcome, and prepared/blocked/duplicate dispatch sta
   `findings + Draft outcome -> JSON plan + channel result`
 
   Rule: Render the local JSON plan with the direct-Draft outcome, source gaps,
-  messages, and idempotency keys. Call
+  messages, and idempotency keys. Group selected findings by recipient before
+  rendering: one person receives exactly one proposal containing the combined
+  asks and every covered control/source ID, even when several Work records need
+  action. Never emit one proposal per finding for the same person. Call
   [`dispatch-employee-messages`](../dispatch-employee-messages/SKILL.md) only
   with the grouped message proposals. `prepare` contacts nobody.
 
   Assert:
   - The plan is valid JSON and tells Draft application apart from message delivery.
+  - `message_proposals` contains at most one row per `recipient_person_id`.
   - Missing/disabled handlers are configuration gaps, never permission to send.
 <!-- END FARPLANE_IMPORTANT_CHECKLIST -->
 
@@ -106,9 +113,9 @@ returns: plan, direct Draft outcome, and prepared/blocked/duplicate dispatch sta
 
 - Runtime plan: [project-control-plan.json](templates/project-control-plan.json).
 - Current Draft: [current-weekly-draft.md](../../automations/templates/current-weekly-draft.md).
-- Golden normal plan: [2026-08-24 control plan](examples/golden/project-control-plan-2026-08-24.json).
+- Grounded normal context: [shared Daily context](../../automations/examples/golden/daily-context-diff-2026-08-24.json).
+- Golden normal plan: [CMT control plan](examples/golden/project-control-plan-cmt-2026-08-25.json).
 - Blocked route: [unapproved route plan](examples/blocked/project-control-plan-unapproved-route.json).
-- Collector fixture: [Daily context](../../automations/examples/golden/daily-context-diff-2026-08-24.json).
 
 ## Gotchas
 

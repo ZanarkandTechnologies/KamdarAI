@@ -13,34 +13,33 @@ delivery_state: proposal-only
 ## Provenance
 
 - `context_diff:` automations/examples/golden/daily-context-diff-2026-08-24.json
-- `source_ids_used:` SRC-WORK-102, SRC-PERSON-NUR
+- `source_ids_used:` TASK-104, PERSON-AISHA
 - `template_refs:` templates/task.md@0.7.0
 - `run_key:` documentation-quality:2026-08-24
 
 ## Recipient groups
 
-### Nur Iqbal — documentation updates
+### Aisha Rahman — documentation updates
 
-- `person_id:` PERSON-NUR
-- `preferred_contact_channel:` email
-- `approved_contact_channels:` email; notion_comment
-- `contact_endpoint:` nur@company.example
+- `person_id:` PERSON-AISHA
+- `preferred_contact_channel:` telegram
+- `approved_contact_channels:` telegram
+- `contact_endpoint:` person://PERSON-AISHA#telegram_eval_sink
 - `delivery_status:` proposal-only
 
-#### TASK-102 — Complete launch QA evidence
+#### TASK-104 — identify the blocked work and next commitment
 
-**Why this needs attention:** Release review cannot assess completion while QA
-evidence and reviewer are absent from the Work record.
+**Why this needs attention:** The Task is marked blocked, but the record does not say what is blocking it, when it is due, or what happens next.
 
-**Known record:** Blocked; due 2026-08-25; acceptance evidence is not linked.
-**Update exactly:** Work properties `Evidence` and `Reviewer`; then `Notes`.
+**Known record:** Blocked; last meaningful update 2026-08-21; due date, blocker, and next action are missing.
+**Update exactly:** `due_date` property; then `Notes > current blocker and next action`.
 **Please provide:**
-1. The linked QA evidence and the reviewer who checked it.
-2. The current blocker and accountable resolver, if evidence is still pending.
-3. The revised completion date and next action, if the original commitment moved.
+1. The due date for TASK-104.
+2. The current blocker and the person who can resolve it.
+3. The next action and accountable owner.
 
-**Source:** notion://TASK-102 (`SRC-WORK-102`)
-**Idempotency key:** documentation-quality:2026-08-24:TASK-102
+**Source:** notion://TASK-104 (`TASK-104`)
+**Idempotency key:** documentation-quality:2026-08-24:TASK-104
 
 ## Blocked delivery entries
 
@@ -48,11 +47,11 @@ None.
 
 ## No-finding records
 
-- TASK-103 — all mapped Task fields are sufficient (`SRC-WORK-103`).
+- TASK-109 — current, on track, and its mapped Task evidence is sufficient (`TASK-109`).
 
 ## Handoff
 
 - `delivery_state:` proposal-only
 - `integration_owner:` dispatch-employee-messages
-- `dedupe_boundary:` channel dispatcher merges by person/work and source IDs.
+- `dedupe_boundary:` one proposal per person and Work source ID; dispatcher merges with control messages.
 - `source_gaps:` none

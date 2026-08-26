@@ -14,6 +14,8 @@ const ArtifactRowSchema = z.strictObject({
     readability: CheckSchema,
     template_fidelity: CheckSchema,
     groundedness: CheckSchema,
+    workflow_reconstructability: CheckSchema,
+    baseline_integrity: CheckSchema,
   }),
 });
 

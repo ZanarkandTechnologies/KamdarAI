@@ -67,9 +67,9 @@ artifact, draft, or frozen receipt is not external delivery proof.
 | `FEAT-0001` | [Keep Project pages current](FEAT-0001-daily-project-memory.md) | Daily | Project record patch and Meeting commitment proposals |
 | `FEAT-0002` | [Ask for the missing information](FEAT-0002-daily-documentation-quality.md) | Daily | Type-specific field request and Work comment proof |
 | `FEAT-0003` | [Chase delayed work once](FEAT-0003-daily-progress-chasing.md) | Daily | Direct PM/risk/cost Draft entries plus grouped owner outreach |
-| `FEAT-0004` | [Accumulate grounded knowledge](FEAT-0004-daily-knowledge-candidate-capture.md) | Daily | Direct source-linked Decision/SOP entries in the current Weekly Draft |
+| `FEAT-0004` | [Accumulate workflow and problem baselines](FEAT-0004-daily-knowledge-candidate-capture.md) | Daily | Source-linked current-workflow observations, measurable problem baselines or owned gaps, and Decisions in the current Weekly Draft |
 | `FEAT-0005` | [Company operating review](FEAT-0005-weekly-operating-reports.md) | Weekly | Project → Department → Company reports |
-| `FEAT-0006` | [Promote earned knowledge](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated canonical promotion |
+| `FEAT-0006` | [Promote earned knowledge](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated employee SOP promotion to the existing SOPs database and problem promotion to Issues in existing Work |
 | `FEAT-0007` | [Carry commitments into next week](FEAT-0007-weekly-next-week-planning.md) | Weekly | Canonical Project and Work updates |
 
 ## Update rule

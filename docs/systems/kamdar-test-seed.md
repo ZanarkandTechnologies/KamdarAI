@@ -48,7 +48,7 @@ private capture fingerprint + seven captured Project identities
 | Capture fingerprint and seven Departments | Template IDs, versions, properties, and headings |
 | Seven purposeful scenario Projects using captured names and Departments | Template IDs and versions |
 | Complete template-shaped `properties` and Markdown `body` for every entity | Frozen snapshot and compatibility projections |
-| Six fictional People, each routed to the operator-owned Telegram eval sink | Counts and validation evidence |
+| Six fictional People: two email test-sink aliases plus four Telegram eval-sink routes | Counts and validation evidence |
 | Ten Tasks, three Meetings, four Reports | Report week and Project relation fields |
 | Seven feature cases with plain `shows` checks | Reset procedure and provider safety checks |
 | One reset marker per environment | — |

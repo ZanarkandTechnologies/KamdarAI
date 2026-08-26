@@ -1,6 +1,6 @@
 ---
 artifact_type: kamdar-current-weekly-draft
-artifact_version: "0.2.0"
+artifact_version: "1.0.0"
 week: "{{WEEK}}"
 state: draft
 draft_version: 0
@@ -35,15 +35,20 @@ No PM intervention yet.
 ## Problems and inefficiencies
 
 Combine related problems, inefficiencies, risks, blockers, and cost consequences
-into useful problem definitions. Include the observed condition, operating
-impact, evidence, recurrence, next proof, and monetary basis only when sourced.
+into useful problem definitions. Include the affected workflow and step,
+measurement window, observed condition, operating impact, recurrence/volume,
+time and wait loss, cost formula only when sourced, confidence, measurement
+owner/gaps, next proof, and evidence.
 
 <!-- GOLDEN EXAMPLE — replace every fact below.
 ### Supplier formats prevent one reliable replenishment comparison
 
 - **Problem:** Three supplier files use incompatible product and quantity columns, requiring the same manual remapping before every review.
+- **Workflow / step:** Supplier replenishment comparison / normalise incoming count file.
+- **Baseline:** W34; six files per week; 35 active rework minutes per affected file.
 - **Impact / risk:** Five-store rollout approval is blocked and the remaining weekly comparison target is likely to slip by two days.
-- **Cost consequence:** MYR 1,800 actual against MYR 1,500 planned; +MYR 300, based on recorded TASK-101 values.
+- **Cost consequence:** 6 × 35/60 × MYR 42 = MYR 147/week, using the approved loaded hourly-cost basis.
+- **Confidence / gaps:** Medium; confirm the next two file timings before promotion.
 - **Next proof:** Jun confirms the standard import map and Nur completes two remaining store comparisons by 2026-08-28.
 - **Evidence:** [TASK-101](notion://TASK-101), [TASK-105](notion://TASK-105)
 END GOLDEN EXAMPLE -->
@@ -70,16 +75,21 @@ No grounded decision yet.
 
 ## SOPs
 
-Record reusable methods with their trigger, steps, output, owner or approval
-state, and evidence that the method worked or recurred. Mark candidates as
-Proposed until weekly review confirms reuse and ownership.
+Record the current employee workflow even when it is informal, inefficient, or
+not yet reusable. Include trigger, actors, ordered steps, systems, handoffs,
+frequency/volume, active and waiting time, exceptions, output, evidence window,
+confidence, and measurement gaps. Mark it Observed or Proposed until Weekly
+confirms authority and reuse for canonical SOP promotion.
 
 <!-- GOLDEN EXAMPLE — replace every fact below.
 ### Normalise supplier counts before rollout review — Proposed
 
 - **Trigger:** A supplier count file is submitted for replenishment comparison.
-- **Method:** Retain the original, map its columns to the signed baseline, validate totals, and attach the normalised file to the Work item.
+- **Actors / systems:** Nur receives the supplier spreadsheet, normalises it in the approved workbook, and hands the comparison to Jun for review.
+- **Ordered method:** Retain the original; map columns; validate totals; attach the normalised file; request review.
 - **Output:** One traceable comparison-ready file.
+- **Baseline:** Six files/week; 35 active minutes/file; wait time not yet measured.
+- **Exceptions:** Unmapped product code returns to the supplier owner before comparison.
 - **Reuse evidence:** Applied to three supplier files during W34; owner approval remains missing.
 - **Evidence:** [TASK-105](notion://TASK-105)
 END GOLDEN EXAMPLE -->

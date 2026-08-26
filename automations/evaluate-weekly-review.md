@@ -81,13 +81,15 @@ other providers.
   | Tester | Result slice | Relevant templates | Judge for |
   | --- | --- | --- | --- |
   | FEAT-0005 | `report_results[]` and `configuration_gaps[]` | Project, Area, and Company report templates | Versioned Project finalization, source-linked report hierarchy, shared sections, immutable prior Final, and truthful Company finalization gate |
-  | FEAT-0006 | `promotion_dispositions[]` | Issue, Decision, and Skill/SOP templates | Complete disposition matrix, correct destination, authority, dedupe, provenance, and blocked weak evidence |
+  | FEAT-0006 | `promotion_dispositions[]` | Issue, Decision, and employee SOP templates | Complete disposition matrix, correct existing database, preserved workflow/problem baseline, authority, dedupe, provenance, and blocked weak evidence |
   | FEAT-0007 | `next_week_project_replacements[]` | Project template | One complete guarded Project checklist replacement that carries unresolved priorities forward without changing Work or creating a parallel plan |
 
   Each tester follows the suite tier rubric and returns machine-readable tester
   evidence with `lane`, `target`, `claim_under_test`, `tier`, `test_cases[]`,
-  `assertions[]`, `evidence[]`, `failures[]`, `artifacts[]`, `blockers[]`, and
-  `verdict_path`. Every assertion needs a resolvable JSON pointer or seed/template
+  `rubric`, `assertions[]`, `evidence[]`, `failures[]`, `artifacts[]`,
+  `blockers[]`, and `verdict_path`. `rubric` grades `groundedness`,
+  `completeness`, `usefulness`, `repeatability`, and `length_balance` from `A`
+  through `D`. Every assertion needs a resolvable JSON pointer or seed/template
   reference. Only tier `A` passes; missing evidence is `D`. `verdict_path` must
   be an absolute path exactly equal to the resolved manifest artifact
   `<run_root>/eval/judges/<feature_id>.json`. A missing, relative, or different

@@ -26,14 +26,17 @@ explicit `send` mode.
 `prepare` is the default. It groups duplicate message intents and returns a
 channel-dispatch result without contacting anyone. A missing, disabled, or
 out-of-scope handler is a `configuration_gap`, not permission to use another
-channel. `telegram-message` currently serves Kenji only; email and WhatsApp
-remain unavailable until their owned skills are installed and approved.
+employee channel. `isolated-eval` is a separate proof boundary: it may relay an
+unchanged message envelope to the operator-owned Telegram eval sink while
+preserving the intended Person/channel and must never claim employee delivery.
+`telegram-message` currently serves Kenji only; email and WhatsApp remain
+unavailable until their owned skills are installed and approved.
 
 ## Skill Signature
 
 ```text
 dispatch_employee_messages(message_plans[], people_routes, channel_aliases,
-                           dispatch_mode = prepare, result_path,
+                           dispatch_mode = prepare | isolated-eval | send, result_path,
                            prior_results? = [])
   -> channel-dispatch-result.md | prepared | duplicate | configuration_gap | blocked
 reads: one or more named message plans, recipient route facts, channel aliases, and prior
@@ -84,12 +87,17 @@ returns: per-recipient dispatch state, handler name, and safe receipt reference
 - [ ] **N4 — Invoke only the selected channel skill in send mode.**
   `prepared handoff + send mode + selected handler -> channel receipt | blocked`
 
-  Rule: `send` invokes only the selected, in-scope channel skill with unchanged
-  content and that skill's required input. A missing handler, unavailable
-  authority, failed channel call, or missing receipt is `blocked`.
+  Rule: `send` invokes only the selected, in-scope employee-channel skill with
+  unchanged content. `isolated-eval` instead wraps that content with intended
+  Person/channel metadata and invokes only the configured operator-owned
+  Telegram eval sink. A missing handler, unavailable authority, failed channel
+  call, or missing receipt is `blocked`.
 
   Assert:
   - A provider reference appears only when the named channel skill returns it.
+  - Eval relay returns `delivered_to_eval_sink`, sink scope, intended Person,
+    actual Telegram message ID, payload hash, and provider destination matching
+    the configured route; a message ID alone is not delivery proof.
   - This skill never calls a generic email, Telegram, or WhatsApp API itself.
 
 - [ ] **N5 — Render the dispatch result.**
@@ -100,7 +108,8 @@ returns: per-recipient dispatch state, handler name, and safe receipt reference
   idempotency result, and safe receipt reference; redact endpoints and bodies.
 
   Assert:
-  - A reviewer can tell prepared from sent, duplicate, blocked, and gap.
+- A reviewer can tell prepared, eval-sink relay, employee send, duplicate,
+  blocked, and gap apart.
   - An unsupported channel has a named enablement repair path.
 <!-- END FARPLANE_IMPORTANT_CHECKLIST -->
 
@@ -111,8 +120,9 @@ returns: per-recipient dispatch state, handler name, and safe receipt reference
 
 ## Gotchas
 
-- `telegram-message` is currently scoped to Kenji; do not use it for another
-  employee merely because their preferred channel is Telegram.
+- `telegram-message` is currently scoped to Kenji. An isolated eval relay to
+  Kenji's configured sink tests transport for a fictional intended Person; it
+  is not permission to address that Person's endpoint or claim they received it.
 - Email and WhatsApp are planned aliases, not fallback channels. Their owners
   must install and approve their channel skills before `send` can use them.
 - A local prepared result is not a delivery receipt. Only the invoked channel

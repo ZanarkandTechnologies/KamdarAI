@@ -254,7 +254,7 @@ export const WeeklyProgressChaseSchema = z
  *
  * Feature:
  * Read sufficiently documented Work completed today and extract useful problem
- * definitions, Decisions, and SOP signals into the current Weekly Draft. When
+ * baselines, Decisions, and current workflow observations into the current Weekly Draft. When
  * the source is too incomplete, write the exact ticket comment FEAT-0002 needs.
  *
  * Data sources:
@@ -271,39 +271,117 @@ Extract only learning that another person or future review could use. Write one
 complete Markdown block for the Weekly Draft. Preserve the source IDs.
 
 Writing rules:
-- Problem definition: combine problems, inefficiencies, risks, blockers, and
-  cost consequences under one heading. State the observed condition, impact,
-  recurrence, evidence, and any sourced cost basis.
+- Problem definition: preserve a measurable Before baseline. State the affected
+  workflow step, observed condition, impact, measurement window, recurrence,
+  volume, time lost, wait/delay, affected people, direct-cost formula, evidence,
+  and confidence. Unknown time, volume, wage, or cost is a measurement gap with
+  a named evidence owner; never invent a financial estimate.
 - Decision: state the choice, reason, alternatives or tradeoff, authority, and
   review trigger.
-- SOP signal: state the repeatable method, trigger, output, and proof of reuse.
+- Workflow observation: capture the current method even when it is not approved
+  or reusable. State its trigger, actors, ordered steps, systems, handoffs,
+  frequency/volume, active and waiting time, exceptions, output, evidence
+  window, confidence, and measurement gaps. Reuse proof affects Weekly
+  promotion, not whether Daily may observe the workflow.
 - Omit headings with no grounded candidate.
-- If important context is missing, return an empty draft_entries array and write
-  the complete FEAT-0002-style question in missing_information_comment.
+- If the workflow or problem is real but measurement evidence is incomplete,
+  retain the grounded observation with explicit measurement_gaps and write the
+  complete FEAT-0002-style measurement question in missing_information_comment.
+  Return an empty draft_entries array only when the observed condition itself is
+  not grounded.
 - Combine multiple findings of the same kind from one Work item into one entry.
 
 Weekly Draft template:
 ### Problems and inefficiencies
-- <grounded problem, inefficiency, risk/blocker, impact, and sourced cost basis> [SOURCE-ID]
+- <workflow step, observed problem, recurrence/volume, time/wait/cost baseline or
+  explicit measurement gap, evidence window and confidence> [SOURCE-ID]
 
 ### Decisions
 - <choice, rationale, authority, and review trigger> [SOURCE-ID]
 
 ### SOP signals
-- <method, trigger, output, and reuse evidence> [SOURCE-ID]
+- <current trigger, actors, ordered method, systems/handoffs, volume/timing,
+  exceptions, output, evidence/confidence, and promotion state> [SOURCE-ID]
 
 Golden example:
 ### Problems and inefficiencies
 - Three supplier files required the same manual column remapping before their
   counts could be compared. A standard import map would remove repeated setup
   work from every review; the delay risks missing the final comparison date.
-  No grounded monetary cost was supplied. [TASK-105]
+  W34 observed three files and a two-day delay. Active rework minutes, loaded
+  hourly cost, and direct monetary cost remain measurement gaps owned by the
+  merchandising lead. [TASK-105]
 
 ### SOP signals
 - Before a supplier comparison, map its columns to the approved baseline format,
   retain the original file, and attach the normalised output to the Work item.
-  This method was used for three suppliers during W34. [TASK-105]
+  This method was observed for three suppliers during W34; active time and wait
+  time still need measurement before the baseline is complete. [TASK-105]
 `;
+
+const ConfidenceSchema = z.enum(["low", "medium", "high"]);
+
+const WorkflowObservationSchema = z.object({
+  workflow_name: z.string().min(1),
+  observation_state: z.enum(["observed", "proposed", "approved"]),
+  trigger: z.string().min(1),
+  actor_person_ids: z.array(StableIdSchema).min(1),
+  ordered_steps: z.array(z.string().min(1)).min(2),
+  systems: z.array(z.string().min(1)),
+  handoffs: z.array(z.string().min(1)),
+  frequency: z.string().min(1),
+  volume_per_week: z.number().nonnegative().nullable(),
+  active_minutes_per_run: z.number().nonnegative().nullable(),
+  wait_minutes_per_run: z.number().nonnegative().nullable(),
+  exceptions_and_rework: z.array(z.string().min(1)),
+  output: z.string().min(1),
+  evidence_window: z.string().min(1),
+  confidence: ConfidenceSchema,
+  measurement_gaps: z.array(z.string().min(1)),
+}).strict().superRefine((workflow, context) => {
+  const missingMeasures = [workflow.volume_per_week, workflow.active_minutes_per_run, workflow.wait_minutes_per_run].some((value) => value === null);
+  if (missingMeasures && workflow.measurement_gaps.length === 0) {
+    context.addIssue({ code: "custom", message: "unknown workflow volume or timing requires an explicit measurement gap." });
+  }
+});
+
+const ProblemBaselineSchema = z.object({
+  problem_name: z.string().min(1),
+  workflow_name: z.string().min(1),
+  affected_step: z.string().min(1),
+  observed_condition: z.string().min(1),
+  affected_people: z.array(StableIdSchema).min(1),
+  measurement_window: z.string().min(1),
+  occurrences: z.number().nonnegative().nullable(),
+  volume_per_week: z.number().nonnegative().nullable(),
+  time_lost_minutes_per_occurrence: z.number().nonnegative().nullable(),
+  wait_or_delay_minutes: z.number().nonnegative().nullable(),
+  loaded_hourly_cost_myr: z.number().nonnegative().nullable(),
+  direct_cost_per_week_myr: z.number().nonnegative().nullable(),
+  direct_cost_formula: z.string().min(1).nullable(),
+  revenue_or_risk_impact: z.string().min(1),
+  evidence: z.array(z.string().min(1)).min(1),
+  confidence: ConfidenceSchema,
+  measurement_owner_person_id: StableIdSchema,
+  measurement_gaps: z.array(z.string().min(1)),
+}).strict().superRefine((baseline, context) => {
+  const costInputs = [baseline.volume_per_week, baseline.time_lost_minutes_per_occurrence, baseline.loaded_hourly_cost_myr];
+  const hasAllCostInputs = costInputs.every((value) => value !== null);
+  const hasAnyCostClaim = baseline.direct_cost_per_week_myr !== null || baseline.direct_cost_formula !== null;
+  const hasCompleteCost = hasAllCostInputs && baseline.direct_cost_per_week_myr !== null && baseline.direct_cost_formula !== null;
+  if (!hasCompleteCost && baseline.measurement_gaps.length === 0) {
+    context.addIssue({ code: "custom", message: "an incomplete cost baseline requires explicit measurement gaps." });
+  }
+  if (hasAnyCostClaim && !hasCompleteCost) {
+    context.addIssue({ code: "custom", message: "a direct cost claim requires weekly volume, time lost per occurrence, loaded hourly cost, the visible formula, and the calculated result." });
+  }
+  if (hasCompleteCost) {
+    const expectedCost = baseline.volume_per_week * baseline.time_lost_minutes_per_occurrence / 60 * baseline.loaded_hourly_cost_myr;
+    if (Math.abs(expectedCost - baseline.direct_cost_per_week_myr) > 0.01) {
+      context.addIssue({ code: "custom", message: "direct cost must equal volume per week × time lost per occurrence ÷ 60 × loaded hourly cost." });
+    }
+  }
+});
 
 const WeeklyDraftEntrySchema = z
   .object({
@@ -313,10 +391,22 @@ const WeeklyDraftEntrySchema = z
       .string()
       .min(1)
       .describe("The complete Markdown entry. The Weekly Draft integration writes it unchanged."),
+    workflow_observation: WorkflowObservationSchema.nullable(),
+    problem_baseline: ProblemBaselineSchema.nullable(),
   })
   .describe(
     "One directly routable Weekly Draft entry. The integration derives its source key from kind and work_item_id.",
-  );
+  ).superRefine((entry, context) => {
+    if (entry.kind === "sop" && !entry.workflow_observation) {
+      context.addIssue({ code: "custom", message: "an SOP candidate requires a structured workflow observation." });
+    }
+    if (["problem", "inefficiency"].includes(entry.kind) && !entry.problem_baseline) {
+      context.addIssue({ code: "custom", message: "a problem or inefficiency requires a structured problem baseline." });
+    }
+    if (entry.kind === "decision" && (entry.workflow_observation || entry.problem_baseline)) {
+      context.addIssue({ code: "custom", message: "a Decision entry cannot carry workflow or problem baseline payloads." });
+    }
+  });
 
 export const KnowledgeUpdateSchema = z
   .object({

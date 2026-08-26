@@ -74,16 +74,16 @@ kamdar_company_os(source_window, templates, write_policy)
           NOTION / WIKI          GOOGLE DRIVE      EMAIL / TELEGRAM
        Projects, Work,        reports,             grouped chases,
        Decisions, Reports,    source documents     executive summary
-       Skills / SOP records
+       Employee SOP records
 ```
 
 ## Promotion map
 
 | Candidate found during Daily | Weekly disposition | Intended destination |
 | --- | --- | --- |
-| Repeated or material problem | Promote / Duplicate / Monitor / Dismiss | Work Item / issue record |
+| Repeated or material problem | Promote / Duplicate / Monitor / Dismiss | Existing Work database / Issue record linked to the affected SOP step |
 | Decision with future precedent | Promote / Duplicate / Monitor / Dismiss | Decisions database |
-| Repeated workflow or SOP | Promote / Duplicate / Monitor / Dismiss | Skills/wiki record; owning skill only after review |
+| Observed employee workflow | Observe daily; promote only after authority/reuse review | Existing SOPs database / `templates/sop.md`; `skill.md` remains software-only |
 
 Daily never promotes canonical knowledge. Proprietary Project-specific facts
 stay in the Project knowledge body, linked to their Work or Meeting source and

@@ -38,7 +38,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
         self.assertIn("/.hermes.md", ignored)
         proposal = (ROOT / "workspace.hermes.md").read_text(encoding="utf-8")
         self.assertIn('company_timezone: "Asia/Kuala_Lumpur"', proposal)
-        self.assertIn("workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,weekly-report,area-operating-rollup,company-operating-rollup}.md", proposal)
+        self.assertIn("workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md", proposal)
         self.assertIn("unmapped_template", proposal)
         self.assertIn("meeting_block_parse_gap", proposal)
         self.assertIn("proposal-only", proposal)
@@ -130,6 +130,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
             "documentation-request.md": "kamdar-documentation-request",
             "knowledge-candidates.md": "kamdar-knowledge-candidates",
             "skill.md": "company-os-skill",
+            "sop.md": "kamdar-employee-sop",
             "executive-distribution.md": "kamdar-executive-distribution",
             "issue.md": "kamdar-issue",
             "meeting.md": "kamdar-meeting",
@@ -154,7 +155,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
         for filename in (
             "project.md", "task.md", "feature.md", "issue.md", "meeting.md",
             "weekly-report.md", "area-operating-rollup.md", "company-operating-rollup.md",
-            "decision.md", "skill.md",
+            "decision.md", "skill.md", "sop.md",
         ):
             content = (ROOT / "templates" / filename).read_text(encoding="utf-8")
             self.assertIn("GOLDEN EXAMPLE", content, filename)

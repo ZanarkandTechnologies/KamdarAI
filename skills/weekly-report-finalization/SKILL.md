@@ -7,7 +7,7 @@ source: local
 capability:
   kind: pipeline
   consumes: [kamdar-current-weekly-draft, kamdar-project-snapshot]
-  produces: [kamdar-weekly-finalization-plan, kamdar-weekly-report-hierarchy]
+  produces: [kamdar-weekly-finalization-plan, kamdar-weekly-report-hierarchy, kamdar-employee-sop, kamdar-issue]
 template_uses:
   skill-template: "0.6.1"
 allowed-tools: Read, Write, Grep, Glob
@@ -34,7 +34,7 @@ finalize_weekly_report(current_weekly_draft_path, project_snapshot_path, output_
   -> weekly-finalization-plan.md + Project/Department/Company Markdown reports |
      no_finding | configuration_gap
 reads: one current Draft, local Project routing snapshot, report templates, golden
-does: validates Draft anchors, routes report content, retains promotion gaps, renders hierarchy
+does: validates Draft anchors, routes report content, decides reviewed SOP/Issue promotions, renders hierarchy and local promotion artifacts
 writes: caller-owned output_root only; never the input Draft or a provider
 returns: finalization plan, report paths, promotion-review state, and source gaps
 ```
@@ -64,16 +64,26 @@ returns: finalization plan, report paths, promotion-review state, and source gap
   - Each Project report links its Draft source keys.
   - Department and Company reports aggregate report references, not copied transcripts.
 
-- [ ] **N3 — Keep promotion review-gated.**
-  `Proposed Decisions/SOPs + authority/recurrence/proof -> promote | retain`
+- [ ] **N3 — Promote reviewed workflows and material problems to their owner surfaces.**
+  `Draft Decision/SOP/problem + authority/baseline/proof -> promote | retain | monitor`
 
   Rule: Promote only content whose Draft entry carries the required reviewed
-  authority, recurrence, owner, and proof. Otherwise retain it in report
-  history as Proposed with the exact gap.
+  authority, owner, recurrence/materiality, and proof. A qualified employee
+  workflow renders `kamdar-employee-sop@1.0.0` for the existing SOPs database.
+  A repeated or materially costly problem renders `kamdar-issue@1.0.0` for the
+  existing Work database with `type: Issue`; never create a parallel Problems
+  database. The Issue must preserve the affected workflow/step, dated immutable
+  Before baseline, recurrence/volume, time/wait loss, sourced cost formula or
+  explicit gaps and measurement owner, confidence, next proof, intervention,
+  and an empty/unverified After state. Otherwise retain or monitor it with the
+  exact missing gate.
 
   Assert:
   - A candidate never becomes canonical merely because it appears in the Draft.
   - Promotion plans name a destination, source key, and review condition.
+  - SOP promotion uses the employee SOP template, never the software-skill registry.
+  - Problem promotion uses the existing Work/Issue surface, never an SOP row or
+    a new standalone problem table.
 
 - [ ] **N4 — Render the hierarchy and finalization plan.**
   `routed reports + promotion state -> plan + stable output paths`
@@ -100,6 +110,8 @@ returns: finalization plan, report paths, promotion-review state, and source gap
 
 - Current Draft: [current-weekly-draft.md](../../automations/templates/current-weekly-draft.md).
 - Finalization plan: [weekly-finalization-plan.md](templates/weekly-finalization-plan.md).
+- Promotion destinations: [employee SOP](../../templates/sop.md) and
+  [Work/Issue](../../templates/issue.md).
 - Report templates: [Project weekly report](../../templates/weekly-report.md),
   [Department rollup](../../templates/area-operating-rollup.md), and
   [Company rollup](../../templates/company-operating-rollup.md).
@@ -108,11 +120,13 @@ returns: finalization plan, report paths, promotion-review state, and source gap
 ## Gotchas
 
 - Do not create `weekly-report-diff.md`, re-write a Draft anchor, or duplicate Daily extraction.
-- Do not turn a Proposed Decision/SOP into canonical knowledge without its review evidence.
+- Do not turn a Proposed Decision/SOP/problem into a canonical record without its review evidence.
+- Do not store a measured operational problem in the SOP record or invent a separate Problems database.
 - Do not publish to Notion, Drive, or an executive channel from this local finalization skill.
 
 ## Output
 
-One `kamdar-weekly-finalization-plan` Markdown file plus local report hierarchy
-under `output_root`. The current Weekly Draft remains the single source of
-weekly accumulation.
+One `kamdar-weekly-finalization-plan` Markdown file, local report hierarchy,
+and any review-qualified local SOP/Issue promotion artifacts under
+`output_root`. The current Weekly Draft remains the single source of weekly
+accumulation; provider application is a separate guarded edge.

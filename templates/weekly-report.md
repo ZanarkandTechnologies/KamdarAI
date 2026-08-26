@@ -31,14 +31,16 @@ attention, and next priority. No raw activity log. -->
 ## Problems and inefficiencies
 
 <!-- Combine grounded problems, inefficiencies, risks, blockers, and cost
-consequences. Preserve impact, recurrence, next proof, and source links.
+consequences. Preserve the affected workflow step, dated baseline, impact,
+recurrence/volume, time/wait loss, cost formula or explicit measurement gap,
+confidence, next proof, and source links.
 
 GOLDEN EXAMPLE — replace every fact below.
 | Supplier updates arrive in three incompatible formats | Repeated manual remapping blocks the five-store comparison | MYR 300 over plan from recorded values | Confirm one import map by 2026-08-27 | [TASK-105](task://TASK-105) |
 END GOLDEN EXAMPLE -->
 
-| Problem definition | Operating impact | Cost consequence | Next proof / intervention | Evidence |
-| --- | --- | --- | --- | --- |
+| Workflow / affected step | Problem definition | Baseline window and volume | Time / wait loss | Cost consequence and formula | Confidence / measurement gaps | Next proof / intervention | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 {{PROBLEM_OPPORTUNITY_ROWS}}
 
 ## Decisions
