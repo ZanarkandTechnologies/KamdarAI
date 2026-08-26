@@ -2,9 +2,9 @@
  * Reproducible first-pass evaluator for TASK-0007 skill packages.
  *
  * Static mode validates every normal/hard/boundary contract without invoking a
- * model. Calibration mode additionally runs the normal case for the four Daily
- * pipeline skills against the same Hermes profile twice: candidate instructions
- * present versus absent. A third isolated judge produces an A-D comparison.
+ * model. Calibration mode additionally runs the normal case for the selected
+ * owned pipeline skills against the same Hermes profile twice: candidate
+ * instructions present versus absent. A third isolated judge produces an A-D comparison.
  * No eval run receives provider tools, credentials, or a live workspace.
  */
 import { createHash } from "node:crypto";
@@ -44,6 +44,26 @@ function resolveFixture(skillDirectory, sourcePath) {
   if (!existsSync(resolved)) fail(`fixture ${sourcePath} is missing for ${relative(projectRoot, skillDirectory)}.`);
   return resolved;
 }
+// Canonical Agent-Skills `files` cannot escape the skill root. Package-local
+// evals/config.json therefore names shared Kamdar sources as repository-relative
+// `source_files`; this keeps one mutable source of truth without weakening the
+// portable manifest or copying Daily/Weekly fixtures into every skill package.
+function resolveSourceFixture(sourcePath) {
+  if (typeof sourcePath !== "string" || !sourcePath || sourcePath.startsWith("/") || sourcePath.split("/").includes("..")) {
+    fail(`source fixture ${sourcePath} must be a repository-relative path.`);
+  }
+  const resolved = resolve(projectRoot, sourcePath);
+  assertInsideProject(resolved, `source fixture ${sourcePath}`);
+  if (!existsSync(resolved)) fail(`source fixture ${sourcePath} is missing.`);
+  return resolved;
+}
+export function validateFeatureBinding(featureId) {
+  if (typeof featureId !== "string" || !/^FEAT-\d{4}$/.test(featureId)) fail(`invalid feature binding ${featureId}.`);
+  const matches = readdirSync(resolve(projectRoot, "docs/features"))
+    .filter((name) => name.startsWith(`${featureId}-`) && name.endsWith(".md"));
+  if (matches.length !== 1) fail(`feature binding ${featureId} must resolve to exactly one Kamdar feature document.`);
+  return `docs/features/${matches[0]}`;
+}
 function sourceHash(paths) {
   return sha256(paths.map((path) => `${relative(projectRoot, path)}\n${readFileSync(path, "utf8")}`).join("\n---\n"));
 }
@@ -53,12 +73,18 @@ export function inspectTaskSkill(skillName) {
   const directory = resolve(projectRoot, "skills", skillName);
   const skillPath = resolve(directory, "SKILL.md");
   const evalPath = resolve(directory, "evals/evals.json");
-  if (!existsSync(skillPath) || !existsSync(evalPath)) fail(`${skillName} needs SKILL.md and evals/evals.json.`);
+  const configPath = resolve(directory, "evals/config.json");
+  if (!existsSync(skillPath) || !existsSync(evalPath) || !existsSync(configPath)) fail(`${skillName} needs SKILL.md, evals/evals.json, and evals/config.json.`);
   const skill = readFileSync(skillPath, "utf8");
   const evaluation = readJson(evalPath);
+  const config = readJson(configPath);
   if (evaluation.skill_name !== skillName) fail(`${skillName} eval name does not match its package.`);
   if (!Array.isArray(evaluation.evals) || evaluation.evals.length !== 3) fail(`${skillName} must own exactly three first-pass cases.`);
-  const kinds = evaluation.evals.map((item) => item.kind).sort();
+  if (config.schema_version !== 1 || typeof config.cases !== "object" || Array.isArray(config.cases)) fail(`${skillName} has an invalid eval config.`);
+  const manifestIds = evaluation.evals.map((item) => item.id).sort();
+  const configIds = Object.keys(config.cases).sort();
+  if (JSON.stringify(manifestIds) !== JSON.stringify(configIds)) fail(`${skillName} eval config must describe every manifest case exactly once.`);
+  const kinds = configIds.map((id) => config.cases[id]?.kind).sort();
   if (JSON.stringify(kinds) !== JSON.stringify(["boundary", "hard", "normal"])) {
     fail(`${skillName} must label one normal, one hard, and one boundary case.`);
   }
@@ -66,8 +92,17 @@ export function inspectTaskSkill(skillName) {
     if (!item?.id || !item.prompt || !item.expected_output || !Array.isArray(item.assertions) || !item.assertions.length) {
       fail(`${skillName} has an incomplete eval case.`);
     }
-    const fixtures = (item.files || []).map((sourcePath) => resolveFixture(directory, sourcePath));
-    return { ...item, fixtures: fixtures.map((path) => relative(projectRoot, path)) };
+    const localFixtures = (item.files || []).map((sourcePath) => resolveFixture(directory, sourcePath));
+    const sourceFixtures = (config.cases[item.id]?.source_files || []).map(resolveSourceFixture);
+    const fixtures = [...localFixtures, ...sourceFixtures];
+    const featureDocument = validateFeatureBinding(config.cases[item.id].feature_id);
+    return {
+      ...item,
+      kind: config.cases[item.id].kind,
+      feature_id: config.cases[item.id].feature_id,
+      feature_document: featureDocument,
+      fixtures: fixtures.map((path) => relative(projectRoot, path))
+    };
   });
   const localTemplateDirectory = resolve(directory, "templates");
   const localGoldenDirectory = resolve(directory, "examples/golden");
@@ -75,15 +110,15 @@ export function inspectTaskSkill(skillName) {
   const hasSharedRecordTemplate = skill.includes("../../automations/templates/");
   if (!hasLocalTemplate && !hasSharedRecordTemplate) fail(`${skillName} has no local output template or declared shared record template.`);
   if (!existsSync(localGoldenDirectory) || !readdirSync(localGoldenDirectory).length) fail(`${skillName} has no golden fixture.`);
-  if (!evaluation.extensions?.calibration?.runner || !evaluation.extensions?.calibration?.rerun_rule && !evaluation.rerun_rule) {
+  if (!config.calibration?.runner || !config.rerun_rule) {
     fail(`${skillName} lacks a calibration runner or rerun rule.`);
   }
-  const referenced = [skillPath, evalPath, ...cases.flatMap((item) => item.fixtures.map((path) => resolve(projectRoot, path)))];
+  const referenced = [skillPath, evalPath, configPath, ...cases.flatMap((item) => item.fixtures.map((path) => resolve(projectRoot, path)))];
   return {
     skill_name: skillName,
     capability_kind: skill.match(/capability:\n\s+kind:\s*([^\n]+)/)?.[1]?.trim() || "unknown",
-    artifact_contract: evaluation.artifact_contract,
-    files: { skill: relative(projectRoot, skillPath), evals: relative(projectRoot, evalPath) },
+    artifact_contract: config.artifact_contract || null,
+    files: { skill: relative(projectRoot, skillPath), evals: relative(projectRoot, evalPath), config: relative(projectRoot, configPath) },
     cases,
     source_hash: sourceHash(referenced)
   };
@@ -224,7 +259,7 @@ function ensureOutputRoot(outputRoot) {
   return resolved;
 }
 
-/** Run all static checks, with optional normal-case four-pipeline calibration. */
+/** Run all static checks, with optional selected normal-case calibration. */
 export function runTask0007SkillEvals({ outputRoot, calibratePipelines = false, calibrationSkillNames, commandRunner, profile } = {}) {
   const inspection = inspectTask0007SkillEvals();
   const root = ensureOutputRoot(outputRoot);
@@ -239,8 +274,8 @@ export function runTask0007SkillEvals({ outputRoot, calibratePipelines = false, 
     calibrations: [],
     verdict: "pass",
     limitations: calibratePipelines
-      ? ["Normal cases received candidate-versus-baseline model calibration; hard and boundary cases are structurally validated in this first run."]
-      : ["Static mode validates all 27 case contracts but does not claim model behavior calibration."]
+      ? ["Selected normal cases received candidate-versus-baseline model calibration; hard and boundary cases are structurally validated."]
+      : ["Static mode validates all 21 case contracts but does not claim model behavior calibration."]
   };
   if (calibratePipelines) {
     for (const skill of inspection.skills.filter((entry) => selectedNames.has(entry.skill_name))) {

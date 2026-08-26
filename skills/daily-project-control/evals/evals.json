@@ -1,64 +1,73 @@
 {
   "skill_name": "daily-project-control",
-  "artifact_contract": "kamdar-project-control-plan@0.2.0",
   "evals": [
     {
       "id": "project_control_direct_draft_normal_01",
-      "kind": "normal",
-      "prompt": "Use the supplied Daily context and current Weekly Draft to render the Project control plan and directly update the Draft's control anchors.",
-      "expected_output": "One valid plan records TASK-101 as stale/blocked with 3-day and MYR 300 evidence, creates its local PM/Risk/Cost entries, and prepares an approved email proposal for PERSON-JUN.",
+      "prompt": "Use the supplied grounded CMT Daily context and current Weekly Draft to render the Project control plan and directly update the Draft's control anchors in prepare mode.",
+      "expected_output": "One valid plan records TASK-101 as four days overdue and blocked with a sourced MYR 360 rework variance, creates its local PM/Risk/Cost entries, prepares one Telegram eval-route proposal for PERSON-AISHA, and suppresses healthy TASK-109.",
       "files": [
-        "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
-        "../../automations/templates/current-weekly-draft.md",
         "templates/project-control-plan.json",
-        "examples/golden/project-control-plan-2026-08-24.json"
+        "examples/golden/project-control-plan-cmt-2026-08-25.json"
       ],
       "assertions": [
         "Uses only collector snapshot IDs and makes no provider read or Draft integration call",
-        "Calculates stale duration as 3 calendar days and preserves MYR 1,500 estimate, MYR 1,800 actual, and +MYR 300 basis",
+        "Calculates four days overdue and six days since update from context.local_day 2026-08-24, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis",
         "Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft",
-        "Produces one approved email proposal for PERSON-JUN but no send claim",
+        "Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim",
+        "Suppresses current unblocked TASK-109 from Draft entries and outreach",
         "Leaves Decisions, SOPs, Project memory, and final reports untouched"
       ],
-      "metadata": {"farplane": {"title": "One PM control plan updates its Draft anchors and prepares accountable outreach", "tags": ["skill", "pipeline", "pm-control"], "feature_id": "FEAT-0003"}}
+      "metadata": {
+        "title": "One PM control plan updates its Draft anchors and prepares accountable outreach",
+        "tags": [
+          "skill",
+          "pipeline",
+          "pm-control"
+        ]
+      }
     },
     {
       "id": "project_control_direct_draft_hard_01",
-      "kind": "hard",
       "prompt": "TASK-101 is stale and blocked, but the People snapshot has no approved endpoint and Work has no recorded estimate or actual cost. Update the Draft and produce the plan correctly.",
       "expected_output": "A source-linked control finding updates PM attention and the combined problem section, marks route and cost unknown, and does not guess a channel or number.",
-      "files": ["examples/blocked/project-control-plan-unapproved-route.json", "../../automations/templates/current-weekly-draft.md"],
+      "files": [
+        "examples/blocked/project-control-plan-unapproved-route.json"
+      ],
       "assertions": [
         "Keeps the stale/blocked finding and blocked delivery route",
         "Uses unknown cost inputs rather than estimating and omits an unsupported amount",
         "Does not send a message, choose a fallback channel, or create an intermediate Weekly diff",
         "Changes only source-keyed PM/Risk anchors in the supplied Draft"
       ],
-      "metadata": {"farplane": {"title": "Useful control does not authorize guessed outreach or cost", "tags": ["skill", "hard", "route-safety"], "feature_id": "FEAT-0003"}}
+      "metadata": {
+        "title": "Useful control does not authorize guessed outreach or cost",
+        "tags": [
+          "skill",
+          "hard",
+          "route-safety"
+        ]
+      }
     },
     {
       "id": "project_control_direct_draft_boundary_01",
-      "kind": "boundary",
       "prompt": "All Work snapshots are current, unblocked, on schedule, and have no material variance. What should this skill return?",
       "expected_output": "Returns no_finding and leaves the current Weekly Draft and message plan untouched.",
-      "files": ["templates/project-control-plan.json", "../../automations/templates/current-weekly-draft.md"],
+      "files": [
+        "templates/project-control-plan.json"
+      ],
       "assertions": [
         "Does not manufacture a stale threshold breach, cost concern, or follow-up",
         "Does not modify any Draft anchor or route an employee message",
         "Does not perform a provider read, write, or receipt claim"
       ],
-      "metadata": {"farplane": {"title": "Healthy work is not chased or reported", "tags": ["skill", "boundary", "no-finding"], "feature_id": "FEAT-0003"}}
+      "metadata": {
+        "title": "Healthy work is not chased or reported",
+        "tags": [
+          "skill",
+          "boundary",
+          "no-finding"
+        ]
+      }
     }
-  ],
-  "extensions": {
-    "calibration": {
-      "status": "draft_unrun",
-      "runner": "profile-backed skill evaluation",
-      "candidate": "daily-project-control",
-      "baseline": "no-skill",
-      "required_artifacts": ["candidate-plan.json", "candidate-draft.md", "baseline-output.json", "judge-verdict.json"],
-      "readiness_rule": "Run the grounded stale-blocked case with identical context, Draft, model, sandbox, and budget; fix and rerun the smallest failing eval before readiness."
-    }
-  },
-  "rerun_rule": "fix and rerun the smallest failing eval before readiness"
+  ]
 }

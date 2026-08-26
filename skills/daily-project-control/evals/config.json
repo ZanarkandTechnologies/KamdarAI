@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "artifact_contract": "kamdar-project-control-plan@0.2.0",
+  "rerun_rule": "fix and rerun the smallest failing eval before readiness",
+  "cases": {
+    "project_control_direct_draft_normal_01": {
+      "kind": "normal",
+      "feature_id": "FEAT-0003",
+      "source_files": [
+        "automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "automations/templates/current-weekly-draft.md"
+      ]
+    },
+    "project_control_direct_draft_hard_01": {
+      "kind": "hard",
+      "feature_id": "FEAT-0003",
+      "source_files": ["automations/templates/current-weekly-draft.md"]
+    },
+    "project_control_direct_draft_boundary_01": {
+      "kind": "boundary",
+      "feature_id": "FEAT-0003",
+      "source_files": ["automations/templates/current-weekly-draft.md"]
+    }
+  },
+  "calibration": {
+    "status": "draft_unrun",
+    "runner": "profile-backed skill evaluation",
+    "candidate": "daily-project-control",
+    "baseline": "no-skill",
+    "required_artifacts": ["candidate-plan.json", "candidate-draft.md", "baseline-output.json", "judge-verdict.json"],
+    "readiness_rule": "Run the grounded stale-blocked case with identical context, Draft, model, sandbox, and budget; fix and rerun the smallest failing eval before readiness."
+  }
+}

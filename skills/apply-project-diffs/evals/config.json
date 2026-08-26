@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "rerun_rule": "fix and rerun the smallest failing eval before readiness",
+  "cases": {
+    "apply_project_diffs_matching_preflight_01": {"kind": "normal", "feature_id": "FEAT-0001"},
+    "apply_project_diffs_exact_duplicate_01": {"kind": "hard", "feature_id": "FEAT-0001"},
+    "apply_project_diffs_expected_value_conflict_01": {"kind": "boundary", "feature_id": "FEAT-0001"}
+  },
+  "calibration": {
+    "status": "draft_unrun",
+    "runner": "profile-backed skill evaluation",
+    "candidate": "apply-project-diffs",
+    "baseline": "no-skill",
+    "required_artifacts": ["candidate-output.md", "baseline-output.md", "judge-verdict.json"],
+    "readiness_rule": "Run the matching-preflight case with an instrumented Project adapter; fix and rerun the smallest failing eval before readiness."
+  }
+}

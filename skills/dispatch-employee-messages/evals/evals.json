@@ -2,35 +2,52 @@
   "skill_name": "dispatch-employee-messages",
   "evals": [
     {
-      "id": "dispatch_employee_messages_prepared_telegram_01",
-      "kind": "normal",
-      "prompt": "Use the documentation and control deltas for PERSON-KENJI. Telegram is preferred and approved, the channel registry maps Telegram to telegram-message for Kenji, and dispatch_mode is prepare.",
-      "expected_output": "One prepared Telegram dispatch result with no channel call or provider reference.",
-      "files": ["templates/channel-dispatch-result.md", "examples/golden/prepared-telegram-handoff.md"],
-      "assertions": [
-        "Selects telegram-message only because the recipient is within its Kenji-only scope",
-        "Combines the two supplied deltas without changing either message body",
-        "Records prepared, dispatch_mode prepare, and no provider effect",
-        "Preserves source records and an idempotency key without an endpoint"
+      "id": "dispatch_employee_messages_isolated_eval_sink_01",
+      "prompt": "PERSON-AISHA is a fictional eval Person whose approved contact instructions route proof through the operator-owned Telegram eval sink. Relay the unchanged CMT recovery chase using dispatch_mode isolated-eval.",
+      "expected_output": "One Telegram eval-sink relay that preserves PERSON-AISHA as the intended recipient and proves transport without claiming employee delivery.",
+      "files": [
+        "templates/channel-dispatch-result.md"
       ],
-      "metadata": {"farplane": {"title": "Preferred Telegram route prepares one handoff", "tags": ["skill", "integration", "normal", "dispatch"], "feature_id": "FEAT-0002"}}
+      "assertions": [
+        "Uses only the configured operator-owned Telegram eval sink",
+        "Records delivered_to_eval_sink, PERSON-AISHA, the exact payload hash, and the provider message ID",
+        "Does not claim delivered_to_employee or expose a personal endpoint",
+        "Keeps the intended preferred channel distinct from the actual proof sink"
+      ],
+      "metadata": {
+        "title": "Fictional owner chase proves transport at the eval sink",
+        "tags": [
+          "skill",
+          "integration",
+          "normal",
+          "eval-sink"
+        ]
+      }
     },
     {
       "id": "dispatch_employee_messages_email_handler_unavailable_01",
-      "kind": "hard",
       "prompt": "PERSON-024 prefers approved email, but the channel registry marks email-message planned and unavailable. Prepare the documentation message.",
       "expected_output": "A configuration_gap dispatch result that retains the message intent and identifies email-message enablement as the repair.",
-      "files": ["templates/channel-dispatch-result.md"],
+      "files": [
+        "templates/channel-dispatch-result.md"
+      ],
       "assertions": [
         "Does not use Telegram, WhatsApp, or another fallback channel",
         "Names the approved preferred email route and missing email handler",
         "Makes no provider or channel-skill call"
       ],
-      "metadata": {"farplane": {"title": "Unavailable email handler remains actionable", "tags": ["skill", "integration", "hard", "configuration-gap"], "feature_id": "FEAT-0003"}}
+      "metadata": {
+        "title": "Unavailable email handler remains actionable",
+        "tags": [
+          "skill",
+          "integration",
+          "hard",
+          "configuration-gap"
+        ]
+      }
     },
     {
       "id": "dispatch_employee_messages_whatsapp_scope_boundary_01",
-      "kind": "boundary",
       "prompt": "PERSON-025 prefers approved WhatsApp, but Baileys has not been enabled and no whatsapp-message handler exists. Use dispatch_mode send.",
       "expected_output": "A configuration_gap result with no send, no fallback, and the exact missing WhatsApp handler as repair.",
       "files": [],
@@ -39,18 +56,15 @@
         "Does not call a Baileys API or claim a provider receipt",
         "Names whatsapp-message/Baileys enablement as the repair condition"
       ],
-      "metadata": {"farplane": {"title": "Unenabled WhatsApp cannot become an accidental send", "tags": ["skill", "integration", "boundary", "whatsapp"], "feature_id": "FEAT-0003"}}
+      "metadata": {
+        "title": "Unenabled WhatsApp cannot become an accidental send",
+        "tags": [
+          "skill",
+          "integration",
+          "boundary",
+          "whatsapp"
+        ]
+      }
     }
-  ],
-  "extensions": {
-    "calibration": {
-      "status": "draft_unrun",
-      "runner": "profile-backed skill evaluation",
-      "candidate": "dispatch-employee-messages",
-      "baseline": "no-skill",
-      "required_artifacts": ["candidate-output.md", "baseline-output.md", "judge-verdict.json"],
-      "readiness_rule": "Run the prepared-Telegram case with an instrumented channel-skill boundary; fix and rerun the smallest failing eval before readiness."
-    }
-  },
-  "rerun_rule": "fix and rerun the smallest failing eval before readiness"
+  ]
 }

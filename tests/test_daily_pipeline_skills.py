@@ -60,11 +60,21 @@ class DailyPipelineSkillTests(unittest.TestCase):
     def test_every_package_has_normal_hard_boundary_evals_and_a_rerun_rule(self) -> None:
         for name in PACKAGES:
             suite = json.loads((ROOT / "skills" / name / "evals" / "evals.json").read_text(encoding="utf-8"))
+            config = json.loads((ROOT / "skills" / name / "evals" / "config.json").read_text(encoding="utf-8"))
             self.assertEqual(suite["skill_name"], name)
-            self.assertEqual(suite["rerun_rule"], "fix and rerun the smallest failing eval before readiness")
+            self.assertEqual(set(suite), {"skill_name", "evals"})
+            self.assertEqual(config["rerun_rule"], "fix and rerun the smallest failing eval before readiness")
             self.assertEqual(len(suite["evals"]), 3)
             self.assertTrue(all(case["assertions"] for case in suite["evals"]))
-            calibration = suite["extensions"]["calibration"]
+            self.assertEqual(set(config["cases"]), {case["id"] for case in suite["evals"]})
+            self.assertEqual(
+                sorted(case["kind"] for case in config["cases"].values()),
+                ["boundary", "hard", "normal"],
+            )
+            for case in config["cases"].values():
+                feature_id = case["feature_id"]
+                self.assertEqual(len(list((ROOT / "docs" / "features").glob(f"{feature_id}-*.md"))), 1)
+            calibration = config["calibration"]
             self.assertEqual(calibration["status"], "draft_unrun")
             self.assertTrue(calibration["baseline"])
 
@@ -72,11 +82,19 @@ class DailyPipelineSkillTests(unittest.TestCase):
         for name in PACKAGES:
             package = ROOT / "skills" / name
             suite = json.loads((package / "evals" / "evals.json").read_text(encoding="utf-8"))
+            config = json.loads((package / "evals" / "config.json").read_text(encoding="utf-8"))
             for case in suite["evals"]:
                 for relative_path in case.get("files", []):
+                    self.assertNotIn("..", Path(relative_path).parts)
                     self.assertTrue(
                         (package / relative_path).is_file(),
                         f"{name}:{case['id']} declares missing file {relative_path}",
+                    )
+                for source_path in config["cases"][case["id"]].get("source_files", []):
+                    self.assertNotIn("..", Path(source_path).parts)
+                    self.assertTrue(
+                        (ROOT / source_path).is_file(),
+                        f"{name}:{case['id']} declares missing repository source file {source_path}",
                     )
 
     def test_automation_runs_one_structured_extraction_then_routes_application_arrays(self) -> None:
@@ -162,10 +180,11 @@ class DailyPipelineSkillTests(unittest.TestCase):
             "notion.projects", "notion.work_items_this_week",
             "notion.embedded_meetings", "notion.people",
         })
-        expected_fixture = "../../automations/examples/golden/daily-context-diff-2026-08-24.json"
+        expected_fixture = "automations/examples/golden/daily-context-diff-2026-08-24.json"
         for name in DAILY_CONTEXT_CONSUMERS:
-            suite = json.loads((ROOT / "skills" / name / "evals" / "evals.json").read_text(encoding="utf-8"))
-            self.assertIn(expected_fixture, suite["evals"][0]["files"])
+            config = json.loads((ROOT / "skills" / name / "evals" / "config.json").read_text(encoding="utf-8"))
+            first_case = next(iter(config["cases"].values()))
+            self.assertIn(expected_fixture, first_case["source_files"])
         current_draft_template = ROOT / "automations/templates/current-weekly-draft.md"
         current_draft_golden = ROOT / "automations/examples/golden/current-weekly-draft-2026-W34.md"
         for path in (current_draft_template, current_draft_golden):
@@ -176,8 +195,15 @@ class DailyPipelineSkillTests(unittest.TestCase):
             self.assertIn("draft_version:", content)
             self.assertIn("last_updated:", content)
         self.assertIn("GOLDEN EXAMPLE", current_draft_template.read_text(encoding="utf-8"))
-        weekly_suite = json.loads((ROOT / "skills" / "weekly-report-finalization" / "evals" / "evals.json").read_text(encoding="utf-8"))
-        self.assertIn("../../automations/examples/golden/current-weekly-draft-2026-W34.md", weekly_suite["evals"][0]["files"])
+        weekly_config = json.loads((ROOT / "skills" / "weekly-report-finalization" / "evals" / "config.json").read_text(encoding="utf-8"))
+        weekly_evals = json.loads((ROOT / "skills" / "weekly-report-finalization" / "evals" / "evals.json").read_text(encoding="utf-8"))
+        first_weekly_case = next(iter(weekly_config["cases"].values()))
+        self.assertIn("templates/sop.md", first_weekly_case["source_files"])
+        self.assertIn("templates/issue.md", first_weekly_case["source_files"])
+        self.assertIn(
+            "examples/inputs/qualified-current-weekly-draft-2026-W34.md",
+            weekly_evals["evals"][0]["files"],
+        )
 
     def test_project_application_can_guard_a_complete_overview_replacement(self) -> None:
         skill = (ROOT / "skills" / "apply-project-diffs" / "SKILL.md").read_text(encoding="utf-8")
@@ -201,7 +227,7 @@ class DailyPipelineSkillTests(unittest.TestCase):
         self.assertIn("`prepare` is the default", dispatch_skill)
         self.assertIn("`send` invokes only", dispatch_skill)
         self.assertIn("telegram-message` currently serves Kenji only", dispatch_skill)
-        self.assertIn("dispatch_mode: {{prepare | send}}", result_template)
+        self.assertIn("dispatch_mode: {{prepare | isolated-eval | send}}", result_template)
         self.assertIn("state: {{prepared | delivered", result_template)
 
     def test_operated_daily_eval_relays_without_claiming_employee_delivery(self) -> None:

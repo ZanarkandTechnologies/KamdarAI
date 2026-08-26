@@ -10,7 +10,8 @@ import {
   inspectTask0007SkillEvals,
   parseJudge,
   runTask0007SkillEvals,
-  taskSkillNames
+  taskSkillNames,
+  validateFeatureBinding
 } from "../scripts/run-task0007-skill-evals.mjs";
 
 function temporaryRoot(t) {
@@ -25,8 +26,24 @@ test("TASK-0007 owns seven independently shaped normal/hard/boundary skill evals
   assert.equal(inspection.counts.cases, 21);
   for (const skill of inspection.skills) {
     assert.deepEqual(skill.cases.map((entry) => entry.kind).sort(), ["boundary", "hard", "normal"]);
+    assert.equal(skill.cases.every((entry) => /^FEAT-\d{4}$/.test(entry.feature_id)), true);
+    assert.equal(skill.cases.every((entry) => entry.feature_document.startsWith("docs/features/")), true);
+    assert.match(skill.files.config, /\/evals\/config\.json$/);
     assert.match(skill.source_hash, /^[a-f0-9]{64}$/);
   }
+});
+
+test("sidecar feature bindings resolve to Kamdar feature documents", () => {
+  assert.match(validateFeatureBinding("FEAT-0003"), /^docs\/features\/FEAT-0003-/);
+  assert.throws(() => validateFeatureBinding("FEAT-9999"), /must resolve to exactly one Kamdar feature document/);
+});
+
+test("repository-owned shared fixtures remain source-linked through package config", () => {
+  const inspection = inspectTask0007SkillEvals();
+  const memory = inspection.skills.find((entry) => entry.skill_name === "daily-project-memory");
+  const normal = memory.cases.find((entry) => entry.kind === "normal");
+  assert.equal(normal.fixtures.includes("automations/examples/golden/daily-context-diff-2026-08-24.json"), true);
+  assert.equal(normal.files.every((path) => !path.split("/").includes("..")), true);
 });
 
 test("candidate and baseline calibration prompts share source input while golden outputs stay outside the model prompt", () => {
