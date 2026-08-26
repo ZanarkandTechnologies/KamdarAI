@@ -1,0 +1,1102 @@
+{
+  "schema_version": 1,
+  "kind": "task0007-skill-eval-run",
+  "mode": "static-plus-normal-case-calibration",
+  "side_effect_boundary": "source fixtures and safe-mode model calls only; no provider tools or writes",
+  "inspection": {
+    "schema_version": 1,
+    "kind": "task0007-skill-eval-inspection",
+    "skills": [
+      {
+        "skill_name": "daily-project-memory",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-project-diff-plan@0.1.0",
+        "files": {
+          "skill": "skills/daily-project-memory/SKILL.md",
+          "evals": "skills/daily-project-memory/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "daily_project_memory_normal_01",
+            "kind": "normal",
+            "prompt": "Use the supplied Daily context diff to write the Project diff plan at the requested output path.",
+            "files": [
+              "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "examples/golden/project-diff-plan.json",
+              "templates/project-diff-plan.json",
+              "../../templates/project.md"
+            ],
+            "expected_output": "One valid proposal-only plan that appends the confirmed TASK-101 tech-pack handoff failure to PROJ-CMT-CMT_PIPELINE, preserves its existing attention row, and performs no weekly-attention reset.",
+            "assertions": [
+              "Cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot",
+              "Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack",
+              "Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present",
+              "Preserves the unnamed correction approver as an explicit gap",
+              "Uses proposal-only application state and makes no provider or receipt claim"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Project knowledge and reset attention become minimal source-linked patches",
+                "tags": [
+                  "skill",
+                  "artifact",
+                  "daily",
+                  "project-memory"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "skills/daily-project-memory/examples/golden/project-diff-plan.json",
+              "skills/daily-project-memory/templates/project-diff-plan.json",
+              "templates/project.md"
+            ]
+          },
+          {
+            "id": "daily_project_memory_hard_01",
+            "kind": "hard",
+            "prompt": "A context says a Work item's suspected cause is unconfirmed and the current attention checklist already has a source-linked row for the same Work item. Produce the safe diff plan.",
+            "files": [
+              "templates/project-diff-plan.json",
+              "../../templates/project.md"
+            ],
+            "expected_output": "A minimal plan that does not promote the suspected cause to Project knowledge, avoids a duplicate attention item, and records the missing confirmation as a gap.",
+            "assertions": [
+              "Does not write the unconfirmed cause as a known Project fact",
+              "Uses append or named-row replace only when a material source-backed change exists",
+              "Records duplicate/uncertain evidence in gaps rather than producing conflicting patches",
+              "Does not fetch a Project or call an application integration"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unconfirmed and duplicate evidence cannot overwrite Project truth",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "evidence-boundary"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": [
+              "skills/daily-project-memory/templates/project-diff-plan.json",
+              "templates/project.md"
+            ]
+          },
+          {
+            "id": "daily_project_memory_boundary_01",
+            "kind": "boundary",
+            "prompt": "Changed Work evidence names a Project ID, but the context diff contains no Project snapshot or Project source ID. Produce the appropriate result.",
+            "files": [
+              "templates/project-diff-plan.json"
+            ],
+            "expected_output": "Returns configuration_gap: missing_project_snapshot with no patch plan, provider read, or invented Project body.",
+            "assertions": [
+              "Names the missing embedded Project snapshot and preserves the Work source ID",
+              "Creates no Project patch or child memory file",
+              "Does not compensate with a provider read or guessed Project content",
+              "Does not claim application or a provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Missing Project snapshots stop safe Project-memory proposal",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": [
+              "skills/daily-project-memory/templates/project-diff-plan.json"
+            ]
+          }
+        ],
+        "source_hash": "13563e53c8b5c0d3c75580f1e9cd574ed026717e6887465559c1c575cab2cd9d"
+      },
+      {
+        "skill_name": "daily-documentation-quality",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-employee-message-plan@0.1.0",
+        "files": {
+          "skill": "skills/daily-documentation-quality/SKILL.md",
+          "evals": "skills/daily-documentation-quality/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "daily_documentation_quality_normal_01",
+            "kind": "normal",
+            "prompt": "Use the supplied Daily context diff to produce the documentation-quality message plan at the requested output path.",
+            "files": [
+              "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "examples/golden/employee-message-plan.md",
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "One proposal-only grouped message plan for Aisha Rahman that asks only for TASK-104's missing due date, blocker, and next action at their mapped locations; complete records remain no findings.",
+            "assertions": [
+              "Cites TASK-104 and PERSON-AISHA from the input context",
+              "Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations",
+              "Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt",
+              "Keeps TASK-109 out of a recipient message and records it as sufficient",
+              "Uses a documentation-quality idempotency key and proposal-only delivery state"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Mapped documentation gap becomes one useful grouped plan",
+                "tags": [
+                  "skill",
+                  "artifact",
+                  "daily",
+                  "documentation"
+                ],
+                "feature_id": "FEAT-0002"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "skills/daily-documentation-quality/examples/golden/employee-message-plan.md",
+              "skills/daily-documentation-quality/templates/employee-message-plan.md"
+            ]
+          },
+          {
+            "id": "daily_documentation_quality_hard_01",
+            "kind": "hard",
+            "prompt": "The context has a fully read Issue with a missing Root cause field and PERSON-SAM as owner, but the People snapshot lists no approved channel or endpoint. Render the safe message plan.",
+            "files": [
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "A proposal-only plan that preserves the source-linked Root cause request in Blocked delivery entries and never invents a recipient route.",
+            "assertions": [
+              "Names the exact missing mapped Issue field and update location",
+              "Uses blocked_delivery with the known person ID and missing route facts",
+              "Does not select email, chat, Notion, or a guessed endpoint",
+              "Does not fold in unrelated stale-work or cost diagnosis"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Missing People routing blocks delivery without losing the request",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "routing-boundary"
+                ],
+                "feature_id": "FEAT-0002"
+              }
+            },
+            "fixtures": [
+              "skills/daily-documentation-quality/templates/employee-message-plan.md"
+            ]
+          },
+          {
+            "id": "daily_documentation_quality_boundary_01",
+            "kind": "boundary",
+            "prompt": "Every fully read Work record in the context satisfies its resolved template. Produce the appropriate output.",
+            "files": [
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "A no_finding message-plan artifact with zero recipient groups and the reviewed records named; no messages, delivery choice, or provider claim.",
+            "assertions": [
+              "Renders state no_finding rather than generic reminders",
+              "Creates no empty recipient group or fabricated question",
+              "Preserves source IDs for reviewed sufficient records",
+              "Does not send, post, fetch, or claim an integration receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Sufficient records suppress low-value documentation outreach",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "no-finding"
+                ],
+                "feature_id": "FEAT-0002"
+              }
+            },
+            "fixtures": [
+              "skills/daily-documentation-quality/templates/employee-message-plan.md"
+            ]
+          }
+        ],
+        "source_hash": "433ec95eeaf8a0f562bff164413d7423f8cd58869b0825c51586d85aa4467fe5"
+      },
+      {
+        "skill_name": "daily-project-control",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-project-control-plan@0.2.0",
+        "files": {
+          "skill": "skills/daily-project-control/SKILL.md",
+          "evals": "skills/daily-project-control/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "project_control_direct_draft_normal_01",
+            "kind": "normal",
+            "prompt": "Use the supplied grounded CMT Daily context and current Weekly Draft to render the Project control plan and directly update the Draft's control anchors in prepare mode.",
+            "expected_output": "One valid plan records TASK-101 as five days overdue and blocked with a sourced MYR 360 rework variance, creates its local PM/Risk/Cost entries, prepares one Telegram eval-route proposal for PERSON-AISHA, and suppresses healthy TASK-109.",
+            "files": [
+              "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "../../automations/templates/current-weekly-draft.md",
+              "templates/project-control-plan.json",
+              "examples/golden/project-control-plan-cmt-2026-08-25.json"
+            ],
+            "assertions": [
+              "Uses only collector snapshot IDs and makes no provider read or Draft integration call",
+              "Calculates five days overdue and seven days since update, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis",
+              "Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft",
+              "Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim",
+              "Suppresses current unblocked TASK-109 from Draft entries and outreach",
+              "Leaves Decisions, SOPs, Project memory, and final reports untouched"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "One PM control plan updates its Draft anchors and prepares accountable outreach",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "pm-control"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "automations/templates/current-weekly-draft.md",
+              "skills/daily-project-control/templates/project-control-plan.json",
+              "skills/daily-project-control/examples/golden/project-control-plan-cmt-2026-08-25.json"
+            ]
+          },
+          {
+            "id": "project_control_direct_draft_hard_01",
+            "kind": "hard",
+            "prompt": "TASK-101 is stale and blocked, but the People snapshot has no approved endpoint and Work has no recorded estimate or actual cost. Update the Draft and produce the plan correctly.",
+            "expected_output": "A source-linked control finding updates PM attention and the combined problem section, marks route and cost unknown, and does not guess a channel or number.",
+            "files": [
+              "examples/blocked/project-control-plan-unapproved-route.json",
+              "../../automations/templates/current-weekly-draft.md"
+            ],
+            "assertions": [
+              "Keeps the stale/blocked finding and blocked delivery route",
+              "Uses unknown cost inputs rather than estimating and omits an unsupported amount",
+              "Does not send a message, choose a fallback channel, or create an intermediate Weekly diff",
+              "Changes only source-keyed PM/Risk anchors in the supplied Draft"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Useful control does not authorize guessed outreach or cost",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "route-safety"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": [
+              "skills/daily-project-control/examples/blocked/project-control-plan-unapproved-route.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "project_control_direct_draft_boundary_01",
+            "kind": "boundary",
+            "prompt": "All Work snapshots are current, unblocked, on schedule, and have no material variance. What should this skill return?",
+            "expected_output": "Returns no_finding and leaves the current Weekly Draft and message plan untouched.",
+            "files": [
+              "templates/project-control-plan.json",
+              "../../automations/templates/current-weekly-draft.md"
+            ],
+            "assertions": [
+              "Does not manufacture a stale threshold breach, cost concern, or follow-up",
+              "Does not modify any Draft anchor or route an employee message",
+              "Does not perform a provider read, write, or receipt claim"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Healthy work is not chased or reported",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "no-finding"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": [
+              "skills/daily-project-control/templates/project-control-plan.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          }
+        ],
+        "source_hash": "3c46b8092c66d614910d9139dd59fa90c21b969baf96d708f1807702d32a6f3e"
+      },
+      {
+        "skill_name": "daily-knowledge-capture",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-current-weekly-draft@0.1.0",
+        "files": {
+          "skill": "skills/daily-knowledge-capture/SKILL.md",
+          "evals": "skills/daily-knowledge-capture/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "daily_knowledge_direct_draft_normal_01",
+            "kind": "normal",
+            "prompt": "Use the supplied Daily context and current Weekly Draft. Directly update the Draft with the grounded Decision and current employee workflow observations.",
+            "expected_output": "The existing Draft gains a source-keyed Proposed Decision and a reconstructable current-workflow observation with explicit measurement gaps; no contribution file or provider action is created.",
+            "files": [
+              "../../automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "../../automations/templates/current-weekly-draft.md",
+              "examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md"
+            ],
+            "assertions": [
+              "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+              "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+              "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+              "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+              "Edits the supplied current Draft directly and creates no contribution or diff file",
+              "Does not write PM control, Project memory, promotion, or provider effects"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Daily evidence enters the current Weekly Draft directly",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "daily",
+                  "knowledge-capture"
+                ],
+                "feature_id": "FEAT-0004"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "automations/templates/current-weekly-draft.md",
+              "skills/daily-knowledge-capture/examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md"
+            ]
+          },
+          {
+            "id": "daily_knowledge_direct_draft_hard_01",
+            "kind": "hard",
+            "prompt": "The context contains an AI-summary suggestion but no observed current method, concrete choice, source evidence, authority, or proof. Update the current Weekly Draft correctly.",
+            "expected_output": "Returns no_finding or a named source gap and leaves the Draft unchanged; it does not invent a Decision, workflow, authority, timing, or generic wiki item.",
+            "files": [
+              "../../automations/templates/current-weekly-draft.md"
+            ],
+            "assertions": [
+              "Rejects the generic suggestion as neither a Decision nor an observed workflow",
+              "Names missing choice, observed steps, evidence, authority, and proof without filling them in",
+              "Leaves every Draft anchor unchanged and creates no intermediate artifact or provider action"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Weak ideas do not pollute the Weekly Draft",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "grounding"
+                ],
+                "feature_id": "FEAT-0004"
+              }
+            },
+            "fixtures": [
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "daily_knowledge_direct_draft_boundary_01",
+            "kind": "boundary",
+            "prompt": "The Daily context is valid but the supplied current Weekly Draft path is missing. Produce the correct result.",
+            "expected_output": "Returns configuration_gap: missing_current_weekly_draft, retains the source IDs, and changes no file.",
+            "files": [
+              "examples/blocked/current-weekly-draft-missing.md"
+            ],
+            "assertions": [
+              "Does not search for or infer another Weekly Draft",
+              "Preserves the exact missing-target gap and source context",
+              "Does not write, promote, send, or claim a provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "A missing local Draft blocks direct Daily capture",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ],
+                "feature_id": "FEAT-0004"
+              }
+            },
+            "fixtures": [
+              "skills/daily-knowledge-capture/examples/blocked/current-weekly-draft-missing.md"
+            ]
+          }
+        ],
+        "source_hash": "5602f8b7d7468803f65be09287a3749a0878ddd34cb1064487f943d6f676332d"
+      },
+      {
+        "skill_name": "apply-project-diffs",
+        "capability_kind": "integration",
+        "files": {
+          "skill": "skills/apply-project-diffs/SKILL.md",
+          "evals": "skills/apply-project-diffs/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "apply_project_diffs_matching_preflight_01",
+            "kind": "normal",
+            "prompt": "Apply the PROJECT-124 Project knowledge append from PROJECT-DIFF-2026-08-24. The Project ID and expected empty section both match preflight, and the adapter returned page-demo-124 revision 18.",
+            "expected_output": "One applied receipt that preserves the source IDs, expected-value match, key, hashes, and observed adapter reference.",
+            "files": [
+              "templates/project-diff-application-receipt.md",
+              "examples/golden/project-knowledge-patch.md"
+            ],
+            "assertions": [
+              "Applies only PROJECT-124's Project knowledge append unchanged",
+              "Records passed source, identity, idempotency, and expected-current-value guards",
+              "Uses project-adapter:page-demo-124:rev-18 only because the adapter returned it",
+              "Does not mutate a Work, Person, Decision, or Weekly record"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Matching Project preflight permits one patch",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "normal"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": [
+              "skills/apply-project-diffs/templates/project-diff-application-receipt.md",
+              "skills/apply-project-diffs/examples/golden/project-knowledge-patch.md"
+            ]
+          },
+          {
+            "id": "apply_project_diffs_exact_duplicate_01",
+            "kind": "hard",
+            "prompt": "The same PROJECT-124 patch key and proposed-value hash already have a successful receipt. Apply the plan again.",
+            "expected_output": "A duplicate no-write receipt, preserving the original plan identity.",
+            "files": [],
+            "assertions": [
+              "Returns duplicate instead of applied",
+              "Does not call the adapter",
+              "Keeps the source IDs, idempotency key, and value hash inspectable"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Exact Project rerun is safe",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "hard",
+                  "idempotency"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": []
+          },
+          {
+            "id": "apply_project_diffs_expected_value_conflict_01",
+            "kind": "boundary",
+            "prompt": "The plan expects PROJECT-124 Project knowledge to be empty, but preflight shows a different value. Apply the patch.",
+            "expected_output": "A conflict receipt with no overwrite and a re-plan requirement.",
+            "files": [],
+            "assertions": [
+              "Returns conflict because expected current value mismatched",
+              "Preserves the existing provider value and makes no adapter call",
+              "Does not merge or rewrite the proposed Project knowledge"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Project content is never silently overwritten",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "boundary"
+                ],
+                "feature_id": "FEAT-0001"
+              }
+            },
+            "fixtures": []
+          }
+        ],
+        "source_hash": "2a957a51d5788eb15f37b6bf8ad3d78e63979a93bf4bc3bcd9290ce857a11f31"
+      },
+      {
+        "skill_name": "dispatch-employee-messages",
+        "capability_kind": "integration",
+        "files": {
+          "skill": "skills/dispatch-employee-messages/SKILL.md",
+          "evals": "skills/dispatch-employee-messages/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "dispatch_employee_messages_isolated_eval_sink_01",
+            "kind": "normal",
+            "prompt": "PERSON-AISHA is a fictional eval Person whose approved contact instructions route proof through the operator-owned Telegram eval sink. Relay the unchanged CMT recovery chase using dispatch_mode isolated-eval.",
+            "expected_output": "One Telegram eval-sink relay that preserves PERSON-AISHA as the intended recipient and proves transport without claiming employee delivery.",
+            "files": [
+              "templates/channel-dispatch-result.md"
+            ],
+            "assertions": [
+              "Uses only the configured operator-owned Telegram eval sink",
+              "Records delivered_to_eval_sink, PERSON-AISHA, the exact payload hash, and the provider message ID",
+              "Does not claim delivered_to_employee or expose a personal endpoint",
+              "Keeps the intended preferred channel distinct from the actual proof sink"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Fictional owner chase proves transport at the eval sink",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "normal",
+                  "eval-sink"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": [
+              "skills/dispatch-employee-messages/templates/channel-dispatch-result.md"
+            ]
+          },
+          {
+            "id": "dispatch_employee_messages_email_handler_unavailable_01",
+            "kind": "hard",
+            "prompt": "PERSON-024 prefers approved email, but the channel registry marks email-message planned and unavailable. Prepare the documentation message.",
+            "expected_output": "A configuration_gap dispatch result that retains the message intent and identifies email-message enablement as the repair.",
+            "files": [
+              "templates/channel-dispatch-result.md"
+            ],
+            "assertions": [
+              "Does not use Telegram, WhatsApp, or another fallback channel",
+              "Names the approved preferred email route and missing email handler",
+              "Makes no provider or channel-skill call"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unavailable email handler remains actionable",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "hard",
+                  "configuration-gap"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": [
+              "skills/dispatch-employee-messages/templates/channel-dispatch-result.md"
+            ]
+          },
+          {
+            "id": "dispatch_employee_messages_whatsapp_scope_boundary_01",
+            "kind": "boundary",
+            "prompt": "PERSON-025 prefers approved WhatsApp, but Baileys has not been enabled and no whatsapp-message handler exists. Use dispatch_mode send.",
+            "expected_output": "A configuration_gap result with no send, no fallback, and the exact missing WhatsApp handler as repair.",
+            "files": [],
+            "assertions": [
+              "Does not infer Telegram or email as a fallback",
+              "Does not call a Baileys API or claim a provider receipt",
+              "Names whatsapp-message/Baileys enablement as the repair condition"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unenabled WhatsApp cannot become an accidental send",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "boundary",
+                  "whatsapp"
+                ],
+                "feature_id": "FEAT-0003"
+              }
+            },
+            "fixtures": []
+          }
+        ],
+        "source_hash": "051b3512075895c31c8bc943fe57e7a531dabcd13234fcd02a52f93290bbf010"
+      },
+      {
+        "skill_name": "weekly-report-finalization",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-weekly-finalization-plan@0.1.0",
+        "files": {
+          "skill": "skills/weekly-report-finalization/SKILL.md",
+          "evals": "skills/weekly-report-finalization/evals/evals.json"
+        },
+        "cases": [
+          {
+            "id": "weekly_finalization_direct_draft_normal_01",
+            "kind": "normal",
+            "prompt": "Use the supplied completed current Weekly Draft and local Project routing snapshot to render the Weekly finalization plan and hierarchy.",
+            "expected_output": "A Project → Department → Company hierarchy traces every item to Draft source keys and retains the unapproved Decision/SOP candidates as Proposed.",
+            "files": [
+              "../../automations/examples/golden/current-weekly-draft-2026-W34.md",
+              "templates/weekly-finalization-plan.md",
+              "examples/golden/weekly-finalization-plan-2026-08-24.md"
+            ],
+            "assertions": [
+              "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+              "Routes reports through supplied local Project/Department facts only",
+              "Retains Decision authority and SOP recurrence gaps rather than promoting either candidate",
+              "Renders Project, Department, and Company report paths with source-key traceability",
+              "Claims no provider publication, delivery, or promotion effect"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "The current Weekly Draft becomes the final report hierarchy",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "weekly",
+                  "finalization"
+                ],
+                "feature_id": "FEAT-0005"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/current-weekly-draft-2026-W34.md",
+              "skills/weekly-report-finalization/templates/weekly-finalization-plan.md",
+              "skills/weekly-report-finalization/examples/golden/weekly-finalization-plan-2026-08-24.md"
+            ]
+          },
+          {
+            "id": "weekly_finalization_draft_conflict_hard_01",
+            "kind": "hard",
+            "prompt": "The current Draft contains a Proposed Decision whose authority is absent and a Proposed SOP whose recurrence is absent. Finalize correctly.",
+            "expected_output": "Reports retain both candidates as Proposed and name their review gaps; it does not promote, delete, or overwrite the Draft entries.",
+            "files": [
+              "../../automations/examples/golden/current-weekly-draft-2026-W34.md"
+            ],
+            "assertions": [
+              "Leaves the input Draft unchanged",
+              "Names authority and recurrence/owner/proof gaps separately",
+              "Does not create a promotion or provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Finalization does not auto-promote a Draft candidate",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "promotion"
+                ],
+                "feature_id": "FEAT-0006"
+              }
+            },
+            "fixtures": [
+              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+            ]
+          },
+          {
+            "id": "weekly_finalization_missing_draft_boundary_01",
+            "kind": "boundary",
+            "prompt": "The weekly run has no current non-final Markdown Draft. Produce the correct result.",
+            "expected_output": "Returns configuration_gap: missing_current_weekly_draft and creates no report, promotion, provider, or delivery output.",
+            "files": [
+              "examples/blocked/current-weekly-draft-missing.md"
+            ],
+            "assertions": [
+              "Does not search for or infer another Draft",
+              "Names the exact missing-input repair",
+              "Does not write a report or mutate project knowledge"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Weekly finalization refuses a missing Draft",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ],
+                "feature_id": "FEAT-0005"
+              }
+            },
+            "fixtures": [
+              "skills/weekly-report-finalization/examples/blocked/current-weekly-draft-missing.md"
+            ]
+          }
+        ],
+        "source_hash": "cbd734a96d9a3595a15f84b8ae96c3af0dccbb59b32a1725f7e86ed08fe26c81"
+      }
+    ],
+    "counts": {
+      "skills": 7,
+      "cases": 21,
+      "normal": 7,
+      "hard": 7,
+      "boundary": 7
+    }
+  },
+  "calibrations": [
+    {
+      "skill_name": "daily-project-memory",
+      "case_id": "daily_project_memory_normal_01",
+      "source_hash": "13563e53c8b5c0d3c75580f1e9cd574ed026717e6887465559c1c575cab2cd9d",
+      "candidate": {
+        "status": 0,
+        "stdout": "{\n  \"artifact_type\": \"kamdar-project-diff-plan\",\n  \"artifact_version\": \"0.1.0\",\n  \"context\": {\n    \"context_diff_id\": \"daily-context-2026-08-24\",\n    \"context_diff_path\": \"automations/examples/golden/daily-context-diff-2026-08-24.json\",\n    \"local_day\": \"2026-08-24\",\n    \"evidence_window\": {\"start\": \"2026-08-24T00:00:00+08:00\", \"end\": \"2026-08-24T23:59:59+08:00\"}\n  },\n  \"state\": \"proposed\",\n  \"patches\": [\n    {\n      \"patch_id\": \"PATCH-001\",\n      \"project\": {\"project_id\": \"PROJ-CMT-CMT_PIPELINE\", \"project_source_id\": \"PROJ-CMT-CMT_PIPELINE\", \"project_url\": \"notion://PROJ-CMT-CMT_PIPELINE\"},\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"First seasonal sample is under construction review.\",\n      \"proposed_markdown\": \"### Collar tolerance and tech-pack approval constraint\\n- **Known:** The sewn baju kurung sample is 1.5 cm wider at the collar than the issued tech pack; the fitting correction was discussed beside the sample but not transferred to the canonical tech pack, and no approver is named.\\n- **Impact:** Tech-pack approval remains blocked; planned 540 MYR vs actual 900 MYR (67% overrun); production line hold is conditional on resolution.\\n- **Evidence:** [Task TASK-101](notion://TASK-101)\\n- **Review:** After the collar correction is approved, the approver is named, and the tech pack is updated.\",\n      \"source_ids\": [\"TASK-101\"],\n      \"attention_reset\": {\"requested\": false, \"week\": null, \"reason\": null, \"source_id\": null},\n      \"gaps\": [],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-CMT-CMT_PIPELINE:project_knowledge:TASK-101\"\n    },\n    {\n      \"patch_id\": \"PATCH-002\",\n      \"project\": {\"project_id\": \"PROJ-CMT-CMT_PIPELINE\", \"project_source_id\": \"PROJ-CMT-CMT_PIPELINE\", \"project_url\": \"notion://PROJ-CMT-CMT_PIPELINE\"},\n      \"target_section\": \"this_weeks_attention\",\n      \"operation\": \"replace\",\n      \"before_excerpt\": \"- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]\",\n      \"proposed_markdown\": \"- [ ] **P0 · Blocked · overdue 4d (due 2026-08-20)** — Approve the consolidated production tech pack with collar tolerance and named approver.\\n  **Owner:** Aisha · **Why now:** sewn sample is 1.5 cm wider at the collar; cost variance 540 to 900 MYR (67% overrun); no named approver for the correction.\\n  **Evidence:** [Task TASK-101](notion://TASK-101)\\n- [ ] **P1 · Blocked · no due date** — Close the remaining collar correction with a due date, blocker, and next action.\\n  **Owner:** Nur · **Why now:** the Task is marked blocked but has no due date, named blocker, or next action.\\n  **Evidence:** [Task TASK-104](notion://TASK-104)\",\n      \"source_ids\": [\"TASK-101\", \"TASK-104\"],\n      \"attention_reset\": {\"requested\": false, \"week\": null, \"reason\": null, \"source_id\": null},\n      \"gaps\": [\"TASK-101 attention says due 2026-08-22 but work item due_date is 2026-08-20; used work item date.\", \"TASK-104 attention says due 2026-08-23 but work item due_date is null; flagged as missing.\"],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-CMT-CMT_PIPELINE:this_weeks_attention:TASK-101-TASK-104\"\n    },\n    {\n      \"patch_id\": \"PATCH-003\",\n      \"project\": {\"project_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\", \"project_source_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\", \"project_url\": \"notion://PROJ-MKT-DEEPAVALI_MARKETING\"},\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Branch and online campaign activation.\",\n      \"proposed_markdown\": \"### Campaign asset folder decision\\n- **Known:** Coordinated Deepavali themes were approved; one campaign asset folder per batch is the agreed structure.\\n- **Impact:** Asset handoff can proceed with one folder per batch; the accountable approver is not named in the source.\\n- **Evidence:** [Meeting TASK-201](notion://TASK-201)\\n- **Review:** After seven campaign days.\",\n      \"source_ids\": [\"TASK-201\"],\n      \"attention_reset\": {\"requested\": false, \"week\": null, \"reason\": null, \"source_id\": null},\n      \"gaps\": [\"The accountable approver for the decision is not named in the source.\", \"No start date supplied for the seven-campaign-day review window.\"],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-MKT-DEEPAVALI_MARKETING:project_knowledge:TASK-201\"\n    },\n    {\n      \"patch_id\": \"PATCH-004\",\n      \"project\": {\"project_id\": \"PROJ-ECOM-LISTING_PIPELINE\", \"project_source_id\": \"PROJ-ECOM-LISTING_PIPELINE\", \"project_url\": \"notion://PROJ-ECOM-LISTING_PIPELINE\"},\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Approved products need one publish-ready handoff.\",\n      \"proposed_markdown\": \"### Publish-ready listing handoff workflow\\n- **Known:** Nur prepares and validates the listing package (product IDs, fields, images), then hands it to Darren for acceptance and publishing. A missing approved sample or final commercial term stops the package before handoff; a catalog sync that drops a required field returns the product to Nur.\\n- **Impact:** Standardised handoff reduces rework; active preparation time, review time, queue wait, batch count, SKU volume, and loaded hourly cost are not yet measured.\\n- **Evidence:** [Meeting TASK-203](notion://TASK-203)\\n- **Review:** Sample ten pages after the next catalog sync.\",\n      \"source_ids\": [\"TASK-203\"],\n      \"attention_reset\": {\"requested\": false, \"week\": null, \"reason\": null, \"source_id\": null},\n      \"gaps\": [\"Active preparation time, review time, queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost are not recorded.\", \"No date supplied for the next catalog sync review.\"],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-ECOM-LISTING_PIPELINE:project_knowledge:TASK-203\"\n    }\n  ],\n  \"no_change_project_ids\": [\"PROJ-MERCH-INDIA_SOURCING\", \"PROJ-MKT-WEEKLY_META_ADS_UPDATES\"],\n  \"source_gaps\": [\n    \"TASK-109 appears in work_items but is not listed in source_manifest source_ids for notion.work_items_this_week.\",\n    \"PROJ-ECOM-ECOM_FIXES is referenced by TASK-102 and TASK-202 but is not in the projects collection.\",\n    \"PROJ-MERCH-INDIA_SOURCING this_weeks_attention references TASK-101 which belongs to PROJ-CMT-CMT_PIPELINE (cross-project reference).\"\n  ],\n  \"integration_handoff\": {\n    \"owner\": \"apply-project-diffs\",\n    \"application_state\": \"proposal-only\",\n    \"receipt_required_before_applied_claim\": true\n  }\n}",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "8f04351da73054741e0e8548b6e3a1008b38ee5a500b159d4ae33e385f382f14"
+      },
+      "baseline": {
+        "status": 0,
+        "stdout": "```json\n{\n  \"artifact_type\": \"kamdar-project-diff-plan\",\n  \"artifact_version\": \"0.1.0\",\n  \"context_id\": \"daily-context-2026-08-24\",\n  \"local_day\": \"2026-08-24\",\n  \"projects\": [\n    {\n      \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n      \"source_url\": \"notion://PROJ-CMT-CMT_PIPELINE\",\n      \"name\": \"CMT Pipeline\",\n      \"owner_person_id\": \"PERSON-AISHA\",\n      \"knowledge_patches\": [\n        {\n          \"heading\": \"Collar tolerance gap on first baju kurung sample\",\n          \"known\": \"The sewn sample is 1.5 cm wider at the collar than the issued tech pack; the proposed correction has no named approver.\",\n          \"impact\": \"Tech pack approval (TASK-101) stays blocked until the collar tolerance and approver are recorded; effort overran from 540 MYR est to 900 MYR actual (6h planned, 10h actual at 90 MYR/h).\",\n          \"evidence\": [\"notion://TASK-101\"],\n          \"review\": \"Replace once the approved collar tolerance and named approver are recorded on the tech pack.\"\n        }\n      ],\n      \"attention_patches\": [\n        {\"action\": \"keep_blocked\", \"item\": \"Approve the consolidated production tech pack\", \"source_id\": \"TASK-101\", \"note\": \"blocked; task due_date 2026-08-20 (attention text says 2026-08-22 — discrepancy)\"},\n        {\"action\": \"flag\", \"item\": \"Close the remaining collar correction\", \"source_id\": \"TASK-104\", \"note\": \"blocked with missing due_date, blocker, and next_action\"}\n      ],\n      \"progress_comment_proposals\": [\n        {\"source_id\": \"TASK-101\", \"source_url\": \"notion://TASK-101\", \"reason\": \"blocked and overdue (due 2026-08-20 vs local day 2026-08-24); last meaningful update 2026-08-18 (6d stale)\", \"ask\": \"Current state, blocker owner, root-cause evidence, revised commitment, and effort variance (est 540 vs actual 900 MYR).\"},\n        {\"source_id\": \"TASK-104\", \"source_url\": \"notion://TASK-104\", \"reason\": \"blocked with missing due_date, blocker, and next_action on the canonical Task\", \"ask\": \"Due date, named blocker, and next action so the collar correction can be tracked.\"}\n      ],\n      \"gaps\": [{\"type\": \"due_date_discrepancy\", \"detail\": \"Attention says due 2026-08-22; task record says due 2026-08-20.\"}]\n    },\n    {\n      \"project_id\": \"PROJ-MERCH-INDIA_SOURCING\",\n      \"source_url\": \"notion://PROJ-MERCH-INDIA_SOURCING\",\n      \"name\": \"India Sourcing\",\n      \"owner_person_id\": \"PERSON-NUR\",\n      \"knowledge_patches\": [],\n      \"attention_patches\": [],\n      \"progress_comment_proposals\": [],\n      \"gaps\": [{\"type\": \"task_reference_mismatch\", \"detail\": \"Attention cites TASK-101 (a CMT Pipeline task); the on-track India Sourcing item is TASK-109 (due 2026-08-23, healthy no-chase control).\"}]\n    },\n    {\n      \"project_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\",\n      \"source_url\": \"notion://PROJ-MKT-DEEPAVALI_MARKETING\",\n      \"name\": \"Deepavali Marketing\",\n      \"owner_person_id\": \"PERSON-MAYA\",\n      \"knowledge_patches\": [\n        {\n          \"heading\": \"One campaign asset folder per batch\",\n          \"known\": \"Coordinated Deepavali themes were approved; one campaign asset folder per batch is the agreed handoff structure.\",\n          \"impact\": \"Campaign asset handoff should follow the one-folder-per-batch convention.\",\n          \"evidence\": [\"notion://TASK-201\"],\n          \"review\": \"Review after seven campaign days per TASK-201. Accountable approver not named in source.\"\n        }\n      ],\n      \"attention_patches\": [\n        {\"action\": \"check\", \"item\": \"Complete campaign asset handoff\", \"source_id\": \"TASK-201\", \"note\": \"meeting completed 2026-08-21\"}\n      ],\n      \"decision_candidates\": [\n        {\"source_id\": \"TASK-201\", \"choice\": \"Use one campaign asset folder per batch for the coordinated Deepavali campaign.\", \"authority_gap\": \"Accountable approver not named in source.\", \"evidence\": [\"notion://TASK-201\"]}\n      ],\n      \"progress_comment_proposals\": [],\n      \"gaps\": []\n    },\n    {\n      \"project_id\": \"PROJ-MKT-WEEKLY_META_ADS_UPDATES\",\n      \"source_url\": \"notion://PROJ-MKT-WEEKLY_META_ADS_UPDATES\",\n      \"name\": \"Weekly Meta Ads Updates\",\n      \"owner_person_id\": \"PERSON-MAYA\",\n      \"knowledge_patches\": [],\n      \"attention_patches\": [\n        {\"action\": \"check\", \"item\": \"Document Meta performance\", \"source_id\": \"TASK-115\", \"note\": \"completed 2026-08-21\"},\n        {\"action\": \"append\", \"item\": \"TASK-116 completed\", \"source_id\": \"TASK-116\", \"note\": \"done 2026-08-21; not currently listed in attention\"}\n      ],\n      \"progress_comment_proposals\": [],\n      \"gaps\": []\n    },\n    {\n      \"project_id\": \"PROJ-ECOM-LISTING_PIPELINE\",\n      \"source_url\": \"notion://PROJ-ECOM-LISTING_PIPELINE\",\n      \"name\": \"Listing Pipeline\",\n      \"owner_person_id\": \"PERSON-DARREN\",\n      \"knowledge_patches\": [\n        {\n          \"heading\": \"Publish-ready listing handoff sequence\",\n          \"known\": \"Nur prepares the listing package (confirm IDs, validate fields, check images, assemble) then hands to Darren for acceptance; a missing approved sample or final commercial term stops the package before handoff.\",\n          \"impact\": \"Listing pipeline should follow the observed five-step handoff; active prep, review, and queue wait time are not yet measured.\",\n          \"evidence\": [\"notion://TASK-203\"],\n          \"review\": \"Sample ten pages after the next catalog sync per TASK-203.\"\n        }\n      ],\n      \"attention_patches\": [\n        {\"action\": \"check\", \"item\": \"Apply listing checklist\", \"source_id\": \"TASK-203\", \"note\": \"meeting completed 2026-08-21\"}\n      ],\n      \"sop_candidates\": [\n        {\"source_id\": \"TASK-203\", \"workflow_name\": \"Prepare a publish-ready product-listing handoff\", \"confidence\": \"high\", \"measurement_gaps\": [\"active prep and review time on next two batches\", \"queue wait, weekly batch count, SKU volume, rework count, loaded hourly cost\"]}\n      ],\n      \"progress_comment_proposals\": [],\n      \"gaps\": []\n    }\n  ],\n  \"orphaned_work_items\": [\n    {\"source_id\": \"TASK-102\", \"project_id\": \"PROJ-ECOM-ECOM_FIXES\", \"note\": \"project not in fetched project set\"},\n    {\"source_id\": \"TASK-202\", \"project_id\": \"PROJ-ECOM-ECOM_FIXES\", \"note\": \"project not in fetched project set\"}\n  ],\n  \"summary\": {\n    \"projects_reviewed\": 5,\n    \"knowledge_patches\": 3,\n    \"progress_comment_proposals\": 2,\n    \"decision_candidates\": 1,\n    \"sop_candidates\": 1,\n    \"orphaned_work_items\": 2\n  }\n}\n```",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "da27a35741d80708e690b0c9217b08550f7a2eac0985d3e57de3ef4c2e38f9a0"
+      },
+      "judge": {
+        "status": 0,
+        "stdout": "Looking at both outputs against the five assertions, I need to carefully check each one.\n\nLet me verify the critical assertions by examining the key sections of both outputs.\n\n**Assertion 2 (collar correction not transferred to canonical tech pack):**\n- Candidate PATCH-001: \"the fitting correction was discussed beside the sample but not transferred to the canonical tech pack\" — explicitly stated. PASS.\n- Baseline knowledge_patches: \"The sewn sample is 1.5 cm wider at the collar than the issued tech pack; the proposed correction has no named approver.\" — mentions a correction with no approver, but never states it was not transferred to the canonical tech pack. FAIL.\n\n**Assertion 3 (does not replace this_weeks_attention):**\n- Candidate PATCH-002: operation = \"replace\" on this_weeks_attention, with attention_reset.requested = false — explicitly replaces the section despite reset not being requested. FAIL.\n- Baseline: uses targeted attention_patches (keep_blocked, flag) — no full section replacement. PASS.\n\nThese are the two key differentiators. Both outputs each fail exactly one assertion.\n\n**Assertion 4 (unnamed approver as explicit gap):**\n- Candidate: \"no approver is named\" in proposed_markdown, but gaps array is empty []. The gap is mentioned in text but not structured as a gap entry. Marginal PASS.\n- Baseline: \"the proposed correction has no named approver\" in known field. Also marginal PASS.\n\n**Assertion 5 (proposal-only, no provider/receipt claim):**\n- Candidate: explicit \"state\": \"proposed\", \"application_state\": \"proposal-only\", \"receipt_required_before_applied_claim\": true. PASS.\n- Baseline: uses \"progress_comment_proposals\" and makes no claims, but no explicit proposal-only state declaration. PASS (marginal).\n\n```json\n{\"tier\":\"B\",\"candidate_checks\":[{\"assertion\":\"Cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot\",\"met\":true,\"evidence\":\"PATCH-001 (CMT Pipeline project_knowledge) has source_ids [\\\"TASK-101\\\"] only; no other source cited in the knowledge finding.\"},{\"assertion\":\"Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack\",\"met\":true,\"evidence\":\"PATCH-001 proposed_markdown: 'the fitting correction was discussed beside the sample but not transferred to the canonical tech pack' — operation is 'append' on project_knowledge.\"},{\"assertion\":\"Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present\",\"met\":false,\"evidence\":\"PATCH-002 has operation='replace' on this_weeks_attention with attention_reset.requested=false — contradicts the assertion; the candidate knows reset is not requested but replaces the section anyway, also introducing TASK-104.\"},{\"assertion\":\"Preserves the unnamed correction approver as an explicit gap\",\"met\":true,\"evidence\":\"PATCH-001 proposed_markdown states 'no approver is named'; Review says 'the approver is named' (implying currently unnamed). Text-level gap preservation, though gaps array is empty.\"},{\"assertion\":\"Uses proposal-only application state and makes no provider or receipt claim\",\"met\":true,\"evidence\":\"state='proposed'; integration_handoff.application_state='proposal-only'; receipt_required_before_applied_claim=true. No provider or receipt claim anywhere.\"}],\"baseline_checks\":[{\"assertion\":\"Cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot\",\"met\":true,\"evidence\":\"CMT Pipeline knowledge_patches evidence=['notion://TASK-101'] only; no other source cited in the knowledge finding.\"},{\"assertion\":\"Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack\",\"met\":false,\"evidence\":\"CMT knowledge_patches known field says 'The sewn sample is 1.5 cm wider at the collar than the issued tech pack; the proposed correction has no named approver.' Never states the correction was not transferred to the canonical tech pack — the critical transfer-status finding is absent.\"},{\"assertion\":\"Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present\",\"met\":true,\"evidence\":\"Uses targeted attention_patches (keep_blocked for TASK-101, flag for TASK-104) — no full section replacement; existing attention items preserved.\"},{\"assertion\":\"Preserves the unnamed correction approver as an explicit gap\",\"met\":true,\"evidence\":\"knowledge_patches known: 'the proposed correction has no named approver'; review: 'Replace once the approved collar tolerance and named approver are recorded on the tech pack.' Gap preserved in text.\"},{\"assertion\":\"Uses proposal-only application state and makes no provider or receipt claim\",\"met\":true,\"evidence\":\"Uses progress_comment_proposals (proposals, not applied claims); no explicit proposal-only state field but no provider or receipt claim is made anywhere.\"}],\"winner\":\"tie\",\"reason\":\"Both are useful near misses at 4/5 assertions, each failing exactly one. The candidate captures the critical finding (assertion 2: collar correction not transferred to canonical tech pack) that the baseline misses entirely, but the candidate violates the structural rule (assertion 3) by replacing this_weeks_attention with operation='replace' despite recording attention_reset.requested=false — a potentially destructive action that could overwrite existing attention items. The baseline correctly avoids replacing this_weeks_attention (assertion 3) using targeted patches, but omits the key transfer-status finding (assertion 2), leaving the knowledge patch without the most important high-confidence insight. These failures are comparable in severity: one is a content omission, the other is a structural violation with data-loss risk. Neither meets all five assertions, so neither is tier A.\"}\n```",
+        "stderr": "",
+        "timed_out": false,
+        "result": {
+          "tier": "B",
+          "candidate_checks": [
+            {
+              "assertion": "Cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot",
+              "met": true,
+              "evidence": "PATCH-001 (CMT Pipeline project_knowledge) has source_ids [\"TASK-101\"] only; no other source cited in the knowledge finding."
+            },
+            {
+              "assertion": "Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack",
+              "met": true,
+              "evidence": "PATCH-001 proposed_markdown: 'the fitting correction was discussed beside the sample but not transferred to the canonical tech pack' — operation is 'append' on project_knowledge."
+            },
+            {
+              "assertion": "Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present",
+              "met": false,
+              "evidence": "PATCH-002 has operation='replace' on this_weeks_attention with attention_reset.requested=false — contradicts the assertion; the candidate knows reset is not requested but replaces the section anyway, also introducing TASK-104."
+            },
+            {
+              "assertion": "Preserves the unnamed correction approver as an explicit gap",
+              "met": true,
+              "evidence": "PATCH-001 proposed_markdown states 'no approver is named'; Review says 'the approver is named' (implying currently unnamed). Text-level gap preservation, though gaps array is empty."
+            },
+            {
+              "assertion": "Uses proposal-only application state and makes no provider or receipt claim",
+              "met": true,
+              "evidence": "state='proposed'; integration_handoff.application_state='proposal-only'; receipt_required_before_applied_claim=true. No provider or receipt claim anywhere."
+            }
+          ],
+          "baseline_checks": [
+            {
+              "assertion": "Cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot",
+              "met": true,
+              "evidence": "CMT Pipeline knowledge_patches evidence=['notion://TASK-101'] only; no other source cited in the knowledge finding."
+            },
+            {
+              "assertion": "Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack",
+              "met": false,
+              "evidence": "CMT knowledge_patches known field says 'The sewn sample is 1.5 cm wider at the collar than the issued tech pack; the proposed correction has no named approver.' Never states the correction was not transferred to the canonical tech pack — the critical transfer-status finding is absent."
+            },
+            {
+              "assertion": "Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present",
+              "met": true,
+              "evidence": "Uses targeted attention_patches (keep_blocked for TASK-101, flag for TASK-104) — no full section replacement; existing attention items preserved."
+            },
+            {
+              "assertion": "Preserves the unnamed correction approver as an explicit gap",
+              "met": true,
+              "evidence": "knowledge_patches known: 'the proposed correction has no named approver'; review: 'Replace once the approved collar tolerance and named approver are recorded on the tech pack.' Gap preserved in text."
+            },
+            {
+              "assertion": "Uses proposal-only application state and makes no provider or receipt claim",
+              "met": true,
+              "evidence": "Uses progress_comment_proposals (proposals, not applied claims); no explicit proposal-only state field but no provider or receipt claim is made anywhere."
+            }
+          ],
+          "winner": "tie",
+          "reason": "Both are useful near misses at 4/5 assertions, each failing exactly one. The candidate captures the critical finding (assertion 2: collar correction not transferred to canonical tech pack) that the baseline misses entirely, but the candidate violates the structural rule (assertion 3) by replacing this_weeks_attention with operation='replace' despite recording attention_reset.requested=false — a potentially destructive action that could overwrite existing attention items. The baseline correctly avoids replacing this_weeks_attention (assertion 3) using targeted patches, but omits the key transfer-status finding (assertion 2), leaving the knowledge patch without the most important high-confidence insight. These failures are comparable in severity: one is a content omission, the other is a structural violation with data-loss risk. Neither meets all five assertions, so neither is tier A."
+        }
+      },
+      "verdict": "needs-revision"
+    },
+    {
+      "skill_name": "daily-documentation-quality",
+      "case_id": "daily_documentation_quality_normal_01",
+      "source_hash": "433ec95eeaf8a0f562bff164413d7423f8cd58869b0825c51586d85aa4467fe5",
+      "candidate": {
+        "status": 0,
+        "stdout": "---\nartifact_type: kamdar-employee-message-plan\nartifact_version: \"0.1.0\"\ncontext_diff_id: daily-context-2026-08-24\nlocal_day: \"2026-08-24\"\nevidence_window: \"2026-08-24T00:00:00+08:00..2026-08-24T23:59:59+08:00\"\nstate: proposed\ndelivery_state: proposal-only\n---\n\n# Documentation-quality message plan — 2026-08-24\n\n## Provenance\n\n- `context_diff:` automations/examples/golden/daily-context-diff-2026-08-24.json\n- `source_ids_used:` TASK-104, PERSON-AISHA\n- `template_refs:` templates/task.md@0.7.0\n- `run_key:` documentation-quality:2026-08-24\n\n## Recipient groups\n\n### Aisha Rahman — documentation updates\n\n- `person_id:` PERSON-AISHA\n- `preferred_contact_channel:` telegram\n- `approved_contact_channels:` telegram\n- `contact_endpoint:` person://PERSON-AISHA#telegram_eval_sink\n- `delivery_status:` proposal-only\n\n#### TASK-104 — Complete the blocked collar-correction record\n\n**Why this needs attention:** The task is marked blocked but the canonical Task\nrecord has no due date, named blocker, or next action — the team cannot assess\nwhen the collar correction will close or who owns the resolution.\n\n**Known record:** Blocked; no due date; no blocker text; no next action documented.\n**Update exactly:** `due_date` property; then `Notes` with the current blocker and next action.\n**Please provide:**\n1. The due date for closing the remaining collar correction.\n2. The current blocker and the accountable resolver.\n3. The next action and its owner, if different from the blocker resolver.\n\n**Source:** notion://TASK-104 (`TASK-104`)\n**Idempotency key:** documentation-quality:2026-08-24:TASK-104\n\n## Blocked delivery entries\n\nNone.\n\n## No-finding records\n\n- TASK-101 — blocked; all mapped Task fields sufficient (blocker, cause, effort, and cost variance documented).\n- TASK-102 — done; all mapped fields sufficient.\n- TASK-105 — done; all mapped fields sufficient.\n- TASK-109 — on_track; all mapped fields sufficient.\n- TASK-110 — done; all mapped fields sufficient.\n- TASK-115 — done; all mapped fields sufficient.\n- TASK-116 — done; all mapped fields sufficient.\n- TASK-201 — done Meeting; all mapped fields sufficient.\n- TASK-202 — done Meeting; all mapped fields sufficient.\n- TASK-203 — done Meeting; all mapped fields sufficient.\n\n## Handoff\n\n- `delivery_state:` proposal-only\n- `integration_owner:` dispatch-employee-messages\n- `dedupe_boundary:` One message per person and Work item; channel dispatcher merges by person_id and source_id.\n- `source_gaps:` TASK-109 appears in work_items (11 entries) but is not listed in the source_manifest source_ids for notion.work_items_this_week (10 declared). Record was fully read; no documentation gap found.",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "89904e5db8756638e1fef03a82022873e09d460bef15006c67bc24a68155effe"
+      },
+      "baseline": {
+        "status": 0,
+        "stdout": "{\n  \"artifact_type\": \"kamdar-documentation-quality-message-plan\",\n  \"artifact_version\": \"0.2.0\",\n  \"context_id\": \"daily-context-2026-08-24\",\n  \"local_day\": \"2026-08-24\",\n  \"generated_at\": \"2026-08-24T16:30:00+08:00\",\n  \"evaluation_mode\": \"isolated-eval\",\n  \"isolated_eval_namespace\": \"EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26\",\n  \"collector_run_id\": \"daily-2026-08-24-grounded-v4\",\n  \"provider_effects_performed\": false,\n  \"messages\": [\n    {\n      \"message_id\": \"DQ-MSG-AISHA-2026-08-24\",\n      \"person_id\": \"PERSON-AISHA\",\n      \"person_name\": \"Aisha Rahman\",\n      \"channel\": \"telegram\",\n      \"endpoint_ref\": \"person://PERSON-AISHA#telegram_eval_sink\",\n      \"delivery_status\": \"proposal_only\",\n      \"work_item_ids\": [\"TASK-101\", \"TASK-104\"],\n      \"documentation_gaps\": [\n        {\n          \"work_item_id\": \"TASK-101\",\n          \"source_url\": \"notion://TASK-101\",\n          \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n          \"project_name\": \"CMT Pipeline\",\n          \"gap_type\": \"overdue_blocked_missing_approval_documentation\",\n          \"severity\": \"high\",\n          \"due_date\": \"2026-08-20\",\n          \"days_overdue\": 4,\n          \"last_meaningful_update\": \"2026-08-18\",\n          \"findings\": [\n            \"Task is overdue by 4 days and blocked; the last meaningful update was 2026-08-18.\",\n            \"The corrected baju kurung tech pack lacks the approved collar tolerance and a named approver.\",\n            \"Blocker states a 1.5 cm collar discrepancy but the proposed correction has no named approver.\",\n            \"Cost variance: estimated MYR 540 vs actual MYR 900 (67% overrun); effort variance: 6 planned vs 10 actual hours at MYR 90/hr loaded.\"\n          ],\n          \"mapped_field_state\": {\"planned_hours\": 6, \"actual_hours\": 10, \"loaded_hourly_cost_myr\": 90},\n          \"update_locations\": [\"Notes\"],\n          \"requested_updates\": [\n            \"Record the approved collar tolerance and name the approver in the tech pack.\",\n            \"Document the cost variance basis (MYR 540 estimated vs MYR 900 actual) and effort variance (6 vs 10 hours) in Notes.\",\n            \"Confirm the revised commitment date for the consolidated production tech pack.\"\n          ],\n          \"evidence\": [\"TASK-101 notes, due date, blocker, and recorded effort basis.\"],\n          \"cause_value\": \"The fitting correction was discussed beside the sample but not transferred to the canonical tech pack.\",\n          \"cause_confidence\": \"high\"\n        },\n        {\n          \"work_item_id\": \"TASK-104\",\n          \"source_url\": \"notion://TASK-104\",\n          \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n          \"project_name\": \"CMT Pipeline\",\n          \"gap_type\": \"blocked_missing_critical_fields\",\n          \"severity\": \"high\",\n          \"due_date\": null,\n          \"days_overdue\": null,\n          \"last_meaningful_update\": \"2026-08-21\",\n          \"findings\": [\n            \"Task status is blocked but the due_date property is missing.\",\n            \"No named blocker is recorded despite the blocked status.\",\n            \"No next action is documented.\"\n          ],\n          \"mapped_field_state\": {\"due_date\": \"missing\", \"blocker\": \"missing\", \"next_action\": \"missing\"},\n          \"update_locations\": [\"due_date property\", \"Notes > current blocker and next action\"],\n          \"requested_updates\": [\n            \"Set a due_date on the Task property.\",\n            \"Record the current blocker and its owner in Notes.\",\n            \"Document the next action and revised commitment.\"\n          ],\n          \"evidence\": [\"TASK-104 status, due date property, and full-page Notes read.\"],\n          \"cause_value\": null,\n          \"cause_confidence\": \"unknown\"\n        }\n      ],\n      \"proposed_message\": \"Hi Aisha, two CMT Pipeline tasks need documentation updates:\\n\\n1. TASK-101 (overdue, due 2026-08-20): The tech pack still lacks the approved collar tolerance and a named approver. Please record the approved tolerance, name the approver, document the cost variance (estimated MYR 540 vs actual MYR 900, 67% overrun) and effort variance (6 vs 10 hours at MYR 90/hr) in Notes, and confirm the revised commitment date.\\n\\n2. TASK-104 (blocked): The Task is marked blocked but has no due date, named blocker, or next action. Please set a due date, record the blocker and its owner, and document the next action.\\n\\nSource: notion://TASK-101, notion://TASK-104\"\n    }\n  ],\n  \"no_chase_items\": [\n    {\n      \"work_item_id\": \"TASK-109\",\n      \"person_id\": \"PERSON-NUR\",\n      \"reason\": \"On-track with current documentation; healthy no-chase control per fixture.\"\n    }\n  ],\n  \"reviewed_no_gap\": [\n    {\"work_item_id\": \"TASK-102\", \"status\": \"done\", \"reason\": \"Completed task; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-105\", \"status\": \"done\", \"reason\": \"Completed task; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-110\", \"status\": \"done\", \"reason\": \"Completed task; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-115\", \"status\": \"done\", \"reason\": \"Completed task; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-116\", \"status\": \"done\", \"reason\": \"Completed task; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-201\", \"status\": \"done\", \"reason\": \"Completed meeting; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-202\", \"status\": \"done\", \"reason\": \"Completed meeting; no documentation gap flagged.\"},\n    {\"work_item_id\": \"TASK-203\", \"status\": \"done\", \"reason\": \"Completed meeting; no documentation gap flagged.\"}\n  ],\n  \"summary\": {\n    \"total_work_items_reviewed\": 10,\n    \"items_with_documentation_gaps\": 2,\n    \"items_no_chase\": 1,\n    \"items_reviewed_no_gap\": 7,\n    \"persons_to_message\": 1,\n    \"proposed_messages\": 1,\n    \"delivery_authority\": \"proposal_only\"\n  },\n  \"receipt\": {\n    \"delivery_status\": \"proposal_only\",\n    \"provider_effects_performed\": false,\n    \"channel_unavailable\": [],\n    \"idempotency_key\": \"dq-msg-plan-2026-08-24-AISHA\"\n  }\n}",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "872fbe87948fe25329b51cea48b395a99761e7f810835161826512e5ee7d8c72"
+      },
+      "judge": {
+        "status": 0,
+        "stdout": "{\"tier\":\"A\",\"candidate_checks\":[{\"assertion\":\"Cites TASK-104 and PERSON-AISHA from the input context\",\"met\":true,\"evidence\":\"Provenance lists 'source_ids_used: TASK-104, PERSON-AISHA'; recipient group header is 'Aisha Rahman — documentation updates' with person_id PERSON-AISHA; TASK-104 has its own subsection with source notion://TASK-104.\"},{\"assertion\":\"Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations\",\"met\":true,\"evidence\":\"template_refs cites 'templates/task.md@0.7.0'; 'Update exactly: due_date property; then Notes with the current blocker and next action'; the three numbered requests are (1) due date, (2) blocker + accountable resolver, (3) next action + owner — nothing extra requested.\"},{\"assertion\":\"Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt\",\"met\":true,\"evidence\":\"Recipient group for PERSON-AISHA lists preferred_contact_channel: telegram, approved_contact_channels: telegram, contact_endpoint: person://PERSON-AISHA#telegram_eval_sink, delivery_status: proposal-only. No send or receipt is claimed anywhere; state is 'proposed' and delivery_state is 'proposal-only'.\"},{\"assertion\":\"Keeps TASK-109 out of a recipient message and records it as sufficient\",\"met\":true,\"evidence\":\"TASK-109 appears under 'No-finding records' as 'on_track; all mapped fields sufficient.' It is absent from the recipient group. The Handoff also notes TASK-109's source_manifest discrepancy as a source_gap, not a documentation gap.\"},{\"assertion\":\"Uses a documentation-quality idempotency key and proposal-only delivery state\",\"met\":true,\"evidence\":\"run_key is 'documentation-quality:2026-08-24'; per-task idempotency key is 'documentation-quality:2026-08-24:TASK-104'; top-level state is 'proposed' and delivery_state is 'proposal-only'; Handoff reiterates 'delivery_state: proposal-only'.\"}],\"baseline_checks\":[{\"assertion\":\"Cites TASK-104 and PERSON-AISHA from the input context\",\"met\":true,\"evidence\":\"messages[0].person_id is PERSON-AISHA; messages[0].documentation_gaps[1].work_item_id is TASK-104 with source_url notion://TASK-104.\"},{\"assertion\":\"Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations\",\"met\":false,\"evidence\":\"No Task template mapping is cited anywhere (no template_ref or template version). For TASK-104 the requested_updates include 'Set a due_date', 'Record the current blocker and its owner', and 'Document the next action and revised commitment' — 'revised commitment' is an extra field beyond the three. Additionally the message bundles TASK-101 with entirely different update requests (collar tolerance, approver, cost variance, effort variance).\"},{\"assertion\":\"Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt\",\"met\":true,\"evidence\":\"messages[0].person_id is PERSON-AISHA, channel is telegram, endpoint_ref is person://PERSON-AISHA#telegram_eval_sink, delivery_status is proposal_only, provider_effects_performed is false.\"},{\"assertion\":\"Keeps TASK-109 out of a recipient message and records it as sufficient\",\"met\":true,\"evidence\":\"TASK-109 is listed in no_chase_items with reason 'On-track with current documentation; healthy no-chase control per fixture.' It does not appear in any messages[] entry.\"},{\"assertion\":\"Uses a documentation-quality idempotency key and proposal-only delivery state\",\"met\":false,\"evidence\":\"receipt.idempotency_key is 'dq-msg-plan-2026-08-24-AISHA' — uses the abbreviation 'dq', not the full 'documentation-quality' term. delivery_status and provider_effects_performed correctly reflect proposal_only/false, but the key itself does not match the required documentation-quality idempotency key pattern.\"}],\"winner\":\"candidate\",\"reason\":\"The candidate cleanly meets all five assertions: it cites the Task template mapping (templates/task.md@0.7.0), requests exactly due_date, blocker, and next_action with no extra fields, routes TASK-104 under PERSON-AISHA via the telegram_eval_sink with proposal-only state, keeps TASK-109 in no-finding records as sufficient, and uses a full 'documentation-quality:2026-08-24:TASK-104' idempotency key. The baseline is a useful near miss — it correctly groups TASK-104 under PERSON-AISHA and excludes TASK-109 — but fails two assertions: it never cites a Task template mapping, requests additional fields beyond the three named (revised commitment for TASK-104, plus an entirely separate set of updates for a bundled TASK-101), and its idempotency key uses 'dq' abbreviation rather than the full 'documentation-quality' term.\"}",
+        "stderr": "",
+        "timed_out": false,
+        "result": {
+          "tier": "A",
+          "candidate_checks": [
+            {
+              "assertion": "Cites TASK-104 and PERSON-AISHA from the input context",
+              "met": true,
+              "evidence": "Provenance lists 'source_ids_used: TASK-104, PERSON-AISHA'; recipient group header is 'Aisha Rahman — documentation updates' with person_id PERSON-AISHA; TASK-104 has its own subsection with source notion://TASK-104."
+            },
+            {
+              "assertion": "Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations",
+              "met": true,
+              "evidence": "template_refs cites 'templates/task.md@0.7.0'; 'Update exactly: due_date property; then Notes with the current blocker and next action'; the three numbered requests are (1) due date, (2) blocker + accountable resolver, (3) next action + owner — nothing extra requested."
+            },
+            {
+              "assertion": "Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt",
+              "met": true,
+              "evidence": "Recipient group for PERSON-AISHA lists preferred_contact_channel: telegram, approved_contact_channels: telegram, contact_endpoint: person://PERSON-AISHA#telegram_eval_sink, delivery_status: proposal-only. No send or receipt is claimed anywhere; state is 'proposed' and delivery_state is 'proposal-only'."
+            },
+            {
+              "assertion": "Keeps TASK-109 out of a recipient message and records it as sufficient",
+              "met": true,
+              "evidence": "TASK-109 appears under 'No-finding records' as 'on_track; all mapped fields sufficient.' It is absent from the recipient group. The Handoff also notes TASK-109's source_manifest discrepancy as a source_gap, not a documentation gap."
+            },
+            {
+              "assertion": "Uses a documentation-quality idempotency key and proposal-only delivery state",
+              "met": true,
+              "evidence": "run_key is 'documentation-quality:2026-08-24'; per-task idempotency key is 'documentation-quality:2026-08-24:TASK-104'; top-level state is 'proposed' and delivery_state is 'proposal-only'; Handoff reiterates 'delivery_state: proposal-only'."
+            }
+          ],
+          "baseline_checks": [
+            {
+              "assertion": "Cites TASK-104 and PERSON-AISHA from the input context",
+              "met": true,
+              "evidence": "messages[0].person_id is PERSON-AISHA; messages[0].documentation_gaps[1].work_item_id is TASK-104 with source_url notion://TASK-104."
+            },
+            {
+              "assertion": "Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations",
+              "met": false,
+              "evidence": "No Task template mapping is cited anywhere (no template_ref or template version). For TASK-104 the requested_updates include 'Set a due_date', 'Record the current blocker and its owner', and 'Document the next action and revised commitment' — 'revised commitment' is an extra field beyond the three. Additionally the message bundles TASK-101 with entirely different update requests (collar tolerance, approver, cost variance, effort variance)."
+            },
+            {
+              "assertion": "Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt",
+              "met": true,
+              "evidence": "messages[0].person_id is PERSON-AISHA, channel is telegram, endpoint_ref is person://PERSON-AISHA#telegram_eval_sink, delivery_status is proposal_only, provider_effects_performed is false."
+            },
+            {
+              "assertion": "Keeps TASK-109 out of a recipient message and records it as sufficient",
+              "met": true,
+              "evidence": "TASK-109 is listed in no_chase_items with reason 'On-track with current documentation; healthy no-chase control per fixture.' It does not appear in any messages[] entry."
+            },
+            {
+              "assertion": "Uses a documentation-quality idempotency key and proposal-only delivery state",
+              "met": false,
+              "evidence": "receipt.idempotency_key is 'dq-msg-plan-2026-08-24-AISHA' — uses the abbreviation 'dq', not the full 'documentation-quality' term. delivery_status and provider_effects_performed correctly reflect proposal_only/false, but the key itself does not match the required documentation-quality idempotency key pattern."
+            }
+          ],
+          "winner": "candidate",
+          "reason": "The candidate cleanly meets all five assertions: it cites the Task template mapping (templates/task.md@0.7.0), requests exactly due_date, blocker, and next_action with no extra fields, routes TASK-104 under PERSON-AISHA via the telegram_eval_sink with proposal-only state, keeps TASK-109 in no-finding records as sufficient, and uses a full 'documentation-quality:2026-08-24:TASK-104' idempotency key. The baseline is a useful near miss — it correctly groups TASK-104 under PERSON-AISHA and excludes TASK-109 — but fails two assertions: it never cites a Task template mapping, requests additional fields beyond the three named (revised commitment for TASK-104, plus an entirely separate set of updates for a bundled TASK-101), and its idempotency key uses 'dq' abbreviation rather than the full 'documentation-quality' term."
+        }
+      },
+      "verdict": "pass"
+    },
+    {
+      "skill_name": "daily-project-control",
+      "case_id": "project_control_direct_draft_normal_01",
+      "source_hash": "3c46b8092c66d614910d9139dd59fa90c21b969baf96d708f1807702d32a6f3e",
+      "candidate": {
+        "status": 0,
+        "stdout": "PROJECT CONTROL PLAN (kamdar-project-control-plan v0.2.0)\n\n{\n  \"artifact_type\": \"kamdar-project-control-plan\",\n  \"artifact_version\": \"0.2.0\",\n  \"state\": \"proposal_only\",\n  \"generated_at\": \"2026-08-24T16:30:00+08:00\",\n  \"local_day\": \"2026-08-24\",\n  \"source_context\": {\n    \"path\": \"automations/examples/golden/daily-context-diff-2026-08-24.json\",\n    \"collector_run_id\": \"daily-2026-08-24-grounded-v4\",\n    \"evidence_window\": \"2026-08-24T00:00:00+08:00 to 2026-08-24T23:59:59+08:00\",\n    \"source_ids\": [\"TASK-101\",\"TASK-104\",\"PROJ-CMT-CMT_PIPELINE\",\"PERSON-AISHA\",\"PERSON-NUR\"],\n    \"source_gaps\": []\n  },\n  \"control_findings\": [\n    {\n      \"finding_id\": \"F-001\",\n      \"source_id\": \"TASK-101\",\n      \"source_url\": \"notion://TASK-101\",\n      \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n      \"project_name\": \"CMT Pipeline\",\n      \"owner_person_id\": \"PERSON-AISHA\",\n      \"owner_name\": \"Aisha Rahman\",\n      \"status\": \"blocked\",\n      \"kind\": [\"overdue_commitment\",\"explicit_blocker\",\"cost_variance\"],\n      \"due_date\": \"2026-08-20\",\n      \"current_day\": \"2026-08-24\",\n      \"days_overdue\": 4,\n      \"last_meaningful_update\": \"2026-08-18\",\n      \"blocker\": \"The sewn sample is 1.5 cm wider at the collar than the issued tech pack, but the proposed correction has no named approver.\",\n      \"cause\": {\"value\":\"The fitting correction was discussed beside the sample but not transferred to the canonical tech pack.\",\"confidence\":\"high\"},\n      \"plan_actual\": {\"currency\":\"MYR\",\"estimated_amount\":540,\"actual_amount\":900},\n      \"effort_variance\": {\"planned_hours\":6,\"actual_hours\":10,\"variance_hours\":4,\"loaded_hourly_cost_myr\":90,\"effort_cost_variance_myr\":360,\"basis\":\"(actual_hours - planned_hours) x loaded_hourly_cost\"},\n      \"cost_variance\": {\"variance_myr\":360,\"pct_over\":67,\"basis\":\"actual_amount - estimated_amount\"},\n      \"anchors\": [\"PM attention\",\"Problems and inefficiencies\"],\n      \"source_keys\": [\"pm_attention:TASK-101\",\"problem:TASK-101\",\"cost:TASK-101\"],\n      \"evidence\": [\"TASK-101 notes, due date, blocker, and recorded effort basis.\"]\n    },\n    {\n      \"finding_id\": \"F-002\",\n      \"source_id\": \"TASK-104\",\n      \"source_url\": \"notion://TASK-104\",\n      \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n      \"project_name\": \"CMT Pipeline\",\n      \"owner_person_id\": \"PERSON-AISHA\",\n      \"owner_name\": \"Aisha Rahman\",\n      \"status\": \"blocked\",\n      \"kind\": [\"documentation_gap\"],\n      \"due_date\": null,\n      \"project_attention_due_date\": \"2026-08-23\",\n      \"project_attention_due_date_passed\": true,\n      \"days_overdue_from_task\": null,\n      \"last_meaningful_update\": \"2026-08-21\",\n      \"blocker\": null,\n      \"cause\": {\"value\": null, \"confidence\": \"unknown\"},\n      \"missing_fields\": [\"due_date\",\"blocker\",\"next_action\"],\n      \"staleness_note\": \"Cannot confirm staleness from the Task alone; the Project attention due date 2026-08-23 has passed without a Task-level commitment.\",\n      \"owner_mismatch\": {\"task_owner\":\"PERSON-AISHA\",\"project_attention_assignee\":\"PERSON-NUR\"},\n      \"anchors\": [\"PM attention\",\"Problems and inefficiencies\"],\n      \"source_keys\": [\"pm_attention:TASK-104\",\"problem:TASK-104\"],\n      \"evidence\": [\"TASK-104 status, due date property, and full-page Notes read.\"]\n    }\n  ],\n  \"weekly_draft_update\": {\n    \"path\": \"automations/templates/current-weekly-draft.md\",\n    \"state\": \"applied\",\n    \"draft_version_before\": 0,\n    \"draft_version_after\": 1,\n    \"last_updated\": \"2026-08-24T16:30:00+08:00\",\n    \"owned_anchors\": [\"PM attention\",\"Problems and inefficiencies\"],\n    \"source_keys\": [\"pm_attention:TASK-101\",\"problem:TASK-101\",\"cost:TASK-101\",\"pm_attention:TASK-104\",\"problem:TASK-104\"],\n    \"conflicts\": []\n  },\n  \"message_proposals\": [\n    {\n      \"proposal_id\": \"MSG-001\",\n      \"source_id\": \"TASK-101\",\n      \"recipient_person_id\": \"PERSON-AISHA\",\n      \"recipient_name\": \"Aisha Rahman\",\n      \"channel\": \"telegram\",\n      \"route_ref\": \"person://PERSON-AISHA#telegram_eval_sink\",\n      \"route_available\": true,\n      \"state\": \"prepared\",\n      \"ask\": \"Name the approver for the 1.5 cm collar correction and confirm the revised consolidated tech pack completion date. The Task is 4 calendar days overdue (due 2026-08-20) and effort is 67% over plan (MYR 360 overrun).\",\n      \"evidence\": [\"TASK-101\"]\n    },\n    {\n      \"proposal_id\": \"MSG-002\",\n      \"source_id\": \"TASK-104\",\n      \"recipient_person_id\": \"PERSON-AISHA\",\n      \"recipient_name\": \"Aisha Rahman\",\n      \"channel\": \"telegram\",\n      \"route_ref\": \"person://PERSON-AISHA#telegram_eval_sink\",\n      \"route_available\": true,\n      \"state\": \"prepared\",\n      \"ask\": \"Confirm the Task owner (the canonical Task lists Aisha but the Project attention assigns Nur), record the blocker, due date, and next action. The Task is marked blocked but all three fields are missing; the Project attention due date 2026-08-23 has passed.\",\n      \"evidence\": [\"TASK-104\"]\n    }\n  ],\n  \"unresolved_facts\": [\n    {\"fact\":\"TASK-104 owner mismatch: Task owner_person_id is PERSON-AISHA but the Project this_weeks_attention assigns the item to Nur (PERSON-NUR).\",\"source_ids\":[\"TASK-104\",\"PROJ-CMT-CMT_PIPELINE\"]}\n  ],\n  \"provider_effects\": {\n    \"performed\": false,\n    \"reason\": \"The local Weekly Draft update is part of this pipeline; only the channel dispatcher and selected channel skill own sends and receipts. prepare mode contacts nobody.\"\n  }\n}\n\nUPDATED CURRENT WEEKLY DRAFT (draft_version 1, last_updated 2026-08-24T16:30:00+08:00)\n\n---\nartifact_type: kamdar-current-weekly-draft\nartifact_version: \"1.0.0\"\nweek: \"2026-W34\"\nstate: draft\ndraft_version: 1\nlast_updated: \"2026-08-24T16:30:00+08:00\"\n---\n\n# Current Weekly Draft — 2026-W34\n\n## PM attention\n\n### pm_attention:TASK-101 — name the collar correction approver and confirm the revised tech pack date\n\n- **Owner:** Aisha Rahman (PERSON-AISHA).\n- **State:** Blocked; due 2026-08-20; 4 calendar days overdue as of 2026-08-24; last meaningful update 2026-08-18.\n- **Why now:** The sewn sample is 1.5 cm wider at the collar than the issued tech pack, but the proposed correction has no named approver, so the consolidated production tech pack cannot be approved.\n- **Ask:** Name the approver for the collar correction and confirm the revised tech pack completion date today.\n- **Evidence:** [TASK-101](notion://TASK-101), [CMT Pipeline](notion://PROJ-CMT-CMT_PIPELINE)\n\n### pm_attention:TASK-104 — confirm owner and record missing blocker, due date, and next action\n\n- **Owner:** Aisha Rahman (PERSON-AISHA) on the canonical Task; the Project this_week's_attention assigns this item to Nur (PERSON-NUR) — owner mismatch unresolved.\n- **State:** Blocked; the canonical Task has no due_date, blocker, or next_action; the Project attention due date 2026-08-23 has passed; last meaningful update 2026-08-21.\n- **Why now:** The Task is marked blocked but cannot be controlled or chased from its own fields; the Project attention commitment has lapsed without a Task-level record.\n- **Ask:** Confirm the accountable owner, record the blocker, due date, and next action on the canonical Task.\n- **Evidence:** [TASK-104](notion://TASK-104), [CMT Pipeline](notion://PROJ-CMT-CMT_PIPELINE)\n\n## Problems and inefficiencies\n\n### problem:TASK-101 / cost:TASK-101 — Collar correction has no named approver, blocking the tech pack and driving a MYR 360 effort overrun\n\n- **Problem:** The sewn sample is 1.5 cm wider at the collar than the issued tech pack, but the correction has no named approver, so the consolidated production tech pack remains unapproved 4 calendar days past its due date.\n- **Workflow / step:** CMT Pipeline / approve the consolidated production tech pack.\n- **Baseline:** W34; TASK-101; planned 6h at MYR 90/h = MYR 540; actual 10h at MYR 90/h = MYR 900.\n- **Impact / risk:** The first seasonal sample construction review is blocked; the tech pack is overdue (due 2026-08-20, now 2026-08-24); last meaningful update 2026-08-18.\n- **Cost consequence:** (10 − 6) × MYR 90 = MYR 360 effort overrun; actual MYR 900 vs estimated MYR 540 = MYR 360 (67% over). Basis: recorded planned/actual hours and loaded hourly cost.\n- **Confidence / gaps:** High; cause is high-confidence — the fitting correction was discussed beside the sample but not transferred to the canonical tech pack.\n- **Next proof:** Aisha names the collar correction approver and attaches the revised tech pack with the approved collar tolerance.\n- **Evidence:** [TASK-101](notion://TASK-101)\n\n### problem:TASK-104 — Blocked Task missing canonical documentation fields\n\n- **Problem:** TASK-104 is marked blocked but the canonical Task has no due_date, blocker, or next_action, while the Project attention lists it due 2026-08-23 (now past) assigned to Nur — the Task owner is Aisha.\n- **Workflow / step:** CMT Pipeline / close the remaining collar correction.\n- **Baseline:** W34; TASK-104; status blocked; last meaningful update 2026-08-21.\n- **Impact / risk:** Cannot assess staleness or route a chase from the Task record alone; the Project attention due date has passed without a Task-level commitment.\n- **Cost consequence:** Unknown — no cost or effort values recorded.\n- **Confidence / gaps:** Medium; the missing fields are confirmed but the actual blocker and cause are unknown.\n- **Next proof:** Confirm the accountable owner (Aisha or Nur), record the blocker, due date, and next action on the canonical Task.\n- **Evidence:** [TASK-104](notion://TASK-104), [CMT Pipeline](notion://PROJ-CMT-CMT_PIPELINE)\n\n## Decisions\n\nNo grounded decision yet.\n\n## SOPs\n\nNo grounded SOP yet.\n\n## Draft receipt\n\n- `daily_contexts:` daily-context-2026-08-24 (run daily-2026-08-24-grounded-v4)\n- `source_gaps:` none",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "352763a5a62b63892b2a52064ab2cd815a6f7ead05f0f0b18139f8cfaa0ff01c"
+      },
+      "baseline": {
+        "status": 0,
+        "stdout": "Project Control Plan — CMT Pipeline (PROJ-CMT-CMT_PIPELINE)\nPrepared from daily-context-2026-08-24 | Mode: prepare (proposal-only, no send)\nOwner: Aisha Rahman (PERSON-AISHA) | Evidence window: 2026-08-24\n\n================================================================\n1. CONTROL ASSESSMENT\n================================================================\n\nProject knowledge: First seasonal sample is under construction review.\n\nActive work items this week (4):\n  TASK-105  done     Approve first baju kurung sample          completed 2026-08-20\n  TASK-110  done     Record production capacity / line hold     completed 2026-08-21\n  TASK-101  blocked  Approve consolidated production tech pack  due 2026-08-20 — 4 days overdue\n  TASK-104  blocked  Close remaining collar correction         due 2026-08-23 (project attention) — 1 day overdue\n\nGrounded control findings: 2 blocked, 2 done, 0 on-track requiring chase.\nHealthy items (TASK-105, TASK-110): no control action. No off-platform chase.\n\n================================================================\n2. GROUNDED FINDINGS — BLOCKED WORK\n================================================================\n\nFINDING-1: TASK-101 — Overdue blocked, stale, effort variance\n  Source: notion://TASK-101 (full-page read confirmed)\n  Status: blocked | Due: 2026-08-20 | Last update: 2026-08-18 (6 days stale)\n  Blocker: The sewn sample is 1.5 cm wider at the collar than the issued\n           tech pack, but the proposed correction has no named approver.\n  Cause (high confidence): The fitting correction was discussed beside the\n           sample but not transferred to the canonical tech pack.\n  Effort variance:\n    Planned: 6 h @ 90 MYR/h = 540 MYR\n    Actual:  10 h @ 90 MYR/h = 900 MYR\n    Delta:   +4 h (+66.7%) | +360 MYR (+66.7%)\n  Evidence: TASK-101 notes, due date, blocker, recorded effort basis.\n  Control gap: No named approver for the collar tolerance correction;\n               tech pack remains unapproved past due date.\n\nFINDING-2: TASK-104 — Overdue blocked, missing canonical fields\n  Source: notion://TASK-104 (full-page read confirmed)\n  Status: blocked | Due: missing in canonical record\n           (project attention lists 2026-08-23 — 1 day overdue)\n  Last update: 2026-08-21 (3 days)\n  Blocker: missing | Next action: missing\n  Evidence: TASK-104 status, due_date property, full-page Notes read.\n  Control gap: Canonical Task has no due date, no named blocker, no next\n               action despite blocked status. Documentation incomplete.\n\n================================================================\n3. CONTROL ACTION PROPOSALS (prepare mode — no send)\n================================================================\n\nACTION-1: Progress-comment proposal on TASK-101 source record\n  Type: deduplicated progress comment (one per stale/blocked item)\n  Channel: Notion comment on notion://TASK-101 (proposal-only)\n  Ask:\n    1. Name the approver for the 1.5 cm collar tolerance correction.\n    2. Confirm the revised commitment date for the consolidated tech pack.\n    3. Explain the effort variance: 540→900 MYR, 6→10 h (+66.7%).\n    4. State the current blocker owner and root-cause evidence.\n  Receipt: pending (prepare mode — not dispatched)\n\nACTION-2: Progress-comment proposal on TASK-104 source record\n  Type: deduplicated progress comment (one per stale/blocked item)\n  Channel: Notion comment on notion://TASK-104 (proposal-only)\n  Ask:\n    1. Set the due date on the canonical Task (project attention: 2026-08-23).\n    2. Name the current blocker and its owner.\n    3. State the next action and who is accountable.\n    4. Confirm current collar-correction state and evidence.\n  Receipt: pending (prepare mode — not dispatched)\n\nNo chase actions for TASK-105, TASK-110 (done) or TASK-109 (on-track, healthy\nno-chase control — India Sourcing, not CMT but confirmed no action).\n\n================================================================\n4. UPDATED DRAFT CONTROL ANCHORS — CMT Pipeline\n================================================================\n\nThe following replaces the CMT Pipeline control anchors in the current\nWeekly Draft. All values are source-grounded; unconfirmed items remain\nexplicitly labelled.\n\n--- Draft anchor: CMT Pipeline / This week's attention ---\n\n- [x] Approve the first baju kurung sample measurements, seams, and colour\n      checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha —\n      completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due\n      2026-08-20; BLOCKED 4 days; collar correction 1.5 cm wider than tech\n      pack, no named approver; effort 540→900 MYR (+66.7%), 6→10 h\n      (+66.7%); cause high-confidence [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23\n      (project attention); BLOCKED 1 day; canonical Task missing due date,\n      blocker, and next action [TASK-104]\n\n--- Draft anchor: CMT Pipeline / Blocked register ---\n\n| Task     | Owner  | Due         | Overdue | Blocker                              | Cause conf. | Effort variance         | Action              |\n|----------|--------|-------------|---------|--------------------------------------|-------------|-------------------------|---------------------|\n| TASK-101 | Aisha  | 2026-08-20  | 4 days  | Collar 1.5 cm wide; no approver     | high        | +360 MYR / +4 h (+66.7%)| Comment proposal #1 |\n| TASK-104 | Nur    | 2026-08-23* | 1 day   | Missing (canonical field empty)     | unknown     | not recorded            | Comment proposal #2 |\n\n* Due date from project attention; canonical Task due_date is missing.\n\n--- Draft anchor: CMT Pipeline / Control action log ---\n\n| Action | Target      | Type                | Mode    | Status    | Ask summary                                      |\n|--------|-------------|---------------------|---------|-----------|--------------------------------------------------|\n| #1     | TASK-101    | Progress comment    | prepare | pending   | Name approver, revised date, effort variance     |\n| #2     | TASK-104    | Progress comment    | prepare | pending   | Set due date, name blocker, state next action     |\n\n--- Draft anchor: CMT Pipeline / Effort variance summary ---\n\n| Task     | Currency | Estimated | Actual  | Delta        | Basis                    |\n|----------|----------|-----------|---------|--------------|--------------------------|\n| TASK-101 | MYR      | 540       | 900     | +360 (+66.7%)| 6→10 h @ 90 MYR/h loaded |\n| TASK-104 | —        | —         | —       | not recorded | fields missing           |\n\n--- Draft anchor: CMT Pipeline / Project status ---\n\nStatus: AT RISK\nRationale: 2 of 4 active work items blocked and overdue. TASK-101 has a\nhigh-confidence cause and measurable effort overrun; TASK-104 has missing\ncanonical fields preventing control. Both require source-record comment\nproposals before any off-platform chase. No sends authorized in prepare mode.\n\n================================================================\n5. SOURCE INTEGRITY\n================================================================\n\n- All findings grounded in daily-context-2026-08-24 fixture (full-page reads\n  confirmed for TASK-101, TASK-104, TASK-105, TASK-110).\n- provider_effects.performed = false; no external write or send attempted.\n- Unconfirmed: TASK-104 cause (unknown confidence), TASK-104 canonical due\n  date (missing). Both labelled explicitly; no hypothesis converted to fact.\n- Weekly attention reset not requested for this project.",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "cda14937f1e24f5395d977b7e2a5c40c6e1906fb0f75dbc8fa8fbbd616f86a12"
+      },
+      "judge": {
+        "status": 0,
+        "stdout": "```json\n{\"tier\":\"B\",\"candidate_checks\":[{\"assertion\":\"Uses only collector snapshot IDs and makes no provider read or Draft integration call\",\"met\":true,\"evidence\":\"source_context lists collector_run_id 'daily-2026-08-24-grounded-v4' and source_ids from the fixture; provider_effects.performed=false; weekly_draft_update is a local in-place edit, not an API integration call.\"},{\"assertion\":\"Calculates five days overdue and seven days since update, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis\",\"met\":false,\"evidence\":\"days_overdue is 4 (due 2026-08-20 vs current 2026-08-24) and last_meaningful_update 2026-08-18 yields 6 days, not the expected 5 and 7; however the Draft does preserve the visible formula '(10 − 6) × MYR 90 = MYR 360' and effort_cost_variance_myr=360 with the correct basis string.\"},{\"assertion\":\"Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft\",\"met\":true,\"evidence\":\"weekly_draft_update.owned_anchors = ['PM attention','Problems and inefficiencies']; all source_keys are prefixed pm_attention: or problem:/cost: under those two anchors; Decisions and SOPs sections remain empty placeholders.\"},{\"assertion\":\"Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim\",\"met\":false,\"evidence\":\"Two message proposals (MSG-001 and MSG-002) are produced for PERSON-AISHA via telegram_eval_sink, both state 'prepared' with no send claim; the assertion requires exactly one proposal.\"},{\"assertion\":\"Suppresses current unblocked TASK-109 from Draft entries and outreach\",\"met\":true,\"evidence\":\"TASK-109 does not appear anywhere in the candidate output — not in control_findings, Draft anchors, or message_proposals.\"},{\"assertion\":\"Leaves Decisions, SOPs, Project memory, and final reports untouched\",\"met\":true,\"evidence\":\"Draft Decisions and SOPs sections are empty placeholders ('No grounded decision yet' / 'No grounded SOP yet'); no Project memory patch or final report is produced; provider_effects.performed=false.\"}],\"baseline_checks\":[{\"assertion\":\"Uses only collector snapshot IDs and makes no provider read or Draft integration call\",\"met\":true,\"evidence\":\"States 'Prepared from daily-context-2026-08-24 fixture'; provider_effects.performed=false; no external write or send attempted; all findings reference fixture source IDs.\"},{\"assertion\":\"Calculates five days overdue and seven days since update, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis\",\"met\":false,\"evidence\":\"FINDING-1 says '4 days overdue' and '6 days stale' (last update 2026-08-18 to 2026-08-24), not the expected 5 and 7; effort variance is shown as '540→900 MYR, 6→10 h (+66.7%)' and '+360 MYR' but the visible '(10-6) × MYR 90 = MYR 360' formula form is not preserved.\"},{\"assertion\":\"Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft\",\"met\":false,\"evidence\":\"Baseline invents five arbitrary Draft anchors — 'This week's attention', 'Blocked register', 'Control action log', 'Effort variance summary', 'Project status' — none of which are the specified 'PM attention' and 'Problems and inefficiencies' source-keyed anchors.\"},{\"assertion\":\"Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim\",\"met\":false,\"evidence\":\"Baseline produces two Notion progress-comment proposals (ACTION-1, ACTION-2) on TASK-101 and TASK-104 source records, not Telegram eval-route proposals; wrong channel and wrong count.\"},{\"assertion\":\"Suppresses current unblocked TASK-109 from Draft entries and outreach\",\"met\":true,\"evidence\":\"TASK-109 is mentioned only in the narrative ('No chase actions for … TASK-109 (on-track, healthy no-chase control)'); it does not appear in any Draft anchor or outreach action.\"},{\"assertion\":\"Leaves Decisions, SOPs, Project memory, and final reports untouched\",\"met\":true,\"evidence\":\"No Decisions, SOPs, Project memory, or final report sections are created or modified; provider_effects.performed=false; 'Weekly attention reset not requested for this project.'\"}],\"winner\":\"candidate\",\"reason\":\"The candidate meets 4 of 6 assertions versus the baseline's 3. Both share the same day-count error (4/6 instead of 5/7), but the candidate correctly uses only the specified PM attention and Problems and inefficiencies anchors, preserves the visible '(10 − 6) × MYR 90 = MYR 360' formula, fully suppresses TASK-109, and targets the correct Telegram eval route for PERSON-AISHA. The candidate's only additional miss is producing two proposals instead of one. The baseline is materially weaker: it invents five arbitrary Draft anchors instead of the two specified, uses Notion comments instead of the Telegram eval route, and does not preserve the visible MYR 360 basis formula. Neither output fully passes, so the tier is B.\"}\n```",
+        "stderr": "",
+        "timed_out": false,
+        "result": {
+          "tier": "B",
+          "candidate_checks": [
+            {
+              "assertion": "Uses only collector snapshot IDs and makes no provider read or Draft integration call",
+              "met": true,
+              "evidence": "source_context lists collector_run_id 'daily-2026-08-24-grounded-v4' and source_ids from the fixture; provider_effects.performed=false; weekly_draft_update is a local in-place edit, not an API integration call."
+            },
+            {
+              "assertion": "Calculates five days overdue and seven days since update, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis",
+              "met": false,
+              "evidence": "days_overdue is 4 (due 2026-08-20 vs current 2026-08-24) and last_meaningful_update 2026-08-18 yields 6 days, not the expected 5 and 7; however the Draft does preserve the visible formula '(10 − 6) × MYR 90 = MYR 360' and effort_cost_variance_myr=360 with the correct basis string."
+            },
+            {
+              "assertion": "Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft",
+              "met": true,
+              "evidence": "weekly_draft_update.owned_anchors = ['PM attention','Problems and inefficiencies']; all source_keys are prefixed pm_attention: or problem:/cost: under those two anchors; Decisions and SOPs sections remain empty placeholders."
+            },
+            {
+              "assertion": "Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim",
+              "met": false,
+              "evidence": "Two message proposals (MSG-001 and MSG-002) are produced for PERSON-AISHA via telegram_eval_sink, both state 'prepared' with no send claim; the assertion requires exactly one proposal."
+            },
+            {
+              "assertion": "Suppresses current unblocked TASK-109 from Draft entries and outreach",
+              "met": true,
+              "evidence": "TASK-109 does not appear anywhere in the candidate output — not in control_findings, Draft anchors, or message_proposals."
+            },
+            {
+              "assertion": "Leaves Decisions, SOPs, Project memory, and final reports untouched",
+              "met": true,
+              "evidence": "Draft Decisions and SOPs sections are empty placeholders ('No grounded decision yet' / 'No grounded SOP yet'); no Project memory patch or final report is produced; provider_effects.performed=false."
+            }
+          ],
+          "baseline_checks": [
+            {
+              "assertion": "Uses only collector snapshot IDs and makes no provider read or Draft integration call",
+              "met": true,
+              "evidence": "States 'Prepared from daily-context-2026-08-24 fixture'; provider_effects.performed=false; no external write or send attempted; all findings reference fixture source IDs."
+            },
+            {
+              "assertion": "Calculates five days overdue and seven days since update, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis",
+              "met": false,
+              "evidence": "FINDING-1 says '4 days overdue' and '6 days stale' (last update 2026-08-18 to 2026-08-24), not the expected 5 and 7; effort variance is shown as '540→900 MYR, 6→10 h (+66.7%)' and '+360 MYR' but the visible '(10-6) × MYR 90 = MYR 360' formula form is not preserved."
+            },
+            {
+              "assertion": "Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft",
+              "met": false,
+              "evidence": "Baseline invents five arbitrary Draft anchors — 'This week's attention', 'Blocked register', 'Control action log', 'Effort variance summary', 'Project status' — none of which are the specified 'PM attention' and 'Problems and inefficiencies' source-keyed anchors."
+            },
+            {
+              "assertion": "Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim",
+              "met": false,
+              "evidence": "Baseline produces two Notion progress-comment proposals (ACTION-1, ACTION-2) on TASK-101 and TASK-104 source records, not Telegram eval-route proposals; wrong channel and wrong count."
+            },
+            {
+              "assertion": "Suppresses current unblocked TASK-109 from Draft entries and outreach",
+              "met": true,
+              "evidence": "TASK-109 is mentioned only in the narrative ('No chase actions for … TASK-109 (on-track, healthy no-chase control)'); it does not appear in any Draft anchor or outreach action."
+            },
+            {
+              "assertion": "Leaves Decisions, SOPs, Project memory, and final reports untouched",
+              "met": true,
+              "evidence": "No Decisions, SOPs, Project memory, or final report sections are created or modified; provider_effects.performed=false; 'Weekly attention reset not requested for this project.'"
+            }
+          ],
+          "winner": "candidate",
+          "reason": "The candidate meets 4 of 6 assertions versus the baseline's 3. Both share the same day-count error (4/6 instead of 5/7), but the candidate correctly uses only the specified PM attention and Problems and inefficiencies anchors, preserves the visible '(10 − 6) × MYR 90 = MYR 360' formula, fully suppresses TASK-109, and targets the correct Telegram eval route for PERSON-AISHA. The candidate's only additional miss is producing two proposals instead of one. The baseline is materially weaker: it invents five arbitrary Draft anchors instead of the two specified, uses Notion comments instead of the Telegram eval route, and does not preserve the visible MYR 360 basis formula. Neither output fully passes, so the tier is B."
+        }
+      },
+      "verdict": "needs-revision"
+    },
+    {
+      "skill_name": "daily-knowledge-capture",
+      "case_id": "daily_knowledge_direct_draft_normal_01",
+      "source_hash": "5602f8b7d7468803f65be09287a3749a0878ddd34cb1064487f943d6f676332d",
+      "candidate": {
+        "status": 0,
+        "stdout": "---\nartifact_type: kamdar-current-weekly-draft\nartifact_version: \"1.0.0\"\nweek: \"2026-W34\"\nstate: draft\ndraft_version: 1\nlast_updated: \"2026-08-24T16:30:00+08:00\"\n---\n\n# Current Weekly Draft — 2026-W34\n\nEach Daily run reads the entire Report and validated Daily Review JSON, returns\na complete replacement body, increments draft_version by one, and sets\nlast_updated. Still-current content and source IDs are preserved.\n\n## PM attention\n\nNo PM intervention yet.\n\n## Problems and inefficiencies\n\nNo grounded problem definition yet.\n\n## Decisions\n\n### decision:TASK-201 — Use one campaign asset folder per batch for the coordinated Deepavali campaign — Proposed\n\n- **Choice:** Use one campaign asset folder per batch for the coordinated Deepavali campaign.\n- **Reason / tradeoff:** Coordinated Deepavali themes were approved; one folder per batch keeps asset handoff traceable per campaign batch rather than mixed.\n- **Authority:** Campaign review participants approved the choice; the accountable approver is not named in the source — unconfirmed.\n- **Review trigger:** Review after seven campaign days.\n- **Evidence:** [TASK-201](notion://TASK-201)\n\n## SOPs\n\n### sop:TASK-203 — Prepare a publish-ready product-listing handoff — Observed\n\n- **Trigger:** An approved product batch is ready for Ecommerce listing.\n- **Actors / handoff:** Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.\n- **Ordered steps:**\n  1. Confirm the approved product IDs and samples in the batch.\n  2. Validate title, category, dimensions, composition, care, price, and stock fields.\n  3. Check approved images, crops, and alt text against each product ID.\n  4. Assemble the listing package in the shared handoff folder.\n  5. Darren confirms the package is publish-ready or returns named exceptions to Nur.\n- **Systems:** approved product record, shared asset folder, listing handoff checklist.\n- **Frequency / volume:** Observed across two product batches; normal weekly batch and SKU volume not recorded.\n- **Active and wait time:** Active preparation, review time, and queue wait not measured.\n- **Exceptions:** A missing approved sample or final commercial term stops the package before handoff; a catalog sync that drops a required field returns the affected product to Nur for correction.\n- **Output:** A receiver-accepted, publish-ready listing package keyed to approved product IDs.\n- **Evidence window:** 2026-08-24.\n- **Confidence:** High.\n- **Measurement gaps:** Measure active preparation and review time separately on the next two batches; record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost.\n- **Reuse evidence:** Observed across two batches; owner approval and repeat-use proof remain missing — blocks Weekly promotion.\n- **Evidence:** [TASK-203](notion://TASK-203)\n\n## Draft receipt\n\n- `daily_contexts:` daily-context-2026-08-24\n- `source_gaps:` none\n\n---\n\nOutcome: applied\n- decision:TASK-201 — new (concrete choice present; authority unconfirmed → Proposed)\n- sop:TASK-203 — new (observed employee workflow; high confidence; promotion blocked pending owner authority and repeat-use proof)\n- no_finding: TASK-202 (no decision_observation, no workflow_observation)\n- PM attention and Problems and inefficiencies unchanged by contract\n- draft_version: 0 → 1; last_updated set to run timestamp",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "567b41ac1f55f20ec29a77bae400c7f294f85892a0da4ac142c8f22fda95de60"
+      },
+      "baseline": {
+        "status": 0,
+        "stdout": "# Weekly Draft — 2026-W34 Update (2026-08-24)\n\n## Grounded Decision\n\n### DEC-001: One campaign asset folder per batch for the coordinated Deepavali campaign\n\n- Source: notion://TASK-201 (Meeting, PROJ-MKT-DEEPAVALI_MARKETING, owner: PERSON-MAYA)\n- Choice: Use one campaign asset folder per batch for the coordinated Deepavali campaign.\n- Authority: Campaign review participants approved the choice; the accountable approver is not named in the source.\n- Evidence: TASK-201 meeting statements record the approved theme and the one-folder-per-batch choice.\n- Decision owner: unconfirmed — no named approver in source. Do not attribute to any individual.\n- Review condition: Review after seven campaign days.\n- Promotion status: Candidate for Eval Decisions database. Blocked from promotion until a named accountable approver is confirmed in a source record.\n\n---\n\n## Employee Workflow Observation\n\n### WFLOW-001: Prepare a publish-ready product-listing handoff\n\n- Source: notion://TASK-203 (Meeting, PROJ-ECOM-LISTING_PIPELINE, owner: PERSON-DARREN)\n- Confidence: high\n- Observed across: two product-listing batches prepared by Nur (PERSON-NUR) and accepted by Darren (PERSON-DARREN) using the same handoff sequence.\n\nTrigger: An approved product batch is ready for Ecommerce listing.\n\nActors and handoff: Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.\n\nOrdered steps:\n1. Confirm the approved product IDs and samples in the batch.\n2. Validate title, category, dimensions, composition, care, price, and stock fields.\n3. Check approved images, crops, and alt text against each product ID.\n4. Assemble the listing package in the shared handoff folder.\n5. Darren confirms the package is publish-ready or returns named exceptions to Nur.\n\nSystems: approved product record, shared asset folder, listing handoff checklist.\n\nExceptions:\n- A missing approved sample or final commercial term stops the package before handoff.\n- A catalog sync that drops a required field returns the affected product to Nur for correction.\n\nOutput: A receiver-accepted, publish-ready listing package keyed to approved product IDs.\n\nReview condition: Sample ten pages after the next catalog sync.\n\nMeasurement gaps (carry forward):\n- Measure active preparation and review time separately on the next two batches.\n- Record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost.\n\nFrequency and volume: Not yet recorded beyond the two observed batches.\nActive and wait time: Not yet measured.\n\nPromotion status: Candidate for Eval SOPs database after the review-condition sampling and measurement gaps are addressed.\n\n---\n\n## Current work-item observations carried into the Draft\n\n- TASK-101 (PROJ-CMT-CMT_PIPELINE, Aisha): blocked, overdue (due 2026-08-20). Blocker: sewn sample collar 1.5 cm wider than tech pack; correction has no named approver. Effort variance: estimated MYR 540, actual MYR 900 (planned 6h, actual 10h at MYR 90/h). Cause: high confidence — fitting correction discussed beside the sample but not transferred to the canonical tech pack.\n- TASK-104 (PROJ-CMT-CMT_PIPELINE, Aisha): blocked, no due date, no named blocker, no next action in the canonical record. Documentation gap: due_date, blocker, and next_action all missing.\n- TASK-109 (PROJ-MERCH-INDIA_SOURCING, Nur): on_track, due 2026-08-23. Healthy no-chase control — no current problem.",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "6b69f76c5720b2eb004bf1c715c22835e9af308842eccdb66e309a6f3a4ce059"
+      },
+      "judge": {
+        "status": 0,
+        "stdout": "```json\n{\"tier\":\"A\",\"candidate_checks\":[{\"assertion\":\"Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context\",\"met\":true,\"evidence\":\"Candidate includes [TASK-201](notion://TASK-201) under the Decisions section and [TASK-203](notion://TASK-203) under the SOPs section.\"},{\"assertion\":\"Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys\",\"met\":true,\"evidence\":\"Candidate keys entries as 'decision:TASK-201' and 'sop:TASK-203', directly using source-ID/kind composite keys rather than inventing separate identifiers.\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":true,\"evidence\":\"sop:TASK-203 includes Trigger, Actors / handoff, Ordered steps (1-5), Systems, Frequency / volume, Active and wait time, Exceptions, Output, Evidence window + Confidence, and Reuse evidence / promotion state (blocks Weekly promotion).\"},{\"assertion\":\"Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps\",\"met\":true,\"evidence\":\"Decision authority: 'the accountable approver is not named in the source — unconfirmed.' Measurement gaps line lists 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost' explicitly.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Output is a complete replacement Draft body with draft_version and last_updated set; no separate contribution or diff file is emitted.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":true,\"evidence\":\"PM attention section is left as 'No PM intervention yet.' No work-item state, Project memory entries, promotion actions, or provider effects are written. Promotion is only noted as a blocked state within the SOP entry.\"}],\"baseline_checks\":[{\"assertion\":\"Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context\",\"met\":true,\"evidence\":\"Baseline references 'Source: notion://TASK-201' and 'Source: notion://TASK-203' in their respective sections.\"},{\"assertion\":\"Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys\",\"met\":false,\"evidence\":\"Baseline keys entries as 'DEC-001' and 'WFLOW-001' — synthetic identifiers that do not use the source-ID/kind composite key format (e.g., decision:TASK-201).\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":true,\"evidence\":\"WFLOW-001 includes Trigger, Actors and handoff, Ordered steps (1-5), Systems, Exceptions, Output, Confidence, Frequency and volume, Active and wait time, and Promotion status.\"},{\"assertion\":\"Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps\",\"met\":true,\"evidence\":\"Decision authority: 'Decision owner: unconfirmed — no named approver in source.' Measurement gaps list includes 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost'.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Output is presented as a direct draft update; no separate diff or contribution file is created.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":false,\"evidence\":\"Baseline includes a 'Current work-item observations carried into the Draft' section with TASK-101, TASK-104, and TASK-109 detailed status, blockers, effort variance, and documentation gaps — this is Project memory content outside the skill's scope.\"}],\"winner\":\"candidate\",\"reason\":\"The candidate meets all six assertions: it uses source-ID/kind composite keys (decision:TASK-201, sop:TASK-203), includes every required workflow state, preserves all measurement and authority gaps explicitly, edits the Draft directly, and writes no PM control, Project memory, promotion effects, or provider effects. The baseline fails two assertions: it keys entries with synthetic identifiers (DEC-001, WFLOW-001) instead of source-ID/kind keys, and it writes work-item observations (TASK-101/104/109 with blockers and effort variance) that constitute Project memory content outside the daily-knowledge-capture skill's scope.\"}\n```",
+        "stderr": "",
+        "timed_out": false,
+        "result": {
+          "tier": "A",
+          "candidate_checks": [
+            {
+              "assertion": "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+              "met": true,
+              "evidence": "Candidate includes [TASK-201](notion://TASK-201) under the Decisions section and [TASK-203](notion://TASK-203) under the SOPs section."
+            },
+            {
+              "assertion": "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+              "met": true,
+              "evidence": "Candidate keys entries as 'decision:TASK-201' and 'sop:TASK-203', directly using source-ID/kind composite keys rather than inventing separate identifiers."
+            },
+            {
+              "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+              "met": true,
+              "evidence": "sop:TASK-203 includes Trigger, Actors / handoff, Ordered steps (1-5), Systems, Frequency / volume, Active and wait time, Exceptions, Output, Evidence window + Confidence, and Reuse evidence / promotion state (blocks Weekly promotion)."
+            },
+            {
+              "assertion": "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+              "met": true,
+              "evidence": "Decision authority: 'the accountable approver is not named in the source — unconfirmed.' Measurement gaps line lists 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost' explicitly."
+            },
+            {
+              "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+              "met": true,
+              "evidence": "Output is a complete replacement Draft body with draft_version and last_updated set; no separate contribution or diff file is emitted."
+            },
+            {
+              "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+              "met": true,
+              "evidence": "PM attention section is left as 'No PM intervention yet.' No work-item state, Project memory entries, promotion actions, or provider effects are written. Promotion is only noted as a blocked state within the SOP entry."
+            }
+          ],
+          "baseline_checks": [
+            {
+              "assertion": "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+              "met": true,
+              "evidence": "Baseline references 'Source: notion://TASK-201' and 'Source: notion://TASK-203' in their respective sections."
+            },
+            {
+              "assertion": "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+              "met": false,
+              "evidence": "Baseline keys entries as 'DEC-001' and 'WFLOW-001' — synthetic identifiers that do not use the source-ID/kind composite key format (e.g., decision:TASK-201)."
+            },
+            {
+              "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+              "met": true,
+              "evidence": "WFLOW-001 includes Trigger, Actors and handoff, Ordered steps (1-5), Systems, Exceptions, Output, Confidence, Frequency and volume, Active and wait time, and Promotion status."
+            },
+            {
+              "assertion": "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+              "met": true,
+              "evidence": "Decision authority: 'Decision owner: unconfirmed — no named approver in source.' Measurement gaps list includes 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost'."
+            },
+            {
+              "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+              "met": true,
+              "evidence": "Output is presented as a direct draft update; no separate diff or contribution file is created."
+            },
+            {
+              "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+              "met": false,
+              "evidence": "Baseline includes a 'Current work-item observations carried into the Draft' section with TASK-101, TASK-104, and TASK-109 detailed status, blockers, effort variance, and documentation gaps — this is Project memory content outside the skill's scope."
+            }
+          ],
+          "winner": "candidate",
+          "reason": "The candidate meets all six assertions: it uses source-ID/kind composite keys (decision:TASK-201, sop:TASK-203), includes every required workflow state, preserves all measurement and authority gaps explicitly, edits the Draft directly, and writes no PM control, Project memory, promotion effects, or provider effects. The baseline fails two assertions: it keys entries with synthetic identifiers (DEC-001, WFLOW-001) instead of source-ID/kind keys, and it writes work-item observations (TASK-101/104/109 with blockers and effort variance) that constitute Project memory content outside the daily-knowledge-capture skill's scope."
+        }
+      },
+      "verdict": "pass"
+    }
+  ],
+  "verdict": "needs-revision",
+  "limitations": [
+    "Normal cases received candidate-versus-baseline model calibration; hard and boundary cases are structurally validated in this first run."
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "skill_name": "daily-knowledge-capture",
+  "case_id": "daily_knowledge_direct_draft_normal_01",
+  "source_hash": "5602f8b7d7468803f65be09287a3749a0878ddd34cb1064487f943d6f676332d",
+  "candidate": {
+    "status": 0,
+    "stdout": "---\nartifact_type: kamdar-current-weekly-draft\nartifact_version: \"1.0.0\"\nweek: \"2026-W34\"\nstate: draft\ndraft_version: 1\nlast_updated: \"2026-08-24T16:30:00+08:00\"\n---\n\n# Current Weekly Draft — 2026-W34\n\nEach Daily run reads the entire Report and validated Daily Review JSON, returns\na complete replacement body, increments draft_version by one, and sets\nlast_updated. Still-current content and source IDs are preserved.\n\n## PM attention\n\nNo PM intervention yet.\n\n## Problems and inefficiencies\n\nNo grounded problem definition yet.\n\n## Decisions\n\n### decision:TASK-201 — Use one campaign asset folder per batch for the coordinated Deepavali campaign — Proposed\n\n- **Choice:** Use one campaign asset folder per batch for the coordinated Deepavali campaign.\n- **Reason / tradeoff:** Coordinated Deepavali themes were approved; one folder per batch keeps asset handoff traceable per campaign batch rather than mixed.\n- **Authority:** Campaign review participants approved the choice; the accountable approver is not named in the source — unconfirmed.\n- **Review trigger:** Review after seven campaign days.\n- **Evidence:** [TASK-201](notion://TASK-201)\n\n## SOPs\n\n### sop:TASK-203 — Prepare a publish-ready product-listing handoff — Observed\n\n- **Trigger:** An approved product batch is ready for Ecommerce listing.\n- **Actors / handoff:** Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.\n- **Ordered steps:**\n  1. Confirm the approved product IDs and samples in the batch.\n  2. Validate title, category, dimensions, composition, care, price, and stock fields.\n  3. Check approved images, crops, and alt text against each product ID.\n  4. Assemble the listing package in the shared handoff folder.\n  5. Darren confirms the package is publish-ready or returns named exceptions to Nur.\n- **Systems:** approved product record, shared asset folder, listing handoff checklist.\n- **Frequency / volume:** Observed across two product batches; normal weekly batch and SKU volume not recorded.\n- **Active and wait time:** Active preparation, review time, and queue wait not measured.\n- **Exceptions:** A missing approved sample or final commercial term stops the package before handoff; a catalog sync that drops a required field returns the affected product to Nur for correction.\n- **Output:** A receiver-accepted, publish-ready listing package keyed to approved product IDs.\n- **Evidence window:** 2026-08-24.\n- **Confidence:** High.\n- **Measurement gaps:** Measure active preparation and review time separately on the next two batches; record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost.\n- **Reuse evidence:** Observed across two batches; owner approval and repeat-use proof remain missing — blocks Weekly promotion.\n- **Evidence:** [TASK-203](notion://TASK-203)\n\n## Draft receipt\n\n- `daily_contexts:` daily-context-2026-08-24\n- `source_gaps:` none\n\n---\n\nOutcome: applied\n- decision:TASK-201 — new (concrete choice present; authority unconfirmed → Proposed)\n- sop:TASK-203 — new (observed employee workflow; high confidence; promotion blocked pending owner authority and repeat-use proof)\n- no_finding: TASK-202 (no decision_observation, no workflow_observation)\n- PM attention and Problems and inefficiencies unchanged by contract\n- draft_version: 0 → 1; last_updated set to run timestamp",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "567b41ac1f55f20ec29a77bae400c7f294f85892a0da4ac142c8f22fda95de60"
+  },
+  "baseline": {
+    "status": 0,
+    "stdout": "# Weekly Draft — 2026-W34 Update (2026-08-24)\n\n## Grounded Decision\n\n### DEC-001: One campaign asset folder per batch for the coordinated Deepavali campaign\n\n- Source: notion://TASK-201 (Meeting, PROJ-MKT-DEEPAVALI_MARKETING, owner: PERSON-MAYA)\n- Choice: Use one campaign asset folder per batch for the coordinated Deepavali campaign.\n- Authority: Campaign review participants approved the choice; the accountable approver is not named in the source.\n- Evidence: TASK-201 meeting statements record the approved theme and the one-folder-per-batch choice.\n- Decision owner: unconfirmed — no named approver in source. Do not attribute to any individual.\n- Review condition: Review after seven campaign days.\n- Promotion status: Candidate for Eval Decisions database. Blocked from promotion until a named accountable approver is confirmed in a source record.\n\n---\n\n## Employee Workflow Observation\n\n### WFLOW-001: Prepare a publish-ready product-listing handoff\n\n- Source: notion://TASK-203 (Meeting, PROJ-ECOM-LISTING_PIPELINE, owner: PERSON-DARREN)\n- Confidence: high\n- Observed across: two product-listing batches prepared by Nur (PERSON-NUR) and accepted by Darren (PERSON-DARREN) using the same handoff sequence.\n\nTrigger: An approved product batch is ready for Ecommerce listing.\n\nActors and handoff: Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.\n\nOrdered steps:\n1. Confirm the approved product IDs and samples in the batch.\n2. Validate title, category, dimensions, composition, care, price, and stock fields.\n3. Check approved images, crops, and alt text against each product ID.\n4. Assemble the listing package in the shared handoff folder.\n5. Darren confirms the package is publish-ready or returns named exceptions to Nur.\n\nSystems: approved product record, shared asset folder, listing handoff checklist.\n\nExceptions:\n- A missing approved sample or final commercial term stops the package before handoff.\n- A catalog sync that drops a required field returns the affected product to Nur for correction.\n\nOutput: A receiver-accepted, publish-ready listing package keyed to approved product IDs.\n\nReview condition: Sample ten pages after the next catalog sync.\n\nMeasurement gaps (carry forward):\n- Measure active preparation and review time separately on the next two batches.\n- Record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost.\n\nFrequency and volume: Not yet recorded beyond the two observed batches.\nActive and wait time: Not yet measured.\n\nPromotion status: Candidate for Eval SOPs database after the review-condition sampling and measurement gaps are addressed.\n\n---\n\n## Current work-item observations carried into the Draft\n\n- TASK-101 (PROJ-CMT-CMT_PIPELINE, Aisha): blocked, overdue (due 2026-08-20). Blocker: sewn sample collar 1.5 cm wider than tech pack; correction has no named approver. Effort variance: estimated MYR 540, actual MYR 900 (planned 6h, actual 10h at MYR 90/h). Cause: high confidence — fitting correction discussed beside the sample but not transferred to the canonical tech pack.\n- TASK-104 (PROJ-CMT-CMT_PIPELINE, Aisha): blocked, no due date, no named blocker, no next action in the canonical record. Documentation gap: due_date, blocker, and next_action all missing.\n- TASK-109 (PROJ-MERCH-INDIA_SOURCING, Nur): on_track, due 2026-08-23. Healthy no-chase control — no current problem.",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "6b69f76c5720b2eb004bf1c715c22835e9af308842eccdb66e309a6f3a4ce059"
+  },
+  "judge": {
+    "status": 0,
+    "stdout": "```json\n{\"tier\":\"A\",\"candidate_checks\":[{\"assertion\":\"Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context\",\"met\":true,\"evidence\":\"Candidate includes [TASK-201](notion://TASK-201) under the Decisions section and [TASK-203](notion://TASK-203) under the SOPs section.\"},{\"assertion\":\"Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys\",\"met\":true,\"evidence\":\"Candidate keys entries as 'decision:TASK-201' and 'sop:TASK-203', directly using source-ID/kind composite keys rather than inventing separate identifiers.\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":true,\"evidence\":\"sop:TASK-203 includes Trigger, Actors / handoff, Ordered steps (1-5), Systems, Frequency / volume, Active and wait time, Exceptions, Output, Evidence window + Confidence, and Reuse evidence / promotion state (blocks Weekly promotion).\"},{\"assertion\":\"Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps\",\"met\":true,\"evidence\":\"Decision authority: 'the accountable approver is not named in the source — unconfirmed.' Measurement gaps line lists 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost' explicitly.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Output is a complete replacement Draft body with draft_version and last_updated set; no separate contribution or diff file is emitted.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":true,\"evidence\":\"PM attention section is left as 'No PM intervention yet.' No work-item state, Project memory entries, promotion actions, or provider effects are written. Promotion is only noted as a blocked state within the SOP entry.\"}],\"baseline_checks\":[{\"assertion\":\"Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context\",\"met\":true,\"evidence\":\"Baseline references 'Source: notion://TASK-201' and 'Source: notion://TASK-203' in their respective sections.\"},{\"assertion\":\"Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys\",\"met\":false,\"evidence\":\"Baseline keys entries as 'DEC-001' and 'WFLOW-001' — synthetic identifiers that do not use the source-ID/kind composite key format (e.g., decision:TASK-201).\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":true,\"evidence\":\"WFLOW-001 includes Trigger, Actors and handoff, Ordered steps (1-5), Systems, Exceptions, Output, Confidence, Frequency and volume, Active and wait time, and Promotion status.\"},{\"assertion\":\"Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps\",\"met\":true,\"evidence\":\"Decision authority: 'Decision owner: unconfirmed — no named approver in source.' Measurement gaps list includes 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost'.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Output is presented as a direct draft update; no separate diff or contribution file is created.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":false,\"evidence\":\"Baseline includes a 'Current work-item observations carried into the Draft' section with TASK-101, TASK-104, and TASK-109 detailed status, blockers, effort variance, and documentation gaps — this is Project memory content outside the skill's scope.\"}],\"winner\":\"candidate\",\"reason\":\"The candidate meets all six assertions: it uses source-ID/kind composite keys (decision:TASK-201, sop:TASK-203), includes every required workflow state, preserves all measurement and authority gaps explicitly, edits the Draft directly, and writes no PM control, Project memory, promotion effects, or provider effects. The baseline fails two assertions: it keys entries with synthetic identifiers (DEC-001, WFLOW-001) instead of source-ID/kind keys, and it writes work-item observations (TASK-101/104/109 with blockers and effort variance) that constitute Project memory content outside the daily-knowledge-capture skill's scope.\"}\n```",
+    "stderr": "",
+    "timed_out": false,
+    "result": {
+      "tier": "A",
+      "candidate_checks": [
+        {
+          "assertion": "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+          "met": true,
+          "evidence": "Candidate includes [TASK-201](notion://TASK-201) under the Decisions section and [TASK-203](notion://TASK-203) under the SOPs section."
+        },
+        {
+          "assertion": "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+          "met": true,
+          "evidence": "Candidate keys entries as 'decision:TASK-201' and 'sop:TASK-203', directly using source-ID/kind composite keys rather than inventing separate identifiers."
+        },
+        {
+          "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+          "met": true,
+          "evidence": "sop:TASK-203 includes Trigger, Actors / handoff, Ordered steps (1-5), Systems, Frequency / volume, Active and wait time, Exceptions, Output, Evidence window + Confidence, and Reuse evidence / promotion state (blocks Weekly promotion)."
+        },
+        {
+          "assertion": "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+          "met": true,
+          "evidence": "Decision authority: 'the accountable approver is not named in the source — unconfirmed.' Measurement gaps line lists 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost' explicitly."
+        },
+        {
+          "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+          "met": true,
+          "evidence": "Output is a complete replacement Draft body with draft_version and last_updated set; no separate contribution or diff file is emitted."
+        },
+        {
+          "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+          "met": true,
+          "evidence": "PM attention section is left as 'No PM intervention yet.' No work-item state, Project memory entries, promotion actions, or provider effects are written. Promotion is only noted as a blocked state within the SOP entry."
+        }
+      ],
+      "baseline_checks": [
+        {
+          "assertion": "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+          "met": true,
+          "evidence": "Baseline references 'Source: notion://TASK-201' and 'Source: notion://TASK-203' in their respective sections."
+        },
+        {
+          "assertion": "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+          "met": false,
+          "evidence": "Baseline keys entries as 'DEC-001' and 'WFLOW-001' — synthetic identifiers that do not use the source-ID/kind composite key format (e.g., decision:TASK-201)."
+        },
+        {
+          "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+          "met": true,
+          "evidence": "WFLOW-001 includes Trigger, Actors and handoff, Ordered steps (1-5), Systems, Exceptions, Output, Confidence, Frequency and volume, Active and wait time, and Promotion status."
+        },
+        {
+          "assertion": "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+          "met": true,
+          "evidence": "Decision authority: 'Decision owner: unconfirmed — no named approver in source.' Measurement gaps list includes 'active preparation and review time', 'queue wait', 'weekly batch count', 'SKU volume', 'rework count', and 'loaded hourly cost'."
+        },
+        {
+          "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+          "met": true,
+          "evidence": "Output is presented as a direct draft update; no separate diff or contribution file is created."
+        },
+        {
+          "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+          "met": false,
+          "evidence": "Baseline includes a 'Current work-item observations carried into the Draft' section with TASK-101, TASK-104, and TASK-109 detailed status, blockers, effort variance, and documentation gaps — this is Project memory content outside the skill's scope."
+        }
+      ],
+      "winner": "candidate",
+      "reason": "The candidate meets all six assertions: it uses source-ID/kind composite keys (decision:TASK-201, sop:TASK-203), includes every required workflow state, preserves all measurement and authority gaps explicitly, edits the Draft directly, and writes no PM control, Project memory, promotion effects, or provider effects. The baseline fails two assertions: it keys entries with synthetic identifiers (DEC-001, WFLOW-001) instead of source-ID/kind keys, and it writes work-item observations (TASK-101/104/109 with blockers and effort variance) that constitute Project memory content outside the daily-knowledge-capture skill's scope."
+    }
+  },
+  "verdict": "pass"
+}

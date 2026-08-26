@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "objective": "Reach tier A on every real Hermes Daily calibration, then pass a real-model Weekly SOP/Issue promotion proof.",
+  "phase": "complete",
+  "baseline": {
+    "evidence": "tickets/TASK-0009/artifacts/qa/model-calibration-2026-08-26/summary.json",
+    "tiers": ["B", "A", "B", "A"],
+    "valid_for_optimization": true,
+    "reason": "Fresh real-model run after identity/source repair. Documentation and knowledge are A. Memory has one real reset-safety miss. Control has one real grouping miss plus one newly discovered date-fixture inconsistency that must be corrected before refreeze."
+  },
+  "nodes": [
+    {
+      "id": "H0",
+      "parent_id": null,
+      "status": "confirmed",
+      "kind": "prerequisite_repair",
+      "hypothesis": "Align each normal-case prompt, fixture, golden, and assertion to the same current source evidence before freezing.",
+      "expected_observation": "A fresh baseline judges actual model behavior rather than stale identities or scenarios.",
+      "falsifier": "Independent review still finds expected IDs, facts, or dates absent from bound inputs.",
+      "expected_reward": "Valid comparison boundary",
+      "reward_basis": "2026-08-26 evidence review found fixture mismatch in project-memory and documentation-quality; current goldens confirm drift.",
+      "source_refs": [
+        "tickets/TASK-0009/artifacts/qa/model-calibration-2026-08-26/evidence-review.json",
+        "automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "skills/daily-project-memory/evals/evals.json",
+        "skills/daily-documentation-quality/evals/evals.json",
+        "skills/daily-knowledge-capture/evals/evals.json"
+      ],
+      "result": "Confirmed after the date repair: all current normal-case identities, facts, dates, route facts, and expected outputs are present in their bound inputs. The corrected control case then returned A with truthful 4/6 elapsed-day arithmetic."
+    },
+    {
+      "id": "H1",
+      "parent_id": "H0",
+      "status": "confirmed",
+      "kind": "knowledge_output_contract",
+      "hypothesis": "A field-complete, source-consistent workflow exemplar plus an explicit do-not-invent gate will make knowledge capture emit every required baseline field.",
+      "expected_observation": "daily-knowledge-capture judge returns A without unsupported steps or systems.",
+      "falsifier": "Output remains incomplete or invents workflow facts on the repaired fixture.",
+      "expected_reward": "Tier A for the user-critical workflow discovery path",
+      "reward_basis": "The B result passed four of six assertions and missed explicit field rendering and source IDs.",
+      "source_refs": ["tickets/TASK-0009/artifacts/qa/model-calibration-frozen-baseline-2026-08-26/daily-knowledge-capture-normal-calibration.json"],
+      "result": "Confirmed: real judge returned A with 6/6 assertions met."
+    },
+    {
+      "id": "H2",
+      "parent_id": "H0",
+      "status": "confirmed",
+      "kind": "project_memory_output_contract",
+      "hypothesis": "A current-context golden and explicit no-reset behavior will remove stale scenario failures while preserving minimal patches.",
+      "expected_observation": "daily-project-memory judge returns A.",
+      "falsifier": "The repaired model output still omits source-grounded impact/review gaps or resets attention without authority.",
+      "expected_reward": "Tier A project-memory behavior",
+      "reward_basis": "The prior B output already rendered actionable rows; its three misses referenced absent stale-fixture facts.",
+      "source_refs": ["tickets/TASK-0009/artifacts/qa/model-calibration-frozen-baseline-2026-08-26/daily-project-memory-normal-calibration.json"],
+      "result": "Confirmed in Round 2: real judge returned A with 5/5 assertions met after false-reset rejection and claim-level source specificity."
+    },
+    {
+      "id": "H3",
+      "parent_id": "H0",
+      "status": "confirmed",
+      "kind": "documentation_output_contract",
+      "hypothesis": "A current-context golden and assertions will test precise mapped gaps rather than obsolete SRC identities.",
+      "expected_observation": "daily-documentation-quality produces only current source-linked requests and reaches A.",
+      "falsifier": "It requests non-material or unmapped fields after fixture repair.",
+      "expected_reward": "Tier A documentation behavior",
+      "reward_basis": "The C tie was entirely dominated by stale fixture expectations.",
+      "source_refs": ["tickets/TASK-0009/artifacts/qa/model-calibration-frozen-baseline-2026-08-26/daily-documentation-quality-normal-calibration.json"],
+      "result": "Confirmed: real judge returned A with 5/5 assertions met."
+    },
+    {
+      "id": "H4",
+      "parent_id": "H0",
+      "status": "rejected",
+      "kind": "control_output_contract",
+      "hypothesis": "The already-updated CMT eval and golden will make the next run preserve the sourced MYR 360 calculation and Aisha route.",
+      "expected_observation": "daily-project-control returns A without further instruction edits.",
+      "falsifier": "The model still omits the visible cost formula or selects the wrong owner/route.",
+      "expected_reward": "Tier A control behavior",
+      "reward_basis": "The previous B was judged against the obsolete MYR 300/PERSON-JUN case; current owner files now bind MYR 360/PERSON-AISHA.",
+      "source_refs": ["tickets/TASK-0009/artifacts/qa/model-calibration-frozen-baseline-2026-08-26/daily-project-control-normal-calibration.json"],
+      "result": "Rejected: fresh judge returned B. The candidate correctly followed the Aug 24 context date (4/6), exposing an invalid 5/7 assertion, and emitted two proposals instead of one person-grouped proposal."
+    },
+    {
+      "id": "H5",
+      "parent_id": "H0",
+      "status": "confirmed",
+      "kind": "control_grouping_and_date_repair",
+      "hypothesis": "Correcting the control date expectation to the context's Aug 24 clock and enforcing one grouped proposal per person will produce a truthful A output.",
+      "expected_observation": "daily-project-control returns A with 4 days overdue, 6 days since update, the MYR 360 formula, and one Aisha proposal covering every selected finding.",
+      "falsifier": "The output still emits multiple same-person proposals, loses a finding, or misstates grounded duration/cost.",
+      "expected_reward": "Tier A control behavior without false arithmetic",
+      "reward_basis": "Fresh judge found the candidate otherwise met 4/6 assertions; one miss is invalid fixture arithmetic and one is a concrete grouping defect.",
+      "source_refs": [
+        "tickets/TASK-0009/artifacts/qa/model-calibration-frozen-baseline-2026-08-26/daily-project-control-normal-calibration.json",
+        "tickets/TASK-0009/artifacts/qa/model-calibration-round-1-2026-08-26/daily-project-control-normal-calibration.json"
+      ],
+      "result": "Confirmed: after correcting the invalid date expectation and enforcing per-person grouping, the real judge returned A with 6/6 assertions met."
+    },
+    {
+      "id": "H6",
+      "parent_id": null,
+      "status": "confirmed",
+      "kind": "weekly_sop_issue_promotion",
+      "hypothesis": "A qualified Draft-backed workflow should promote to the existing SOPs surface, while a material measured problem should promote to the existing Work surface as an Issue and weaker workflow evidence should remain project_only.",
+      "expected_observation": "Weekly real judge returns A across destination, baseline integrity, SOP reconstruction, retain control, hierarchy, and no-provider-effect assertions.",
+      "falsifier": "Wrong destination, incomplete Before/SOP record, premature weak-candidate promotion, missing hierarchy traceability, or provider-effect claim.",
+      "expected_reward": "Real proof of the user's workflow-to-paid-problem system",
+      "reward_basis": "Weekly promotion is the terminal conversion from Daily observations into durable SOP and Issue records.",
+      "source_refs": ["tickets/TASK-0009/artifacts/qa/model-calibration-weekly-promotion-round-1-2026-08-26/weekly-report-finalization-normal-calibration.json"],
+      "result": "Confirmed: real judge returned A with 6/6 assertions met. TASK-203 routes to kamdar-employee-sop@1.0.0, TASK-101 routes to kamdar-issue@1.0.0 with preserved Before economics, and TASK-201 remains project_only."
+    }
+  ]
+}

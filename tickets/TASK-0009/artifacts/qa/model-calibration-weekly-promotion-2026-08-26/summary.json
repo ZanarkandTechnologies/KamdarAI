@@ -1,0 +1,858 @@
+{
+  "schema_version": 1,
+  "kind": "task0007-skill-eval-run",
+  "mode": "static-plus-normal-case-calibration",
+  "side_effect_boundary": "source fixtures and safe-mode model calls only; no provider tools or writes",
+  "inspection": {
+    "schema_version": 1,
+    "kind": "task0007-skill-eval-inspection",
+    "skills": [
+      {
+        "skill_name": "daily-project-memory",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-project-diff-plan@0.1.0",
+        "files": {
+          "skill": "skills/daily-project-memory/SKILL.md",
+          "evals": "skills/daily-project-memory/evals/evals.json",
+          "config": "skills/daily-project-memory/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "daily_project_memory_normal_01",
+            "prompt": "Use the supplied Daily context diff to write the Project diff plan at the requested output path.",
+            "files": [
+              "examples/golden/project-diff-plan.json",
+              "templates/project-diff-plan.json"
+            ],
+            "expected_output": "One valid proposal-only plan that appends the confirmed TASK-101 tech-pack handoff failure to PROJ-CMT-CMT_PIPELINE, preserves its existing attention row, and performs no weekly-attention reset.",
+            "assertions": [
+              "The CMT tech-pack knowledge patch cites only TASK-101 and the embedded PROJ-CMT-CMT_PIPELINE snapshot; it does not use TASK-104's documentation gap as supporting evidence",
+              "Appends the high-confidence finding that the collar correction was not transferred to the canonical tech pack",
+              "Does not replace this_weeks_attention because reset.requested is false and TASK-101 is already present",
+              "Preserves the unnamed correction approver as an explicit gap",
+              "Uses proposal-only application state and makes no provider or receipt claim"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Project knowledge and reset attention become minimal source-linked patches",
+                "tags": [
+                  "skill",
+                  "artifact",
+                  "daily",
+                  "project-memory"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": [
+              "skills/daily-project-memory/examples/golden/project-diff-plan.json",
+              "skills/daily-project-memory/templates/project-diff-plan.json",
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "templates/project.md"
+            ]
+          },
+          {
+            "id": "daily_project_memory_hard_01",
+            "prompt": "A context says a Work item's suspected cause is unconfirmed and the current attention checklist already has a source-linked row for the same Work item. Produce the safe diff plan.",
+            "files": [
+              "templates/project-diff-plan.json"
+            ],
+            "expected_output": "A minimal plan that does not promote the suspected cause to Project knowledge, avoids a duplicate attention item, and records the missing confirmation as a gap.",
+            "assertions": [
+              "Does not write the unconfirmed cause as a known Project fact",
+              "Uses append or named-row replace only when a material source-backed change exists",
+              "Records duplicate/uncertain evidence in gaps rather than producing conflicting patches",
+              "Does not fetch a Project or call an application integration"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unconfirmed and duplicate evidence cannot overwrite Project truth",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "evidence-boundary"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": [
+              "skills/daily-project-memory/templates/project-diff-plan.json",
+              "templates/project.md"
+            ]
+          },
+          {
+            "id": "daily_project_memory_boundary_01",
+            "prompt": "Changed Work evidence names a Project ID, but the context diff contains no Project snapshot or Project source ID. Produce the appropriate result.",
+            "files": [
+              "templates/project-diff-plan.json"
+            ],
+            "expected_output": "Returns configuration_gap: missing_project_snapshot with no patch plan, provider read, or invented Project body.",
+            "assertions": [
+              "Names the missing embedded Project snapshot and preserves the Work source ID",
+              "Creates no Project patch or child memory file",
+              "Does not compensate with a provider read or guessed Project content",
+              "Does not claim application or a provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Missing Project snapshots stop safe Project-memory proposal",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": [
+              "skills/daily-project-memory/templates/project-diff-plan.json"
+            ]
+          }
+        ],
+        "source_hash": "2f81af19f075c56fa1ae58e12015c82df7f33d3df9e4267c20e02a775590ee09"
+      },
+      {
+        "skill_name": "daily-documentation-quality",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-employee-message-plan@0.1.0",
+        "files": {
+          "skill": "skills/daily-documentation-quality/SKILL.md",
+          "evals": "skills/daily-documentation-quality/evals/evals.json",
+          "config": "skills/daily-documentation-quality/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "daily_documentation_quality_normal_01",
+            "prompt": "Use the supplied Daily context diff to produce the documentation-quality message plan at the requested output path.",
+            "files": [
+              "examples/golden/employee-message-plan.md",
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "One proposal-only grouped message plan for Aisha Rahman that asks only for TASK-104's missing due date, blocker, and next action at their mapped locations; complete records remain no findings.",
+            "assertions": [
+              "Cites TASK-104 and PERSON-AISHA from the input context",
+              "Uses the Task template mapping and requests exactly due_date, blocker, and next_action at the named update locations",
+              "Groups TASK-104 under PERSON-AISHA using only the approved Telegram eval route without claiming a send or receipt",
+              "Keeps TASK-109 out of a recipient message and records it as sufficient",
+              "Uses a documentation-quality idempotency key and proposal-only delivery state"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Mapped documentation gap becomes one useful grouped plan",
+                "tags": [
+                  "skill",
+                  "artifact",
+                  "daily",
+                  "documentation"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0002",
+            "feature_document": "docs/features/FEAT-0002-daily-documentation-quality.md",
+            "fixtures": [
+              "skills/daily-documentation-quality/examples/golden/employee-message-plan.md",
+              "skills/daily-documentation-quality/templates/employee-message-plan.md",
+              "automations/examples/golden/daily-context-diff-2026-08-24.json"
+            ]
+          },
+          {
+            "id": "daily_documentation_quality_hard_01",
+            "prompt": "The context has a fully read Issue with a missing Root cause field and PERSON-SAM as owner, but the People snapshot lists no approved channel or endpoint. Render the safe message plan.",
+            "files": [
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "A proposal-only plan that preserves the source-linked Root cause request in Blocked delivery entries and never invents a recipient route.",
+            "assertions": [
+              "Names the exact missing mapped Issue field and update location",
+              "Uses blocked_delivery with the known person ID and missing route facts",
+              "Does not select email, chat, Notion, or a guessed endpoint",
+              "Does not fold in unrelated stale-work or cost diagnosis"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Missing People routing blocks delivery without losing the request",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "routing-boundary"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0002",
+            "feature_document": "docs/features/FEAT-0002-daily-documentation-quality.md",
+            "fixtures": [
+              "skills/daily-documentation-quality/templates/employee-message-plan.md"
+            ]
+          },
+          {
+            "id": "daily_documentation_quality_boundary_01",
+            "prompt": "Every fully read Work record in the context satisfies its resolved template. Produce the appropriate output.",
+            "files": [
+              "templates/employee-message-plan.md"
+            ],
+            "expected_output": "A no_finding message-plan artifact with zero recipient groups and the reviewed records named; no messages, delivery choice, or provider claim.",
+            "assertions": [
+              "Renders state no_finding rather than generic reminders",
+              "Creates no empty recipient group or fabricated question",
+              "Preserves source IDs for reviewed sufficient records",
+              "Does not send, post, fetch, or claim an integration receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Sufficient records suppress low-value documentation outreach",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "no-finding"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0002",
+            "feature_document": "docs/features/FEAT-0002-daily-documentation-quality.md",
+            "fixtures": [
+              "skills/daily-documentation-quality/templates/employee-message-plan.md"
+            ]
+          }
+        ],
+        "source_hash": "4c1d8b2e0fb62ab86ad818170ab02c31948db4a17943505a6265959a2548dbfa"
+      },
+      {
+        "skill_name": "daily-project-control",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-project-control-plan@0.2.0",
+        "files": {
+          "skill": "skills/daily-project-control/SKILL.md",
+          "evals": "skills/daily-project-control/evals/evals.json",
+          "config": "skills/daily-project-control/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "project_control_direct_draft_normal_01",
+            "prompt": "Use the supplied grounded CMT Daily context and current Weekly Draft to render the Project control plan and directly update the Draft's control anchors in prepare mode.",
+            "expected_output": "One valid plan records TASK-101 as four days overdue and blocked with a sourced MYR 360 rework variance, creates its local PM/Risk/Cost entries, prepares one Telegram eval-route proposal for PERSON-AISHA, and suppresses healthy TASK-109.",
+            "files": [
+              "templates/project-control-plan.json",
+              "examples/golden/project-control-plan-cmt-2026-08-25.json"
+            ],
+            "assertions": [
+              "Uses only collector snapshot IDs and makes no provider read or Draft integration call",
+              "Calculates four days overdue and six days since update from context.local_day 2026-08-24, then preserves the visible (10 - 6) × MYR 90 = MYR 360 basis",
+              "Directly adds only PM attention and Problems and inefficiencies source-keyed entries to the supplied Draft",
+              "Produces one approved Telegram eval-route proposal for PERSON-AISHA but no send claim",
+              "Suppresses current unblocked TASK-109 from Draft entries and outreach",
+              "Leaves Decisions, SOPs, Project memory, and final reports untouched"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "One PM control plan updates its Draft anchors and prepares accountable outreach",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "pm-control"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": [
+              "skills/daily-project-control/templates/project-control-plan.json",
+              "skills/daily-project-control/examples/golden/project-control-plan-cmt-2026-08-25.json",
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "project_control_direct_draft_hard_01",
+            "prompt": "TASK-101 is stale and blocked, but the People snapshot has no approved endpoint and Work has no recorded estimate or actual cost. Update the Draft and produce the plan correctly.",
+            "expected_output": "A source-linked control finding updates PM attention and the combined problem section, marks route and cost unknown, and does not guess a channel or number.",
+            "files": [
+              "examples/blocked/project-control-plan-unapproved-route.json"
+            ],
+            "assertions": [
+              "Keeps the stale/blocked finding and blocked delivery route",
+              "Uses unknown cost inputs rather than estimating and omits an unsupported amount",
+              "Does not send a message, choose a fallback channel, or create an intermediate Weekly diff",
+              "Changes only source-keyed PM/Risk anchors in the supplied Draft"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Useful control does not authorize guessed outreach or cost",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "route-safety"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": [
+              "skills/daily-project-control/examples/blocked/project-control-plan-unapproved-route.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "project_control_direct_draft_boundary_01",
+            "prompt": "All Work snapshots are current, unblocked, on schedule, and have no material variance. What should this skill return?",
+            "expected_output": "Returns no_finding and leaves the current Weekly Draft and message plan untouched.",
+            "files": [
+              "templates/project-control-plan.json"
+            ],
+            "assertions": [
+              "Does not manufacture a stale threshold breach, cost concern, or follow-up",
+              "Does not modify any Draft anchor or route an employee message",
+              "Does not perform a provider read, write, or receipt claim"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Healthy work is not chased or reported",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "no-finding"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": [
+              "skills/daily-project-control/templates/project-control-plan.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          }
+        ],
+        "source_hash": "601130a16c707e2368bb41e76495e6ee717189c4e34dcb75c8ce33e859252db7"
+      },
+      {
+        "skill_name": "daily-knowledge-capture",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-current-weekly-draft@0.1.0",
+        "files": {
+          "skill": "skills/daily-knowledge-capture/SKILL.md",
+          "evals": "skills/daily-knowledge-capture/evals/evals.json",
+          "config": "skills/daily-knowledge-capture/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "daily_knowledge_direct_draft_normal_01",
+            "prompt": "Use the supplied Daily context and current Weekly Draft. Directly update the Draft with the grounded Decision and current employee workflow observations.",
+            "expected_output": "The existing Draft gains a source-keyed Proposed Decision and a reconstructable current-workflow observation with explicit measurement gaps; no contribution file or provider action is created.",
+            "files": [
+              "examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md"
+            ],
+            "assertions": [
+              "Cites notion://TASK-201 and notion://TASK-203 with those source IDs from the context",
+              "Adds the TASK-201 Decision and TASK-203 workflow observation only with source-ID/kind keys",
+              "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+              "Preserves the missing accountable decision authority plus unmeasured active time, wait time, weekly volume, SKU volume, rework, and loaded cost as explicit gaps",
+              "Edits the supplied current Draft directly and creates no contribution or diff file",
+              "Does not write PM control, Project memory, promotion, or provider effects"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Daily evidence enters the current Weekly Draft directly",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "daily",
+                  "knowledge-capture"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0004",
+            "feature_document": "docs/features/FEAT-0004-daily-knowledge-candidate-capture.md",
+            "fixtures": [
+              "skills/daily-knowledge-capture/examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md",
+              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "daily_knowledge_direct_draft_hard_01",
+            "prompt": "The context contains an AI-summary suggestion but no observed current method, concrete choice, source evidence, authority, or proof. Update the current Weekly Draft correctly.",
+            "expected_output": "Returns no_finding or a named source gap and leaves the Draft unchanged; it does not invent a Decision, workflow, authority, timing, or generic wiki item.",
+            "files": [],
+            "assertions": [
+              "Rejects the generic suggestion as neither a Decision nor an observed workflow",
+              "Names missing choice, observed steps, evidence, authority, and proof without filling them in",
+              "Leaves every Draft anchor unchanged and creates no intermediate artifact or provider action"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Weak ideas do not pollute the Weekly Draft",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "grounding"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0004",
+            "feature_document": "docs/features/FEAT-0004-daily-knowledge-candidate-capture.md",
+            "fixtures": [
+              "automations/templates/current-weekly-draft.md"
+            ]
+          },
+          {
+            "id": "daily_knowledge_direct_draft_boundary_01",
+            "prompt": "The Daily context is valid but the supplied current Weekly Draft path is missing. Produce the correct result.",
+            "expected_output": "Returns configuration_gap: missing_current_weekly_draft, retains the source IDs, and changes no file.",
+            "files": [
+              "examples/blocked/current-weekly-draft-missing.md"
+            ],
+            "assertions": [
+              "Does not search for or infer another Weekly Draft",
+              "Preserves the exact missing-target gap and source context",
+              "Does not write, promote, send, or claim a provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "A missing local Draft blocks direct Daily capture",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0004",
+            "feature_document": "docs/features/FEAT-0004-daily-knowledge-candidate-capture.md",
+            "fixtures": [
+              "skills/daily-knowledge-capture/examples/blocked/current-weekly-draft-missing.md"
+            ]
+          }
+        ],
+        "source_hash": "927b686c0caa271eda4eef3278c92cf6588deed1b1aabcf28b6b939a6cdc28c4"
+      },
+      {
+        "skill_name": "apply-project-diffs",
+        "capability_kind": "integration",
+        "artifact_contract": null,
+        "files": {
+          "skill": "skills/apply-project-diffs/SKILL.md",
+          "evals": "skills/apply-project-diffs/evals/evals.json",
+          "config": "skills/apply-project-diffs/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "apply_project_diffs_matching_preflight_01",
+            "prompt": "Apply the PROJECT-124 Project knowledge append from PROJECT-DIFF-2026-08-24. The Project ID and expected empty section both match preflight, and the adapter returned page-demo-124 revision 18.",
+            "expected_output": "One applied receipt that preserves the source IDs, expected-value match, key, hashes, and observed adapter reference.",
+            "files": [
+              "templates/project-diff-application-receipt.md",
+              "examples/golden/project-knowledge-patch.md"
+            ],
+            "assertions": [
+              "Applies only PROJECT-124's Project knowledge append unchanged",
+              "Records passed source, identity, idempotency, and expected-current-value guards",
+              "Uses project-adapter:page-demo-124:rev-18 only because the adapter returned it",
+              "Does not mutate a Work, Person, Decision, or Weekly record"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Matching Project preflight permits one patch",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "normal"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": [
+              "skills/apply-project-diffs/templates/project-diff-application-receipt.md",
+              "skills/apply-project-diffs/examples/golden/project-knowledge-patch.md"
+            ]
+          },
+          {
+            "id": "apply_project_diffs_exact_duplicate_01",
+            "prompt": "The same PROJECT-124 patch key and proposed-value hash already have a successful receipt. Apply the plan again.",
+            "expected_output": "A duplicate no-write receipt, preserving the original plan identity.",
+            "files": [],
+            "assertions": [
+              "Returns duplicate instead of applied",
+              "Does not call the adapter",
+              "Keeps the source IDs, idempotency key, and value hash inspectable"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Exact Project rerun is safe",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "hard",
+                  "idempotency"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": []
+          },
+          {
+            "id": "apply_project_diffs_expected_value_conflict_01",
+            "prompt": "The plan expects PROJECT-124 Project knowledge to be empty, but preflight shows a different value. Apply the patch.",
+            "expected_output": "A conflict receipt with no overwrite and a re-plan requirement.",
+            "files": [],
+            "assertions": [
+              "Returns conflict because expected current value mismatched",
+              "Preserves the existing provider value and makes no adapter call",
+              "Does not merge or rewrite the proposed Project knowledge"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Project content is never silently overwritten",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "boundary"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0001",
+            "feature_document": "docs/features/FEAT-0001-daily-project-memory.md",
+            "fixtures": []
+          }
+        ],
+        "source_hash": "5476da9cc0b7c067e3ab29d326b485f66456cc37c509a072447363d0fa5380e3"
+      },
+      {
+        "skill_name": "dispatch-employee-messages",
+        "capability_kind": "integration",
+        "artifact_contract": null,
+        "files": {
+          "skill": "skills/dispatch-employee-messages/SKILL.md",
+          "evals": "skills/dispatch-employee-messages/evals/evals.json",
+          "config": "skills/dispatch-employee-messages/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "dispatch_employee_messages_isolated_eval_sink_01",
+            "prompt": "PERSON-AISHA is a fictional eval Person whose approved contact instructions route proof through the operator-owned Telegram eval sink. Relay the unchanged CMT recovery chase using dispatch_mode isolated-eval.",
+            "expected_output": "One Telegram eval-sink relay that preserves PERSON-AISHA as the intended recipient and proves transport without claiming employee delivery.",
+            "files": [
+              "templates/channel-dispatch-result.md"
+            ],
+            "assertions": [
+              "Uses only the configured operator-owned Telegram eval sink",
+              "Records delivered_to_eval_sink, PERSON-AISHA, the exact payload hash, and the provider message ID",
+              "Does not claim delivered_to_employee or expose a personal endpoint",
+              "Keeps the intended preferred channel distinct from the actual proof sink"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Fictional owner chase proves transport at the eval sink",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "normal",
+                  "eval-sink"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": [
+              "skills/dispatch-employee-messages/templates/channel-dispatch-result.md"
+            ]
+          },
+          {
+            "id": "dispatch_employee_messages_email_handler_unavailable_01",
+            "prompt": "PERSON-024 prefers approved email, but the channel registry marks email-message planned and unavailable. Prepare the documentation message.",
+            "expected_output": "A configuration_gap dispatch result that retains the message intent and identifies email-message enablement as the repair.",
+            "files": [
+              "templates/channel-dispatch-result.md"
+            ],
+            "assertions": [
+              "Does not use Telegram, WhatsApp, or another fallback channel",
+              "Names the approved preferred email route and missing email handler",
+              "Makes no provider or channel-skill call"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unavailable email handler remains actionable",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "hard",
+                  "configuration-gap"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": [
+              "skills/dispatch-employee-messages/templates/channel-dispatch-result.md"
+            ]
+          },
+          {
+            "id": "dispatch_employee_messages_whatsapp_scope_boundary_01",
+            "prompt": "PERSON-025 prefers approved WhatsApp, but Baileys has not been enabled and no whatsapp-message handler exists. Use dispatch_mode send.",
+            "expected_output": "A configuration_gap result with no send, no fallback, and the exact missing WhatsApp handler as repair.",
+            "files": [],
+            "assertions": [
+              "Does not infer Telegram or email as a fallback",
+              "Does not call a Baileys API or claim a provider receipt",
+              "Names whatsapp-message/Baileys enablement as the repair condition"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Unenabled WhatsApp cannot become an accidental send",
+                "tags": [
+                  "skill",
+                  "integration",
+                  "boundary",
+                  "whatsapp"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0003",
+            "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
+            "fixtures": []
+          }
+        ],
+        "source_hash": "e8a7dce094e418e1c16e1df8a839b2f7f35f32935e1b6f013e5e776ae1d405a1"
+      },
+      {
+        "skill_name": "weekly-report-finalization",
+        "capability_kind": "pipeline",
+        "artifact_contract": "kamdar-weekly-finalization-plan@0.1.0",
+        "files": {
+          "skill": "skills/weekly-report-finalization/SKILL.md",
+          "evals": "skills/weekly-report-finalization/evals/evals.json",
+          "config": "skills/weekly-report-finalization/evals/config.json"
+        },
+        "cases": [
+          {
+            "id": "weekly_finalization_direct_draft_normal_01",
+            "prompt": "Use the supplied completed current Weekly Draft and local Project routing snapshot to render the Weekly finalization plan, hierarchy, and review-qualified local promotion artifacts.",
+            "expected_output": "A source-traceable Project → Department → Company hierarchy promotes TASK-203 to the existing SOPs surface, promotes TASK-101 to the existing Work surface as an Issue with its Before economics, and retains TASK-201 as project_only.",
+            "files": [
+              "templates/weekly-finalization-plan.md",
+              "examples/golden/qualified-current-weekly-draft-2026-W34.md",
+              "examples/golden/project-routing-snapshot.json",
+              "examples/golden/weekly-finalization-plan-2026-08-24.md"
+            ],
+            "assertions": [
+              "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+              "Promotes problem:TASK-101 to the existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0, preserving the workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state",
+              "Promotes sop:TASK-203 to the existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0, preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps",
+              "Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established",
+              "Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability",
+              "Claims no provider publication, delivery, or promotion effect"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "The current Weekly Draft becomes the final report hierarchy",
+                "tags": [
+                  "skill",
+                  "pipeline",
+                  "weekly",
+                  "finalization"
+                ]
+              }
+            },
+            "kind": "normal",
+            "feature_id": "FEAT-0006",
+            "feature_document": "docs/features/FEAT-0006-weekly-knowledge-promotion.md",
+            "fixtures": [
+              "skills/weekly-report-finalization/templates/weekly-finalization-plan.md",
+              "skills/weekly-report-finalization/examples/golden/qualified-current-weekly-draft-2026-W34.md",
+              "skills/weekly-report-finalization/examples/golden/project-routing-snapshot.json",
+              "skills/weekly-report-finalization/examples/golden/weekly-finalization-plan-2026-08-24.md",
+              "templates/sop.md",
+              "templates/issue.md"
+            ]
+          },
+          {
+            "id": "weekly_finalization_draft_conflict_hard_01",
+            "prompt": "The current Draft contains a Proposed Decision whose authority is absent and a Proposed SOP whose recurrence is absent. Finalize correctly.",
+            "expected_output": "Reports retain both candidates as Proposed and name their review gaps; it does not promote, delete, or overwrite the Draft entries.",
+            "files": [],
+            "assertions": [
+              "Leaves the input Draft unchanged",
+              "Names authority and recurrence/owner/proof gaps separately",
+              "Does not create a promotion or provider receipt"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Finalization does not auto-promote a Draft candidate",
+                "tags": [
+                  "skill",
+                  "hard",
+                  "promotion"
+                ]
+              }
+            },
+            "kind": "hard",
+            "feature_id": "FEAT-0006",
+            "feature_document": "docs/features/FEAT-0006-weekly-knowledge-promotion.md",
+            "fixtures": [
+              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+            ]
+          },
+          {
+            "id": "weekly_finalization_missing_draft_boundary_01",
+            "prompt": "The weekly run has no current non-final Markdown Draft. Produce the correct result.",
+            "expected_output": "Returns configuration_gap: missing_current_weekly_draft and creates no report, promotion, provider, or delivery output.",
+            "files": [
+              "examples/blocked/current-weekly-draft-missing.md"
+            ],
+            "assertions": [
+              "Does not search for or infer another Draft",
+              "Names the exact missing-input repair",
+              "Does not write a report or mutate project knowledge"
+            ],
+            "metadata": {
+              "farplane": {
+                "title": "Weekly finalization refuses a missing Draft",
+                "tags": [
+                  "skill",
+                  "boundary",
+                  "configuration-gap"
+                ]
+              }
+            },
+            "kind": "boundary",
+            "feature_id": "FEAT-0005",
+            "feature_document": "docs/features/FEAT-0005-weekly-operating-reports.md",
+            "fixtures": [
+              "skills/weekly-report-finalization/examples/blocked/current-weekly-draft-missing.md"
+            ]
+          }
+        ],
+        "source_hash": "ca67b654d9be55d7c2e5d3895aaf91d9c6effb3790cb0cc8cc174c3abd0c7feb"
+      }
+    ],
+    "counts": {
+      "skills": 7,
+      "cases": 21,
+      "normal": 7,
+      "hard": 7,
+      "boundary": 7
+    }
+  },
+  "calibrations": [
+    {
+      "skill_name": "weekly-report-finalization",
+      "case_id": "weekly_finalization_direct_draft_normal_01",
+      "source_hash": "ca67b654d9be55d7c2e5d3895aaf91d9c6effb3790cb0cc8cc174c3abd0c7feb",
+      "candidate": {
+        "status": 0,
+        "stdout": "---\nartifact_type: kamdar-weekly-finalization-plan\nartifact_version: \"0.1.0\"\nweek: \"{{UNRESOLVED}}\"\nstate: configuration_gap\ncurrent_weekly_draft: \"{{CURRENT_WEEKLY_DRAFT_PATH}}\"\n---\n\n# Weekly finalization — {{UNRESOLVED}}\n\n## Input Draft\n\n- path: {{CURRENT_WEEKLY_DRAFT_PATH}}\n- source_keys: {{UNRESOLVED}}\n- source_gaps:\n  - missing_draft: No completed current Weekly Draft body was supplied. The finalization contract requires exactly one non-final Draft with all five anchor markers, stable source keys, and a week. A missing Draft is a named gap; the skill must not search another file or re-mine Daily evidence.\n  - missing_project_routing_snapshot: No local Project routing snapshot was supplied. Report routing depends on the snapshot to map known Project and Department relations. Without it, every Project/Department relation is an explicit report gap.\n\n## Report hierarchy\n\nNo hierarchy rendered. The skill contract states `no_finding` creates no hierarchy; a `configuration_gap` likewise creates no Project, Department, or Company report, because every final report item must trace to a Draft source key and no Draft source keys are available.\n\n## Promotion review\n\nNo promotion review performed. Promotion requires a Draft entry carrying reviewed authority, owner, recurrence/materiality, and proof. With no Draft supplied, no candidate can be qualified or retained. There is nothing to promote to `kamdar-employee-sop@1.0.0` or `kamdar-issue@1.0.0`, and no missing gate to record against a specific entry.\n\nRetained/promotion-ready keys: none.\nSource gaps: missing_draft, missing_project_routing_snapshot, unresolved_week.\n\n## Completion boundary\n\n- No Draft was read. No provider publication or executive delivery was invoked.\n- No Project, Department, or Company report was rendered.\n- No SOP or Issue promotion artifact was produced.\n- No second Weekly diff, Draft mutation, or provider receipt was created.\n- The input Draft path remains unmodified and unresolved.\n\n## Required re-run inputs\n\nTo re-run finalization, supply:\n1. One non-final completed Weekly Draft with all five anchor markers, stable source keys, and an explicit week.\n2. One local Project routing snapshot mapping known Project and Department relations for the Draft's source keys.\n\nUntil both are supplied, the finalization state remains `configuration_gap` and no report hierarchy or promotion artifacts are produced.",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "a12633d5f717b4e270e5e852c11d5bf08fd8e3842bf46a45f7298c040010a93b"
+      },
+      "baseline": {
+        "status": 0,
+        "stdout": "WEEKLY FINALIZATION — INPUT GAP REPORT\n\nThe request asks me to render the Weekly finalization plan, hierarchy, and\nreview-qualified local promotion artifacts from a \"supplied completed current\nWeekly Draft and local Project routing snapshot.\"\n\nHowever, the supplied fixtures contain only:\n  1. templates/sop.md (kamdar-employee-sop, v1.0.0)\n  2. templates/issue.md (kamdar-issue, v1.0.0)\n\nThe two primary inputs are missing:\n  - Completed current Weekly Draft (the source document whose content drives\n    Project report finalization, Area/Company rollups, and promotion decisions)\n  - Local Project routing snapshot (the per-Project routing map that names\n    which Projects roll into which Area, which Work items are review-qualified,\n    and which Decisions/SOPs are candidates for promotion)\n\nWithout these, I cannot:\n  - Render the finalization hierarchy (canonical Projects → Weekly Project\n    reports → Area rollups → Company rollup → selective Decisions/SOPs promotion)\n  - Identify review-qualified promotion candidates\n  - Populate sop.md or issue.md artifacts with source-backed content, because\n    every placeholder (PURPOSE_AND_OUTCOME, PROBLEM_AND_IMPACT, BEFORE_BASELINE,\n    etc.) requires facts extracted from the Weekly Draft and routing snapshot\n  - Produce receipts or idempotency proofs\n\nREQUIRED TO PROCEED\n  1. The completed current Weekly Draft (full text or page content)\n  2. The local Project routing snapshot (Project-to-Area mapping, review-qualified\n     Work items, promotion candidates with source links)\n\nOnce both are supplied, the finalization will:\n  - Finalize each Project report from the Weekly Draft using the weekly-report\n    template\n  - Derive Area operating rollups from finalized Project reports\n  - Derive the Company operating rollup from Area rollups\n  - Render review-qualified SOP and Issue promotion artifacts using the provided\n    templates, populated only with source-backed facts\n  - Preserve native source URLs and never invent rationale, measurements, or\n    financial values\n\nSTATUS: blocked_on_missing_inputs — awaiting Weekly Draft and routing snapshot.",
+        "stderr": "",
+        "timed_out": false,
+        "output_sha256": "16e37102e166b243ae8aadc78300a58c60599260ae3d0eedc3da0ebb6a87ff85"
+      },
+      "judge": {
+        "status": 0,
+        "stdout": "{\"tier\":\"C\",\"candidate_checks\":[{\"assertion\":\"Reads the current Draft and does not create a second Weekly diff or rewrite an anchor\",\"met\":false,\"evidence\":\"Candidate explicitly states 'No Draft was read' and 'No second Weekly diff, Draft mutation, or provider receipt was created.' The negative constraints (no second diff, no anchor rewrite) are satisfied, but the affirmative 'reads the current Draft' is not — it declares the Draft path unresolved.\"},{\"assertion\":\"Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state\",\"met\":false,\"evidence\":\"Candidate states 'No SOP or Issue promotion artifact was produced' and 'There is nothing to promote to kamdar-issue@1.0.0.' No TASK-101, ISSUE-CMT-TECH-PACK-01, or any preserved fields appear.\"},{\"assertion\":\"Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps\",\"met\":false,\"evidence\":\"Candidate states 'There is nothing to promote to kamdar-employee-sop@1.0.0.' No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or any preserved fields appear.\"},{\"assertion\":\"Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established\",\"met\":false,\"evidence\":\"TASK-201 is never mentioned. Candidate says 'Retained/promotion-ready keys: none.'\"},{\"assertion\":\"Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability\",\"met\":false,\"evidence\":\"Candidate states 'No hierarchy rendered' and 'No Project, Department, or Company report was rendered.' It explicitly attributes this to the missing routing snapshot.\"},{\"assertion\":\"Claims no provider publication, delivery, or promotion effect\",\"met\":true,\"evidence\":\"Candidate states 'No provider publication or executive delivery was invoked' and 'No provider receipt was created.'\"}],\"baseline_checks\":[{\"assertion\":\"Reads the current Draft and does not create a second Weekly diff or rewrite an anchor\",\"met\":false,\"evidence\":\"Baseline says the Draft is missing and cannot be read. It does not create a second diff or rewrite an anchor, but does not affirmatively read the Draft.\"},{\"assertion\":\"Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state\",\"met\":false,\"evidence\":\"Baseline says it cannot 'Render review-qualified SOP and Issue promotion artifacts.' No TASK-101, ISSUE-CMT-TECH-PACK-01, kamdar-issue@1.0.0, or any preserved fields appear.\"},{\"assertion\":\"Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps\",\"met\":false,\"evidence\":\"Baseline mentions sop.md template exists but does not produce any promotion. No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or preserved fields appear.\"},{\"assertion\":\"Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established\",\"met\":false,\"evidence\":\"TASK-201 is never mentioned. Baseline provides no per-candidate retention decision.\"},{\"assertion\":\"Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability\",\"met\":false,\"evidence\":\"Baseline says it cannot 'Render the finalization hierarchy' without the routing snapshot. No reports are produced.\"},{\"assertion\":\"Claims no provider publication, delivery, or promotion effect\",\"met\":true,\"evidence\":\"Baseline states STATUS: blocked_on_missing_inputs and does not claim any provider publication, delivery, or promotion effect.\"}],\"winner\":\"candidate\",\"reason\":\"Both outputs are materially incomplete (tier C): neither reads the Draft, performs the two named promotions (TASK-101 → ISSUE, TASK-203 → SOP), retains TASK-201 as project_only, or routes reports through the snapshot. Both correctly claim no provider publication/delivery/promotion effect. The candidate is marginally better because it uses the structured artifact format with named gap keys (missing_draft, missing_project_routing_snapshot, unresolved_week), explicitly satisfies the negative constraints (no second Weekly diff, no anchor rewrite, no provider receipt), and provides a precise completion boundary enumerating what was not done. The baseline is a prose narrative that also identifies the gaps but lacks the structured artifact shape and does not explicitly address the no-second-diff / no-anchor-rewrite constraints. Neither meets the core affirmative assertions.\"}",
+        "stderr": "",
+        "timed_out": false,
+        "result": {
+          "tier": "C",
+          "candidate_checks": [
+            {
+              "assertion": "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+              "met": false,
+              "evidence": "Candidate explicitly states 'No Draft was read' and 'No second Weekly diff, Draft mutation, or provider receipt was created.' The negative constraints (no second diff, no anchor rewrite) are satisfied, but the affirmative 'reads the current Draft' is not — it declares the Draft path unresolved."
+            },
+            {
+              "assertion": "Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state",
+              "met": false,
+              "evidence": "Candidate states 'No SOP or Issue promotion artifact was produced' and 'There is nothing to promote to kamdar-issue@1.0.0.' No TASK-101, ISSUE-CMT-TECH-PACK-01, or any preserved fields appear."
+            },
+            {
+              "assertion": "Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps",
+              "met": false,
+              "evidence": "Candidate states 'There is nothing to promote to kamdar-employee-sop@1.0.0.' No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or any preserved fields appear."
+            },
+            {
+              "assertion": "Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established",
+              "met": false,
+              "evidence": "TASK-201 is never mentioned. Candidate says 'Retained/promotion-ready keys: none.'"
+            },
+            {
+              "assertion": "Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability",
+              "met": false,
+              "evidence": "Candidate states 'No hierarchy rendered' and 'No Project, Department, or Company report was rendered.' It explicitly attributes this to the missing routing snapshot."
+            },
+            {
+              "assertion": "Claims no provider publication, delivery, or promotion effect",
+              "met": true,
+              "evidence": "Candidate states 'No provider publication or executive delivery was invoked' and 'No provider receipt was created.'"
+            }
+          ],
+          "baseline_checks": [
+            {
+              "assertion": "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+              "met": false,
+              "evidence": "Baseline says the Draft is missing and cannot be read. It does not create a second diff or rewrite an anchor, but does not affirmatively read the Draft."
+            },
+            {
+              "assertion": "Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state",
+              "met": false,
+              "evidence": "Baseline says it cannot 'Render review-qualified SOP and Issue promotion artifacts.' No TASK-101, ISSUE-CMT-TECH-PACK-01, kamdar-issue@1.0.0, or any preserved fields appear."
+            },
+            {
+              "assertion": "Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps",
+              "met": false,
+              "evidence": "Baseline mentions sop.md template exists but does not produce any promotion. No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or preserved fields appear."
+            },
+            {
+              "assertion": "Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established",
+              "met": false,
+              "evidence": "TASK-201 is never mentioned. Baseline provides no per-candidate retention decision."
+            },
+            {
+              "assertion": "Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability",
+              "met": false,
+              "evidence": "Baseline says it cannot 'Render the finalization hierarchy' without the routing snapshot. No reports are produced."
+            },
+            {
+              "assertion": "Claims no provider publication, delivery, or promotion effect",
+              "met": true,
+              "evidence": "Baseline states STATUS: blocked_on_missing_inputs and does not claim any provider publication, delivery, or promotion effect."
+            }
+          ],
+          "winner": "candidate",
+          "reason": "Both outputs are materially incomplete (tier C): neither reads the Draft, performs the two named promotions (TASK-101 → ISSUE, TASK-203 → SOP), retains TASK-201 as project_only, or routes reports through the snapshot. Both correctly claim no provider publication/delivery/promotion effect. The candidate is marginally better because it uses the structured artifact format with named gap keys (missing_draft, missing_project_routing_snapshot, unresolved_week), explicitly satisfies the negative constraints (no second Weekly diff, no anchor rewrite, no provider receipt), and provides a precise completion boundary enumerating what was not done. The baseline is a prose narrative that also identifies the gaps but lacks the structured artifact shape and does not explicitly address the no-second-diff / no-anchor-rewrite constraints. Neither meets the core affirmative assertions."
+        }
+      },
+      "verdict": "needs-revision"
+    }
+  ],
+  "verdict": "needs-revision",
+  "limitations": [
+    "Selected normal cases received candidate-versus-baseline model calibration; hard and boundary cases are structurally validated."
+  ]
+}

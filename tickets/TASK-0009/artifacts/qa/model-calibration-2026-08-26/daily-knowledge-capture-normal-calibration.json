@@ -1,0 +1,95 @@
+{
+  "skill_name": "daily-knowledge-capture",
+  "case_id": "daily_knowledge_direct_draft_normal_01",
+  "source_hash": "2ad3aacf30276d8665641c15183854c1e0138519d1c6eec099d5ba18feaea5db",
+  "candidate": {
+    "status": 0,
+    "stdout": "---\nartifact_type: kamdar-current-weekly-draft\nartifact_version: \"1.0.0\"\nweek: \"2026-W34\"\nstate: draft\ndraft_version: 1\nlast_updated: \"2026-08-24T16:30:00+08:00\"\n---\n\n# Current Weekly Draft — 2026-W34\n\n## PM attention\n\nNo PM intervention yet.\n\n## Problems and inefficiencies\n\nNo grounded problem definition yet.\n\n## Decisions\n\n### decision:TASK-201 — Approve coordinated Deepavali themes and one campaign asset folder per batch — Proposed\n\n- **Choice:** Approve coordinated Deepavali campaign themes and use one campaign asset folder per batch.\n- **Reason / tradeoff:** Coordinated themes across branch and online versus independent activation; per-batch asset folders versus a single shared folder.\n- **Authority:** Not supplied; weekly review must confirm the decision owner.\n- **Review trigger:** Review after seven campaign days.\n- **Evidence:** [TASK-201](notion://TASK-201)\n\n### decision:TASK-203 — Approve the listing handoff after two reused batches — Proposed\n\n- **Choice:** Approve the listing handoff after two reused batches.\n- **Reason / tradeoff:** Approving after two reused batches versus requiring additional batches before handoff approval.\n- **Authority:** Not supplied; weekly review must confirm the decision owner.\n- **Review trigger:** Sample ten pages after the next catalog sync.\n- **Evidence:** [TASK-203](notion://TASK-203)\n\n## SOPs\n\n### sop:TASK-201 — Campaign asset handoff by batch — Observed\n\n- **Trigger:** A Deepavali campaign batch is prepared for asset handoff.\n- **Actors / systems:** Maya Tan organizes campaign assets into one folder per batch and approves coordinated themes for branch and online activation.\n- **Ordered method:** Organize assets into one campaign asset folder per batch; approve coordinated Deepavali themes; hand off for activation.\n- **Output:** One campaign asset folder per batch with coordinated themes approved.\n- **Baseline:** One batch during W34; active time not measured; wait time not measured.\n- **Exceptions:** Not stated.\n- **Reuse evidence:** Applied to one campaign batch during W34; weekly confirmation of authority and reuse pending.\n- **Evidence:** [TASK-201](notion://TASK-201)\n\n### sop:TASK-202 — Verify customer-facing fixes with named storefront cases — Observed\n\n- **Trigger:** Customer-facing e-commerce fixes are completed.\n- **Actors / systems:** Darren Lim verifies completed fixes against named storefront cases.\n- **Ordered method:** Complete the fix; identify named storefront cases; verify the fix against each case.\n- **Output:** Verified customer-facing fix confirmed against named storefront cases.\n- **Baseline:** One completed meeting during W34; active time not measured; wait time not measured.\n- **Exceptions:** Not stated.\n- **Reuse evidence:** Referenced in one completed meeting during W34; weekly confirmation of authority and reuse pending.\n- **Evidence:** [TASK-202](notion://TASK-202)\n\n### sop:TASK-203 — Listing handoff after reused batches — Observed\n\n- **Trigger:** Approved products are ready for listing handoff.\n- **Actors / systems:** Darren Lim applies the listing checklist and approves the handoff after two reused batches.\n- **Ordered method:** Apply the listing checklist to approved products; reuse two batches; approve the listing handoff; sample ten pages after the next catalog sync.\n- **Output:** One publish-ready listing handoff per approved product set.\n- **Baseline:** One handoff during W34; active time not measured; wait time not measured.\n- **Exceptions:** Not stated.\n- **Reuse evidence:** Applied to one handoff during W34; weekly confirmation of authority and reuse pending.\n- **Evidence:** [TASK-203](notion://TASK-203)\n\n## Draft receipt\n\n- `daily_contexts:` daily-context-2026-08-24\n- `source_gaps:` none\n\n---\n\nOUTCOME: applied\npath: automations/templates/current-weekly-draft.md\napplied: decision:TASK-201, decision:TASK-203, sop:TASK-201, sop:TASK-202, sop:TASK-203\nduplicate: none\nconflict: none",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "19d3e251e379d77f6080f583734c27fdf5cb7cded3f04e441ca4f2b8623de793"
+  },
+  "baseline": {
+    "status": 0,
+    "stdout": "# Weekly Draft — 2026-W34 (through 2026-08-24)\n\nSource: daily-context-2026-08-24 (run daily-2026-08-24-grounded-v4, provider_effects: false)\nEvidence window: 2026-08-24T00:00:00–23:59:59+08:00\nProjects reviewed: CMT Pipeline, India Sourcing, Deepavali Marketing, Weekly Meta Ads Updates, Listing Pipeline\nWork items reviewed: 10 | Meetings: 3 | People: 5\n\n## Grounded Decisions (from embedded meetings)\n\n1. Deepavali Marketing — coordinated campaign themes approved; one campaign asset folder per batch.\n   Source: notion://TASK-201 (Meeting, Maya Tan, done 2026-08-21). Review condition: after seven campaign days.\n\n2. Ecom Fixes — customer-facing fixes must be verified against named storefront cases.\n   Source: notion://TASK-202 (Meeting, Darren Lim, done 2026-08-21). Review condition: review customer enquiries for recurrence.\n\n3. Listing Pipeline — listing handoff approved after two reused batches.\n   Source: notion://TASK-203 (Meeting, Darren Lim, done 2026-08-21). Review condition: sample ten pages after the next catalog sync.\n\n## Employee workflow observations\n\nAisha Rahman — CMT Pipeline (notion://PROJ-CMT-CMT_PIPELINE)\n- TASK-105: Approve baju kurung sample measurements, seams, colour checks — DONE (completed 2026-08-20).\n- TASK-110: Record production capacity and conditional line hold — DONE (completed 2026-08-21).\n- TASK-101: Approve consolidated production tech pack — BLOCKED. Sample ETA and commercial quote missing. Was due 2026-08-22; now overdue. Last meaningful update 2026-08-18 (6 days stale). Cause unconfirmed.\n- TASK-104: Close remaining collar correction — due 2026-08-23, status blocked, no blocker reason recorded. Cause unconfirmed.\n\nNur Iqbal — India Sourcing (notion://PROJ-MERCH-INDIA_SOURCING)\n- TASK-101: Receive supplier sample and complete quote — BLOCKED. Sample ETA and commercial quote missing. Last meaningful update 2026-08-18 (6 days stale). Cause unconfirmed.\n\nJun Wong — Weekly Meta Ads Updates (notion://PROJ-MKT-WEEKLY_META_ADS_UPDATES)\n- TASK-115: Document Meta performance — DONE.\n- TASK-116: DONE.\n\nMaya Tan — Deepavali Marketing (notion://PROJ-MKT-DEEPAVALI_MARKETING)\n- TASK-201: Complete campaign asset handoff — DONE (meeting). Decision recorded above.\n\nDarren Lim — Ecom Fixes / Listing Pipeline (notion://PROJ-ECOM-LISTING_PIPELINE)\n- TASK-102: DONE.\n- TASK-202: DONE (meeting). Decision recorded above.\n- TASK-203: Apply listing checklist — DONE (meeting). Decision recorded above.\n\n## Open blockers / stale items requiring follow-up\n\n- TASK-101 (shared by CMT Pipeline and India Sourcing, owner Nur): blocked on missing sample ETA and commercial quote; 6 days since last meaningful update. Highest-priority stale item. Proposed progress-comment on notion://TASK-101 before any off-platform chase.\n- TASK-104 (CMT Pipeline, owner Aisha): blocked with no recorded blocker reason; due 2026-08-23. Proposed progress-comment on notion://TASK-104 to capture current state, blocker owner, and revised commitment.\n\n## Notes\n\n- All five People have telegram as the only approved channel (eval sink). No employee delivery claimed; any chase remains proposal-only.\n- No causes were inferred; items with cause confidence \"unknown\" remain unconfirmed.\n- Provider effects: none performed this run.",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "c72bd1f6f112189cc05a513affeb5b127aaeb04835884946322bc87c37c54cc8"
+  },
+  "judge": {
+    "status": 0,
+    "stdout": "```json\n{\"tier\":\"B\",\"candidate_checks\":[{\"assertion\":\"Cites source URLs and SRC-MEETING-042/SRC-WORK-124 evidence from the context\",\"met\":false,\"evidence\":\"Cites notion://TASK-201, TASK-202, TASK-203 URLs but never references SRC-MEETING-042 or SRC-WORK-124 evidence identifiers.\"},{\"assertion\":\"Adds Decisions and workflow observations only with source-ID/kind keys\",\"met\":true,\"evidence\":\"Decisions keyed as 'decision:TASK-201 — [title] — Proposed'; SOPs keyed as 'sop:TASK-201 — [title] — Observed'. All entries use source-ID/kind keys.\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":false,\"evidence\":\"SOPs include Trigger, Actors/systems, Ordered method, Output, Exceptions, Reuse evidence, Baseline. Missing explicit frequency/volume, timing (only acknowledges 'not measured'), evidence/confidence level, and promotion state fields.\"},{\"assertion\":\"Preserves missing authority, ownership, timing, volume, and repeat-use proof as explicit gaps\",\"met\":true,\"evidence\":\"'Authority: Not supplied; weekly review must confirm the decision owner.' 'active time not measured; wait time not measured.' 'weekly confirmation of authority and reuse pending.' Gaps systematically preserved.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Shows full draft content with frontmatter and OUTCOME block 'applied' with path; no diff or contribution file created.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":true,\"evidence\":\"PM attention states 'No PM intervention yet.' No progress-comments proposed, no project memory writes, no promotion actions, no provider effects.\"}],\"baseline_checks\":[{\"assertion\":\"Cites source URLs and SRC-MEETING-042/SRC-WORK-124 evidence from the context\",\"met\":false,\"evidence\":\"Cites notion://TASK-* and notion://PROJ-* URLs and references 'daily-context-2026-08-24 (run daily-2026-08-24-grounded-v4)' but never references SRC-MEETING-042 or SRC-WORK-124.\"},{\"assertion\":\"Adds Decisions and workflow observations only with source-ID/kind keys\",\"met\":false,\"evidence\":\"Decisions are numbered list items (1, 2, 3) with source citations, not source-ID/kind keyed. Workflow observations are organized by person name (Aisha Rahman, Nur Iqbal, etc.), not by source-ID/kind keys.\"},{\"assertion\":\"The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state\",\"met\":false,\"evidence\":\"No structured workflow observation fields at all. Employee section lists task statuses, dates, and blockers but lacks trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, or promotion state.\"},{\"assertion\":\"Preserves missing authority, ownership, timing, volume, and repeat-use proof as explicit gaps\",\"met\":false,\"evidence\":\"'Cause unconfirmed' appears three times and 'no blocker reason recorded' once, but no systematic preservation of missing authority, timing, volume, or repeat-use proof as explicit gaps.\"},{\"assertion\":\"Edits the supplied current Draft directly and creates no contribution or diff file\",\"met\":true,\"evidence\":\"Shows draft content directly; no diff or contribution file mentioned.\"},{\"assertion\":\"Does not write PM control, Project memory, promotion, or provider effects\",\"met\":false,\"evidence\":\"Includes 'Proposed progress-comment on notion://TASK-101 before any off-platform chase' and 'Proposed progress-comment on notion://TASK-104 to capture current state, blocker owner, and revised commitment.' These are PM control proposals, which the daily-knowledge-capture skill must not write.\"}],\"winner\":\"candidate\",\"reason\":\"The candidate is a useful near miss (B): it correctly structures Decisions and SOP/workflow observations with source-ID/kind keys, systematically preserves authority/timing/reuse gaps as explicit acknowledgements, edits the draft directly without a diff file, and does not write PM control, project memory, promotion, or provider effects. It falls short of A by not citing SRC-MEETING-042/SRC-WORK-124 evidence and by missing several required workflow fields (frequency/volume, timing, evidence/confidence, promotion state). The baseline is materially incomplete (C): it lacks structured workflow observation fields entirely, does not key observations by source-ID/kind, does not systematically preserve gaps, and—most critically—violates the skill boundary by writing PM control proposals (progress-comments and chase proposals), which daily-knowledge-capture must not do.\"}\n```",
+    "stderr": "",
+    "timed_out": false,
+    "result": {
+      "tier": "B",
+      "candidate_checks": [
+        {
+          "assertion": "Cites source URLs and SRC-MEETING-042/SRC-WORK-124 evidence from the context",
+          "met": false,
+          "evidence": "Cites notion://TASK-201, TASK-202, TASK-203 URLs but never references SRC-MEETING-042 or SRC-WORK-124 evidence identifiers."
+        },
+        {
+          "assertion": "Adds Decisions and workflow observations only with source-ID/kind keys",
+          "met": true,
+          "evidence": "Decisions keyed as 'decision:TASK-201 — [title] — Proposed'; SOPs keyed as 'sop:TASK-201 — [title] — Observed'. All entries use source-ID/kind keys."
+        },
+        {
+          "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+          "met": false,
+          "evidence": "SOPs include Trigger, Actors/systems, Ordered method, Output, Exceptions, Reuse evidence, Baseline. Missing explicit frequency/volume, timing (only acknowledges 'not measured'), evidence/confidence level, and promotion state fields."
+        },
+        {
+          "assertion": "Preserves missing authority, ownership, timing, volume, and repeat-use proof as explicit gaps",
+          "met": true,
+          "evidence": "'Authority: Not supplied; weekly review must confirm the decision owner.' 'active time not measured; wait time not measured.' 'weekly confirmation of authority and reuse pending.' Gaps systematically preserved."
+        },
+        {
+          "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+          "met": true,
+          "evidence": "Shows full draft content with frontmatter and OUTCOME block 'applied' with path; no diff or contribution file created."
+        },
+        {
+          "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+          "met": true,
+          "evidence": "PM attention states 'No PM intervention yet.' No progress-comments proposed, no project memory writes, no promotion actions, no provider effects."
+        }
+      ],
+      "baseline_checks": [
+        {
+          "assertion": "Cites source URLs and SRC-MEETING-042/SRC-WORK-124 evidence from the context",
+          "met": false,
+          "evidence": "Cites notion://TASK-* and notion://PROJ-* URLs and references 'daily-context-2026-08-24 (run daily-2026-08-24-grounded-v4)' but never references SRC-MEETING-042 or SRC-WORK-124."
+        },
+        {
+          "assertion": "Adds Decisions and workflow observations only with source-ID/kind keys",
+          "met": false,
+          "evidence": "Decisions are numbered list items (1, 2, 3) with source citations, not source-ID/kind keyed. Workflow observations are organized by person name (Aisha Rahman, Nur Iqbal, etc.), not by source-ID/kind keys."
+        },
+        {
+          "assertion": "The workflow states trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, and promotion state",
+          "met": false,
+          "evidence": "No structured workflow observation fields at all. Employee section lists task statuses, dates, and blockers but lacks trigger, actors/handoff, ordered steps, systems, frequency/volume, timing, exception, output, evidence/confidence, or promotion state."
+        },
+        {
+          "assertion": "Preserves missing authority, ownership, timing, volume, and repeat-use proof as explicit gaps",
+          "met": false,
+          "evidence": "'Cause unconfirmed' appears three times and 'no blocker reason recorded' once, but no systematic preservation of missing authority, timing, volume, or repeat-use proof as explicit gaps."
+        },
+        {
+          "assertion": "Edits the supplied current Draft directly and creates no contribution or diff file",
+          "met": true,
+          "evidence": "Shows draft content directly; no diff or contribution file mentioned."
+        },
+        {
+          "assertion": "Does not write PM control, Project memory, promotion, or provider effects",
+          "met": false,
+          "evidence": "Includes 'Proposed progress-comment on notion://TASK-101 before any off-platform chase' and 'Proposed progress-comment on notion://TASK-104 to capture current state, blocker owner, and revised commitment.' These are PM control proposals, which the daily-knowledge-capture skill must not write."
+        }
+      ],
+      "winner": "candidate",
+      "reason": "The candidate is a useful near miss (B): it correctly structures Decisions and SOP/workflow observations with source-ID/kind keys, systematically preserves authority/timing/reuse gaps as explicit acknowledgements, edits the draft directly without a diff file, and does not write PM control, project memory, promotion, or provider effects. It falls short of A by not citing SRC-MEETING-042/SRC-WORK-124 evidence and by missing several required workflow fields (frequency/volume, timing, evidence/confidence, promotion state). The baseline is materially incomplete (C): it lacks structured workflow observation fields entirely, does not key observations by source-ID/kind, does not systematically preserve gaps, and—most critically—violates the skill boundary by writing PM control proposals (progress-comments and chase proposals), which daily-knowledge-capture must not do."
+    }
+  },
+  "verdict": "needs-revision"
+}

@@ -1,0 +1,95 @@
+{
+  "skill_name": "weekly-report-finalization",
+  "case_id": "weekly_finalization_direct_draft_normal_01",
+  "source_hash": "ca67b654d9be55d7c2e5d3895aaf91d9c6effb3790cb0cc8cc174c3abd0c7feb",
+  "candidate": {
+    "status": 0,
+    "stdout": "---\nartifact_type: kamdar-weekly-finalization-plan\nartifact_version: \"0.1.0\"\nweek: \"{{UNRESOLVED}}\"\nstate: configuration_gap\ncurrent_weekly_draft: \"{{CURRENT_WEEKLY_DRAFT_PATH}}\"\n---\n\n# Weekly finalization — {{UNRESOLVED}}\n\n## Input Draft\n\n- path: {{CURRENT_WEEKLY_DRAFT_PATH}}\n- source_keys: {{UNRESOLVED}}\n- source_gaps:\n  - missing_draft: No completed current Weekly Draft body was supplied. The finalization contract requires exactly one non-final Draft with all five anchor markers, stable source keys, and a week. A missing Draft is a named gap; the skill must not search another file or re-mine Daily evidence.\n  - missing_project_routing_snapshot: No local Project routing snapshot was supplied. Report routing depends on the snapshot to map known Project and Department relations. Without it, every Project/Department relation is an explicit report gap.\n\n## Report hierarchy\n\nNo hierarchy rendered. The skill contract states `no_finding` creates no hierarchy; a `configuration_gap` likewise creates no Project, Department, or Company report, because every final report item must trace to a Draft source key and no Draft source keys are available.\n\n## Promotion review\n\nNo promotion review performed. Promotion requires a Draft entry carrying reviewed authority, owner, recurrence/materiality, and proof. With no Draft supplied, no candidate can be qualified or retained. There is nothing to promote to `kamdar-employee-sop@1.0.0` or `kamdar-issue@1.0.0`, and no missing gate to record against a specific entry.\n\nRetained/promotion-ready keys: none.\nSource gaps: missing_draft, missing_project_routing_snapshot, unresolved_week.\n\n## Completion boundary\n\n- No Draft was read. No provider publication or executive delivery was invoked.\n- No Project, Department, or Company report was rendered.\n- No SOP or Issue promotion artifact was produced.\n- No second Weekly diff, Draft mutation, or provider receipt was created.\n- The input Draft path remains unmodified and unresolved.\n\n## Required re-run inputs\n\nTo re-run finalization, supply:\n1. One non-final completed Weekly Draft with all five anchor markers, stable source keys, and an explicit week.\n2. One local Project routing snapshot mapping known Project and Department relations for the Draft's source keys.\n\nUntil both are supplied, the finalization state remains `configuration_gap` and no report hierarchy or promotion artifacts are produced.",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "a12633d5f717b4e270e5e852c11d5bf08fd8e3842bf46a45f7298c040010a93b"
+  },
+  "baseline": {
+    "status": 0,
+    "stdout": "WEEKLY FINALIZATION — INPUT GAP REPORT\n\nThe request asks me to render the Weekly finalization plan, hierarchy, and\nreview-qualified local promotion artifacts from a \"supplied completed current\nWeekly Draft and local Project routing snapshot.\"\n\nHowever, the supplied fixtures contain only:\n  1. templates/sop.md (kamdar-employee-sop, v1.0.0)\n  2. templates/issue.md (kamdar-issue, v1.0.0)\n\nThe two primary inputs are missing:\n  - Completed current Weekly Draft (the source document whose content drives\n    Project report finalization, Area/Company rollups, and promotion decisions)\n  - Local Project routing snapshot (the per-Project routing map that names\n    which Projects roll into which Area, which Work items are review-qualified,\n    and which Decisions/SOPs are candidates for promotion)\n\nWithout these, I cannot:\n  - Render the finalization hierarchy (canonical Projects → Weekly Project\n    reports → Area rollups → Company rollup → selective Decisions/SOPs promotion)\n  - Identify review-qualified promotion candidates\n  - Populate sop.md or issue.md artifacts with source-backed content, because\n    every placeholder (PURPOSE_AND_OUTCOME, PROBLEM_AND_IMPACT, BEFORE_BASELINE,\n    etc.) requires facts extracted from the Weekly Draft and routing snapshot\n  - Produce receipts or idempotency proofs\n\nREQUIRED TO PROCEED\n  1. The completed current Weekly Draft (full text or page content)\n  2. The local Project routing snapshot (Project-to-Area mapping, review-qualified\n     Work items, promotion candidates with source links)\n\nOnce both are supplied, the finalization will:\n  - Finalize each Project report from the Weekly Draft using the weekly-report\n    template\n  - Derive Area operating rollups from finalized Project reports\n  - Derive the Company operating rollup from Area rollups\n  - Render review-qualified SOP and Issue promotion artifacts using the provided\n    templates, populated only with source-backed facts\n  - Preserve native source URLs and never invent rationale, measurements, or\n    financial values\n\nSTATUS: blocked_on_missing_inputs — awaiting Weekly Draft and routing snapshot.",
+    "stderr": "",
+    "timed_out": false,
+    "output_sha256": "16e37102e166b243ae8aadc78300a58c60599260ae3d0eedc3da0ebb6a87ff85"
+  },
+  "judge": {
+    "status": 0,
+    "stdout": "{\"tier\":\"C\",\"candidate_checks\":[{\"assertion\":\"Reads the current Draft and does not create a second Weekly diff or rewrite an anchor\",\"met\":false,\"evidence\":\"Candidate explicitly states 'No Draft was read' and 'No second Weekly diff, Draft mutation, or provider receipt was created.' The negative constraints (no second diff, no anchor rewrite) are satisfied, but the affirmative 'reads the current Draft' is not — it declares the Draft path unresolved.\"},{\"assertion\":\"Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state\",\"met\":false,\"evidence\":\"Candidate states 'No SOP or Issue promotion artifact was produced' and 'There is nothing to promote to kamdar-issue@1.0.0.' No TASK-101, ISSUE-CMT-TECH-PACK-01, or any preserved fields appear.\"},{\"assertion\":\"Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps\",\"met\":false,\"evidence\":\"Candidate states 'There is nothing to promote to kamdar-employee-sop@1.0.0.' No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or any preserved fields appear.\"},{\"assertion\":\"Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established\",\"met\":false,\"evidence\":\"TASK-201 is never mentioned. Candidate says 'Retained/promotion-ready keys: none.'\"},{\"assertion\":\"Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability\",\"met\":false,\"evidence\":\"Candidate states 'No hierarchy rendered' and 'No Project, Department, or Company report was rendered.' It explicitly attributes this to the missing routing snapshot.\"},{\"assertion\":\"Claims no provider publication, delivery, or promotion effect\",\"met\":true,\"evidence\":\"Candidate states 'No provider publication or executive delivery was invoked' and 'No provider receipt was created.'\"}],\"baseline_checks\":[{\"assertion\":\"Reads the current Draft and does not create a second Weekly diff or rewrite an anchor\",\"met\":false,\"evidence\":\"Baseline says the Draft is missing and cannot be read. It does not create a second diff or rewrite an anchor, but does not affirmatively read the Draft.\"},{\"assertion\":\"Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state\",\"met\":false,\"evidence\":\"Baseline says it cannot 'Render review-qualified SOP and Issue promotion artifacts.' No TASK-101, ISSUE-CMT-TECH-PACK-01, kamdar-issue@1.0.0, or any preserved fields appear.\"},{\"assertion\":\"Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps\",\"met\":false,\"evidence\":\"Baseline mentions sop.md template exists but does not produce any promotion. No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or preserved fields appear.\"},{\"assertion\":\"Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established\",\"met\":false,\"evidence\":\"TASK-201 is never mentioned. Baseline provides no per-candidate retention decision.\"},{\"assertion\":\"Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability\",\"met\":false,\"evidence\":\"Baseline says it cannot 'Render the finalization hierarchy' without the routing snapshot. No reports are produced.\"},{\"assertion\":\"Claims no provider publication, delivery, or promotion effect\",\"met\":true,\"evidence\":\"Baseline states STATUS: blocked_on_missing_inputs and does not claim any provider publication, delivery, or promotion effect.\"}],\"winner\":\"candidate\",\"reason\":\"Both outputs are materially incomplete (tier C): neither reads the Draft, performs the two named promotions (TASK-101 → ISSUE, TASK-203 → SOP), retains TASK-201 as project_only, or routes reports through the snapshot. Both correctly claim no provider publication/delivery/promotion effect. The candidate is marginally better because it uses the structured artifact format with named gap keys (missing_draft, missing_project_routing_snapshot, unresolved_week), explicitly satisfies the negative constraints (no second Weekly diff, no anchor rewrite, no provider receipt), and provides a precise completion boundary enumerating what was not done. The baseline is a prose narrative that also identifies the gaps but lacks the structured artifact shape and does not explicitly address the no-second-diff / no-anchor-rewrite constraints. Neither meets the core affirmative assertions.\"}",
+    "stderr": "",
+    "timed_out": false,
+    "result": {
+      "tier": "C",
+      "candidate_checks": [
+        {
+          "assertion": "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+          "met": false,
+          "evidence": "Candidate explicitly states 'No Draft was read' and 'No second Weekly diff, Draft mutation, or provider receipt was created.' The negative constraints (no second diff, no anchor rewrite) are satisfied, but the affirmative 'reads the current Draft' is not — it declares the Draft path unresolved."
+        },
+        {
+          "assertion": "Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state",
+          "met": false,
+          "evidence": "Candidate states 'No SOP or Issue promotion artifact was produced' and 'There is nothing to promote to kamdar-issue@1.0.0.' No TASK-101, ISSUE-CMT-TECH-PACK-01, or any preserved fields appear."
+        },
+        {
+          "assertion": "Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps",
+          "met": false,
+          "evidence": "Candidate states 'There is nothing to promote to kamdar-employee-sop@1.0.0.' No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or any preserved fields appear."
+        },
+        {
+          "assertion": "Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established",
+          "met": false,
+          "evidence": "TASK-201 is never mentioned. Candidate says 'Retained/promotion-ready keys: none.'"
+        },
+        {
+          "assertion": "Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability",
+          "met": false,
+          "evidence": "Candidate states 'No hierarchy rendered' and 'No Project, Department, or Company report was rendered.' It explicitly attributes this to the missing routing snapshot."
+        },
+        {
+          "assertion": "Claims no provider publication, delivery, or promotion effect",
+          "met": true,
+          "evidence": "Candidate states 'No provider publication or executive delivery was invoked' and 'No provider receipt was created.'"
+        }
+      ],
+      "baseline_checks": [
+        {
+          "assertion": "Reads the current Draft and does not create a second Weekly diff or rewrite an anchor",
+          "met": false,
+          "evidence": "Baseline says the Draft is missing and cannot be read. It does not create a second diff or rewrite an anchor, but does not affirmatively read the Draft."
+        },
+        {
+          "assertion": "Promotes problem:TASK-101 to existing Work database as ISSUE-CMT-TECH-PACK-01 using kamdar-issue@1.0.0 preserving workflow step, W34 four-hour and MYR 360 Before baseline and formula, confidence, unmeasured lost-line-cost owner, intervention, and empty After state",
+          "met": false,
+          "evidence": "Baseline says it cannot 'Render review-qualified SOP and Issue promotion artifacts.' No TASK-101, ISSUE-CMT-TECH-PACK-01, kamdar-issue@1.0.0, or any preserved fields appear."
+        },
+        {
+          "assertion": "Promotes sop:TASK-203 to existing SOPs database as SOP-ECOM-LISTING-HANDOFF-01 using kamdar-employee-sop@1.0.0 preserving trigger, actors/handoff, five ordered steps, systems, two-batch reuse, exceptions, output, owner, and timing/volume measurement gaps",
+          "met": false,
+          "evidence": "Baseline mentions sop.md template exists but does not produce any promotion. No TASK-203, SOP-ECOM-LISTING-HANDOFF-01, or preserved fields appear."
+        },
+        {
+          "assertion": "Retains sop:TASK-201 as project_only with no destination because cross-campaign reuse is not established",
+          "met": false,
+          "evidence": "TASK-201 is never mentioned. Baseline provides no per-candidate retention decision."
+        },
+        {
+          "assertion": "Routes Project, Department, and Company reports only through the supplied snapshot with source-key traceability",
+          "met": false,
+          "evidence": "Baseline says it cannot 'Render the finalization hierarchy' without the routing snapshot. No reports are produced."
+        },
+        {
+          "assertion": "Claims no provider publication, delivery, or promotion effect",
+          "met": true,
+          "evidence": "Baseline states STATUS: blocked_on_missing_inputs and does not claim any provider publication, delivery, or promotion effect."
+        }
+      ],
+      "winner": "candidate",
+      "reason": "Both outputs are materially incomplete (tier C): neither reads the Draft, performs the two named promotions (TASK-101 → ISSUE, TASK-203 → SOP), retains TASK-201 as project_only, or routes reports through the snapshot. Both correctly claim no provider publication/delivery/promotion effect. The candidate is marginally better because it uses the structured artifact format with named gap keys (missing_draft, missing_project_routing_snapshot, unresolved_week), explicitly satisfies the negative constraints (no second Weekly diff, no anchor rewrite, no provider receipt), and provides a precise completion boundary enumerating what was not done. The baseline is a prose narrative that also identifies the gaps but lacks the structured artifact shape and does not explicitly address the no-second-diff / no-anchor-rewrite constraints. Neither meets the core affirmative assertions."
+    }
+  },
+  "verdict": "needs-revision"
+}

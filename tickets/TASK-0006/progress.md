@@ -289,3 +289,44 @@ created_at: 2026-08-21T22:15:00+08:00
   Node passes 80 with zero failures and skips 10 superseded legacy comparison
   tests; Python passes 28/28, setup 7/7, and onboarding 12/12.
 - `artifact:` `tickets/TASK-0006/artifacts/qa/deployments/seed-v4-2026-08-26-06/deployment-proof.md`.
+
+## 2026-08-26 — actual Hermes Weekly recovery run
+
+- `run:` Hermes executed the installed Weekly automation in isolated-eval mode
+  against the existing W34 Final Project reports. It created no Daily Report
+  and did not rewrite or duplicate the seven existing reports.
+- `promotion:` The agent inspected 22 report candidates, deduped the existing
+  CMT Decision and Ecommerce SOP, and created one missing template-complete
+  Deepavali campaign handoff SOP. Independent live read-back confirmed its
+  parent data source, 11 properties, complete body, and untrashed state.
+- `rollup:` Three Project → three Department → one Company source-report chains
+  were read back and matched exactly.
+- `delivery:` The complete Company report and all three Department links were
+  delivered to the approved operator Telegram route; the private provider
+  receipt records message ID 22.
+- `remaining_gap:` The run could not prove Draft → separate immutable Final
+  snapshot creation because the earlier adapter had already finalized the
+  Project Drafts in place. Distinct Draft and Final identities plus a fresh
+  cycle remain required.
+- `artifact:` `tickets/TASK-0006/artifacts/qa/deployments/seed-v4-2026-08-26-07/weekly-agent-run.md`.
+- `deployment:` Published the operated evidence as
+  `dpl_HVuFesH5DPHSFH2cEbmFEnVjzRK6` at the stable dossier alias; previous
+  deployments remain retained.
+
+## 2026-08-26 — progress-chasing eval hardening
+
+- `root_cause:` FEAT-0003 extraction existed, but its tracked receipt called the
+  Telegram effect `duplicate`, linked the response to Notion, and the active
+  dispatcher lacked the automation's isolated-eval mode. The project-control
+  normal eval also still described Penang/Jun/email instead of grounded CMT.
+- `repair:` Added explicit operator-owned eval-sink delivery semantics, Telegram
+  provider receipt/read-back requirements, a negative no-delivery proof case,
+  a grounded Aisha/TASK-101 control case, and healthy TASK-109 suppression.
+- `proof:` Focused workflow tests pass 44/44; Farplane eval lint passes all 82
+  manifests; new deployment 08 Daily base validation passes with FEAT-0001..0004
+  row counts `1, 2, 1, 3`.
+- `remaining:` Deployment 08 is base-only. Current Daily and Weekly result bytes
+  need fresh independent feature/evidence/artifact judgments before the dossier
+  may select or publish them. Deployment 06/07 remains the latest judged and
+  operated dashboard evidence; no old deployment was deleted.
+- `artifact:` `tickets/TASK-0006/artifacts/qa/deployments/seed-v4-2026-08-26-08/deployment-proof.md`.

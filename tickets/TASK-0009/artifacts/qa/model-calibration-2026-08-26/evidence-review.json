@@ -1,0 +1,36 @@
+{
+  "lane": "evidence-review",
+  "verdict": "fail",
+  "claim_under_test": "Real Hermes reaches tier A on four Daily normal cases while the declared suite contracts remain structurally valid.",
+  "unsupported_claims": [
+    "No calibration reached tier A; tiers were B, C, B, and B.",
+    "The runner inspected 21 cases, not the 27 stated in its source comment and prior documentation."
+  ],
+  "scope_mismatch": [
+    "daily-documentation-quality assertions expect SRC-WORK-102, SRC-PERSON-NUR, TASK-102, and TASK-103, but the bound context supplies TASK-101 and TASK-104.",
+    "daily-project-memory assertions expect PROJ-REPLENISH and a normalisation-date gap absent from the bound current context."
+  ],
+  "missing_evidence": [
+    "No tier-A Daily normal-case result.",
+    "Hard and boundary cases were structurally inspected but not model-calibrated.",
+    "No real-model Weekly promotion case is included in this runner."
+  ],
+  "weak_artifacts": [
+    "At least two normal-case failures mix model quality with stale fixture/assertion wiring.",
+    "Candidate-beats-baseline does not satisfy the A-only acceptance gate."
+  ],
+  "human_confusion_findings": [
+    "A reader could mistake a winning tier-B candidate for a passing result.",
+    "The declared 27-case description conflicts with the 21-case inventory in summary.json."
+  ],
+  "rerun_instructions": [
+    "Align each normal-case fixture, prompt, expected IDs, and assertions.",
+    "Rerun all four model calibrations and require tier A for each.",
+    "Add a real-model Weekly promotion calibration before claiming end-to-end model proof."
+  ],
+  "fix_candidates": [
+    "Repair documentation-quality and project-memory fixture bindings.",
+    "Require project-control to preserve the MYR 1500/MYR 1800/+MYR 300 basis and PERSON-JUN proposal.",
+    "Require knowledge capture to emit source IDs, frequency/volume, timing, evidence/confidence, and promotion state."
+  ]
+}
