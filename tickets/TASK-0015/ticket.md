@@ -3,7 +3,7 @@ template_id: ticket-template
 template_version: "0.2.5"
 ticket_id: TASK-0015
 title: Package a lean Hermes Company OS distribution
-status: active
+status: complete
 claimed_by: codex-root
 created_at: 2026-08-27T08:30:00Z
 updated_at: 2026-08-27T08:30:00Z
@@ -75,13 +75,13 @@ Excluded: tickets, tests, seed, screenshots, run evidence, credentials, state
 
 ## Done
 
-- [ ] Native `hermes profile install` creates a named profile from this repo.
-- [ ] Installed profile visibly contains both existing setup skills and no facade.
-- [ ] Client payload excludes development tickets, tests, seed, and run evidence.
-- [ ] Onboarding preview is non-mutating and apply is idempotent.
-- [ ] Daily and Weekly cron jobs are created or reconciled with client-local paths.
-- [ ] README states when the profile is created, configured, onboarded, and updated.
-- [ ] Focused, full, install-smoke, and skill-contract checks pass.
+- [x] Native `hermes profile install` creates a named profile from this repo.
+- [x] Installed profile visibly contains both existing setup skills and no facade.
+- [x] Client payload excludes development tickets, tests, seed, and run evidence.
+- [x] Onboarding preview is non-mutating and apply is idempotent.
+- [x] Daily and Weekly cron jobs are created or reconciled with client-local paths.
+- [x] README states when the profile is created, configured, onboarded, and updated.
+- [x] Focused, full, install-smoke, and skill-contract checks pass.
 
 ## QA Strategy
 
@@ -99,6 +99,6 @@ residual_risk: Live provider credentials and Notion authority remain client-owne
 
 ## State
 
-- Current: implementation active.
-- Next: add manifest, onboarding skill, tests, and docs.
+- Current: complete; public GitHub install and apply proof passed.
+- Next: run `hermes setup` and Notion onboarding on the client machine.
 - Blockers: none.

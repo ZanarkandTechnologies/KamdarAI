@@ -35,7 +35,7 @@ rubrics: [code-quality, integration-readiness, skill-contract, documentation-qua
 | Family | TAS | Evidence |
 | --- | --- | --- |
 | Code quality | TAS-A | Standard-library helper, explicit failures, unit coverage for create/update/resume/duplicates/readiness. |
-| Integration readiness | TAS-A | Native local install, update, apply, idempotent rerun, cwd read-back, and two stored jobs. |
+| Integration readiness | TAS-A | Native local and public-GitHub install, update, apply, idempotent rerun, cwd read-back, and two stored jobs. |
 | Skill contract | TAS-A | Five bounded nodes, explicit source modes, schedule edge, proof, and separate Notion owner. |
 | Documentation quality | TAS-A | Public README leads with exact client commands and security gates. |
 | Evidence quality | TAS-A | Commands are replayable; full tests and operated receipts match the claims. |
