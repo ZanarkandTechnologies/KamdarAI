@@ -4,59 +4,66 @@ KamdarAI is the source-controlled configuration and evaluation harness for the
 Kamdar Hermes manager. The live agent runs from a separate Hermes workspace;
 this repository owns the reviewed inputs used to configure and test it.
 
-## Quick setup
+## Client installation
 
-1. Install Hermes, create a separate profile, and configure that profile.
+Install the public repository as a native Hermes distribution. Hermes creates
+the profile and copies only the runtime allowlist in `distribution.yaml`; it
+does not install this repository's tickets, tests, seed, screenshots, or Git
+history.
 
-   ```bash
-   hermes profile create kamdarai
-   hermes -p kamdarai setup
-   ```
+```bash
+export KAMDAR_PROFILE=client-company-os
 
-2. Clone KamdarAI, preview the install, then apply it.
+hermes profile install \
+  https://github.com/ZanarkandTechnologies/KamdarAI \
+  --name "$KAMDAR_PROFILE" \
+  --alias
 
-   ```bash
-   git clone <KamdarAI-repository-url>
-   cd KamdarAI
+hermes -p "$KAMDAR_PROFILE" setup
+```
 
-   export KAMDAR_PROFILE=kamdarai
-   export KAMDAR_PROFILE_HOME="${HOME}/.hermes/profiles/${KAMDAR_PROFILE}"
-   export KAMDAR_WORKSPACE="${KAMDAR_PROFILE_HOME}/workspace"
-   mkdir -p "$KAMDAR_WORKSPACE"
+Preview and apply the Company OS workspace and native schedules:
 
-   python3 scripts/validate_company_context.py --context workspace.hermes.md
-   python3 skills/setup-kamdar-workspace/scripts/setup_workspace.py \
-     --workspace "$KAMDAR_WORKSPACE" \
-     --profile-home "$KAMDAR_PROFILE_HOME"
-   python3 skills/setup-kamdar-workspace/scripts/setup_workspace.py \
-     --workspace "$KAMDAR_WORKSPACE" \
-     --profile-home "$KAMDAR_PROFILE_HOME" \
-     --apply
-   hermes -p "$KAMDAR_PROFILE" config set terminal.cwd "$KAMDAR_WORKSPACE"
-   hermes -p "$KAMDAR_PROFILE" config get terminal.cwd
-   ```
+```bash
+export KAMDAR_PROFILE_HOME="${HOME}/.hermes/profiles/${KAMDAR_PROFILE}"
+export KAMDAR_SETUP="${KAMDAR_PROFILE_HOME}/skills/setup-kamdar-workspace/scripts/setup_profile.py"
 
-   The preview is safe; `--apply` copies the approved context, automations,
-   templates, skills, and source-owned plugins without deleting runtime files.
-   Then open a fresh Hermes session from that profile.
+python3 "$KAMDAR_SETUP" --profile-home "$KAMDAR_PROFILE_HOME"
+python3 "$KAMDAR_SETUP" --profile-home "$KAMDAR_PROFILE_HOME" --apply
 
-3. Set up Notion as a separate test root first. The current config is
-   evaluation-only and production writes are proposal-only. Use
-   [`templates/`](templates/README.md) for the database shape, then approve
-   real database routes and write authority before using production records.
+hermes -p "$KAMDAR_PROFILE" config get terminal.cwd
+hermes -p "$KAMDAR_PROFILE" cron status
+```
 
-4. Optional: activate the Notion comment bridge on the Linux Hermes VPS.
+The first command is non-mutating. Apply copies reviewed workspace inputs,
+sets `terminal.cwd`, and creates or reconciles the weekday Daily and Friday
+Weekly jobs without deleting client files. A stopped gateway produces a
+truthful `partial` receipt because scheduled jobs cannot fire until the gateway
+or Hermes desktop scheduler is running.
 
-   ```bash
-   export KAMDAR_NOTION_ONBOARD="$KAMDAR_PROFILE_HOME/skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py"
-   python3 "$KAMDAR_NOTION_ONBOARD" preflight
-   ```
+The same flow can be run inside Hermes chat by saying
+`Run setup-kamdar-workspace.`
 
-   Follow the JSON receipt's `next_action` through each phase. Login, sharing,
-   subscription creation, and webhook verification remain human gates:
+## Optional Notion webhook
 
-   ```bash
-   export NOTION_ROOT_URL="https://www.notion.so/<root-page-id>"
+Set up Notion as a separate test root first. The current config is
+evaluation-only and production writes are proposal-only. Use
+[`templates/`](templates/README.md) for the database shape, then approve real
+database routes and write authority before using production records.
+
+On a Linux Hermes VPS, say `Run notion-webhook-onboarding.` in the configured
+profile, or begin directly with its preflight:
+
+```bash
+export KAMDAR_NOTION_ONBOARD="$KAMDAR_PROFILE_HOME/skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py"
+python3 "$KAMDAR_NOTION_ONBOARD" preflight
+```
+
+Follow the JSON receipt's `next_action` through each phase. Login, sharing,
+subscription creation, and webhook verification remain human gates:
+
+```bash
+export NOTION_ROOT_URL="https://www.notion.so/<root-page-id>"
 
    python3 "$KAMDAR_NOTION_ONBOARD" configure \
      --root-page-url "$NOTION_ROOT_URL" \
@@ -66,27 +73,24 @@ this repository owns the reviewed inputs used to configure and test it.
    python3 "$KAMDAR_NOTION_ONBOARD" discover
    # Leave one harmless comment beginning with @vishanai.
    python3 "$KAMDAR_NOTION_ONBOARD" finalize
-   python3 "$KAMDAR_NOTION_ONBOARD" status
-   ```
+python3 "$KAMDAR_NOTION_ONBOARD" status
+```
 
-   Before `discover`, share the root page and every database that may receive
-   an agent comment with the same Notion connection used by `NOTION_TOKEN`.
-   Sharing a sibling page or a similarly named database is not sufficient:
-   Hermes authorizes the exact parent data-source ID of the commented page.
-   Rerun `discover` after granting a new database access so the active
-   `NOTION_ALLOWED_DATA_SOURCES` catalog is refreshed.
+Before `discover`, share the root page and every database that may receive an
+agent comment with the same Notion connection used by `NOTION_TOKEN`. Sharing a
+sibling page or similarly named database is insufficient: Hermes authorizes the
+exact parent data-source ID. Rerun `discover` after granting new access.
 
-   Setup is complete only when `status` reports all of these conditions:
+Setup is complete only when `status` reports all of these conditions:
 
-   - `hermes_health=true` and `ngrok_online=true`
-   - `verification_token_captured=true`
-   - `data_sources_configured=true`
-   - `workspace_locked=true`
-   - `reply_observed=true`
+- `hermes_health=true` and `ngrok_online=true`
+- `verification_token_captured=true`
+- `data_sources_configured=true`
+- `workspace_locked=true`
+- `reply_observed=true`
 
-   Poll `verification` after requesting a token and poll `finalize` after the
-   test comment until each phase advances. Do not treat the first
-   `human_required` receipt as an error.
+Poll `verification` after requesting a token and `finalize` after the test
+comment. A `human_required` receipt is a normal security gate, not an error.
 
 ## Notion comment bridge troubleshooting
 
