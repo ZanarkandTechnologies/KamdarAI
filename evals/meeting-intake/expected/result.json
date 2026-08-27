@@ -1,0 +1,57 @@
+{
+  "schema_version": "kamdar-meeting-commitment-intake-result@1.0.0",
+  "meeting_id": "TASK-204",
+  "task_creations": [
+    {
+      "commitment_key": "TASK-307",
+      "source_text": "Jun publishes the approved store banner crop by 2026-08-22.",
+      "work_item_id": "TASK-307",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner_person_id": "PERSON-JUN",
+      "name": "Publish approved Deepavali store banner crop",
+      "type": "Task",
+      "status": "Not started",
+      "ai_review": "Pending",
+      "priority": "P1",
+      "start_date": "2026-08-21",
+      "due_date": "2026-08-22",
+      "progress": "Committed in TASK-204; not started.",
+      "last_meaningful_update": "2026-08-21",
+      "notes_markdown": "## Notes\n\nPublish the approved store banner crop.\n\n- **Source Meeting:** TASK-204\n- **Commitment:** TASK-307\n- **Success evidence:** final store banner crop linked from this Task.",
+      "source_meeting_id": "TASK-204",
+      "source_ids": ["TASK-204", "PROJ-MKT-DEEPAVALI_MARKETING", "PERSON-JUN"],
+      "idempotency_key": "meeting:TASK-204:commitment:TASK-307"
+    },
+    {
+      "commitment_key": "TASK-308",
+      "source_text": "Darren verifies the website launch checklist by 2026-08-23.",
+      "work_item_id": "TASK-308",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner_person_id": "PERSON-DARREN",
+      "name": "Verify Deepavali website launch checklist",
+      "type": "Task",
+      "status": "Not started",
+      "ai_review": "Pending",
+      "priority": "P1",
+      "start_date": "2026-08-21",
+      "due_date": "2026-08-23",
+      "progress": "Committed in TASK-204; not started.",
+      "last_meaningful_update": "2026-08-21",
+      "notes_markdown": "## Notes\n\nVerify the website launch checklist.\n\n- **Source Meeting:** TASK-204\n- **Commitment:** TASK-308\n- **Success evidence:** completed website launch checklist linked from this Task.",
+      "source_meeting_id": "TASK-204",
+      "source_ids": ["TASK-204", "PROJ-MKT-DEEPAVALI_MARKETING", "PERSON-DARREN"],
+      "idempotency_key": "meeting:TASK-204:commitment:TASK-308"
+    }
+  ],
+  "blocked_commitments": [
+    {
+      "commitment_key": "NOTE-1",
+      "source_text": "Improve the asset naming convention. Owner and due date were not agreed.",
+      "missing_fields": ["owner", "due_date"],
+      "reason": "The Meeting did not assign an accountable Person or commitment date."
+    }
+  ],
+  "run_notes": "The Meeting Decision and general Notes were not converted into Tasks."
+}

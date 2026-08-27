@@ -7,7 +7,8 @@ updated_at: 2026-08-21
 refs:
   - ../systems/kamdar-company-os.md
   - ../../automations/README.md
-  - ../../evals/evals.json
+  - ../../evals/daily/suite.json
+  - ../../evals/weekly/suite.json
 ---
 
 # Kamdar feature docs
@@ -16,8 +17,8 @@ Each `FEAT-*` page owns one buyer-visible capability of the Kamdar manager and
 is the canonical explanation rendered above that feature's grouped proof. The
 [Kamdar Company OS system spec](../systems/kamdar-company-os.md) owns how the
 features run together; automation files own cadence and procedure;
-`evals/evals.json` owns runnable assertions and tags each assertion with the
-feature it proves.
+The Daily and Weekly eval suites own runnable assertions and tag each case with
+the feature it proves.
 
 One Daily run reads the bounded source window once and produces several feature
 outcomes. Its knowledge and control pipelines directly accumulate disjoint,
@@ -71,6 +72,7 @@ artifact, draft, or frozen receipt is not external delivery proof.
 | `FEAT-0005` | [Company operating review](FEAT-0005-weekly-operating-reports.md) | Weekly | Project → Department → Company reports |
 | `FEAT-0006` | [Promote earned knowledge](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated employee SOP promotion to the existing SOPs database and problem promotion to Issues in existing Work |
 | `FEAT-0007` | [Carry commitments into next week](FEAT-0007-weekly-next-week-planning.md) | Weekly | Canonical Project and Work updates |
+| `FEAT-0010` | [Turn Meeting commitments into accountable Work](FEAT-0010-meeting-commitment-intake.md) | Event workflow | Explicit Meeting commitments become canonical, deduplicated Task records |
 
 ## Update rule
 
@@ -82,6 +84,6 @@ artifact, draft, or frozen receipt is not external delivery proof.
    Do not split source reads to match UI groups.
 5. Run the repository tests listed in the root README.
 
-The active product registry contains seven ROI-bearing workflows. Delivery is
+The active product registry contains eight ROI-bearing workflows. Delivery is
 an optional integration after the Company report; safety, receipts, and rerun
 behavior are acceptance requirements on every workflow rather than features.
