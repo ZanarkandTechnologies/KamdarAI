@@ -15,6 +15,8 @@ from typing import Any
 PACKAGE = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PACKAGE.parents[1]
 SETUP_WORKSPACE = PACKAGE / "scripts" / "setup_workspace.py"
+NOTION_PLUGIN_NAME = "notion-platform"
+NOTION_PLUGIN_KEY = "platforms/notion"
 
 SCHEDULES = (
     {
@@ -64,6 +66,37 @@ def run_command(arguments: list[str], profile_home: Path) -> subprocess.Complete
 def gateway_is_running(result: subprocess.CompletedProcess[str]) -> bool:
     output = f"{result.stdout}\n{result.stderr}"
     return "✓ Gateway is running" in output
+
+
+def notion_plugin_enabled(profile_home: Path) -> bool:
+    result = run_command(
+        ["hermes", "plugins", "list", "--user", "--json"], profile_home
+    )
+    try:
+        plugins = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise ProfileSetupError("plugin_list_unreadable") from error
+    if not isinstance(plugins, list):
+        raise ProfileSetupError("plugin_list_must_be_list")
+    return any(
+        isinstance(plugin, dict)
+        and plugin.get("name") == NOTION_PLUGIN_NAME
+        and plugin.get("status") == "enabled"
+        for plugin in plugins
+    )
+
+
+def enable_notion_plugin(profile_home: Path) -> None:
+    run_command(
+        [
+            "hermes", "plugins", "enable", NOTION_PLUGIN_KEY,
+            "--no-allow-tool-override",
+        ],
+        profile_home,
+    )
+    run_command(["hermes", "plugins", "doctor", NOTION_PLUGIN_KEY], profile_home)
+    if not notion_plugin_enabled(profile_home):
+        raise ProfileSetupError("notion_plugin_enable_verification_failed")
 
 
 def read_jobs(profile_home: Path) -> list[dict[str, Any]]:
@@ -185,19 +218,22 @@ def run(profile_home: Path, apply: bool) -> int:
         setup_result = run_command(workspace_command, profile_home)
         setup_receipt = json.loads(setup_result.stdout)
         actions = cron_plan(profile_home, workspace)
+        plugin_action = "in_sync" if notion_plugin_enabled(profile_home) else "enable"
         if not apply:
             emit(
                 "changes_pending" if setup_receipt.get("pending") or any(
                     item["action"] != "in_sync" for item in actions
-                ) else "in_sync",
+                ) or plugin_action != "in_sync" else "in_sync",
                 profile_home=str(profile_home),
                 workspace=str(workspace),
                 workspace_setup=setup_receipt,
+                notion_plugin_action=plugin_action,
                 cron_actions=actions,
                 next_action="rerun_with_apply",
             )
             return 0
 
+        enable_notion_plugin(profile_home)
         run_command(["hermes", "config", "set", "terminal.cwd", str(workspace)], profile_home)
         cwd_result = run_command(["hermes", "config", "get", "terminal.cwd"], profile_home)
         if Path(cwd_result.stdout.strip()).expanduser().resolve() != workspace.resolve():
@@ -216,6 +252,7 @@ def run(profile_home: Path, apply: bool) -> int:
             profile_home=str(profile_home),
             workspace=str(workspace),
             workspace_setup=setup_receipt,
+            notion_plugin_action="in_sync",
             terminal_cwd=str(workspace),
             cron_jobs=verified,
             scheduler_ready=scheduler_ready,

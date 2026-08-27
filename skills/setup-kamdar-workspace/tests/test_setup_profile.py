@@ -28,6 +28,38 @@ class SetupProfileTests(unittest.TestCase):
         self.assertFalse(PROFILE.gateway_is_running(stopped))
         self.assertTrue(PROFILE.gateway_is_running(running))
 
+    def test_notion_plugin_enabled_reads_native_plugin_inventory(self) -> None:
+        profile_home = Path("/tmp/client-profile")
+        payload = json.dumps(
+            [{"name": "notion-platform", "status": "enabled", "source": "user"}]
+        )
+        completed = subprocess.CompletedProcess([], 0, payload, "")
+        with patch.object(PROFILE, "run_command", return_value=completed) as run_command:
+            self.assertTrue(PROFILE.notion_plugin_enabled(profile_home))
+        self.assertEqual(
+            run_command.call_args.args[0],
+            ["hermes", "plugins", "list", "--user", "--json"],
+        )
+
+    def test_enable_notion_plugin_declines_tool_override_and_verifies(self) -> None:
+        profile_home = Path("/tmp/client-profile")
+        enabled = subprocess.CompletedProcess(
+            [], 0, json.dumps([{"name": "notion-platform", "status": "enabled"}]), ""
+        )
+        with patch.object(
+            PROFILE,
+            "run_command",
+            side_effect=[subprocess.CompletedProcess([], 0, "", ""),
+                         subprocess.CompletedProcess([], 0, "", ""), enabled],
+        ) as run_command:
+            PROFILE.enable_notion_plugin(profile_home)
+        commands = [call.args[0] for call in run_command.call_args_list]
+        self.assertEqual(
+            commands[0],
+            ["hermes", "plugins", "enable", "platforms/notion", "--no-allow-tool-override"],
+        )
+        self.assertEqual(commands[1], ["hermes", "plugins", "doctor", "platforms/notion"])
+
     def test_missing_jobs_plan_two_creates_with_client_paths(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             profile_home = Path(temporary)

@@ -36,13 +36,22 @@ hermes -p "$KAMDAR_PROFILE" cron status
 ```
 
 The first command is non-mutating. Apply copies reviewed workspace inputs,
-sets `terminal.cwd`, and creates or reconciles the weekday Daily and Friday
-Weekly jobs without deleting client files. A stopped gateway produces a
-truthful `partial` receipt because scheduled jobs cannot fire until the gateway
-or Hermes desktop scheduler is running.
+enables and validates the distribution-shipped `platforms/notion` plugin
+without granting built-in tool replacement, sets `terminal.cwd`, and creates or
+reconciles the weekday Daily and Friday Weekly jobs without deleting client
+files. A stopped gateway produces a truthful `partial` receipt because scheduled
+jobs cannot fire until the gateway or Hermes desktop scheduler is running.
 
 The same flow can be run inside Hermes chat by saying
 `Run setup-kamdar-workspace.`
+
+The Notion connector is private distribution code copied from this repository;
+it does not need a community-registry deployment. Verify it with:
+
+```bash
+hermes -p "$KAMDAR_PROFILE" plugins show platforms/notion
+hermes -p "$KAMDAR_PROFILE" plugins doctor platforms/notion
+```
 
 ## Optional Notion webhook
 

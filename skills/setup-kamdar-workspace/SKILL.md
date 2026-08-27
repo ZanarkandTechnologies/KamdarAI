@@ -22,8 +22,9 @@ The deterministic helpers manage only the reviewed workspace context,
 `automations/`, automation schemas, the shared artifact-quality rubric,
 `templates/`, project-owned `skills/`, and project-owned `plugins/`. It previews
 by default and never deletes target files. `setup_profile.py` also sets native
-`terminal.cwd` and reconciles the two canonical cron jobs. Credentials and the
-Notion webhook remain separate setup steps.
+`terminal.cwd`, enables and validates the shipped Notion platform plugin, and
+reconciles the two canonical cron jobs. Credentials and the Notion webhook
+remain separate setup steps.
 
 ## Skill Signature
 
@@ -32,7 +33,8 @@ setup_kamdar_workspace(profile_home, apply = false)
   -> workspace_receipt + cron_receipt + scheduler_state
 reads: workspace.hermes.md, automations/, schemas/automations/,
        evals/rubrics/, templates/, skills/, plugins/, target state
-does: validates ownership, previews or copies allowlisted files, and reconciles native runtime config
+does: validates ownership, previews or copies allowlisted files,
+      enables the shipped Notion plugin, and reconciles native runtime config
 writes: workspace/.hermes.md, workspace/automations/,
         workspace/schemas/automations/, workspace/evals/rubrics/,
         workspace/templates/, profile_home/skills/, profile_home/plugins/
@@ -83,7 +85,19 @@ returns: JSON state, changed or pending paths, cron actions, scheduler state, ne
   - Daily is `0 8 * * 1-5`; Weekly is `0 18 * * 5`.
   - Both use the client-local workspace and a second apply is in sync.
 
-- [ ] **N5 — Verify readiness and hand off Notion.**
+- [ ] **N5 — Enable and validate the shipped Notion connector.**
+  `profile plugin files + explicit no-override grant -> enabled connector | blocked`
+
+  Rule: Enable the profile-owned plugin as `platforms/notion`, explicitly deny
+  built-in tool replacement, and run the native plugin doctor before claiming
+  readiness. The connector is shipped by the distribution; it is not fetched
+  from the community plugin registry.
+
+  Assert:
+  - `hermes plugins list --user --json` reports `notion-platform` enabled.
+  - `hermes plugins doctor platforms/notion` passes registration.
+
+- [ ] **N6 — Verify readiness and hand off Notion.**
   `installed files + native config + jobs + gateway -> ready | partial | blocked`
 
   Rule: A configured workspace with a stopped gateway is `partial`, because the
@@ -114,6 +128,7 @@ kamdar_workspace_setup:
   pending_or_changed:
   deletion_count: 0
   native_terminal_cwd:
+  notion_plugin: in_sync | enabled | blocked
   daily_job: in_sync | created | updated | blocked
   weekly_job: in_sync | created | updated | blocked
   scheduler_ready:
