@@ -1,0 +1,58 @@
+{
+  "work_type": "final implementation completion review",
+  "search_scope": [
+    "tickets/TASK-0012",
+    "plugins/platforms/notion",
+    "tests/test_notion_comment_adapter.py",
+    "tests/test_notion_webhook_protocol.py",
+    "skills/setup-kamdar-workspace",
+    "README.md",
+    "docs/systems/kamdar-company-os-operator-manual.md",
+    "Hermes SessionSource and send contracts"
+  ],
+  "rubrics_used": [
+    "implementation-plan",
+    "integration-readiness",
+    "evidence-quality",
+    "code-quality"
+  ],
+  "adversarial_rejection_attempts": [
+    "Cross-discussion activation and session leakage.",
+    "Delayed webhook retroactive activation.",
+    "Exact, mixed, and disallowed no-reply marker handling.",
+    "Bot loops and incorrect Notion reply destination.",
+    "Runtime-as-source edits and destructive installation.",
+    "Missing static diagnostics and stale proof."
+  ],
+  "overall_tas": "TAS-A",
+  "verdict": "pass",
+  "rerun_required": false,
+  "hard_gate_failures": [],
+  "failed_checks": [],
+  "finding_log": [],
+  "blocking_findings": [],
+  "rubric_sections": {
+    "implementation-plan": {"tas": "TAS-A", "pass": true},
+    "integration-readiness": {"tas": "TAS-A", "pass": true},
+    "evidence-quality": {"tas": "TAS-A", "pass": true},
+    "code-quality": {"tas": "TAS-A", "pass": true}
+  },
+  "verification": {
+    "static_diagnostics": "Pyright: 0 errors, 0 warnings, 0 information",
+    "focused_connector_tests": "14 passed",
+    "repo_python_tests": "25 passed",
+    "setup_tests": "7 passed",
+    "onboarding_tests": "12 passed",
+    "node_filesystem_tests": "82 passed, 2 skipped, 0 failed",
+    "context_validator": "context_valid=true",
+    "py_compile": "passed",
+    "git_diff_check": "passed",
+    "live_profile_preview": "changes_pending; deletion_count=0; not applied"
+  },
+  "decision_rationale": "One explicit trigger activates only its open discussion; prior same-discussion activation enables untagged follow-ups; exact discussion context and session identity are preserved; optional silence safely suppresses only the exact reserved marker; installation is source-owned and non-deleting.",
+  "residual_risk": [
+    "No live Notion provider smoke was run.",
+    "Live installation is gated because the preview contains unrelated pending changes."
+  ],
+  "next_action": "Run a controlled live Notion smoke after isolating or approving the pending profile install batch."
+}

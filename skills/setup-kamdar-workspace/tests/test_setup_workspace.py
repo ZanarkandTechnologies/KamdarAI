@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 
@@ -21,7 +22,7 @@ SPEC.loader.exec_module(SETUP)
 
 
 class SetupWorkspaceTests(unittest.TestCase):
-    def run_setup(self, workspace: Path, profile_home: Path, *extra: str) -> tuple[int, dict[str, object]]:
+    def run_setup(self, workspace: Path, profile_home: Path, *extra: str) -> tuple[int, dict[str, Any]]:
         result = subprocess.run(
             [sys.executable, str(SCRIPT), "--workspace", str(workspace),
              "--profile-home", str(profile_home), *extra],
@@ -44,6 +45,7 @@ class SetupWorkspaceTests(unittest.TestCase):
                                 for item in receipt["pending"]))
             self.assertTrue(any(item.startswith("profile:skills/setup-kamdar-workspace/")
                                 for item in receipt["pending"]))
+            self.assertIn("profile:plugins/platforms/notion/plugin.yaml", receipt["pending"])
             self.assertFalse((workspace / ".hermes.md").exists())
             self.assertEqual(receipt["deletion_count"], 0)
 
@@ -76,21 +78,33 @@ class SetupWorkspaceTests(unittest.TestCase):
             profile_home = workspace.parent
             source.mkdir(parents=True)
             (source / "automations").mkdir()
+            (source / "schemas/automations").mkdir(parents=True)
+            (source / "evals/rubrics").mkdir(parents=True)
             (source / "templates").mkdir()
             (source / "skills/example").mkdir(parents=True)
+            (source / "plugins/platforms/notion").mkdir(parents=True)
             workspace.mkdir(parents=True)
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
+            (source / "schemas/automations/daily.mjs").write_text("schema\n", encoding="utf-8")
+            (source / "evals/rubrics/quality.md").write_text("rubric\n", encoding="utf-8")
             (source / "templates/project.md").write_text("project\n", encoding="utf-8")
             (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
+            (source / "plugins/platforms/notion/plugin.yaml").write_text("name: notion-platform\n", encoding="utf-8")
             with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config):
                 code = SETUP.run(workspace, profile_home, apply=True)
             self.assertEqual(code, 0)
             self.assertEqual((workspace / ".hermes.md").read_text(encoding="utf-8"), config.read_text(encoding="utf-8"))
             self.assertEqual((workspace / "automations/daily.md").read_text(encoding="utf-8"), "daily\n")
+            self.assertEqual((workspace / "schemas/automations/daily.mjs").read_text(encoding="utf-8"), "schema\n")
+            self.assertEqual((workspace / "evals/rubrics/quality.md").read_text(encoding="utf-8"), "rubric\n")
             self.assertEqual((workspace / "templates/project.md").read_text(encoding="utf-8"), "project\n")
             self.assertEqual((profile_home / "skills/example/SKILL.md").read_text(encoding="utf-8"), "# Example\n")
+            self.assertEqual(
+                (profile_home / "plugins/platforms/notion/plugin.yaml").read_text(encoding="utf-8"),
+                "name: notion-platform\n",
+            )
 
     def test_apply_preflights_all_destinations_before_copying(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

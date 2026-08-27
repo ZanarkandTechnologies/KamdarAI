@@ -1,0 +1,34 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0012",
+  "phase": "qa",
+  "proof_type": "cli",
+  "runtime_target": "local KamdarAI source tree",
+  "proof_policy": "Done + QA Strategy + reviewer",
+  "verdict": "pass",
+  "summary": "Deterministic discussion routing, continuation, optional silence, installation, and regression checks pass.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "pass",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0012/artifacts/qa/2026-08-27-notion-thread-continuation/report.md",
+  "artifacts": [
+    "tickets/TASK-0012/artifacts/qa/2026-08-27-notion-thread-continuation/report.md",
+    "tickets/TASK-0012/artifacts/qa/2026-08-27-notion-thread-continuation/result.json"
+  ],
+  "blockers": [],
+  "residual_risk": [
+    "No live Notion provider smoke was run.",
+    "The live-profile setup preview includes unrelated pending changes and was not applied."
+  ],
+  "judgment_receipts": [
+    "tickets/TASK-0012/artifacts/review/2026-08-27-completion-receipt.json"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "work_type": "implementation review",
+  "search_scope": [
+    "tickets/TASK-0012",
+    "plugins/platforms/notion",
+    "tests/test_notion_comment_adapter.py",
+    "tests/test_notion_webhook_protocol.py",
+    "skills/setup-kamdar-workspace",
+    "README.md",
+    "docs/systems/kamdar-company-os-operator-manual.md"
+  ],
+  "rubrics_used": [
+    "implementation-plan",
+    "integration-readiness",
+    "evidence-quality",
+    "code-quality"
+  ],
+  "adversarial_rejection_attempts": [
+    "Checked cross-discussion activation and session leakage.",
+    "Checked delayed webhook ordering and retroactive activation.",
+    "Checked exact-marker, mixed-marker, and explicit-invocation suppression.",
+    "Checked bot-loop prevention and exact Notion reply routing.",
+    "Checked source/runtime ownership and non-deleting installer behavior."
+  ],
+  "overall_tas": "TAS-B",
+  "verdict": "revise",
+  "rerun_required": true,
+  "hard_gate_failures": [
+    "Completion receipts and ticket writeback were absent at review time."
+  ],
+  "failed_checks": [
+    "evidence-quality"
+  ],
+  "finding_log": [
+    "No functional blocker was found after the activation-order repair.",
+    "The only completion blocker was the missing durable QA/review artifact and ticket writeback."
+  ],
+  "rubric_sections": {
+    "implementation-plan": "pass",
+    "integration-readiness": "pass",
+    "evidence-quality": "revise",
+    "code-quality": "pass"
+  },
+  "blocking_findings": [
+    "Write and link QA/review receipts, reconcile Done, and update ticket State."
+  ],
+  "next_action": "Rerun final completion review after evidence writeback."
+}
