@@ -3,7 +3,6 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { writePresentationEligibilityManifest } from "./build-vercel-showcase.mjs";
 import { loadDailyReviewEvalSuite, reconcileJudgedRun, validateUnifiedDailyRun } from "./unified-daily-review-eval.mjs";
 import { loadWeeklyReviewEvalSuite, reconcileJudgedWeeklyRun, validateUnifiedWeeklyRun } from "./unified-weekly-review-eval.mjs";
 
@@ -67,11 +66,9 @@ export function finalizeFreshCompanyOperatingEvalRun({ deploymentRoot }) {
   const weeklyDeterministic = validateUnifiedWeeklyRun({ runRoot: weeklyRoot, suite: weeklySuite, stage: "judged" });
   const daily = reconcileJudgedRun({ runRoot: dailyRoot, deterministic: dailyDeterministic, suite: dailySuite });
   const weekly = reconcileJudgedWeeklyRun({ runRoot: weeklyRoot, deterministic: weeklyDeterministic, suite: weeklySuite });
-  const eligibility = writePresentationEligibilityManifest({ deploymentRoot: root });
   return {
     daily,
     weekly,
-    presentation_eligibility: { path: eligibility.path, sha256: eligibility.sha256 },
   };
 }
 

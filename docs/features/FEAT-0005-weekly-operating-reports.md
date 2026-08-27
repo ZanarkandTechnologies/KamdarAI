@@ -14,8 +14,7 @@ category: reporting
 public: true
 surfaces:
   - automations/weekly-operating-review.md
-  - automations/templates/current-weekly-draft.md
-  - skills/weekly-report-finalization/SKILL.md
+  - templates/current-weekly-draft.md
   - templates/weekly-report.md
   - templates/area-operating-rollup.md
   - templates/company-operating-rollup.md
@@ -23,8 +22,7 @@ source_refs:
   - workspace.hermes.md
   - tickets/TASK-0007/ticket.md
 evidence_refs:
-  - skills/weekly-report-finalization/evals/evals.json
-  - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
   - evals/filesystem/scripts/operate-task0007-notion-seed.mjs
 known_limits: "Production report publication and executive delivery remain proposal-only."
 ---
@@ -49,14 +47,12 @@ gap; it does not trigger a Daily rescan or inferred relation.
 
 ## Pipeline signature
 
-    finalize_weekly_report(current_weekly_draft_path, project_snapshot_path,
-                           output_root)
-      -> weekly-finalization-plan.md + Project, Department, and Company reports
-         | no_finding | configuration_gap
+    WeeklyReviewResult + current Project Report Drafts
+      -> finalized Project, Department, and Company reports
+         | no_finding | configuration_gap | blocked
 
-[Weekly Report Finalization](../../skills/weekly-report-finalization/SKILL.md)
-owns local report rendering and promotion review. Provider publication and
-executive delivery are outside this source contract.
+The [Weekly automation](../../automations/weekly-operating-review.md) owns report
+rendering, promotion review, authorized publication, and delivery.
 
 ## Flow
 

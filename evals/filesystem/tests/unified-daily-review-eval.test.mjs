@@ -12,13 +12,13 @@ import {
   reconcileJudgedRun,
   validateUnifiedDailyRun,
 } from "../scripts/unified-daily-review-eval.mjs";
-import { DailyReviewResultSchema } from "../../../automations/schemas/daily-review-result.zod.mjs";
+import { DailyReviewResultSchema } from "../../../schemas/automations/daily-review-result.zod.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const contextGolden = resolve(projectRoot, "automations/examples/golden/daily-context-diff-2026-08-25.json");
-const resultGolden = resolve(projectRoot, "automations/examples/golden/daily-review-result-2026-08-25.json");
-const receiptGolden = resolve(projectRoot, "automations/examples/golden/daily-integration-receipt-2026-08-25.json");
-const rerunGolden = resolve(projectRoot, "automations/examples/golden/daily-idempotency-rerun-receipt-2026-08-25.json");
+const expectedContext = resolve(projectRoot, "evals/daily/expected/context.json");
+const expectedResult = resolve(projectRoot, "evals/daily/expected/result.json");
+const expectedReceipt = resolve(projectRoot, "evals/daily/expected/integration-receipt.json");
+const expectedRerunReceipt = resolve(projectRoot, "evals/daily/expected/idempotency-receipt.json");
 
 function writeJson(path, value) {
   mkdirSync(dirname(path), { recursive: true });
@@ -33,10 +33,10 @@ function prepareRun() {
   const contextPath = resolve(root, "daily/context/daily-context-diff-2026-08-25.json");
   mkdirSync(dirname(resultPath), { recursive: true });
   mkdirSync(dirname(receiptPath), { recursive: true });
-  cpSync(resultGolden, resultPath);
-  cpSync(receiptGolden, receiptPath);
-  cpSync(rerunGolden, rerunPath);
-  cpSync(contextGolden, contextPath);
+  cpSync(expectedResult, resultPath);
+  cpSync(expectedReceipt, receiptPath);
+  cpSync(expectedRerunReceipt, rerunPath);
+  cpSync(expectedContext, contextPath);
   return root;
 }
 
@@ -114,7 +114,7 @@ function prepareJudgedRun(root, suite = loadDailyReviewEvalSuite()) {
     reviewed_feature_ids: suite.features.map((feature) => feature.feature_id),
   });
   const check = (pointer) => ({ pass: true, evidence_refs: [`daily/review/daily-review-result-2026-08-25.json#${pointer}`], findings: [] });
-  const pointers = ["project_updates", "completed_ticket_comments", "weekly_progress_chases", "knowledge_updates"]
+  const pointers = ["project_updates", "documentation_reviews", "weekly_progress_chases", "knowledge_updates"]
     .flatMap((key) => result[key].map((_, index) => `/${key}/${index}`));
   writeJson(resolve(root, "eval/artifact-quality-review.json"), {
     schema_version: "kamdar-artifact-quality-review@1.0.0",
@@ -139,7 +139,7 @@ test("one unified Daily run passes schema, provenance, receipt, and feature-slic
     const validated = validateUnifiedDailyRun({ runRoot: root });
     assert.equal(validated.pass, true);
     assert.deepEqual(validated.feature_checks.map((row) => row.feature_id), ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"]);
-    assert.deepEqual(validated.feature_checks.map((row) => row.rows), [1, 1, 1, 3]);
+    assert.deepEqual(validated.feature_checks.map((row) => row.rows), [1, 6, 1, 2]);
     const suite = loadDailyReviewEvalSuite();
     for (const feature of suite.features) {
       const packet = buildFeatureJudgePacket({ featureId: feature.feature_id, result: validated.result, runRoot: root, suite });
@@ -180,7 +180,7 @@ test("Daily showcase rejects a chase without explicit eval-sink delivery proof",
 });
 
 test("Daily workflow and problem entries preserve structured baselines and reject invented cost", () => {
-  const result = JSON.parse(readFileSync(resultGolden, "utf8"));
+  const result = JSON.parse(readFileSync(expectedResult, "utf8"));
   assert.equal(DailyReviewResultSchema.safeParse(result).success, true);
 
   const missingWorkflow = structuredClone(result);

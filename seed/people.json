@@ -1,0 +1,146 @@
+[
+  {
+    "id": "PERSON-AISHA",
+    "template": "person",
+    "properties": {
+      "name": "Aisha Rahman",
+      "person_id": "PERSON-AISHA",
+      "department": "CMT (Cut Make Trim)",
+      "role": "CMT Lead",
+      "status": "Active",
+      "manager": "Kamdar leadership",
+      "preferred_contact_channel": "Email",
+      "approved_contact_channels": "Email test sink; Telegram eval sink; Notion comment",
+      "contact_endpoint": "operator_primary_email",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. Resolve operator_primary_email only from the private workspace route map and prefix the test email “Intended for Aisha Rahman (CMT Lead)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "tech packs; garment sampling; line planning; production handoff"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_primary_email test-sink alias and must name the intended recipient.\n\nOwns sample approval and the gate from corrected tech pack to bulk cutting.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PERSON-NUR",
+    "template": "person",
+    "properties": {
+      "name": "Nur Iqbal",
+      "person_id": "PERSON-NUR",
+      "department": "Merchandising",
+      "role": "Merchandising Lead",
+      "status": "Active",
+      "manager": "Kamdar leadership",
+      "preferred_contact_channel": "Telegram",
+      "approved_contact_channels": "Telegram eval sink; Notion comment",
+      "contact_endpoint": "telegram",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Nur Iqbal (Merchandising Lead)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "fabric sourcing; supplier samples; landed cost; product readiness"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns supplier comparisons and evidence-backed sample acceptance.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PERSON-JUN",
+    "template": "person",
+    "properties": {
+      "name": "Jun Wong",
+      "person_id": "PERSON-JUN",
+      "department": "Marketing",
+      "role": "Marketing Analyst",
+      "status": "Active",
+      "manager": "PERSON-MAYA",
+      "preferred_contact_channel": "Email",
+      "approved_contact_channels": "Email test sink; Telegram eval sink; Notion comment",
+      "contact_endpoint": "operator_secondary_email",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. Resolve operator_secondary_email only from the private workspace route map and prefix the test email “Intended for Jun Wong (Marketing Analyst)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "Meta reporting; campaign assets; channel handoffs"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_secondary_email test-sink alias and must name the intended recipient.\n\nPrepares weekly Meta evidence and coordinates campaign asset delivery.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PERSON-MAYA",
+    "template": "person",
+    "properties": {
+      "name": "Maya Tan",
+      "person_id": "PERSON-MAYA",
+      "department": "Marketing",
+      "role": "Marketing Lead",
+      "status": "Active",
+      "manager": "Kamdar leadership",
+      "preferred_contact_channel": "Telegram",
+      "approved_contact_channels": "Telegram eval sink; Notion comment",
+      "contact_endpoint": "telegram",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Maya Tan (Marketing Lead)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "campaign planning; media decisions; retail and ecommerce coordination"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nApproves Marketing priorities, offer wording, and media decisions.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PERSON-DARREN",
+    "template": "person",
+    "properties": {
+      "name": "Darren Lim",
+      "person_id": "PERSON-DARREN",
+      "department": "Ecommerce",
+      "role": "Ecommerce Lead",
+      "status": "Active",
+      "manager": "Kamdar leadership",
+      "preferred_contact_channel": "Telegram",
+      "approved_contact_channels": "Telegram eval sink; Notion comment",
+      "contact_endpoint": "telegram",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Darren Lim (Ecommerce Lead)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "online orders; checkout defects; product listings; ecommerce operations"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns customer-facing store fixes and listing-pipeline acceptance.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PERSON-LINA",
+    "template": "person",
+    "properties": {
+      "name": "Lina Goh",
+      "person_id": "PERSON-LINA",
+      "department": "DTC Brands",
+      "role": "DTC Brands Lead",
+      "status": "Active",
+      "manager": "Kamdar leadership",
+      "preferred_contact_channel": "Telegram",
+      "approved_contact_channels": "Telegram eval sink; Notion comment",
+      "contact_endpoint": "telegram",
+      "contact_instructions": "This fictional employee has no personal endpoint in the source scrape. For eval delivery, resolve the operator-owned Telegram test sink from workspace configuration and prefix the message “Intended for Lina Goh (DTC Brands Lead)”. Use a Notion comment for record-specific questions.",
+      "timezone": "Asia/Kuala_Lumpur",
+      "expertise": "brand launches; assortment; product story; channel readiness"
+    },
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns the kalrah launch brief and cross-functional handoff.\n",
+    "metadata": {
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  }
+]

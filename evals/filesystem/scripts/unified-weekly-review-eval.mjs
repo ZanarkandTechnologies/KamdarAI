@@ -10,8 +10,8 @@ import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
-import { WeeklyContextSchema } from "../../../automations/schemas/weekly-context.zod.mjs";
+import { WeeklyReviewResultSchema } from "../../../schemas/automations/weekly-review-result.zod.mjs";
+import { WeeklyContextSchema } from "../../../schemas/automations/weekly-context.zod.mjs";
 import {
   validateCompanyOperatingEvalSuite,
   validateJudgeRubric,
@@ -21,7 +21,7 @@ import { validateArtifactQualityReview } from "./quality-review-contracts.mjs";
 
 const filesystemRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const projectRoot = resolve(filesystemRoot, "../..");
-export const defaultSuitePath = resolve(projectRoot, "evals/weekly-review-evals.json");
+export const defaultSuitePath = resolve(projectRoot, "evals/weekly/suite.json");
 const featureIds = Object.freeze(["FEAT-0005", "FEAT-0006", "FEAT-0007"]);
 const immutableKinds = Object.freeze(["weekly-context", "weekly-review-result", "mock-integration-receipt", "mock-provider-read-back"]);
 

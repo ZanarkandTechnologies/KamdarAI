@@ -1,0 +1,126 @@
+[
+  {
+    "id": "TASK-201",
+    "template": "meeting",
+    "properties": {
+      "name": "Deepavali campaign review",
+      "work_item_id": "TASK-201",
+      "project": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner": "PERSON-MAYA",
+      "type": "Meeting",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The review completed with source-linked decisions and commitments.",
+      "last_meaningful_update": "2026-08-21",
+      "date": "2026-08-21",
+      "attendees": "Maya Tan; Jun Wong; Darren Lim",
+      "facilitator": "Maya Tan"
+    },
+    "body": "## Purpose and agenda\n\nApprove Deepavali offer wording, confirm channel deadlines, and assign the remaining asset handoff.\n\n## Notes\n\nThe master creative is approved. Store banners, Meta placements, and website modules require different crops, and the prior handoff did not name a receiver for each one.\n\n## Decisions\n\n- **Decision:** Keep one approved offer wording across all channels.\n- **Authority:** Maya approved the wording in the review.\n- **Reason:** Prevent price and date discrepancies between store and online creative.\n- **Review trigger:** Reopen only if stock or trading dates change.\n\n## Commitments\n\n- **TASK-301:** Jun completes the channel asset matrix by 2026-08-22.\n- **TASK-302:** Darren confirms website and product-page asset receipt by 2026-08-22.\n\n## Follow-up\n\nReview only the missing channel acknowledgments on 22 Aug; do not reopen approved wording.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T12:00:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-202",
+    "template": "meeting",
+    "properties": {
+      "name": "Ecom fixes review",
+      "work_item_id": "TASK-202",
+      "project": "PROJ-ECOM-ECOM_FIXES",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "type": "Meeting",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The review completed with source-linked decisions and commitments.",
+      "last_meaningful_update": "2026-08-21",
+      "date": "2026-08-21",
+      "attendees": "Darren Lim; Maya Tan",
+      "facilitator": "Darren Lim"
+    },
+    "body": "## Purpose and agenda\n\nSeparate the guest-checkout confirmation defect from the healthy registered-checkout path and define proof of a real fix.\n\n## Notes\n\nRegistered checkout is healthy. The guest defect appears after asynchronous payment return, but TASK-102 lacks the failed order and webhook trace, so root cause is not established.\n\n## Decisions\n\n- **Decision:** Keep TASK-102 open for evidence despite its Done status.\n- **Authority:** Darren owns the Ecommerce defect gate.\n- **Reason:** A manual confirmation check does not prove the affected path was fixed.\n- **Review trigger:** One failed sample, one trace, and one successful post-fix guest order are linked.\n\n## Commitments\n\n- **TASK-303:** Darren adds the failed order and webhook trace by 2026-08-22.\n- **TASK-304:** Darren records the successful post-fix guest order by 2026-08-23.\n\n## Follow-up\n\nReview the evidence set after the next guest order passes.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T12:00:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-203",
+    "template": "meeting",
+    "properties": {
+      "name": "Listing pipeline handoff review",
+      "work_item_id": "TASK-203",
+      "project": "PROJ-ECOM-LISTING_PIPELINE",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "type": "Meeting",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The review completed with source-linked decisions and commitments.",
+      "last_meaningful_update": "2026-08-21",
+      "date": "2026-08-21",
+      "attendees": "Darren Lim; Nur Iqbal; Lina Goh",
+      "facilitator": "Darren Lim"
+    },
+    "body": "## Purpose and agenda\n\nClarify who owns missing product images, missing attributes, and final listing acceptance for the next batch.\n\n## Notes\n\nPrevious listings used one ready status even when imagery was complete but fabric composition, care, or dimensions were missing. The review separated image-ready and data-ready gates.\n\n## Decisions\n\n- **Decision:** Require both image-ready and data-ready before listing acceptance.\n- **Authority:** Darren approved the next-batch trial.\n- **Reason:** Separate gates expose the actual blocking owner.\n- **Review trigger:** Reassess after one full batch and its return rate are measured.\n\n## Commitments\n\n- **TASK-305:** Nur supplies the complete attribute sheet for the next batch by 2026-08-22.\n- **TASK-306:** Darren records listing cycle time and returned rows by 2026-08-24.\n\n## Follow-up\n\nTreat the checklist as a Project trial until a second successful batch proves reuse.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T12:00:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-204",
+    "template": "meeting",
+    "properties": {
+      "name": "Deepavali retail readiness handoff",
+      "work_item_id": "TASK-204",
+      "project": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner": "PERSON-MAYA",
+      "type": "Meeting",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The handoff ended with two explicit owner commitments and one unowned discussion note.",
+      "last_meaningful_update": "2026-08-21",
+      "date": "2026-08-21",
+      "attendees": "Maya Tan; Jun Wong; Darren Lim",
+      "facilitator": "Maya Tan"
+    },
+    "body": "## Purpose and agenda\n\nConfirm the remaining store and website handoffs before the Deepavali launch.\n\n## Notes\n\nThe store banner crop and website launch checklist are the final accountable handoffs. The team also discussed improving the asset naming convention, but nobody accepted ownership or a due date.\n\n## Decisions\n\n- **Decision:** Keep the approved offer wording unchanged.\n- **Authority:** Maya confirmed the existing decision remains in force.\n- **Reason:** The promotion dates and stock position have not changed.\n- **Review trigger:** Reopen only if trading dates or available stock change.\n\n## Commitments\n\n- **TASK-307:** Jun publishes the approved store banner crop by 2026-08-22.\n- **TASK-308:** Darren verifies the website launch checklist by 2026-08-23.\n- **NOTE-1:** Improve the asset naming convention. Owner and due date were not agreed.\n\n## Follow-up\n\nReview TASK-307 and TASK-308 at the launch-readiness check; carry NOTE-1 only as a blocked commitment.\n",
+    "metadata": {
+      "include_daily": false,
+      "completed_at": "2026-08-21T16:00:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  }
+]

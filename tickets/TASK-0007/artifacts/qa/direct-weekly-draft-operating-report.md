@@ -83,7 +83,7 @@ target or production record was used.
 ## Commands that passed
 
     node --test evals/filesystem/tests/current-weekly-draft.test.mjs
-    node --test evals/filesystem/tests/run-task0007-fixture-automation.test.mjs
+    node --test evals/filesystem/tests/run-task0007-reference-automation.test.mjs
     node --test evals/filesystem/tests/operate-task0007-notion-seed.test.mjs
     node --test evals/filesystem/tests/run-task0007-skill-evals.test.mjs
     python3 -m unittest tests/test_daily_pipeline_skills.py tests/test_kamdar_company_os.py -v

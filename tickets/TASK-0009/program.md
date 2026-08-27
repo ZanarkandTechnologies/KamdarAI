@@ -2,13 +2,17 @@
 kind: goal-program
 mode: skill_improvement
 trigger: native_goal
-status: active
+status: superseded
 approval: owner-approved-2026-08-26
 compiled_from_ticket_updated_at: 2026-08-26
 generated_prompt: tickets/TASK-0009/artifacts/native-goal-prompt.md
 ---
 
 # Self-improve: Daily evidence pipelines to tier A
+
+This completed calibration program was superseded on 2026-08-27 when the
+owner removed the workflow skill packages in favor of direct Daily/Weekly
+automation contracts. Its evidence remains historical.
 
 ```yaml
 files:

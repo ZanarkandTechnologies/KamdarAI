@@ -9,13 +9,13 @@ import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { DailyReviewResultSchema } from "../../../automations/schemas/daily-review-result.zod.mjs";
-import { DailyContextDiffSchema } from "../../../automations/schemas/daily-context-diff.zod.mjs";
+import { DailyReviewResultSchema } from "../../../schemas/automations/daily-review-result.zod.mjs";
+import { DailyContextDiffSchema } from "../../../schemas/automations/daily-context-diff.zod.mjs";
 import {
   DailyIntegrationReceiptSchema,
   assertDailyProcessingSafety,
-} from "../../../automations/schemas/daily-integration-receipt.zod.mjs";
-import { DailyIdempotencyRerunReceiptSchema } from "../../../automations/schemas/daily-idempotency-rerun-receipt.zod.mjs";
+} from "../../../schemas/automations/daily-integration-receipt.zod.mjs";
+import { DailyIdempotencyRerunReceiptSchema } from "../../../schemas/automations/daily-idempotency-rerun-receipt.zod.mjs";
 import {
   validateCompanyOperatingEvalSuite,
   validateJudgeRubric,
@@ -25,7 +25,7 @@ import { validateArtifactQualityReview } from "./quality-review-contracts.mjs";
 
 const filesystemRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const projectRoot = resolve(filesystemRoot, "../..");
-export const defaultSuitePath = resolve(projectRoot, "evals/daily-review-evals.json");
+export const defaultSuitePath = resolve(projectRoot, "evals/daily/suite.json");
 const featureIds = Object.freeze(["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"]);
 const integrationGateIds = Object.freeze([
   "effects-match-receipt",

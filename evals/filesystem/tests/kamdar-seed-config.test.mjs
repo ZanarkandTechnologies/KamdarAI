@@ -6,13 +6,13 @@ import { fileURLToPath } from "node:url";
 
 import {
   compileKamdarSeedSnapshot,
+  loadKamdarSeedBundle,
   loadKamdarSeedConfig,
   validateKamdarSeedConfig,
 } from "../scripts/kamdar-seed-config.mjs";
-import { loadFrozenSnapshot } from "../scripts/template-first-kamdar.mjs";
 
-const configPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../seed/kamdar-company-os.seed.json");
-function fixture() { return JSON.parse(readFileSync(configPath, "utf8")); }
+const configPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../seed/manifest.json");
+function fixture() { return loadKamdarSeedBundle({ path: configPath }).source; }
 
 test("the tracked seed stores only source and scenario facts", () => {
   const raw = fixture();
@@ -23,12 +23,12 @@ test("the tracked seed stores only source and scenario facts", () => {
   assert.deepEqual(Object.keys(raw).sort(), ["capture", "clock", "entities", "environments", "pipeline_cases", "schema_version", "seed_id"]);
   assert.equal("templates" in raw, false);
   assert.equal("legacy_projection" in JSON.parse(JSON.stringify(raw)), false);
-  assert.ok(readFileSync(configPath).length < 80_000);
+  assert.ok(readFileSync(configPath).length < 5_000);
 
   assert.equal(snapshot.projects.length, 7);
   assert.equal(snapshot.people.length, 6);
-  assert.equal(snapshot.work_items.length, 13);
-  assert.equal(snapshot.work_items.filter((item) => item.type === "Meeting").length, 3);
+  assert.equal(snapshot.work_items.length, 14);
+  assert.equal(snapshot.work_items.filter((item) => item.type === "Meeting").length, 4);
   assert.equal(snapshot.reports.length, 4);
   assert.equal(snapshot.source_gaps.length, 1);
   assert.equal(snapshot.projects.filter((item) => item.active).length, 7);
@@ -37,7 +37,7 @@ test("the tracked seed stores only source and scenario facts", () => {
   assert.equal(rows.every((row) => !/^---|^# /m.test(row.body)), true);
   assert.deepEqual(raw.pipeline_cases.map((item) => item.feature_id), [
     "FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004",
-    "FEAT-0005", "FEAT-0006", "FEAT-0007",
+    "FEAT-0005", "FEAT-0006", "FEAT-0007", "FEAT-0010",
   ]);
 });
 
@@ -61,12 +61,15 @@ test("every feature case keeps one useful showcase and its controls", () => {
   assert.match(entity("TASK-115").body, /Screenshot is in the WhatsApp thread/);
   assert.match(entity("TASK-102").body, /not 100% sure/);
   const completedControl = entity("TASK-122");
-  assert.equal(completedControl.properties.status, "Processed");
-  assert.equal(completedControl.metadata.daily_review_version, "daily-review-v1");
+  assert.equal(completedControl.properties.status, "Done");
+  assert.equal(completedControl.properties.ai_review, "Processed");
+  assert.equal(completedControl.metadata.daily_review_version, "daily-review-v2");
   for (const work of fixture().entities.work_items.filter((item) => item.properties.status === "Done")) {
+    if (work.properties.ai_review === "Processed") continue;
+    assert.equal(work.properties.ai_review, "Pending", `${work.id} must remain eligible for Daily processing`);
     assert.equal(work.metadata.daily_review_version, null, `${work.id} must remain eligible for Daily processing`);
   }
-  assert.ok(config.entities.meetings.every((item) => item.metadata.daily_review_version === null));
+  assert.ok(config.entities.meetings.every((item) => item.properties.ai_review === "Pending" && item.metadata.daily_review_version === null));
 
   const drafts = config.entities.reports.filter((item) => item.properties.report_status === "Draft");
   assert.equal(drafts.length, 3);
@@ -78,7 +81,7 @@ test("every feature case keeps one useful showcase and its controls", () => {
   const cases = Object.fromEntries(raw.pipeline_cases.map((item) => [item.feature_id, item]));
   assert.match(cases["FEAT-0005"].shows.join(" "), /complete Company report/);
   assert.match(cases["FEAT-0006"].shows.join(" "), /not raw Work/);
-  assert.equal(fixture().entities.work_items.find((item) => item.id === "TASK-122").metadata.daily_review_version, "daily-review-v1");
+  assert.equal(fixture().entities.work_items.find((item) => item.id === "TASK-122").metadata.daily_review_version, "daily-review-v2");
 });
 
 test("captured Projects are grounded while synthetic operating facts stay explicit", () => {
@@ -158,11 +161,11 @@ test("every Project Draft citation resolves to Work on that Project", () => {
   }
 });
 
-test("the frozen evaluator consumes the compact seed", () => {
-  const snapshot = loadFrozenSnapshot();
+test("the evaluator consumes the modular seed bundle", () => {
+  const snapshot = compileKamdarSeedSnapshot(loadKamdarSeedConfig());
   assert.equal(snapshot.projects.length, 7);
   assert.equal(snapshot.people.length, 6);
-  assert.equal(snapshot.work_items.length, 13);
+  assert.equal(snapshot.work_items.length, 14);
   assert.equal(snapshot.source_gaps.length, 1);
 });
 
@@ -183,5 +186,5 @@ test("the seed rejects private endpoints and incomplete feature coverage", () =>
 
   const missingCase = fixture();
   missingCase.pipeline_cases.pop();
-  assert.throws(() => validateKamdarSeedConfig(missingCase), /must cover FEAT-0001 through FEAT-0007 exactly once/);
+  assert.throws(() => validateKamdarSeedConfig(missingCase), /must cover FEAT-0001 through FEAT-0007 and FEAT-0010 exactly once/);
 });

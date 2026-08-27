@@ -1,0 +1,46 @@
+{
+  "schema_version": "kamdar-company-os-seed@4.0.0",
+  "seed_id": "kamdar-company-os-grounded-projects-template-bodies-2026-w34",
+  "environments": {
+    "frozen": {
+      "reset_marker": ".kamdar-seed-frozen-owned.json"
+    },
+    "notion_eval": {
+      "reset_marker": "kamdar-eval-seed-owned:v1"
+    }
+  },
+  "capture": {
+    "sha256": "26ec0188a4dbf1a527e70de11dbc07e18d554c909684e7969861de7df7e5535d",
+    "manifest": "seed-manifest.json",
+    "departments": [
+      "Marketing",
+      "Merchandising",
+      "CMT (Cut Make Trim)",
+      "Ecommerce",
+      "Property Management",
+      "DTC Brands",
+      "Content"
+    ],
+    "source_gap_count": 10,
+    "material_source_gaps": [
+      "CAPTURE-GAP-01: Content row has no Project name"
+    ]
+  },
+  "clock": {
+    "company": "Kamdar",
+    "timezone": "Asia/Kuala_Lumpur",
+    "frozen_at": "2026-08-21T16:00:00+08:00",
+    "local_day": "2026-08-21",
+    "week": "2026-W34",
+    "week_start": "2026-08-17",
+    "week_end": "2026-08-23"
+  },
+  "tables": {
+    "projects": "projects.json",
+    "people": "people.json",
+    "work_items": "tasks.json",
+    "meetings": "meetings.json",
+    "reports": "reports.json",
+    "pipeline_cases": "scenarios.json"
+  }
+}

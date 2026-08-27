@@ -19,7 +19,8 @@ refs:
   - ../../workspace.hermes.md
   - ../../automations/daily-operating-update.md
   - ../../automations/weekly-operating-review.md
-  - ../../evals/evals.json
+  - ../../evals/daily/suite.json
+  - ../../evals/weekly/suite.json
 ---
 
 # Kamdar Company OS
@@ -93,8 +94,8 @@ and write policy all pass. Otherwise it remains in the report with a named gap.
 
 ## Proof model
 
-Every assertion in `evals/evals.json` belongs to one feature. The future proof
-UI groups rows by feature while the runner still executes one scenario:
+Every assertion in the Daily and Weekly eval suites belongs to one feature. The
+proof UI groups rows by feature while each runner validates one immutable run:
 
 ```text
 feature

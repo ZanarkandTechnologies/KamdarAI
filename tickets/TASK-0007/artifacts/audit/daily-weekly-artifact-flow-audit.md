@@ -60,7 +60,7 @@ weekly accumulation model, and allowed the fixture to claim only a projection.
 | Project Control skipped Weekly accumulation | It owns PM/Risk/Cost anchors directly. | daily-project-control contract and fixture Draft |
 | Two diffs/integrations obscured the local target | Both are retired; direct updater validates target/week/anchor/key. | scripts/current_weekly_draft.mjs |
 | Weekly re-synthesized and rewrote Draft content | Finalization reads the Draft only. | weekly-report-finalization contract and fixture outputs |
-| Fixture was a handwritten template-first projection | It runs direct updater operations, reads the resulting Draft, and finalizes reports. | run-task0007-fixture-automation.mjs |
+| Fixture was a handwritten template-first projection | It runs direct updater operations, reads the resulting Draft, and finalizes reports. | run-task0007-reference-automation.mjs |
 | Isolated provider proof implied Draft application | The operator applies guarded Project-memory patches and finalized reports only. | operate-task0007-notion-seed.mjs |
 
 ## Deterministic checks

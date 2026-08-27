@@ -14,15 +14,11 @@ category: memory
 public: true
 surfaces:
   - automations/daily-operating-update.md
-  - skills/daily-project-memory/SKILL.md
-  - skills/daily-project-memory/templates/project-diff-plan.json
-  - skills/apply-project-diffs/SKILL.md
   - templates/project.md
 source_refs:
   - workspace.hermes.md
   - tickets/TASK-0007/ticket.md
 evidence_refs:
-  - skills/daily-project-memory/evals/evals.json
 known_limits: "No Project adapter is shipped. Production Project updates remain proposal-only."
 ---
 
@@ -42,24 +38,19 @@ in the Project they already use—not a second Daily page that drifts from it.
 
 The Daily collector provides a bounded `daily-context-diff-YYYY-MM-DD.json`
 with complete selected Work/Meeting evidence, embedded Project snapshots, source
-IDs, time window, and source gaps. This pipeline makes no compensating fetch
+IDs, time window, and source gaps. The automation makes no compensating fetch
 when a Project snapshot is absent.
 
 ## Pipeline signature
 
 ```text
-run_daily_project_memory(context_diff, application_mode = prepare)
-  -> project-diff-plan.json + application receipt | no_finding | configuration_gap
-
-apply_project_diffs(project_diff_plan, exact_project_preflight, adapter)
-  -> redacted application receipt | duplicate | conflict | blocked
+daily Project update rows + exact Project preflight
+  -> applied receipt | duplicate | conflict | blocked | no_finding
 ```
 
-[`daily-project-memory`](../../skills/daily-project-memory/SKILL.md) owns the
-whole semantic pipeline: it makes the patch judgment and, only in explicit
-`apply` mode, calls [`apply-project-diffs`](../../skills/apply-project-diffs/SKILL.md).
-That child validates identity, expected current value, source IDs, and
-idempotency before passing the unchanged patch to a supplied adapter.
+The [Daily automation](../../automations/daily-operating-update.md) owns the
+semantic judgment and guarded application. It validates identity, expected
+current value, source IDs, and idempotency before applying a replacement.
 
 ## Flow
 

@@ -14,16 +14,13 @@ category: outreach
 public: true
 surfaces:
   - automations/daily-operating-update.md
-  - automations/templates/current-weekly-draft.md
-  - skills/daily-project-control/SKILL.md
-  - skills/dispatch-employee-messages/SKILL.md
+  - templates/current-weekly-draft.md
   - templates/person.md
 source_refs:
   - workspace.hermes.md
   - tickets/TASK-0007/ticket.md
 evidence_refs:
-  - skills/daily-project-control/evals/evals.json
-  - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
 known_limits: "Fictional eval People have no personal endpoint. Isolated-eval delivery goes only to the operator-owned Telegram sink and never proves employee delivery."
 ---
 
@@ -31,8 +28,7 @@ known_limits: "Fictional eval People have no personal endpoint. Isolated-eval de
 
 Kamdar detects dated, stale, or blocked Work once from the Daily context. It
 records its evidence-bound PM, risk, and cost findings in the current Weekly
-Draft, then prepares one accountable-owner message through the preferred-channel
-dispatcher.
+Draft, then prepares one accountable-owner message for direct Daily delivery.
 
 ## Why it exists
 
@@ -49,17 +45,12 @@ alone is not enough.
 
 ## Pipeline signature
 
-    run_daily_project_control(context_diff_path, current_weekly_draft_path,
-                              dispatch_mode = prepare, output_path)
-      -> project-control-plan.json + same current Weekly Draft
-         + channel dispatch result | no_finding | configuration_gap | conflict
+    DailyReviewResult.weekly_progress_chases + knowledge_updates
+      -> authorized message + current Report Draft update
+         | no_finding | configuration_gap | conflict | blocked
 
-[Daily Project Control](../../skills/daily-project-control/SKILL.md) owns the
-control judgment and its nested
-[preferred-channel dispatcher](../../skills/dispatch-employee-messages/SKILL.md).
-Prepare makes no channel call. `isolated-eval` may invoke Telegram only through
-the operator-owned eval-sink alias and must label the intended fictional Person.
-Production send can invoke only a configured, approved route.
+The [Daily automation](../../automations/daily-operating-update.md) owns the
+control judgment, Report Draft update, and authorized delivery boundary.
 
 ## Flow
 
@@ -67,7 +58,8 @@ Production send can invoke only a configured, approved route.
                      ↓
            daily-project-control
              ├→ PM attention + combined problem definitions in the same Draft
-             └→ grouped message proposal → dispatcher → prepared / sent / blocked
+             └→ grouped message proposal → Daily direct delivery
+                                           → prepared / delivered / blocked
 
 ## State changes and artifacts
 
@@ -84,11 +76,11 @@ Production send can invoke only a configured, approved route.
 ## Downstream application
 
 The current Weekly Draft is local Markdown, so this pipeline updates it
-directly. The dispatcher is the only communication boundary. It returns a
-prepared result by default, `delivered_to_eval_sink` only when the Telegram
-provider message ID and returned destination match the configured eval route,
-or a safe production-channel receipt after an authorized send. Provider
-acceptance is neither employee delivery nor proof that the operator saw it.
+directly. The Daily automation is the only communication boundary. It returns
+a prepared result by default, `delivered_to_eval_sink` only when the direct
+provider message ID and returned destination match the configured eval route.
+Provider acceptance is neither employee delivery nor proof that the operator
+saw it.
 
 ## Failure modes
 

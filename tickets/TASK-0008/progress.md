@@ -1,13 +1,16 @@
 ---
 kind: goal-progress
 ticket_id: TASK-0008
-status: active
+status: superseded
 created_at: 2026-08-25
 template_id: goal-loop-progress
 template_version: "0.1.1"
 ---
 
 # TASK-0008 Goal Progress
+
+Superseded on 2026-08-27 by the owner-directed harness consolidation; retained
+below as historical implementation evidence only.
 
 ## 2026-08-25 20:10 +0800 - turn 1
 

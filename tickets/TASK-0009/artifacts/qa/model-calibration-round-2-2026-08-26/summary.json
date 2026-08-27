@@ -49,7 +49,7 @@
             "fixtures": [
               "skills/daily-project-memory/examples/golden/project-diff-plan.json",
               "skills/daily-project-memory/templates/project-diff-plan.json",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "evals/daily/expected/reference-context.json",
               "templates/project.md"
             ]
           },
@@ -159,7 +159,7 @@
             "fixtures": [
               "skills/daily-documentation-quality/examples/golden/employee-message-plan.md",
               "skills/daily-documentation-quality/templates/employee-message-plan.md",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json"
+              "evals/daily/expected/reference-context.json"
             ]
           },
           {
@@ -267,8 +267,8 @@
             "fixtures": [
               "skills/daily-project-control/templates/project-control-plan.json",
               "skills/daily-project-control/examples/golden/project-control-plan-cmt-2026-08-25.json",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
-              "automations/templates/current-weekly-draft.md"
+              "evals/daily/expected/reference-context.json",
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -299,7 +299,7 @@
             "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
             "fixtures": [
               "skills/daily-project-control/examples/blocked/project-control-plan-unapproved-route.json",
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -329,7 +329,7 @@
             "feature_document": "docs/features/FEAT-0003-daily-progress-chasing.md",
             "fixtures": [
               "skills/daily-project-control/templates/project-control-plan.json",
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           }
         ],
@@ -376,8 +376,8 @@
             "feature_document": "docs/features/FEAT-0004-daily-knowledge-candidate-capture.md",
             "fixtures": [
               "skills/daily-knowledge-capture/examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
-              "automations/templates/current-weekly-draft.md"
+              "evals/daily/expected/reference-context.json",
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -404,7 +404,7 @@
             "feature_id": "FEAT-0004",
             "feature_document": "docs/features/FEAT-0004-daily-knowledge-candidate-capture.md",
             "fixtures": [
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -677,7 +677,7 @@
             "fixtures": [
               "skills/weekly-report-finalization/templates/weekly-finalization-plan.md",
               "skills/weekly-report-finalization/examples/golden/weekly-finalization-plan-2026-08-24.md",
-              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+              "evals/fixtures/golden/current-weekly-draft-2026-W34.md"
             ]
           },
           {
@@ -704,7 +704,7 @@
             "feature_id": "FEAT-0006",
             "feature_document": "docs/features/FEAT-0006-weekly-knowledge-promotion.md",
             "fixtures": [
-              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+              "evals/fixtures/golden/current-weekly-draft-2026-W34.md"
             ]
           },
           {
@@ -755,7 +755,7 @@
       "source_hash": "2f81af19f075c56fa1ae58e12015c82df7f33d3df9e4267c20e02a775590ee09",
       "candidate": {
         "status": 0,
-        "stdout": "{\n  \"artifact_type\": \"kamdar-project-diff-plan\",\n  \"artifact_version\": \"0.1.0\",\n  \"context\": {\n    \"context_diff_id\": \"daily-context-2026-08-24\",\n    \"context_diff_path\": \"automations/examples/golden/daily-context-diff-2026-08-24.json\",\n    \"local_day\": \"2026-08-24\",\n    \"evidence_window\": \"2026-08-24T00:00:00+08:00 to 2026-08-24T23:59:59+08:00\"\n  },\n  \"state\": \"proposed\",\n  \"patches\": [\n    {\n      \"patch_id\": \"PATCH-001-CMT-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n        \"project_source_id\": \"PROJ-CMT-CMT_PIPELINE\",\n        \"project_url\": \"notion://PROJ-CMT-CMT_PIPELINE\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"First seasonal sample is under construction review.\",\n      \"proposed_markdown\": \"### Collar tolerance gap blocking tech pack approval\\n- **Known:** The sewn baju kurung sample is 1.5 cm wider at the collar than the issued tech pack. The fitting correction was discussed beside the sample but not transferred to the canonical tech pack, so the corrected tech pack lacks an approved collar tolerance and a named approver. Planned 6 h vs actual 10 h at 90 MYR/h loaded cost produced an estimated 540 MYR vs actual 900 MYR overrun.\\n- **Impact:** Tech pack approval and the conditional production line hold cannot be released until the collar tolerance is approved and the approver is named in the tech pack.\\n- **Evidence:** [Task TASK-101](task://TASK-101)\\n- **Review:** Replace this after the approved collar tolerance is recorded in the tech pack and the approver is named.\",\n      \"source_ids\": [\"TASK-101\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"The accountable approver for the collar correction is not named in the source; cause confidence is high but approver identity is unconfirmed.\",\n        \"Attention checklist states TASK-101 due 2026-08-22 but the canonical Task due_date is 2026-08-20; date discrepancy not resolved.\",\n        \"TASK-104 (collar correction) is blocked with missing due_date, blocker, and next_action in its canonical record.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-CMT-CMT_PIPELINE:project_knowledge:TASK-101\"\n    },\n    {\n      \"patch_id\": \"PATCH-002-MKT-DEEPAVALI-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\",\n        \"project_source_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\",\n        \"project_url\": \"notion://PROJ-MKT-DEEPAVALI_MARKETING\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Branch and online campaign activation.\",\n      \"proposed_markdown\": \"### Coordinated campaign asset folder per batch\\n- **Known:** The Deepavali campaign will use one campaign asset folder per batch for coordinated themes across branches and online.\\n- **Impact:** Asset handoff and review must follow the per-batch folder structure; batches cannot be mixed.\\n- **Evidence:** [Meeting TASK-201](task://TASK-201)\\n- **Review:** Review after seven campaign days.\",\n      \"source_ids\": [\"TASK-201\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"The accountable approver for the per-batch folder decision is not named in the meeting source.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-MKT-DEEPAVALI_MARKETING:project_knowledge:TASK-201\"\n    },\n    {\n      \"patch_id\": \"PATCH-003-ECOM-LISTING-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-ECOM-LISTING_PIPELINE\",\n        \"project_source_id\": \"PROJ-ECOM-LISTING_PIPELINE\",\n        \"project_url\": \"notion://PROJ-ECOM-LISTING_PIPELINE\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Approved products need one publish-ready handoff.\",\n      \"proposed_markdown\": \"### Publish-ready listing handoff workflow\\n- **Known:** Nur prepares and validates the listing package (product IDs, title, category, dimensions, composition, care, price, stock, images, crops, alt text), then hands it to Darren for acceptance and publishing. A missing approved sample or final commercial term stops the package before handoff; a catalog sync that drops a required field returns the affected product to Nur for correction.\\n- **Impact:** The handoff sequence is the required path for all approved product listings; skipping validation or acceptance risks publishing incomplete listings.\\n- **Evidence:** [Meeting TASK-203](task://TASK-203)\\n- **Review:** Sample ten pages after the next catalog sync.\",\n      \"source_ids\": [\"TASK-203\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"Active preparation time, review time, queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost are not recorded.\",\n        \"Normal weekly batch and SKU volume is not recorded.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-ECOM-LISTING_PIPELINE:project_knowledge:TASK-203\"\n    }\n  ],\n  \"no_change_project_ids\": [\n    \"PROJ-MKT-WEEKLY_META_ADS_UPDATES\",\n    \"PROJ-MERCH-INDIA_SOURCING\"\n  ],\n  \"source_gaps\": [\n    \"TASK-109 appears in work_items but is not listed in the source_manifest source_ids for notion.work_items_this_week.\",\n    \"PROJ-ECOM-ECOM_FIXES is referenced by TASK-102 and TASK-202 but is absent from the projects array and source_manifest.\",\n    \"PROJ-MERCH-INDIA_SOURCING attention checklist references TASK-101 which belongs to PROJ-CMT-CMT_PIPELINE (cross-project reference).\"\n  ],\n  \"integration_handoff\": {\n    \"owner\": \"apply-project-diffs\",\n    \"application_state\": \"proposal-only\",\n    \"receipt_required_before_applied_claim\": true\n  }\n}",
+        "stdout": "{\n  \"artifact_type\": \"kamdar-project-diff-plan\",\n  \"artifact_version\": \"0.1.0\",\n  \"context\": {\n    \"context_diff_id\": \"daily-context-2026-08-24\",\n    \"context_diff_path\": \"evals/daily/expected/reference-context.json\",\n    \"local_day\": \"2026-08-24\",\n    \"evidence_window\": \"2026-08-24T00:00:00+08:00 to 2026-08-24T23:59:59+08:00\"\n  },\n  \"state\": \"proposed\",\n  \"patches\": [\n    {\n      \"patch_id\": \"PATCH-001-CMT-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-CMT-CMT_PIPELINE\",\n        \"project_source_id\": \"PROJ-CMT-CMT_PIPELINE\",\n        \"project_url\": \"notion://PROJ-CMT-CMT_PIPELINE\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"First seasonal sample is under construction review.\",\n      \"proposed_markdown\": \"### Collar tolerance gap blocking tech pack approval\\n- **Known:** The sewn baju kurung sample is 1.5 cm wider at the collar than the issued tech pack. The fitting correction was discussed beside the sample but not transferred to the canonical tech pack, so the corrected tech pack lacks an approved collar tolerance and a named approver. Planned 6 h vs actual 10 h at 90 MYR/h loaded cost produced an estimated 540 MYR vs actual 900 MYR overrun.\\n- **Impact:** Tech pack approval and the conditional production line hold cannot be released until the collar tolerance is approved and the approver is named in the tech pack.\\n- **Evidence:** [Task TASK-101](task://TASK-101)\\n- **Review:** Replace this after the approved collar tolerance is recorded in the tech pack and the approver is named.\",\n      \"source_ids\": [\"TASK-101\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"The accountable approver for the collar correction is not named in the source; cause confidence is high but approver identity is unconfirmed.\",\n        \"Attention checklist states TASK-101 due 2026-08-22 but the canonical Task due_date is 2026-08-20; date discrepancy not resolved.\",\n        \"TASK-104 (collar correction) is blocked with missing due_date, blocker, and next_action in its canonical record.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-CMT-CMT_PIPELINE:project_knowledge:TASK-101\"\n    },\n    {\n      \"patch_id\": \"PATCH-002-MKT-DEEPAVALI-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\",\n        \"project_source_id\": \"PROJ-MKT-DEEPAVALI_MARKETING\",\n        \"project_url\": \"notion://PROJ-MKT-DEEPAVALI_MARKETING\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Branch and online campaign activation.\",\n      \"proposed_markdown\": \"### Coordinated campaign asset folder per batch\\n- **Known:** The Deepavali campaign will use one campaign asset folder per batch for coordinated themes across branches and online.\\n- **Impact:** Asset handoff and review must follow the per-batch folder structure; batches cannot be mixed.\\n- **Evidence:** [Meeting TASK-201](task://TASK-201)\\n- **Review:** Review after seven campaign days.\",\n      \"source_ids\": [\"TASK-201\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"The accountable approver for the per-batch folder decision is not named in the meeting source.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-MKT-DEEPAVALI_MARKETING:project_knowledge:TASK-201\"\n    },\n    {\n      \"patch_id\": \"PATCH-003-ECOM-LISTING-KNOWLEDGE\",\n      \"project\": {\n        \"project_id\": \"PROJ-ECOM-LISTING_PIPELINE\",\n        \"project_source_id\": \"PROJ-ECOM-LISTING_PIPELINE\",\n        \"project_url\": \"notion://PROJ-ECOM-LISTING_PIPELINE\"\n      },\n      \"target_section\": \"project_knowledge\",\n      \"operation\": \"append\",\n      \"before_excerpt\": \"Approved products need one publish-ready handoff.\",\n      \"proposed_markdown\": \"### Publish-ready listing handoff workflow\\n- **Known:** Nur prepares and validates the listing package (product IDs, title, category, dimensions, composition, care, price, stock, images, crops, alt text), then hands it to Darren for acceptance and publishing. A missing approved sample or final commercial term stops the package before handoff; a catalog sync that drops a required field returns the affected product to Nur for correction.\\n- **Impact:** The handoff sequence is the required path for all approved product listings; skipping validation or acceptance risks publishing incomplete listings.\\n- **Evidence:** [Meeting TASK-203](task://TASK-203)\\n- **Review:** Sample ten pages after the next catalog sync.\",\n      \"source_ids\": [\"TASK-203\"],\n      \"attention_reset\": {\n        \"requested\": false,\n        \"week\": null,\n        \"reason\": null,\n        \"source_id\": null\n      },\n      \"gaps\": [\n        \"Active preparation time, review time, queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost are not recorded.\",\n        \"Normal weekly batch and SKU volume is not recorded.\"\n      ],\n      \"idempotency_key\": \"project-memory:2026-08-24:PROJ-ECOM-LISTING_PIPELINE:project_knowledge:TASK-203\"\n    }\n  ],\n  \"no_change_project_ids\": [\n    \"PROJ-MKT-WEEKLY_META_ADS_UPDATES\",\n    \"PROJ-MERCH-INDIA_SOURCING\"\n  ],\n  \"source_gaps\": [\n    \"TASK-109 appears in work_items but is not listed in the source_manifest source_ids for notion.work_items_this_week.\",\n    \"PROJ-ECOM-ECOM_FIXES is referenced by TASK-102 and TASK-202 but is absent from the projects array and source_manifest.\",\n    \"PROJ-MERCH-INDIA_SOURCING attention checklist references TASK-101 which belongs to PROJ-CMT-CMT_PIPELINE (cross-project reference).\"\n  ],\n  \"integration_handoff\": {\n    \"owner\": \"apply-project-diffs\",\n    \"application_state\": \"proposal-only\",\n    \"receipt_required_before_applied_claim\": true\n  }\n}",
         "stderr": "",
         "timed_out": false,
         "output_sha256": "ce7baa126b9a6fc88eac823cd3a710d7340835eed3540f246b89eccb59d97053"

@@ -30,13 +30,10 @@ captured. `person.md` is the machine-readable directory contract: routing and
 expertise remain frontmatter so an agent can select the right person before it
 reads freeform notes. `area-operating-rollup.md`,
 `company-operating-rollup.md`, and the Daily output templates are Kamdar-owned
-derived templates. `documentation-request.md` remains only for the retained v4
-frozen showcase; active Daily documentation output lives with
-`skills/daily-documentation-quality/`. `knowledge-candidates.md` and
-`executive-distribution.md` remain legacy/showcase artifacts only; active
-Decision/SOP accumulation lives in the shared current Weekly Draft template and
-is directly maintained by `skills/daily-knowledge-capture/`; Project Control
-owns the Draft's PM, risk, and cost anchors.
+derived templates. `documentation-request.md`, `knowledge-candidates.md`, and
+`executive-distribution.md` remain legacy/showcase artifacts only. The active
+Daily automation writes documentation requests and current-week report content
+directly through its schema-validated result.
 `skill.md` is a thin registry card for promoted Farplane software capabilities;
 the full executable workflow, golden nodes, and evals belong with the source
 `SKILL.md`, not in the Notion record. `sop.md` is the canonical employee workflow
@@ -55,5 +52,5 @@ independent lifecycle. Automation specifications may retain `Outcome` and
 `Why` where those headings explain a workflow rather than a record.
 
 The setup skill installs this whole directory into the Hermes workspace as
-`workspace/templates/`. `workspace.hermes.md` and the `kamdar-company-os`
-skill route real Notion sources and record types to these filenames.
+`workspace/templates/`. `workspace.hermes.md` routes real Notion sources and
+record types to these filenames.

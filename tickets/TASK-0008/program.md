@@ -3,7 +3,7 @@ template_id: goal-loop-program
 template_version: "0.2.0"
 kind: goal-program
 title: TASK-0008 Goal Program
-status: active
+status: superseded
 owner: goal-advisor
 ticket_ref: tickets/TASK-0008/ticket.md
 progress_ref: tickets/TASK-0008/progress.md
@@ -47,8 +47,8 @@ approval: approved
 | Reference | Used by | Purpose |
 | --- | --- | --- |
 | `tickets/TASK-0008/design.md` | F | accepted interaction, geometry, and visual state |
-| `evals/daily-review-evals.json` | A,D | Daily typed cases, features, paths, assertions |
-| `evals/weekly-review-evals.json` | A,D | Weekly typed cases, features, paths, assertions |
+| `evals/daily/suite.json` | A,D | Daily typed cases, features, paths, assertions |
+| `evals/weekly/suite.json` | A,D | Weekly typed cases, features, paths, assertions |
 | `docs/features/FEAT-*.md` | B,D | feature names, purpose, and examples |
 | `evals/seed/kamdar-company-os.seed.json` | C,D | exact starting entities |
 | completed run roots | C,D | actual result, judge, receipt, and status evidence |

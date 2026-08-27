@@ -1,16 +1,20 @@
 ---
 id: TASK-0010
 title: Align Company OS eval scenarios with Farplane Eval OS
-status: active
+status: superseded
 approval: owner-directed-implementation
 created: 2026-08-26
-updated: 2026-08-26
+updated: 2026-08-27
 owner: vishan-kamdar
 feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004, FEAT-0005, FEAT-0006, FEAT-0007]
 ui_scope: true
 ---
 
 # Align Company OS eval scenarios with Farplane Eval OS
+
+> Superseded on 2026-08-27 by the owner-directed harness consolidation. The
+> canonical Daily/Weekly scenario schema remains; the dashboard and deleted
+> workflow-skill migration scope do not.
 
 ## Decision
 

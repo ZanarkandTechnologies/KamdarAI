@@ -4,7 +4,7 @@ title: Recompose Kamdar Daily review as one structured extraction and guarded ap
 status: active
 approval: owner-directed-source-build
 created: 2026-08-22
-updated: 2026-08-25
+updated: 2026-08-27
 owner: vishan-kamdar
 feature_refs:
   - FEAT-0001
@@ -25,13 +25,25 @@ feature_refs:
 Kamdar uses active Projects as the Daily scope root. One collector reads their
 current editable sections, relevant linked Work, embedded Meetings, and
 referenced People. One model call returns a Zod-validated JSON result containing
-four application-shaped arrays: Project section replacements, completed-ticket
-comments, weekly-progress chases, and Weekly Draft knowledge entries.
+four application-shaped arrays: Project section replacements, documentation
+reviews, weekly-progress chases, and Weekly Draft knowledge entries. Business
+`Status` remains `Done`; the separate `AI review` property records whether
+Daily review is pending, waiting for information, processed, or blocked.
 
-The prior four independently invoked Daily skill pipelines are superseded as the
-runtime design. Their source packages remain frozen reference/eval material until
-the combined automation proves equivalent or better behavior. Templates remain
-the Notion rendering contracts; the Zod schema is the AI output contract.
+The prior independently invoked Daily and Weekly skill pipelines are
+superseded and removed. The Daily and Weekly automation contracts now own the
+runtime behavior directly. Templates remain the Notion rendering contracts;
+the Zod schemas are the structured extraction contracts.
+
+### Runtime authority update — 2026-08-27
+
+TASK-0007 originally proved the flow through `prepare` and `isolated-eval`
+execution. Those modes are no longer part of the automation contract. The
+automation is environment-neutral; `workspace.hermes.md` owns the environment,
+provider routes, and write authority. The current workspace binding remains
+proposal/evaluation-only, so this update does not activate production writes or
+a production schedule. Production requires a separately reviewed binding and
+schedule.
 
 ## Contract diagram
 
@@ -44,7 +56,7 @@ workspace.hermes.md source keys
              +-- full Project sections
              +-- linked open Work
              +-- linked Work changed today
-             +-- linked Done Work not processed by current review version
+             +-- linked Done Work where AI review is not Processed
              +-- embedded Meetings + referenced People
              |
              v
@@ -58,12 +70,12 @@ workspace.hermes.md source keys
         |          |          |          |
         v          v          v          v
      Project     Work       employee    Weekly Draft
-     sections   comments    dispatcher  entries
+     sections   reviews     dispatcher  entries
         \          |          |          /
          +---------+----------+---------+
                            |
                            v
-                  receipts + per-Work processing mark
+                  receipts + per-Work AI review state
 ```
 
 ## In scope
@@ -75,26 +87,31 @@ workspace.hermes.md source keys
 - Route each result array unchanged to its guarded integration boundary.
 - Resolve employee contact only inside the dispatcher from verified People and
   channel-alias facts; no model-selected fallback.
-- Mark completed Work with the current processing version only after all
-  required effects for that Work succeed.
-- Keep `prepare` as the default with zero provider effects.
+- Mark completed Work `AI review = Processed` only when its documentation
+  verdict is sufficient and every required effect succeeds.
+- Keep business `Status = Done`; a posted documentation question leaves
+  `AI review = Needs information` and does not set the review version.
+- Keep execution authority outside the automation and in the reviewed workspace
+  binding.
+- Remove superseded workflow skills, fixtures, runners, and proof UI after the
+  canonical Daily/Weekly validators preserve their behavior.
 
 ## Out of scope
 
-- Production schedule activation or production Notion/message writes.
+- Changing the current proposal/evaluation-only workspace binding or activating
+  a production schedule.
 - Model-selected provider routes, endpoints, action keys, hashes, or receipts.
 - Loading every Project or historical Work item on every run.
-- Deleting the previous Daily skills before combined proof passes.
 - Weekly report finalization, promotion, and executive distribution changes.
 
 ## Change plan
 
 | Unit | Owner surface | Change | Observable proof |
 | --- | --- | --- | --- |
-| A | `automations/schemas/daily-review-result.zod.mjs` | Keep one text-first schema per FEAT and one aggregate result. | Golden-shaped output parses; extra or malformed fields fail. |
+| A | `schemas/automations/daily-review-result.zod.mjs` | Keep one text-first schema per FEAT and one aggregate result. | Golden-shaped output parses; extra or malformed fields fail. |
 | B | `automations/daily-operating-update.md` | Define the Codex automation that collects active-Project context, performs one structured extraction, writes JSON, and calls integration skills. | Contract test proves one collector, one result, and direct result-array routing. |
-| C | Project/Draft/message/comment integrations | Accept directly routable section, comment, message, and anchor rows. | Each integration sees only its owned rows; prepare makes no provider call. |
-| D | processing state | Derive eligible Done Work from context and mark only after successful required effects. | Partial failure leaves the Work unprocessed; rerun is safe. |
+| C | Project/Draft/message/comment integrations | Accept directly routable section, comment, message, and anchor rows. | Each integration sees only its owned rows; the current workspace binding makes no production provider call. |
+| D | processing state | Fetch Done Work whose `AI review` is not `Processed`; mark it processed only after a sufficient documentation verdict and successful required effects. | A posted question leaves `Status = Done`, `AI review = Needs information`, and the review version empty. |
 | E | automation docs/evals | Replace four-call runtime claims with the combined flow and boundary cases. | Focused Node/Python tests pass. |
 
 ## Invariants
@@ -105,9 +122,11 @@ workspace.hermes.md source keys
   another provider scan.
 - Rendered model text passes unchanged through integrations after identity,
   expected-current-value, source, route, and idempotency guards.
-- `prepare` never mutates Notion, sends a message, or marks Work processed.
+- Provider effects require explicit authority from the reviewed workspace
+  binding; the current binding grants no production authority.
 - Missing route/handler/adapter is blocked, never permission to choose a fallback.
-- A processing mark is an observed application fact, not model output.
+- A documentation verdict is model output; a processing mark is an observed
+  application fact derived from that verdict plus integration read-back.
 
 ## Done
 
@@ -121,11 +140,14 @@ workspace.hermes.md source keys
 
 1. Parse a golden one-call result through Zod.
 2. Prove inactive Projects and unrelated Work do not enter context.
-3. Prove linked open, changed-today, and Done-unprocessed Work do enter context.
+3. Prove linked open or changed Work enters Project-control context and Done
+   Work enters documentation review only when `AI review != Processed`.
 4. Prove each result array routes to only its owning integration.
-5. Prove prepare produces zero effects and zero processing marks.
-6. Prove apply marks a Done Work item only after every required owned effect
-   succeeds; one failed effect preserves it for retry.
+5. Prove the proposal/evaluation binding produces no production effects or
+   processing marks.
+6. Prove apply marks a Done Work item only after documentation is sufficient and
+   every required owned effect succeeds; a posted question or failed effect
+   preserves it for retry.
 7. Rerun the existing current-Weekly-Draft and workspace validation tests.
 
 ## Residual gates

@@ -21,7 +21,7 @@ source_refs:
   - workspace.hermes.md
   - tickets/TASK-0006/data-model-gap-report.md
 evidence_refs:
-  - evals/evals.json
+  - evals/weekly/suite.json
 known_limits: "Only operated-v4 may apply a reviewed canonical record in the eval root after authority, privacy, dedupe, and receipt checks; production remains proposal-only."
 ---
 

@@ -1,11 +1,14 @@
 ---
 kind: goal-progress
 ticket_id: TASK-0010
-status: active
+status: superseded
 created_at: 2026-08-26
 ---
 
 # TASK-0010 progress
+
+Superseded on 2026-08-27 by the owner-directed harness consolidation; retained
+below as historical implementation evidence only.
 
 ## 2026-08-26 — planning
 

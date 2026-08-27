@@ -15,11 +15,11 @@ public: true
 surfaces:
   - workspace.hermes.md
   - templates/automation-receipt.md
-  - evals/filesystem/scripts/template-first-kamdar.mjs
 source_refs:
   - tickets/TASK-0006/data-model-gap-report.md
 evidence_refs:
-  - evals/evals.json
+  - evals/daily/suite.json
+  - evals/weekly/suite.json
 known_limits: "A frozen local receipt is not evidence of an external provider write; operated-v4 receipts never authorize production effects."
 ---
 
@@ -77,7 +77,7 @@ write redacted receipt → expose proof beside the feature result
 
 Every feature uses the receipt to distinguish record changes, Markdown
 artifacts, Notion application, Drive publication, Gmail delivery, and Telegram
-delivery. The showcase renders those states beside the owning feature.
+delivery. The saved receipts bind those states to the owning feature.
 
 ## Failure modes
 

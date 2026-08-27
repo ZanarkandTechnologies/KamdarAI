@@ -279,8 +279,8 @@ test("the current environment can seed only canonical entities without legacy au
   provisionTask0007NotionSeed({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment });
   const seeded = seedCurrentNotionEnvironment({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment });
   assert.equal(seeded.mode, "seed-only");
-  assert.equal(seeded.counts.expected, 30);
-  assert.equal(seeded.counts.applied, 30);
+  assert.equal(seeded.counts.expected, 31);
+  assert.equal(seeded.counts.applied, 31);
   assert.equal(seeded.actions.every((action) => /^seed:/.test(action.action_key)), true);
   assert.equal(seeded.actions.some((action) => /^apply:/.test(action.action_key)), false);
   assert.equal([...mock.databases.values()].find((database) => database.title === "Decisions").pages.length, 0);
@@ -292,11 +292,13 @@ test("the current environment can seed only canonical entities without legacy au
   assert.equal("Notes" in workDatabase.properties, false);
   assert.equal(workDatabase.properties.Type.type, "select");
   assert.equal(workDatabase.properties.Status.type, "status");
+  assert.equal(workDatabase.properties["AI review"].type, "select");
   assert.equal(workDatabase.properties["Daily review version"].type, "rich_text");
   const text = (property) => property?.rich_text?.[0]?.plain_text || property?.rich_text?.[0]?.text?.content;
   const processedWork = workDatabase.pages.find((page) => text(page.properties.ID) === "TASK-122");
-  assert.equal(text(processedWork.properties["Daily review version"]), "daily-review-v1");
-  assert.equal(processedWork.properties.Status.status.name, "Processed");
+  assert.equal(text(processedWork.properties["Daily review version"]), "daily-review-v2");
+  assert.equal(processedWork.properties.Status.status.name, "Done");
+  assert.equal(processedWork.properties["AI review"].select.name, "Processed");
   assert.equal(processedWork.properties.Type.select.name, "Task");
   const penangCreate = mock.calls
     .filter((args) => args[0] === "api" && args[1] === "v1/pages" && args.includes("-d"))

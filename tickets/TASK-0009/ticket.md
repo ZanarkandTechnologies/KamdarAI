@@ -90,8 +90,8 @@ messages, schedule activation, or installation into the Hermes runtime. Those
 remain separately operated steps with receipts.
 
 The current acceptance surface is the unified Daily and Weekly golden-run
-validators. The isolated template-first/v4 showcase is a retained legacy
-comparison and is not TASK-0009 completion evidence.
+validators. Legacy template-first/v4 comparison surfaces were removed during
+the 2026-08-27 harness consolidation.
 
 ## Acceptance
 

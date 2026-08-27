@@ -1,0 +1,170 @@
+[
+  {
+    "id": "PROJ-CMT-CMT_PIPELINE",
+    "template": "project",
+    "properties": {
+      "name": "CMT Pipeline",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "department": "CMT (Cut Make Trim)",
+      "owner": "PERSON-AISHA",
+      "status": "At risk",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The baju kurung sample cannot move to bulk cutting until the corrected tech pack and measurement tolerances are confirmed."
+    },
+    "body": "## Overview\n\n**Goal:** Move approved garment samples from tech pack through cutting, sewing, finishing, and production allocation without preventable rework.\n\n- **Current position:** The first baju kurung sample exposed an collar tolerance mismatch; the correction is underway and the signed pre-production check is complete.\n- **Main blocker:** TASK-101 is overdue because the corrected tech pack does not identify who approved the measurement change.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** At risk\n- **Conclusion:** A 1.5 cm collar variance between the tech pack and sewn sample caused the failed fitting and must be resolved before bulk cutting.\n- **Operational impact:** TASK-101 is overdue because the corrected tech pack does not identify who approved the measurement change.\n\n### Research and evidence\n\n- TASK-105 records the signed sample check and photographs.\n- TASK-110 confirms sewing-line capacity is available once the corrected pack is approved.\n\n### Current decisions\n\n- Keep bulk cutting on hold until the corrected tech pack, approver, and effective measurement are linked.\n\n### Blockers and review condition\n\n- TASK-101 is overdue because the corrected tech pack does not identify who approved the measurement change.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [x] Complete the signed pre-production sample check [TASK-105]\n- [ ] **P0 · Blocked · due 2026-08-22** — Confirm the corrected collar tolerance and approver [TASK-101]\n- [ ] Correct and recheck the baju kurung sample against the signed pack [TASK-104]\n- [ ] Reserve the appropriate sewing line after sample approval [TASK-110]\n\n### Daily history\n\n- 2026-08-19: pre-production sample check completed.\n- 2026-08-21: capacity confirmed; tech-pack authority remains missing.\n\n- **Next action:** Aisha records the approved measurement in TASK-101, then Nur completes TASK-104.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-101 · Confirm corrected baju kurung tech pack** — Blocked · Owner: PERSON-AISHA · Due: 2026-08-22\n- **TASK-104 · Correct and recheck baju kurung sample** — In progress · Owner: PERSON-NUR · Due: 2026-08-23\n- **TASK-105 · Complete pre-production sample check** — Done · Owner: PERSON-NUR · Due: 2026-08-19\n- **TASK-110 · Confirm sewing-line capacity** — On track · Owner: PERSON-AISHA · Due: 2026-08-23\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-MERCH-INDIA_SOURCING",
+    "template": "project",
+    "properties": {
+      "name": "India Sourcing",
+      "project_id": "PROJ-MERCH-INDIA_SOURCING",
+      "department": "Merchandising",
+      "owner": "PERSON-NUR",
+      "status": "On track",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The cotton sample and landed-cost quote remain current for the 23 Aug comparison."
+    },
+    "body": "## Overview\n\n**Goal:** Select an India-sourced cotton fabric that meets hand-feel, colourfastness, minimum-order, and landed-cost requirements.\n\n- **Current position:** TASK-109 has a current supplier sample, mill certificate, and quote; the final side-by-side comparison is due 23 Aug.\n- **Main blocker:** No current blocker; this Project is the healthy no-chase control.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** On track\n- **Conclusion:** The shortlisted cotton passes the initial hand-feel and colourfastness screen, while freight and minimum-order assumptions remain within the approved comparison range.\n- **Operational impact:** No current blocker; this Project is the healthy no-chase control.\n\n### Research and evidence\n\n- The mill certificate, swatch reference, quoted minimum order, and freight basis are linked in TASK-109.\n\n### Current decisions\n\n- Do not select a supplier until the final sample and landed-cost comparison is signed.\n\n### Blockers and review condition\n\n- No current blocker; this Project is the healthy no-chase control.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Complete the signed sample and landed-cost comparison [TASK-109]\n\n### Daily history\n\n- 2026-08-21: supplier evidence updated; task remains current.\n\n- **Next action:** Nur completes the comparison on 23 Aug without escalation.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-109 · Compare India cotton sample and landed cost** — On track · Owner: PERSON-NUR · Due: 2026-08-23\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-MKT-DEEPAVALI_MARKETING",
+    "template": "project",
+    "properties": {
+      "name": "Deepavali Marketing",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner": "PERSON-MAYA",
+      "status": "Needs attention",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "Campaign assets are approved, but the retail and e-commerce handoff lacks final crop ownership and delivery confirmation."
+    },
+    "body": "## Overview\n\n**Goal:** Deliver one coordinated Deepavali campaign across stores, social channels, and the online shop using approved product imagery and offer terms.\n\n- **Current position:** The campaign review approved the creative direction, while TASK-122 still lacks the final channel asset matrix and named handoff owner.\n- **Main blocker:** Store, Meta, and website crops are not all linked to one approved handoff record.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** Needs attention\n- **Conclusion:** One channel matrix is needed because store banners, Meta placements, and product pages use different ratios and deadlines.\n- **Operational impact:** Store, Meta, and website crops are not all linked to one approved handoff record.\n\n### Research and evidence\n\n- TASK-201 records approved offer wording and channel deadlines.\n- TASK-122 contains the master creative but not every final crop or receiver acknowledgment.\n\n### Current decisions\n\n- Use the approved Deepavali offer wording across all channels; channel-specific crops may change layout but not price terms.\n\n### Blockers and review condition\n\n- Store, Meta, and website crops are not all linked to one approved handoff record.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Complete the channel asset matrix and receiver acknowledgments [TASK-122]\n- [x] Approve offer wording and campaign milestones [TASK-201]\n\n### Daily history\n\n- 2026-08-21: offer wording approved; asset handoff remained incomplete.\n\n- **Next action:** Jun links each final asset and confirms receipt with store and Ecommerce owners.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-122 · Complete Deepavali campaign asset handoff** — Done with missing documentation · Owner: PERSON-JUN · Due: 2026-08-21\n- **TASK-201 · Deepavali campaign review** — Done · Owner: PERSON-MAYA\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+    "template": "project",
+    "properties": {
+      "name": "Weekly Meta Ads Updates",
+      "project_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "department": "Marketing",
+      "owner": "PERSON-MAYA",
+      "status": "Needs documentation",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "Weekly ad results are available, but one completed update lacks its reporting window, spend basis, and comparison method."
+    },
+    "body": "## Overview\n\n**Goal:** Give Marketing a reproducible weekly view of Meta spend, attributed revenue, creative performance, and budget changes.\n\n- **Current position:** TASK-115 reports a ROAS improvement without the source export or attribution window; TASK-116 is the complete comparison control.\n- **Main blocker:** The reported TASK-115 result cannot be reproduced from its Work page.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** Needs documentation\n- **Conclusion:** A weekly result is only decision-ready when spend, attributed revenue, date window, attribution setting, and comparison baseline are linked.\n- **Operational impact:** The reported TASK-115 result cannot be reproduced from its Work page.\n\n### Research and evidence\n\n- TASK-116 provides all required fields and needs no documentation request.\n- TASK-115 omits the source export, reporting window, and reason for its budget recommendation.\n\n### Current decisions\n\n- Do not change weekly Meta budget from TASK-115 until the missing basis is documented.\n\n### Blockers and review condition\n\n- The reported TASK-115 result cannot be reproduced from its Work page.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Add reporting window, spend, attributed revenue, attribution setting, and recommendation rationale [TASK-115]\n- [x] Retain TASK-116 as the documented control update\n\n### Daily history\n\n- 2026-08-21: both weekly updates completed; only TASK-115 requires clarification.\n\n- **Next action:** Jun completes TASK-115; Maya reviews the recommendation against TASK-116.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-115 · Publish weekly Meta performance update** — Done with missing documentation · Owner: PERSON-JUN · Due: 2026-08-21\n- **TASK-116 · Publish documented Meta performance control** — Done · Owner: PERSON-MAYA · Due: 2026-08-21\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-ECOM-ECOM_FIXES",
+    "template": "project",
+    "properties": {
+      "name": "Ecom Fixes",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "status": "At risk",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The order-confirmation defect is reproduced, but the affected checkout path and verified fix evidence are incomplete."
+    },
+    "body": "## Overview\n\n**Goal:** Resolve customer-facing online-store defects with a reproducible case, confirmed fix, and monitored business impact.\n\n- **Current position:** TASK-102 records missing confirmation messages for guest checkout; TASK-114 verifies registered checkout remains healthy.\n- **Main blocker:** TASK-102 does not identify the exact checkout condition, affected order sample, or post-fix proof.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** At risk\n- **Conclusion:** The defect appears limited to guest checkout when payment returns asynchronously; registered checkout is the healthy control.\n- **Operational impact:** TASK-102 does not identify the exact checkout condition, affected order sample, or post-fix proof.\n\n### Research and evidence\n\n- TASK-114 confirms registered-account confirmations arrive within two minutes.\n- TASK-102 lacks the affected order sample and webhook trace required to confirm the guest-checkout failure.\n\n### Current decisions\n\n- Keep the defect open until one affected guest order and one successful post-fix order are linked.\n\n### Blockers and review condition\n\n- TASK-102 does not identify the exact checkout condition, affected order sample, or post-fix proof.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Document the affected guest-checkout path and attach order/webhook evidence [TASK-102]\n- [x] Verify the registered-checkout confirmation control [TASK-114]\n- [x] Review the failure boundary and owner handoff [TASK-202]\n\n### Daily history\n\n- 2026-08-21: healthy control passed; guest-checkout evidence remains incomplete.\n\n- **Next action:** Darren links the affected order and trace, then verifies one successful guest order after the fix.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-102 · Fix missing guest order confirmation** — Done with missing documentation · Owner: PERSON-DARREN · Due: 2026-08-21\n- **TASK-114 · Verify registered checkout confirmation** — On track · Owner: PERSON-DARREN · Due: 2026-08-23\n- **TASK-202 · Ecom fixes review** — Done · Owner: PERSON-DARREN\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-ECOM-LISTING_PIPELINE",
+    "template": "project",
+    "properties": {
+      "name": "Listing Pipeline",
+      "project_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "status": "Monitoring",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The product-listing handoff was reviewed; missing image and attribute ownership is now assigned for the next batch."
+    },
+    "body": "## Overview\n\n**Goal:** Move approved products from merchandising handoff to complete online listings with images, attributes, prices, and inventory mappings.\n\n- **Current position:** TASK-203 mapped the handoff for the next listing batch and recorded which team owns missing images versus product attributes.\n- **Main blocker:** A second batch is needed to prove the handoff checklist is reusable rather than a one-off meeting output.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** Monitoring\n- **Conclusion:** Listings stall when image readiness and product-attribute readiness are tracked as one undifferentiated status.\n- **Operational impact:** A second batch is needed to prove the handoff checklist is reusable rather than a one-off meeting output.\n\n### Research and evidence\n\n- TASK-203 separates image owner, attribute owner, listing owner, and acceptance condition.\n\n### Current decisions\n\n- Use separate image-ready and data-ready gates for the next listing batch.\n\n### Blockers and review condition\n\n- A second batch is needed to prove the handoff checklist is reusable rather than a one-off meeting output.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Run the split-gate handoff on the next product batch [TASK-203]\n- [ ] Record cycle time and any returned listings [TASK-203]\n\n### Daily history\n\n- 2026-08-21: split-gate handoff agreed for one batch.\n\n- **Next action:** Darren runs the checklist once more before proposing it as an SOP.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- **TASK-203 · Listing pipeline handoff review** — Done · Owner: PERSON-DARREN\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "PROJ-DTC-KALRAH_LAUNCH",
+    "template": "project",
+    "properties": {
+      "name": "kalrah launch",
+      "project_id": "PROJ-DTC-KALRAH_LAUNCH",
+      "department": "DTC Brands",
+      "owner": "PERSON-LINA",
+      "status": "Planning",
+      "priority": "",
+      "start_date": "",
+      "due_date": "",
+      "progress": "The launch scope covers product story, assortment, imagery, and channel readiness; execution Work has not yet been opened."
+    },
+    "body": "## Overview\n\n**Goal:** Launch the kalrah collection with a coherent product story, approved assortment, complete imagery, and channel-ready listings.\n\n- **Current position:** The Project brief is active and the first operating milestone is to convert assortment and imagery decisions into owned Work.\n- **Main blocker:** No canonical W34 Work item currently owns the launch assortment and imagery handoff.\n\n## Project knowledge\n\n### Current operating picture\n\n- **Health:** Planning\n- **Conclusion:** The launch depends on coordinated merchandising, content, and Ecommerce inputs rather than a standalone campaign task.\n- **Operational impact:** No canonical W34 Work item currently owns the launch assortment and imagery handoff.\n\n### Research and evidence\n\n- The captured Project name and Department establish this as an active DTC Brands initiative; operating facts are synthetic eval context.\n\n### Current decisions\n\n- Do not treat the launch brief itself as execution evidence.\n\n### Blockers and review condition\n\n- No canonical W34 Work item currently owns the launch assortment and imagery handoff.\n\n## This week's attention\n\n**Planning window:** 2026-W34\n\n- [ ] Create owned Work for assortment sign-off, imagery delivery, and listing readiness\n\n### Daily history\n\n- 2026-08-21: active Project context loaded; no execution Work found.\n\n- **Next action:** Lina creates the three owned launch Work items before the next Daily run.\n- **Last meaningful update:** 2026-08-21\n\n## Tasks\n\n- No W34 Work item is attached; the next action above must be converted into Work before execution.\n\n## Decisions made\n\n- No durable cross-project decision has been approved from this Project this week.\n",
+    "metadata": {
+      "active": true,
+      "provenance": {
+        "project_name": "captured",
+        "department": "captured",
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  }
+]

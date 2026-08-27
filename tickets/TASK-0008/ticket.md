@@ -1,15 +1,19 @@
 ---
 id: TASK-0008
 title: Render the Company OS eval dossier from typed evidence
-status: active
+status: superseded
 approval: owner-directed-implementation
 created: 2026-08-25
-updated: 2026-08-25
+updated: 2026-08-27
 owner: vishan-kamdar
 feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004, FEAT-0005, FEAT-0006, FEAT-0007]
 ---
 
 # Render the Company OS eval dossier from typed evidence
+
+> Superseded on 2026-08-27 by the owner-directed harness consolidation. The
+> optional dashboard and its generated-run dependencies were removed; canonical
+> Daily/Weekly JSON suites and validators remain the acceptance surface.
 
 ## Decision
 

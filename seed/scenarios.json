@@ -1,0 +1,130 @@
+[
+  {
+    "feature_id": "FEAT-0001",
+    "name": "Update the CMT Pipeline Project from current Work",
+    "entity_ids": [
+      "PROJ-CMT-CMT_PIPELINE",
+      "TASK-101",
+      "TASK-104",
+      "TASK-105",
+      "TASK-110"
+    ],
+    "shows": [
+      "Replace the Project overview, knowledge, and weekly checklist from garment-production evidence.",
+      "Check the completed sample gate, keep the correction open, and surface the signed-tech-pack blocker.",
+      "Block a Notion write when expected current text changed."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0002",
+    "name": "Question incomplete Work completed today",
+    "entity_ids": [
+      "TASK-115",
+      "TASK-116",
+      "TASK-102",
+      "PERSON-JUN",
+      "PERSON-DARREN"
+    ],
+    "shows": [
+      "Ask TASK-115 for its Meta reporting basis and TASK-102 for exact defect evidence.",
+      "Do not comment on complete control TASK-116.",
+      "Resolve each intended recipient through People and route Telegram only to the operator-owned eval sink."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0003",
+    "name": "Chase stale production Work with context",
+    "entity_ids": [
+      "PROJ-CMT-CMT_PIPELINE",
+      "TASK-101",
+      "TASK-109",
+      "PERSON-AISHA",
+      "PERSON-NUR"
+    ],
+    "shows": [
+      "Chase overdue blocked TASK-101 with its measurement and rework context.",
+      "Prefix the eval-sink Telegram with the intended Person.",
+      "Do not chase current India Sourcing control TASK-109."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0004",
+    "name": "Extract completed operating reviews into Weekly Drafts",
+    "entity_ids": [
+      "TASK-201",
+      "TASK-202",
+      "TASK-203",
+      "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+    ],
+    "shows": [
+      "Extract grounded campaign-handoff, ecommerce-defect, and listing-pipeline knowledge.",
+      "Update the matching Notion Weekly Draft with PM attention first and increment its version once.",
+      "Hold proposed SOPs until reuse proof exists."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0005",
+    "name": "Finalize Project reports and roll them up",
+    "entity_ids": [
+      "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+    ],
+    "shows": [
+      "Finalize three current Project Drafts and leave the prior Final unchanged.",
+      "Roll Final Project reports into Department reports, then the Company report.",
+      "Deliver the complete Company report and each Department report to the configured operator-owned Telegram eval sink."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0006",
+    "name": "Promote only reusable approved knowledge",
+    "entity_ids": [
+      "TASK-105",
+      "TASK-201",
+      "TASK-202",
+      "TASK-203",
+      "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "RPT-PROJ-ECOM-ECOM_FIXES-W34"
+    ],
+    "shows": [
+      "Read candidates from Project Drafts, not raw Work.",
+      "Cover approved Project decisions, proposed SOPs, and promotion gates.",
+      "Create a destination only for knowledge that meets authority and reuse proof."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0007",
+    "name": "Replace the CMT Pipeline weekly checklist",
+    "entity_ids": [
+      "PROJ-CMT-CMT_PIPELINE",
+      "TASK-101",
+      "TASK-104",
+      "TASK-110",
+      "RPT-PROJ-CMT-CMT_PIPELINE-W34"
+    ],
+    "shows": [
+      "Carry unresolved garment-production priorities into one checklist replacement.",
+      "Preserve owner, due condition, success evidence, and source IDs.",
+      "Do not change source Work or create a separate plan file."
+    ]
+  },
+  {
+    "feature_id": "FEAT-0010",
+    "name": "Create canonical Tasks from a new Meeting",
+    "entity_ids": [
+      "TASK-204",
+      "PROJ-MKT-DEEPAVALI_MARKETING",
+      "PERSON-JUN",
+      "PERSON-DARREN"
+    ],
+    "shows": [
+      "Create one canonical Task for each explicit owned and dated commitment.",
+      "Block the unowned discussion note without inventing an owner or due date.",
+      "Preserve the Meeting source and create no duplicate on an unchanged rerun."
+    ]
+  }
+]

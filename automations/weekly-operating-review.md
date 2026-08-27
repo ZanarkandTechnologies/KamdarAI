@@ -17,11 +17,12 @@ Project reports into Department reports, then roll finalized Department reports
 into one Company report. Read Reports, Projects, and destination database URLs from
 `workspace.hermes.md`; never rescan raw Work or Meeting pages.
 
-The default execution mode is `prepare`, which writes only the local plan and
-receipt. An explicit `isolated-eval` run may write reports inside the dated
-Notion eval root and, after the hierarchy is verified, send the complete Company
-report to the configured owner Telegram route. It must never use production
-Kamdar records or infer a recipient.
+## Authority
+
+`workspace.hermes.md` is the active environment binding. It supplies the exact
+Notion sources, write authority, and message routes for this run. Use only those
+resources and stop when a required action is not authorized. Never infer a
+destination or substitute another route.
 
 All three report levels use the same core sections: `Summary`, `Outcomes and
 open attention`, `Problems and inefficiencies`, `Decisions`, `SOPs`, and
@@ -34,42 +35,77 @@ the automation must not invent another organizational layer.
 
 ## Todo List
 
-- [ ] **0 — Prepare and review one complete Weekly result.**
+- [ ] **A — Load the contracts and bounded Weekly context.**
 
-  Load the current-week Project Drafts, related Projects, prior Reports, and
-  destination records needed for dedupe. Read
-  `automations/schemas/weekly-review-result.zod.mjs` and every destination
-  template. Produce and validate one complete Weekly result before any Notion
-  mutation. Write it to `weekly/review/weekly-review-result-YYYY-Www.json`.
+  - Read `workspace.hermes.md` completely for source routing and authority.
+  - Before the first provider call, run `ntn --help`,
+    `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
+    syntax confirmed by the installed CLI.
+  - Load every current-week Project Report with `report_status = Draft`, its
+    related Project, the prior Reports, and the destination records needed for
+    dedupe.
+  - Read each full Report page and the complete Project, Issue, Decision, and
+    Skill/SOP templates. Do not read raw Work or Meeting pages.
+  - Freeze the input as `weekly/context/weekly-context-YYYY-Www.json`.
 
-  Give the exact result bytes, frozen context, destination templates, and
-  `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
-  reviewer. Validate its response with
-  `automations/schemas/artifact-quality-review.zod.mjs` and write
-  `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`. Require exact
-  coverage of every report, disposition, Project replacement, and gap. Only
-  tier A may proceed to Notion writes. Route B/C readability findings through
-  `unslop`, regenerate, and review the new hash.
+  Never infer an `ntn` resource or argument shape.
+
+- [ ] **B — Produce and validate one complete Weekly result.**
+
+  - Read `schemas/automations/weekly-review-result.zod.mjs` completely.
+  - Give the schema instructions, golden examples, frozen context, and every
+    destination template to one structured extraction call.
+  - Produce and validate one complete Weekly result before any Notion mutation.
+  - Write the exact result bytes to
+    `weekly/review/weekly-review-result-YYYY-Www.json`.
+  - Stop before integrations if validation fails.
+
+- [ ] **C — Pass the end-user artifact quality gate.**
+
+  - Give the exact result bytes, frozen context, destination templates, and
+    `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
+    reviewer.
+  - Validate its response with
+    `schemas/automations/artifact-quality-review.zod.mjs`.
+  - Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`.
+  - Require exact coverage of every report, disposition, Project replacement,
+    and gap.
+  - Proceed to Notion writes only for tier A.
+  - For B/C readability findings, run `unslop`, regenerate the result, and
+    review the new hash.
 
 - [ ] **1 — Finalize Project Weekly Drafts and promote reviewed knowledge.**
 
-  Read `workspace.hermes.md` and `skills/kamdar-company-os/SKILL.md` completely,
-  including its Notion CLI contract. Before the first provider call, run
-  `ntn --help`, `ntn datasources --help`, `ntn pages --help`, and
-  `ntn api --help`; use only syntax confirmed there or in the skill contract.
-  Never infer an `ntn` resource or argument shape. Then load every current-week
-  Project Report with `report_status = Draft`, its
-  related Project, and the destination records needed for dedupe. Read each
-  full Report page and the complete Project, Issue, Decision, and Skill/SOP
-  templates before judging promotion.
-
-  | Use this Draft section | To do this | With this integration |
+  | Source | Action | Destination |
   | --- | --- | --- |
-  | Complete Project Report Draft | Validate the shared report structure, set `report_status = Final`, increment `report_version`, set `finalized_at`, and preserve source links | `notion` skill via `ntn` on the exact Report |
-  | `Problems and inefficiencies` | Promote a recurring or materially costly problem into a source-linked Issue only when the affected workflow/step, dated Before baseline, cost calculation or explicit measurement gap, confidence, measurement owner, and next test are preserved; keep weaker findings in report history with their disposition | `notion` skill via `ntn` on the existing Work/Issue database |
-  | `Decisions` | Keep routine execution choices in the Project report. Promote only a reusable customer-handling precedent, Project operating standard, monetary commitment, material risk/compliance choice, recurring cross-team tradeoff, or costly-to-reverse choice. Compare 2–3 real options in the style of `advise`; preserve the selected option, rationale, authority, accepted tradeoff, consequences, review trigger, Project relation, and provenance | `notion` skill via `ntn` on the Decisions database |
-  | `SOPs` | Promote an approved employee workflow using `templates/sop.md`, preserving trigger, actors, ordered steps, systems, handoffs, timing/volume baseline, exceptions, output, owner, reuse proof, Project relation, and source provenance; never use the Farplane `skill.md` registry card | `notion` skill via `ntn` on the existing SOPs database |
+  | Complete Project Report Draft | Finalize the exact Report using the rules below | `notion` skill via `ntn` on the exact Report |
+  | `Problems and inefficiencies` | Promote each qualifying problem or record its disposition | `notion` skill via `ntn` on the existing Work/Issue database |
+  | `Decisions` | Promote each qualifying reusable Decision or record its disposition | `notion` skill via `ntn` on the Decisions database |
+  | `SOPs` | Promote each qualifying approved employee workflow or record its disposition | `notion` skill via `ntn` on the existing SOPs database |
   | `Next-week priorities` | Replace the related Project's complete `This week's attention` section for the new week | `notion` skill via `ntn` on `notion.projects` |
+
+  Apply these rules in order:
+
+  1. Validate the shared Project Report structure. Set `report_status = Final`,
+     increment `report_version`, set `finalized_at`, and preserve source links.
+  2. Promote a recurring or materially costly problem only when the Issue
+     preserves the affected workflow or step, dated Before baseline, cost
+     calculation or explicit measurement gap, confidence, measurement owner,
+     and next test. Keep weaker findings in report history with their
+     disposition.
+  3. Keep routine execution choices in the Project report. Promote only a
+     reusable customer-handling precedent, Project operating standard, monetary
+     commitment, material risk or compliance choice, recurring cross-team
+     tradeoff, or costly-to-reverse choice. Compare 2–3 real options in the
+     style of `advise`; preserve the selected option, rationale, authority,
+     accepted tradeoff, consequences, review trigger, Project relation, and
+     provenance.
+  4. Promote an approved employee workflow with `templates/sop.md`. Preserve
+     its trigger, actors, ordered steps, systems, handoffs, timing or volume
+     baseline, exceptions, output, owner, reuse proof, Project relation, and
+     source provenance. Never use the Farplane `skill.md` registry card.
+  5. Replace the related Project's complete `This week's attention` section
+     with the accepted `Next-week priorities` for the new week.
 
   Record one disposition for every candidate: `promoted`, `duplicate`,
   `project_only`, `monitor`, `dismissed`, or `blocked`. Missing authority,
@@ -82,20 +118,23 @@ the automation must not invent another organizational layer.
   materiality may be an amount, exposure, budget boundary, or an explicit
   measurement gap with an owner; never invent a value.
 
-  Reports are the interval staging and management view. The SOP record is the
-  canonical employee-workflow baseline; the Issue is the canonical problem and
-  economics baseline linked to the affected workflow step. Do not create a
-  separate Problems database.
+  Reports hold weekly findings and provide the management view. The SOP record
+  is the canonical employee-workflow baseline. The Issue is the canonical
+  problem and economics baseline linked to the affected workflow step. Do not
+  create a separate Problems database.
 
 - [ ] **2 — Roll finalized Project reports into finalized Department reports.**
 
-  Group only this week's Final Project reports by their Project's Department.
-  For each Department, read the previous Department report and the complete
-  current source reports,
-  then create or replace one Report using `templates/area-operating-rollup.md`.
-  Preserve the shared section structure, summarize cross-Project patterns, link
-  every source Project report, and expose missing Project/Department relations as
-  `configuration_gap`. Write through the `notion` skill via `ntn` to Reports.
+  For each Department:
+
+  - Group only this week's Final Project reports by their Project's Department.
+  - Read the previous Department report and the complete current source reports.
+  - Create or replace one Report using
+    `templates/area-operating-rollup.md`.
+  - Preserve the shared section structure, summarize cross-Project patterns,
+    and link every source Project report.
+  - Record missing Project or Department relations as `configuration_gap`.
+  - Write through the `notion` skill via `ntn` to Reports.
 
   Record the Notion URL and finalized version for every Department report. A
   Department with expected active Projects but no Final Project report blocks
@@ -103,44 +142,53 @@ the automation must not invent another organizational layer.
 
 - [ ] **3 — Roll finalized Department reports into the Company report.**
 
-  Read all Final Department reports for the week and the previous Company report.
-  Create or replace one Company Report using
-  `templates/company-operating-rollup.md`. Preserve the shared section
-  structure, include only company-material patterns, link every Department report,
-  set `report_status = Final`, increment `report_version`, and set
-  `finalized_at`. Write through the `notion` skill via `ntn` to Reports.
+  - Read all Final Department reports for the week and the previous Company
+    report.
+  - Create or replace one Company Report using
+    `templates/company-operating-rollup.md`.
+  - Preserve the shared section structure.
+  - Include only company-material patterns and link every Department report.
+  - Set `report_status = Final`, increment `report_version`, and set
+    `finalized_at`.
+  - Write through the `notion` skill via `ntn` to Reports.
 
   Do not finalize the Company report when an expected Department report is
   missing or non-Final. Report the gap instead.
 
-- [ ] **4 — In explicit `isolated-eval`, deliver the actual Company report.**
+- [ ] **4 — Deliver the actual Company report.**
 
-  This step is forbidden in `prepare`. After all expected Project, Department,
-  and Company records have been read back from Notion as Final, load the owner
-  Person record and resolve its approved `telegram` route alias. Render
-  `templates/executive-distribution.md` with:
+  After all expected Project, Department, and Company records have been read
+  back from Notion as Final:
 
-  - the complete Company report Markdown, unchanged and not summarized;
-  - the title and Notion URL of every source Department report; and
-  - the final Company report URL and version.
+  - Load the owner Person record and resolve its approved Telegram route through
+    the active environment binding.
+  - Run `kamdar send --help`.
+  - Render `templates/executive-distribution.md` with the complete Company
+    report Markdown, unchanged and not summarized; the title and Notion URL of
+    every source Department report; and the final Company report URL and
+    version.
+  - Send the rendered document through the approved route.
 
-  Send that rendered document to the configured owner Telegram route. If the
-  provider requires multiple messages, split only at Markdown section
+  If the provider requires multiple messages, split only at Markdown section
   boundaries, preserve order, and include `part N/M` in each envelope. Do not
   replace the report with a deployment status, test summary, or link-only
   notification. A provider-confirmed receipt for every part is required before
   delivery is `delivered`; otherwise record `partial` or `blocked` truthfully.
-  Missing Telegram configuration does not permit email or another fallback.
+  A missing or unauthorized Telegram route blocks delivery; it does not permit
+  email or another fallback.
 
 ## Output
 
 - Final Project, Department, and Company Notion Report URLs
 - Promotion dispositions and destination record URLs
+- `weekly/context/weekly-context-YYYY-Www.json`
 - `weekly/review/weekly-review-result-YYYY-Www.json`
 - `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`
-- One receipt containing source Report versions, integration outcomes, gaps,
-  the final Company Report URL, owner route alias, and provider delivery receipts
+- `weekly/receipts/weekly-integration-receipt-YYYY-Www.json`, containing source
+  Report versions, integration outcomes, gaps, the final Company Report URL,
+  approved Telegram route, and provider delivery receipts
 
-Write boundary: create the plan and receipt before any Notion mutation. Only an
-explicit `isolated-eval` run may perform the bounded Notion writes and final
-owner Telegram delivery described above.
+Write the validated Weekly result before any Notion mutation. Record each
+integration outcome in the receipt as it settles. Before any provider write,
+prove that the active environment binding authorizes the exact target and
+action. Otherwise record `blocked` and stop that effect.

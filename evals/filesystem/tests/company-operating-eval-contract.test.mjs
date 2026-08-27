@@ -10,7 +10,7 @@ import {
 } from "../scripts/company-operating-eval-contract.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const dailySuite = JSON.parse(readFileSync(resolve(projectRoot, "evals/daily-review-evals.json"), "utf8"));
+const dailySuite = JSON.parse(readFileSync(resolve(projectRoot, "evals/daily/suite.json"), "utf8"));
 const dailyGates = ["effects-match-receipt", "read-back-matches-intent", "processing-safety", "idempotency"];
 
 function validate(suite) {

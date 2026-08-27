@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "ui": "npm run evals:ui",
-    "evals:ui": "node evals/filesystem/scripts/serve-eval-dashboard.mjs"
+    "eval:judge:operated-w34": "npm --prefix evals/filesystem run judge:operated-w34",
+    "eval:view:build": "npm --prefix evals/filesystem run view:build:operated-w34",
+    "eval:view:serve": "npm --prefix evals/filesystem run view:serve"
   },
   "dependencies": {
     "zod": "^4.0.0"

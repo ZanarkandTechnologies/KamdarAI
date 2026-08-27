@@ -1,6 +1,6 @@
 ---
 ticket: TASK-0007
-ticket_updated: 2026-08-25
+ticket_updated: 2026-08-27
 packet_status: active
 trigger: active_goal
 approval: approved
@@ -12,12 +12,12 @@ metric_provider: hybrid_fixture_eval_plus_isolated_provider_receipt_plus_indepen
 
 ## Objective and authority
 
-Complete the ticket's source-proof contract: evaluate each new pipeline and
-integration skill in isolation, provision one fresh Notion-only seed root, run
-the bounded Daily and Weekly workflow there, and retain a concise evidence
-report. The user's 2026-08-25 instruction approves that one new root and its
-receipt-backed writes. Production Kamdar, existing eval roots, staff messaging,
-profile installation, and HermesCorp synchronization remain out of scope.
+Complete the ticket's source-proof contract: validate the source-owned Daily
+and Weekly automations, provision one fresh Notion-only seed root, run the
+bounded workflow there, and retain concise evidence. The user's 2026-08-25
+instruction approves that one new root and its receipt-backed writes.
+Production Kamdar, existing eval roots, staff messaging, profile installation,
+and HermesCorp synchronization remain out of scope.
 
 ## Metric and proof provider
 
@@ -29,7 +29,7 @@ bundle. No fabricated numeric quality threshold substitutes for those gates.
 ## Budget and stop conditions
 
 No numeric budget was supplied. Bound work to one TASK-0007 ticket, one new
-source-safe seed namespace, and its current skill packages. Stop blocked if
+source-safe seed namespace, and the canonical automation/eval packages. Stop blocked if
 source validation, isolated-root identity, required Notion capability, or an
 artifact's deterministic contract cannot be repaired safely. Never retry a
 write outside the new root; never remove an existing root to make a retry pass.
@@ -37,9 +37,9 @@ write outside the new root; never remove an existing root to make a retry pass.
 ## Compiled Execution Path
 
 ```text
-E1 source contracts + seed config
-  -> C1 validate source/template/skill eval fixtures
-  -> D1 isolated skill-eval verdicts
+E1 source contracts + modular seed config
+  -> C1 validate source/templates/Daily-Weekly eval suites
+  -> D1 deterministic automation verdicts
   -> C2 provision a fresh marked Notion seed root
   -> D2 root identity + schema preflight receipt
   -> C3 run the bounded Daily then Weekly fixture workflow
@@ -60,11 +60,13 @@ F4 review or closure failure -> repair named owner and rerun only its proof
 | `ticket.md` | all C/D nodes | scope, Done assertions, and safety boundary |
 | `automations/daily-operating-update.md` | C3 | Daily collector/fan-out order |
 | `automations/weekly-operating-review.md` | C3 | Weekly convergence/finalization order |
-| `evals/seed/kamdar-company-os.seed.json` | C1–C3 | source-safe fresh seed content |
+| `seed/manifest.json` | C1–C3 | modular source-safe seed content and table routing |
 | `evals/filesystem/scripts/kamdar-seed-config.mjs` | C1/C2 | seed validation and projection |
-| `skills/*/evals/evals.json` | C1/D1 | per-skill cases and assertions |
-| `evals/filesystem/scripts/run-task0007-skill-evals.mjs` | C1/D1 | static and safe-mode candidate/baseline/judge evaluation |
-| `evals/filesystem/scripts/run-task0007-fixture-automation.mjs` | C3/D3 | source-safe four-Daily direct-Draft run plus Draft-read-only Weekly finalization |
+| `evals/daily/suite.json` | C1/D1 | Daily cases, feature assertions, and proof bindings |
+| `evals/weekly/suite.json` | C1/D1 | Weekly cases, feature assertions, and proof bindings |
+| `evals/filesystem/scripts/unified-daily-review-eval.mjs` | C1/D1 | Daily deterministic and judged-run validation |
+| `evals/filesystem/scripts/unified-weekly-review-eval.mjs` | C1/D1 | Weekly deterministic and judged-run validation |
+| `evals/filesystem/scripts/run-task0007-reference-automation.mjs` | C3/D3 | source-safe four-Daily direct-Draft run plus Draft-read-only Weekly finalization |
 | `evals/filesystem/scripts/operate-task0007-notion-seed.mjs` | C2–D3 | one-root provision, preflight, Notion-only application, and receipt |
 | `artifacts/qa/direct-weekly-draft-operating-report.md` | D3/D4 | corrected direct-Draft operating evidence owner |
 
@@ -73,7 +75,7 @@ F4 review or closure failure -> repair named owner and rerun only its proof
 | Done assertion | Owning change | Evidence source | Status |
 | --- | --- | --- | --- |
 | One collector fans out to four Daily pipelines | eval runner and Daily proof | context manifest + four outputs | supported |
-| Skills are independently evaluable and safe | per-package eval runner | 21 current static cases, no-provider assertions, and pending profile-backed calibration | structurally supported; calibration pending |
+| Automations are independently evaluable and safe | Daily/Weekly validators | canonical cases, no-provider assertions, and guarded receipts | supported |
 | Weekly convergence is deterministic | Weekly proof | direct current-Draft anchors, conflict/duplicate checks, and no-op rerun result | supported |
 | Fresh Notion proof never touches production/current roots | isolated seed operator | root marker, state, preflight, redacted receipt | supported |
 | Report explains actual feature behavior | corrected feature docs and direct-Draft fixture | feature contracts + current Weekly-Draft fixture report hierarchy | supported |

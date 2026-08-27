@@ -1,0 +1,673 @@
+{
+  "artifact_type": "kamdar-daily-context-diff",
+  "artifact_version": "0.2.0",
+  "context_id": "daily-context-2026-08-24",
+  "local_day": "2026-08-24",
+  "evidence_window": {
+    "start": "2026-08-24T00:00:00+08:00",
+    "end": "2026-08-24T23:59:59+08:00"
+  },
+  "collector": {
+    "run_id": "daily-2026-08-24-grounded-v4",
+    "provider_effects": {
+      "performed": false
+    }
+  },
+  "source_manifest": [
+    {
+      "source_key": "notion.projects",
+      "status": "fetched",
+      "source_url": "notion://projects",
+      "collection_scope": "Active Projects linked to selected Work.",
+      "collected_at": "2026-08-24T16:30:00+08:00",
+      "record_count": 5,
+      "source_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "PROJ-MERCH-INDIA_SOURCING",
+        "PROJ-MKT-DEEPAVALI_MARKETING",
+        "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+        "PROJ-ECOM-LISTING_PIPELINE"
+      ],
+      "gap": null
+    },
+    {
+      "source_key": "notion.work_items_this_week",
+      "status": "fetched",
+      "source_url": "notion://work",
+      "collection_scope": "Work created or changed during 2026-W34.",
+      "collected_at": "2026-08-24T16:30:00+08:00",
+      "record_count": 10,
+      "source_ids": [
+        "TASK-101",
+        "TASK-102",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110",
+        "TASK-115",
+        "TASK-116",
+        "TASK-201",
+        "TASK-202",
+        "TASK-203"
+      ],
+      "gap": null
+    },
+    {
+      "source_key": "notion.embedded_meetings",
+      "status": "fetched",
+      "source_url": "notion://work",
+      "collection_scope": "Completed Meetings selected for knowledge extraction.",
+      "collected_at": "2026-08-24T16:30:00+08:00",
+      "record_count": 3,
+      "source_ids": [
+        "TASK-201",
+        "TASK-202",
+        "TASK-203"
+      ],
+      "gap": null
+    },
+    {
+      "source_key": "notion.people",
+      "status": "fetched",
+      "source_url": "notion://people",
+      "collection_scope": "Referenced People with approved test route references.",
+      "collected_at": "2026-08-24T16:30:00+08:00",
+      "record_count": 5,
+      "source_ids": [
+        "PERSON-AISHA",
+        "PERSON-NUR",
+        "PERSON-JUN",
+        "PERSON-MAYA",
+        "PERSON-DARREN"
+      ],
+      "gap": null
+    }
+  ],
+  "projects": [
+    {
+      "id": "PROJ-CMT-CMT_PIPELINE",
+      "source_id": "PROJ-CMT-CMT_PIPELINE",
+      "source_url": "notion://PROJ-CMT-CMT_PIPELINE",
+      "name": "CMT Pipeline",
+      "owner_person_id": "PERSON-AISHA",
+      "project_knowledge": "First seasonal sample is under construction review.",
+      "this_weeks_attention": "- [x] Approve the first baju kurung sample measurements, seams, and colour checks — Aisha — completed 2026-08-20 [TASK-105]\n- [x] Record production capacity and the conditional line hold — Aisha — completed 2026-08-21 [TASK-110]\n- [ ] Approve the consolidated production tech pack — Aisha — due 2026-08-22; BLOCKED [TASK-101]\n- [ ] Close the remaining collar correction — Nur — due 2026-08-23 [TASK-104]",
+      "weekly_attention_reset": {
+        "requested": false,
+        "week": null,
+        "reason": null,
+        "source_id": "PROJ-CMT-CMT_PIPELINE"
+      }
+    },
+    {
+      "id": "PROJ-MERCH-INDIA_SOURCING",
+      "source_id": "PROJ-MERCH-INDIA_SOURCING",
+      "source_url": "notion://PROJ-MERCH-INDIA_SOURCING",
+      "name": "India Sourcing",
+      "owner_person_id": "PERSON-NUR",
+      "project_knowledge": "Compare samples on MOQ, landed cost, lead time, and quality.",
+      "this_weeks_attention": "- [ ] Receive supplier sample and complete quote [TASK-101]",
+      "weekly_attention_reset": {
+        "requested": false,
+        "week": null,
+        "reason": null,
+        "source_id": "PROJ-MERCH-INDIA_SOURCING"
+      }
+    },
+    {
+      "id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "source_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "source_url": "notion://PROJ-MKT-DEEPAVALI_MARKETING",
+      "name": "Deepavali Marketing",
+      "owner_person_id": "PERSON-MAYA",
+      "project_knowledge": "Branch and online campaign activation.",
+      "this_weeks_attention": "- [ ] Complete campaign asset handoff [TASK-201]",
+      "weekly_attention_reset": {
+        "requested": false,
+        "week": null,
+        "reason": null,
+        "source_id": "PROJ-MKT-DEEPAVALI_MARKETING"
+      }
+    },
+    {
+      "id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "source_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "source_url": "notion://PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "name": "Weekly Meta Ads Updates",
+      "owner_person_id": "PERSON-MAYA",
+      "project_knowledge": "Weekly measurement requires spend, revenue, window, comparison, and source.",
+      "this_weeks_attention": "- [ ] Document Meta performance [TASK-115]",
+      "weekly_attention_reset": {
+        "requested": false,
+        "week": null,
+        "reason": null,
+        "source_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES"
+      }
+    },
+    {
+      "id": "PROJ-ECOM-LISTING_PIPELINE",
+      "source_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "source_url": "notion://PROJ-ECOM-LISTING_PIPELINE",
+      "name": "Listing Pipeline",
+      "owner_person_id": "PERSON-DARREN",
+      "project_knowledge": "Approved products need one publish-ready handoff.",
+      "this_weeks_attention": "- [ ] Apply listing checklist [TASK-203]",
+      "weekly_attention_reset": {
+        "requested": false,
+        "week": null,
+        "reason": null,
+        "source_id": "PROJ-ECOM-LISTING_PIPELINE"
+      }
+    }
+  ],
+  "work_items": [
+    {
+      "id": "TASK-101",
+      "source_id": "TASK-101",
+      "source_url": "notion://TASK-101",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-AISHA",
+      "status": "blocked",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "linked_open_or_changed",
+      "due_date": "2026-08-20",
+      "last_meaningful_update": "2026-08-18",
+      "blocker": "The sewn sample is 1.5 cm wider at the collar than the issued tech pack, but the proposed correction has no named approver.",
+      "cause": {
+        "value": "The fitting correction was discussed beside the sample but not transferred to the canonical tech pack.",
+        "confidence": "high"
+      },
+      "plan_actual": {
+        "currency": "MYR",
+        "estimated_amount": 540,
+        "actual_amount": 900
+      },
+      "documentation": {
+        "known_context": "The corrected baju kurung tech pack is overdue and still lacks the approved collar tolerance and approver.",
+        "mapped_field_state": {"planned_hours": 6, "actual_hours": 10, "loaded_hourly_cost_myr": 90},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "TASK-101 notes, due date, blocker, and recorded effort basis."
+      ]
+    },
+    {
+      "id": "TASK-102",
+      "source_id": "TASK-102",
+      "source_url": "notion://TASK-102",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-DARREN",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-102.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-102."
+      ]
+    },
+    {
+      "id": "TASK-104",
+      "source_id": "TASK-104",
+      "source_url": "notion://TASK-104",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-AISHA",
+      "status": "blocked",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "linked_open_or_changed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "TASK-104 is marked blocked, but the canonical Task has no due date, named blocker, or next action.",
+        "mapped_field_state": {
+          "due_date": "missing",
+          "blocker": "missing",
+          "next_action": "missing"
+        },
+        "update_location": [
+          "due_date property",
+          "Notes > current blocker and next action"
+        ]
+      },
+      "evidence": [
+        "TASK-104 status, due date property, and full-page Notes read."
+      ]
+    },
+    {
+      "id": "TASK-105",
+      "source_id": "TASK-105",
+      "source_url": "notion://TASK-105",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-AISHA",
+      "status": "done",
+      "ai_review": "Processed",
+      "daily_review_version": "daily-review-v2",
+      "selection_reason": "linked_open_or_changed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-105.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-105."
+      ]
+    },
+    {
+      "id": "TASK-109",
+      "source_id": "TASK-109",
+      "source_url": "notion://TASK-109",
+      "project_id": "PROJ-MERCH-INDIA_SOURCING",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-NUR",
+      "status": "on_track",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "linked_open_or_changed",
+      "due_date": "2026-08-23",
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {"value": "No current problem; this is the healthy no-chase control.", "confidence": "high"},
+      "plan_actual": {"currency": null, "estimated_amount": null, "actual_amount": null},
+      "documentation": {
+        "known_context": "The supplier sample, certificate, MOQ, and landed-cost quote are current for the sourcing decision.",
+        "mapped_field_state": {},
+        "update_location": ["Notes"]
+      },
+      "evidence": ["TASK-109 current progress and last meaningful update."]
+    },
+    {
+      "id": "TASK-110",
+      "source_id": "TASK-110",
+      "source_url": "notion://TASK-110",
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-AISHA",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-110.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-110."
+      ]
+    },
+    {
+      "id": "TASK-115",
+      "source_id": "TASK-115",
+      "source_url": "notion://TASK-115",
+      "project_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-JUN",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-115.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-115."
+      ]
+    },
+    {
+      "id": "TASK-116",
+      "source_id": "TASK-116",
+      "source_url": "notion://TASK-116",
+      "project_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "record_type": "Task",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-JUN",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-116.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-116."
+      ]
+    },
+    {
+      "id": "TASK-201",
+      "source_id": "TASK-201",
+      "source_url": "notion://TASK-201",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "record_type": "Meeting",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-MAYA",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-201.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-201."
+      ]
+    },
+    {
+      "id": "TASK-202",
+      "source_id": "TASK-202",
+      "source_url": "notion://TASK-202",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "record_type": "Meeting",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-DARREN",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-202.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-202."
+      ]
+    },
+    {
+      "id": "TASK-203",
+      "source_id": "TASK-203",
+      "source_url": "notion://TASK-203",
+      "project_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "record_type": "Meeting",
+      "full_page_read": true,
+      "owner_person_id": "PERSON-DARREN",
+      "status": "done",
+      "ai_review": "Pending",
+      "daily_review_version": null,
+      "selection_reason": "done_unprocessed",
+      "due_date": null,
+      "last_meaningful_update": "2026-08-21",
+      "blocker": null,
+      "cause": {
+        "value": null,
+        "confidence": "unknown"
+      },
+      "plan_actual": {
+        "currency": null,
+        "estimated_amount": null,
+        "actual_amount": null
+      },
+      "documentation": {
+        "known_context": "Grounded source context for TASK-203.",
+        "mapped_field_state": {},
+        "update_location": [
+          "Notes"
+        ]
+      },
+      "evidence": [
+        "Source evidence for TASK-203."
+      ]
+    }
+  ],
+  "meetings": [
+    {
+      "id": "TASK-201",
+      "source_id": "TASK-201",
+      "source_url": "notion://TASK-201",
+      "project_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "statements": [
+        "Approve coordinated Deepavali themes.",
+        "Use one campaign asset folder per batch."
+      ],
+      "decision_observation": {
+        "choice": "Use one campaign asset folder per batch for the coordinated Deepavali campaign.",
+        "authority": "Campaign review participants approved the choice; the accountable approver is not named in the source.",
+        "evidence": [
+          "TASK-201 meeting statements record the approved theme and one-folder-per-batch choice."
+        ]
+      },
+      "workflow_observation": null,
+      "review_condition": "Review after seven campaign days."
+    },
+    {
+      "id": "TASK-202",
+      "source_id": "TASK-202",
+      "source_url": "notion://TASK-202",
+      "project_id": "PROJ-ECOM-ECOM_FIXES",
+      "statements": [
+        "Verify customer-facing fixes with named storefront cases."
+      ],
+      "decision_observation": null,
+      "workflow_observation": null,
+      "review_condition": "Review customer enquiries for recurrence."
+    },
+    {
+      "id": "TASK-203",
+      "source_id": "TASK-203",
+      "source_url": "notion://TASK-203",
+      "project_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "statements": [
+        "Nur prepared two product-listing batches using the same handoff sequence and Darren accepted each publish-ready package."
+      ],
+      "decision_observation": null,
+      "workflow_observation": {
+        "workflow_name": "Prepare a publish-ready product-listing handoff",
+        "trigger": "An approved product batch is ready for Ecommerce listing.",
+        "actors_and_handoff": "Nur prepares and checks the listing package, then hands it to Darren for acceptance and publishing.",
+        "ordered_steps": [
+          "Confirm the approved product IDs and samples in the batch.",
+          "Validate title, category, dimensions, composition, care, price, and stock fields.",
+          "Check approved images, crops, and alt text against each product ID.",
+          "Assemble the listing package in the shared handoff folder.",
+          "Darren confirms the package is publish-ready or returns named exceptions to Nur."
+        ],
+        "systems": [
+          "approved product record",
+          "shared asset folder",
+          "listing handoff checklist"
+        ],
+        "frequency_and_volume": "The same sequence was observed across two product batches; normal weekly batch and SKU volume is not recorded.",
+        "active_and_wait_time": "Active preparation, review time, and queue wait were not measured.",
+        "exceptions": [
+          "A missing approved sample or final commercial term stops the package before handoff.",
+          "A catalog sync that drops a required field returns the affected product to Nur for correction."
+        ],
+        "output": "A receiver-accepted, publish-ready listing package keyed to approved product IDs.",
+        "confidence": "high",
+        "measurement_gaps": [
+          "Measure active preparation and review time separately on the next two batches.",
+          "Record queue wait, weekly batch count, SKU volume, rework count, and loaded hourly cost."
+        ]
+      },
+      "review_condition": "Sample ten pages after the next catalog sync."
+    }
+  ],
+  "people": [
+    {
+      "id": "PERSON-AISHA",
+      "name": "Aisha Rahman",
+      "source_id": "PERSON-AISHA",
+      "preferred_contact_channel": "telegram",
+      "approved_contact_channels": [
+        "telegram"
+      ],
+      "approved_contact_endpoint_ref": "person://PERSON-AISHA#telegram_eval_sink",
+      "contact_instructions": "Route operated eval messages to the approved Telegram eval sink; never claim employee delivery."
+    },
+    {
+      "id": "PERSON-NUR",
+      "name": "Nur Iqbal",
+      "source_id": "PERSON-NUR",
+      "preferred_contact_channel": "telegram",
+      "approved_contact_channels": [
+        "telegram"
+      ],
+      "approved_contact_endpoint_ref": "person://PERSON-NUR#telegram_eval_sink",
+      "contact_instructions": "Route operated eval messages to the approved Telegram eval sink; never claim employee delivery."
+    },
+    {
+      "id": "PERSON-JUN",
+      "name": "Jun Wong",
+      "source_id": "PERSON-JUN",
+      "preferred_contact_channel": "telegram",
+      "approved_contact_channels": [
+        "telegram"
+      ],
+      "approved_contact_endpoint_ref": "person://PERSON-JUN#telegram_eval_sink",
+      "contact_instructions": "Route operated eval messages to the approved Telegram eval sink; never claim employee delivery."
+    },
+    {
+      "id": "PERSON-MAYA",
+      "name": "Maya Tan",
+      "source_id": "PERSON-MAYA",
+      "preferred_contact_channel": "telegram",
+      "approved_contact_channels": [
+        "telegram"
+      ],
+      "approved_contact_endpoint_ref": "person://PERSON-MAYA#telegram_eval_sink",
+      "contact_instructions": "Route operated eval messages to the approved Telegram eval sink; never claim employee delivery."
+    },
+    {
+      "id": "PERSON-DARREN",
+      "name": "Darren Lim",
+      "source_id": "PERSON-DARREN",
+      "preferred_contact_channel": "telegram",
+      "approved_contact_channels": [
+        "telegram"
+      ],
+      "approved_contact_endpoint_ref": "person://PERSON-DARREN#telegram_eval_sink",
+      "contact_instructions": "Route operated eval messages to the approved Telegram eval sink; never claim employee delivery."
+    }
+  ]
+}

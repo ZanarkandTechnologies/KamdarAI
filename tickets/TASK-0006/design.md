@@ -2,7 +2,7 @@
 ticket_id: TASK-0006
 title: Buyer proof — operated before/after feature dossier
 status: approved-for-implementation
-updated_at: 2026-08-25
+updated_at: 2026-08-27
 ---
 
 # Buyer proof design baseline
@@ -28,6 +28,52 @@ case_details =
 
 The static Vercel page renders the latest generated evidence bundle. It never
 pretends it can operate the private Hermes profile itself.
+
+## Screen `OPERATED-EVAL-DOSSIER` — case checks with real artifacts
+
+The operated public page keeps the evaluator list and right inspector. W34
+evidence enriches only the exact operated case; it does not become a separate
+story page and does not leak onto regression, failure, or rerun cases.
+
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│ 7/7 features · 11/11 cases · 49/49 checks · 14/14 outputs          │
+├─────────────────────────────┬────────────────────────────────────────┤
+│ FEATURE CHECKS              │ PROJECT MEMORY · PASSED                │
+│ ▼ Keep Projects current     │ Task                                   │
+│   ● Operating progress      │ Source inputs                          │
+│   ○ Safe rerun              │ [TASK-101 ↗] [TASK-104 ↗]             │
+│ ▼ Chase stalled progress    │ [TASK-105 ↗] [TASK-110 ↗]             │
+│   ○ Overdue owner           │                                        │
+│ ▼ Weekly reports            │ Actual agent output                    │
+│   ○ Area and Company        │ <rendered Project replacement>         │
+│                             │ Human-facing outputs                   │
+│                             │ [Updated CMT Pipeline Project ↗]       │
+│                             │                                        │
+│                             │ Expected criteria                      │
+│                             │ ✓ Project page was updated             │
+│                             │ ✓ Current blocker is present           │
+│                             │ ▸ Technical proof                      │
+└─────────────────────────────┴────────────────────────────────────────┘
+```
+
+- Metrics are Features, Cases, required Checks, and linked human Outputs.
+- Source links identify every operated Work, Meeting, Project, or report input.
+- Operated evidence owns one canonical Notion URL per source entity ID. The
+  backfill check queries the isolated root and blocks the build when any entity
+  used by an eval case remains unlinked.
+- Seed records render as one-line type/name/status summaries with the actual
+  source link inside the matching card. Expanding the row shows formatted,
+  human-labelled JSON; there are no bespoke Project, Work, Meeting, Person, or
+  Report mini-layouts or a separate source-link grid.
+- Output links open the actual Project, Gmail thread, report, Decision, Issue,
+  or SOP a manager would inspect. Missing expected outputs render `MISSING`.
+- Assertion Review stacks Actual agent output above Expected criteria in one
+  column so neither panel is compressed into a side-by-side comparison.
+- Receipts, hashes, schemas, and JSON remain in collapsed technical proof and
+  never replace a human-facing output.
+- At 900px and below the selected inspector remains the existing full-screen,
+  keyboard-dismissable mobile panel; artifact links become one column.
 
 ## Screen `DESKTOP-EVAL-LIST` — grouped cases with details
 

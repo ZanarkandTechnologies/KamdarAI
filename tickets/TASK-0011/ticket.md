@@ -90,7 +90,7 @@ content and its evaluation while omitting evaluator plumbing.
 
 ```yaml
 diagram_nodes: [S1, S3, F1]
-files: {read: [evals/seed/kamdar-company-os.seed.json, automations/templates/daily-context-diff.json], edit: [automations/schemas/daily-context-diff.zod.mjs, automations/schemas/weekly-context.zod.mjs, automations/examples/golden/daily-context-diff-2026-08-25.json, automations/examples/golden/weekly-context-2026-W34.json, evals/filesystem/scripts/prepare-fresh-company-operating-eval-run.mjs, evals/filesystem/scripts/unified-daily-review-eval.mjs, evals/filesystem/scripts/unified-weekly-review-eval.mjs]}
+files: {read: [evals/seed/kamdar-company-os.seed.json, evals/fixtures/legacy-automation/templates/daily-context-diff.json], edit: [schemas/automations/daily-context-diff.zod.mjs, schemas/automations/weekly-context.zod.mjs, evals/daily/expected/context.json, evals/weekly/expected/context.json, evals/filesystem/scripts/prepare-fresh-company-operating-eval-run.mjs, evals/filesystem/scripts/unified-daily-review-eval.mjs, evals/filesystem/scripts/unified-weekly-review-eval.mjs]}
 operation: Define strict context schemas, including exact current Project sections. Replace the ID-only Daily context synthesizer with a checked-in source-complete fixture. Carry Daily evidence into complete immutable Project Draft report content for Weekly without loading raw Work or Meetings. Validate cited evidence closure, not only ID presence.
 signature_delta: permissive context/ID membership -> typed context with cited facts resolvable from permitted immutable input
 assertions:
@@ -105,7 +105,7 @@ failure: Stop when a desired claim has no source; remove or qualify the claim in
 
 ```yaml
 diagram_nodes: [S2, S4, F1]
-files: {edit: [automations/examples/golden/daily-review-result-2026-08-25.json, automations/examples/golden/weekly-review-result-2026-W34.json, automations/examples/golden/weekly-integration-receipt-2026-W34.json, automations/examples/golden/weekly-integration-read-back-2026-W34.json, automations/examples/golden/weekly-run-manifest-2026-W34.json, evals/daily-review-evals.json, evals/weekly-review-evals.json, tickets/TASK-0011/artifacts/review/assertion-change-review.md]}
+files: {edit: [evals/daily/expected/result.json, evals/weekly/expected/result.json, evals/weekly/expected/integration-receipt.json, evals/weekly/expected/integration-read-back.json, evals/weekly/expected/run-manifest.json, evals/daily/suite.json, evals/weekly/suite.json, tickets/TASK-0011/artifacts/review/assertion-change-review.md]}
 operation: Copy the exact current Project sections into all Daily guards; remove the unrelated TASK-201 documentation comment; replace the unsupported 27-August chase wording and campaign-selection decision. Render all seven Weekly reports with current front matter, receipt fields, complete tables, workflow/baseline detail, Decision 0.6, and a complete guarded Project checklist. Before any assertion edit, record its old/new text, feature and scenario, exact evidence that the old assertion is unsupported or obsolete, and an independent reviewer verdict; no approved row means no assertion change.
 signature_delta: source-tagged prose -> source-supported, current-template candidate artifacts
 assertions:
@@ -123,7 +123,7 @@ failure: Do not edit an assertion merely because a valid source-supported candid
 
 ```yaml
 diagram_nodes: [S2, P1]
-files: {edit: [automations/schemas/daily-idempotency-rerun-receipt.zod.mjs, automations/examples/golden/daily-idempotency-rerun-receipt-2026-08-25.json, evals/daily-review-evals.json, evals/filesystem/scripts/write-fresh-eval-integration-evidence.mjs, evals/filesystem/scripts/unified-daily-review-eval.mjs, evals/filesystem/tests/daily-integration-receipt.test.mjs, evals/filesystem/tests/unified-daily-review-eval.test.mjs]}
+files: {edit: [schemas/automations/daily-idempotency-rerun-receipt.zod.mjs, evals/daily/expected/idempotency-receipt.json, evals/daily/suite.json, evals/filesystem/scripts/write-fresh-eval-integration-evidence.mjs, evals/filesystem/scripts/unified-daily-review-eval.mjs, evals/filesystem/tests/daily-integration-receipt.test.mjs, evals/filesystem/tests/unified-daily-review-eval.test.mjs]}
 operation: Add a separate immutable unchanged-rerun receipt bound to the original receipt, context, and exact result hash. Its audit effects must resolve originally applied/delivered effects as duplicates, preserve no-findings, and preserve originally blocked/failed effects as the same non-mutating outcome; prove zero new provider mutations, preserve processing state, and include matching duplicate lookup/read-back evidence. Audit rows are evidence, not new effects.
 signature_delta: first-run receipt only -> first-run receipt plus immutable unchanged-rerun audit
 assertions:
@@ -137,7 +137,7 @@ failure: Keep the suite red if a real second-run receipt cannot be produced.
 
 ```yaml
 diagram_nodes: [P1, P2, J1, S5, F1]
-files: {edit: [evals/filesystem/scripts/prepare-fresh-company-operating-eval-run.mjs, evals/filesystem/scripts/finalize-fresh-company-operating-eval-run.mjs, automations/evaluate-daily-review.md, automations/evaluate-weekly-review.md]}
+files: {edit: [evals/filesystem/scripts/prepare-fresh-company-operating-eval-run.mjs, evals/filesystem/scripts/finalize-fresh-company-operating-eval-run.mjs, evals/automations/evaluate-daily-review.md, evals/automations/evaluate-weekly-review.md]}
 operation: Materialize one new deployment. Put the exact frozen-context slice—not richer seed-only facts—into each feature packet, bind the packet to context/result hashes, and require the verdict to echo the packet hash. Run seven isolated feature testers, two independent evidence reviews, and two per-output artifact reviewers; validate all schemas and paths, derive integration summaries, then reconcile both suite results. Seed remains identity/control evidence only.
 signature_delta: candidate plus richer seed evidence -> candidate plus exact frozen runtime evidence and packet hash
 assertions:
@@ -154,7 +154,7 @@ failure: A non-A judge or artifact review remains visible and returns to its own
 
 ```yaml
 diagram_nodes: [S5, S6, F2]
-files: {edit: [evals/filesystem/scripts/eval-dashboard-model.mjs, evals/filesystem/scripts/eval-dashboard-components.mjs, evals/filesystem/scripts/eval-dashboard-entity-components.mjs, evals/filesystem/scripts/eval-dashboard-theme.mjs, evals/filesystem/scripts/build-vercel-showcase.mjs, evals/filesystem/scripts/serve-eval-dashboard.mjs, automations/schemas/presentation-eligibility.zod.mjs, evals/filesystem/tests/eval-dashboard.test.mjs, evals/filesystem/tests/template-first-kamdar.test.mjs]}
+files: {edit: [evals/filesystem/scripts/eval-dashboard-model.mjs, evals/filesystem/scripts/eval-dashboard-components.mjs, evals/filesystem/scripts/eval-dashboard-entity-components.mjs, evals/filesystem/scripts/eval-dashboard-theme.mjs, evals/filesystem/scripts/build-vercel-showcase.mjs, evals/filesystem/scripts/serve-eval-dashboard.mjs, evals/schemas/presentation-eligibility.zod.mjs, evals/filesystem/tests/eval-dashboard.test.mjs, evals/filesystem/tests/template-first-kamdar.test.mjs]}
 operation: Validate and join artifact-quality rows by exact observed pointer. Make failed row reviews affect only their owning scenarios. Add readable renderers for Project updates, comments, chases, knowledge candidates, reports, promotion dispositions, and next-week replacements. Label feature-judge grades as Answer quality and row checks as File review. Have the finalizer write presentation-eligibility.json with deployment ID, generated time, Daily/Weekly roots, result hashes/pass states, judge hashes, and artifact-review hashes. Presentation build must consume and validate this manifest, emit a stripped public model plus a build receipt containing eligibility and public-model hashes, and never discover “latest.”
 signature_delta: independently discovered latest runs + diagnostic HTML -> hash-bound paired eligibility manifest + explicit internal/presentation render modes
 assertions:

@@ -48,7 +48,7 @@
             "fixtures": [
               "skills/daily-project-memory/examples/golden/project-diff-plan.json",
               "skills/daily-project-memory/templates/project-diff-plan.json",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
+              "evals/daily/expected/reference-context.json",
               "templates/project.md"
             ]
           },
@@ -155,7 +155,7 @@
             "fixtures": [
               "skills/daily-documentation-quality/examples/golden/employee-message-plan.md",
               "skills/daily-documentation-quality/templates/employee-message-plan.md",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json"
+              "evals/daily/expected/reference-context.json"
             ]
           },
           {
@@ -260,8 +260,8 @@
             "fixtures": [
               "skills/daily-project-control/templates/project-control-plan.json",
               "skills/daily-project-control/examples/golden/project-control-plan-cmt-2026-08-25.json",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
-              "automations/templates/current-weekly-draft.md"
+              "evals/daily/expected/reference-context.json",
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -291,7 +291,7 @@
             "feature_id": "FEAT-0003",
             "fixtures": [
               "skills/daily-project-control/examples/blocked/project-control-plan-unapproved-route.json",
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -320,7 +320,7 @@
             "feature_id": "FEAT-0003",
             "fixtures": [
               "skills/daily-project-control/templates/project-control-plan.json",
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           }
         ],
@@ -366,8 +366,8 @@
             "feature_id": "FEAT-0004",
             "fixtures": [
               "skills/daily-knowledge-capture/examples/golden/current-weekly-draft-after-knowledge-2026-08-24.md",
-              "automations/examples/golden/daily-context-diff-2026-08-24.json",
-              "automations/templates/current-weekly-draft.md"
+              "evals/daily/expected/reference-context.json",
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -393,7 +393,7 @@
             "kind": "hard",
             "feature_id": "FEAT-0004",
             "fixtures": [
-              "automations/templates/current-weekly-draft.md"
+              "templates/current-weekly-draft.md"
             ]
           },
           {
@@ -658,7 +658,7 @@
             "fixtures": [
               "skills/weekly-report-finalization/templates/weekly-finalization-plan.md",
               "skills/weekly-report-finalization/examples/golden/weekly-finalization-plan-2026-08-24.md",
-              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+              "evals/fixtures/golden/current-weekly-draft-2026-W34.md"
             ]
           },
           {
@@ -684,7 +684,7 @@
             "kind": "hard",
             "feature_id": "FEAT-0006",
             "fixtures": [
-              "automations/examples/golden/current-weekly-draft-2026-W34.md"
+              "evals/fixtures/golden/current-weekly-draft-2026-W34.md"
             ]
           },
           {

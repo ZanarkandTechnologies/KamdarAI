@@ -1,0 +1,420 @@
+{
+  "schema_version": "kamdar-seed-realism-review@1.0.0",
+  "lane": "seed-realism-review",
+  "independent": true,
+  "seed_id": "kamdar-company-os-grounded-projects-template-bodies-2026-w34",
+  "seed_sha256": "0ef24458a26ccbb462844c618a98b37af1f1c03add4856fda03a007351f2a3f2",
+  "rubric_path": "evals/rubrics/seed-realism.md",
+  "public_grounding": [
+    {
+      "title": "KAMDAR About us",
+      "url": "https://kamdar.com.my/pages/about-us-1",
+      "supports": "Kamdar operates in Malaysian fabrics, fashion, traditional wear, and furnishings, grounding the textile, merchandising, marketing, ecommerce, and DTC scenario domains."
+    },
+    {
+      "title": "Public garment supply-chain training curriculum",
+      "url": "https://sicip.gov.bd/wp-content/uploads/2026/01/Final-_CBLM_Supply-Chain-Management-15-Dec-25_1766467717618.pdf",
+      "supports": "Sample approval, measurement tolerances, cutting approval, and production-line allocation are normal garment-production control points."
+    }
+  ],
+  "tier": "A",
+  "verdict": "pass",
+  "entity_reviews": [
+    {
+      "target_id": "PROJ-CMT-CMT_PIPELINE",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/0/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-MERCH-INDIA_SOURCING",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/1/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/2/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/3/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-ECOM-ECOM_FIXES",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/4/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-ECOM-LISTING_PIPELINE",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/5/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PROJ-DTC-KALRAH_LAUNCH",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/projects.json#/6/metadata/provenance"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-AISHA",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/0"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-NUR",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/1"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-JUN",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/2"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-MAYA",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/3"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-DARREN",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/4"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "PERSON-LINA",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/people.json#/5"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-101",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/0"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-104",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/1"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-105",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/2"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-110",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/3"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-109",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/4"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-115",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/5"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-116",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/6"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-102",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/7"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-114",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/8"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-122",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/tasks.json#/9"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-201",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/meetings.json#/0"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-202",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/meetings.json#/1"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-203",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/meetings.json#/2"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "TASK-204",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/meetings.json#/3"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/reports.json#/0"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/reports.json#/1"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/reports.json#/2"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/reports.json#/3"
+      ],
+      "pass": true,
+      "findings": []
+    }
+  ],
+  "case_reviews": [
+    {
+      "target_id": "FEAT-0001",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/0"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0002",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/1"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0003",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/2"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0004",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/3"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0005",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/4"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0006",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/5"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0007",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/6"
+      ],
+      "pass": true,
+      "findings": []
+    },
+    {
+      "target_id": "FEAT-0010",
+      "origin": "synthetic_scenario",
+      "reference_refs": [
+        "seed/scenarios.json#/7"
+      ],
+      "pass": true,
+      "findings": []
+    }
+  ],
+  "checks": {
+    "company_fit": {
+      "pass": true,
+      "evidence_refs": [
+        "https://kamdar.com.my/pages/about-us-1",
+        "https://sicip.gov.bd/wp-content/uploads/2026/01/Final-_CBLM_Supply-Chain-Management-15-Dec-25_1766467717618.pdf",
+        "seed/projects.json#"
+      ],
+      "findings": []
+    },
+    "relationship_coherence": {
+      "pass": true,
+      "evidence_refs": [
+        "seed/manifest.json#"
+      ],
+      "findings": []
+    },
+    "lifecycle_consistency": {
+      "pass": true,
+      "evidence_refs": [
+        "seed/scenarios.json#"
+      ],
+      "findings": []
+    },
+    "operational_plausibility": {
+      "pass": true,
+      "evidence_refs": [
+        "seed/tasks.json#",
+        "seed/meetings.json#"
+      ],
+      "findings": []
+    },
+    "surrounding_context": {
+      "pass": true,
+      "evidence_refs": [
+        "seed/projects.json#",
+        "seed/reports.json#"
+      ],
+      "findings": []
+    }
+  },
+  "hard_gate_failures": [],
+  "review_path": "seed/reviews/realism.json"
+}

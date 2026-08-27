@@ -12,14 +12,14 @@ import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { loadKamdarSeedConfig, seedConfigPath } from "./kamdar-seed-config.mjs";
+import { kamdarSeedBundleSha256, loadKamdarSeedConfig, seedConfigPath } from "./kamdar-seed-config.mjs";
 import { loadAndValidateSeedRealismReview, validateArtifactQualityReview } from "./quality-review-contracts.mjs";
-import { runTask0007FixtureAutomation } from "./run-task0007-fixture-automation.mjs";
-import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
+import { runTask0007ReferenceAutomation } from "./run-task0007-reference-automation.mjs";
+import { WeeklyReviewResultSchema } from "../../../schemas/automations/weekly-review-result.zod.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 export const projectRoot = resolve(scriptDirectory, "../../..");
-export const seedRealismReviewPath = resolve(projectRoot, "evals/seed/kamdar-company-os.seed-review.json");
+export const seedRealismReviewPath = resolve(projectRoot, "seed/reviews/realism.json");
 export const profileRoot = "/Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai";
 export const task0007SeedNamespace = "kamdar-task0007-isolated-notion-seed-v1";
 export const task0007OwnedMarker = "kamdar-eval-seed-owned:v1";
@@ -53,16 +53,21 @@ const databaseDefinitions = Object.freeze({
   },
   work_items: {
     title: "Work items",
-    properties: ["Name", "ID", "Project", "Department", "Owner", "Type", "Status", "Priority", "Start date", "Due date", "Progress", "Last meaningful update", "Workflow", "Workflow step", "Baseline date", "Meeting date", "Attendees", "Facilitator", "Daily review version", "Template", "Run key"],
-    propertyTypes: { Type: "select", Status: "status" },
+    properties: ["Name", "ID", "Project", "Department", "Owner", "Type", "Status", "AI review", "Priority", "Start date", "Due date", "Progress", "Last meaningful update", "Workflow", "Workflow step", "Baseline date", "Meeting date", "Attendees", "Facilitator", "Daily review version", "Template", "Run key"],
+    propertyTypes: { Type: "select", Status: "status", "AI review": "select" },
     propertyOptions: {
       Type: [{ name: "Task", color: "blue" }, { name: "Meeting", color: "purple" }, { name: "Issue", color: "red" }],
       Status: [
         { name: "Blocked", color: "red" },
         { name: "In progress", color: "blue" },
         { name: "On track", color: "blue" },
-        { name: "Done", color: "green" },
-        { name: "Processed", color: "green" }
+        { name: "Done", color: "green" }
+      ],
+      "AI review": [
+        { name: "Pending", color: "yellow" },
+        { name: "Needs information", color: "orange" },
+        { name: "Processed", color: "green" },
+        { name: "Blocked", color: "red" }
       ]
     }
   },
@@ -94,14 +99,14 @@ function environmentPaths(environment = task0007Environment, overrides = {}) {
 function requireApprovedSeed(options = {}) {
   const seed = loadKamdarSeedConfig();
   const reviewPath = resolve(options.seedRealismReviewPath || seedRealismReviewPath);
-  const approval = loadAndValidateSeedRealismReview({ seed, seedPath: seedConfigPath, reviewPath });
+  const approval = loadAndValidateSeedRealismReview({ seed, seedSha256: kamdarSeedBundleSha256(), reviewPath });
   return { seed, approval };
 }
 function directDraftRunRoot(requestedRoot, privateRoot) {
   const root = privatePath(requestedRoot, "automation run root", privateRoot);
   const resultPath = resolve(root, "result.json");
   if (!existsSync(resultPath)) return root;
-  const existing = readJson(resultPath, "existing fixture automation result");
+  const existing = readJson(resultPath, "existing reference automation result");
   if (existing.run?.mode === "local-markdown-draft-projection") return root;
   const corrective = privatePath(root + "-direct-draft-v2", "corrective automation run root", privateRoot);
   const correctiveResult = resolve(corrective, "result.json");
@@ -110,7 +115,7 @@ function directDraftRunRoot(requestedRoot, privateRoot) {
     if (readdirSync(corrective).length) fail("corrective automation run root is nonempty without a result; refuse to overwrite it.");
     return corrective;
   }
-  if (readJson(correctiveResult, "corrective fixture automation result").run?.mode !== "local-markdown-draft-projection") {
+  if (readJson(correctiveResult, "corrective reference automation result").run?.mode !== "local-markdown-draft-projection") {
     fail("corrective automation run root has an incompatible result; refuse to overwrite it.");
   }
   return corrective;
@@ -223,7 +228,7 @@ export function provisionTask0007NotionSeed(options = {}) {
   const paths = environmentPaths(options.environment, options);
   const { environment, statePath, privateRoot, runRoot } = paths;
   const { seed } = requireApprovedSeed(options);
-  const seedHash = sha256(readFileSync(seedConfigPath, "utf8"));
+  const seedHash = kamdarSeedBundleSha256();
   let state = readState(statePath, privateRoot, environment);
   if (!state) {
     const root = createRoot(commandRunner, environment);
@@ -308,7 +313,7 @@ function sourceEntityFields(entity, key, runKey) {
   const p = entity.properties || {}; const body = entity.body || {};
   if (key === "projects") return { Name: p.name, ID: entity.id, Department: p.department, Owner: p.owner, Status: p.status, Priority: p.priority || "", "Start date": p.start_date || "", "Due date": p.due_date || "", Progress: p.progress, Template: entity.template, "Run key": runKey };
   if (key === "people") return { Name: p.name, ID: entity.id, Department: p.department, Role: p.role, Status: p.status, Manager: p.manager, "Preferred contact channel": p.preferred_contact_channel, "Approved contact channels": p.approved_contact_channels, "Contact endpoint": p.contact_endpoint, "Contact instructions": p.contact_instructions, Timezone: p.timezone, Expertise: p.expertise, Template: entity.template, "Run key": runKey };
-  if (key === "work_items") return { Name: p.name, ID: entity.id, Project: p.project, Department: p.department, Owner: p.owner, Type: p.type, Status: p.status, Priority: p.priority, "Start date": p.start_date, "Due date": p.due_date, Progress: p.progress, "Last meaningful update": p.last_meaningful_update, "Meeting date": p.date, Attendees: p.attendees, Facilitator: p.facilitator, "Daily review version": entity.metadata?.daily_review_version || "", Template: entity.template, "Run key": runKey };
+  if (key === "work_items") return { Name: p.name, ID: entity.id, Project: p.project, Department: p.department, Owner: p.owner, Type: p.type, Status: p.status, "AI review": p.ai_review, Priority: p.priority, "Start date": p.start_date, "Due date": p.due_date, Progress: p.progress, "Last meaningful update": p.last_meaningful_update, "Meeting date": p.date, Attendees: p.attendees, Facilitator: p.facilitator, "Daily review version": entity.metadata?.daily_review_version || "", Template: entity.template, "Run key": runKey };
   if (key === "reports") return { Name: p.name, ID: entity.id, Project: p.project, Department: p.department, Level: p.report_type, "Week start": p.week_start, Status: p.report_status, "Report version": p.report_version, "Finalized at": p.finalized_at, "Previous report": p.previous_report, "Source report IDs": p.source_report_ids, Template: entity.template, "Run key": runKey };
   fail(`unsupported source entity database ${key}.`);
 }
@@ -443,7 +448,7 @@ function promotionTarget(disposition, seed, result) {
         "Last meaningful update": metadata.last_meaningful_update,
         Workflow: metadata.workflow, "Workflow step": metadata.workflow_step,
         "Baseline date": metadata.baseline_date, "Meeting date": "",
-        Attendees: "", Facilitator: "", "Daily review version": "", Template: metadata.template_id,
+        Attendees: "", Facilitator: "", "AI review": "Pending", "Daily review version": "", Template: metadata.template_id,
         "Run key": runKey
       },
       body
@@ -778,12 +783,12 @@ export function operateTask0007NotionSeed(options = {}) {
   const state = readState(statePath, privateRoot, environment);
   const actualRunRoot = directDraftRunRoot(options.runRoot || state.run_root || runRoot, privateRoot);
   let result;
-  if (existsSync(resolve(actualRunRoot, "result.json"))) result = readJson(resolve(actualRunRoot, "result.json"), "fixture automation result");
-  else result = runTask0007FixtureAutomation({ outputRoot: actualRunRoot });
-  if (result.run?.provider_effects !== false || result.run?.mode !== "local-markdown-draft-projection") fail("fixture automation result has an unsafe provider state.");
+  if (existsSync(resolve(actualRunRoot, "result.json"))) result = readJson(resolve(actualRunRoot, "result.json"), "reference automation result");
+  else result = runTask0007ReferenceAutomation({ outputRoot: actualRunRoot });
+  if (result.run?.provider_effects !== false || result.run?.mode !== "local-markdown-draft-projection") fail("reference automation result has an unsafe provider state.");
   const context = readJson(runArtifactPath(actualRunRoot, result.daily.context_path, "Daily context artifact"), "Daily context artifact");
   const projectMemoryArtifact = result.daily.pipeline_artifacts.find((entry) => entry.id === "project-memory");
-  if (!projectMemoryArtifact?.artifact_path) fail("fixture run lacks its Daily Project memory artifact.");
+  if (!projectMemoryArtifact?.artifact_path) fail("reference run lacks its Daily Project memory artifact.");
   const projectMemoryPlan = readJson(runArtifactPath(actualRunRoot, projectMemoryArtifact.artifact_path, "Daily Project memory artifact"), "Daily Project memory artifact");
   const dailyProjects = validateDailyProjectPlan({ context, plan: projectMemoryPlan });
   const databases = Object.fromEntries(Object.entries(databaseDefinitions).map(([key, definition]) => [key, databaseState(commandRunner, state.databases[key].database_id, definition.title, definition.properties)]));

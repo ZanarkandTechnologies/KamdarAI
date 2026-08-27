@@ -14,16 +14,13 @@ category: knowledge
 public: true
 surfaces:
   - automations/daily-operating-update.md
-  - automations/templates/current-weekly-draft.md
-  - skills/daily-knowledge-capture/SKILL.md
+  - templates/current-weekly-draft.md
   - automations/weekly-operating-review.md
-  - skills/weekly-report-finalization/SKILL.md
 source_refs:
   - workspace.hermes.md
   - tickets/TASK-0007/ticket.md
 evidence_refs:
-  - skills/daily-knowledge-capture/evals/evals.json
-  - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
 known_limits: "Daily writes only its local Markdown anchors. It does not promote knowledge or call a provider."
 ---
 
@@ -49,19 +46,18 @@ not scan for another Draft or call a provider.
 
 ## Pipeline signature
 
-    capture_daily_knowledge(context_diff_path, current_weekly_draft_path)
-      -> same current_weekly_draft_path | applied | duplicate | conflict |
+    DailyReviewResult.knowledge_updates
+      -> current Report Draft | applied | duplicate | conflict |
          no_finding | configuration_gap
 
-[Daily Knowledge Capture](../../skills/daily-knowledge-capture/SKILL.md) owns
-Decisions and SOPs only. It uses the shared
-[current Draft template](../../automations/templates/current-weekly-draft.md).
+The [Daily automation](../../automations/daily-operating-update.md) owns
+Decisions and SOP observations and writes them to the current Report Draft.
 
 ## Flow
 
     complete Daily Work + Meeting snapshots
                      ↓
-    Daily context → daily-knowledge-capture
+    Daily context → schema-validated knowledge updates
                      ↓
     current Weekly Draft, same file
       Decisions + SOPs source-keyed entries

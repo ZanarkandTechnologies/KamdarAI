@@ -1,4 +1,4 @@
-/** Materialize a reference-fixture calibration run. Never presentation eligible. */
+/** Materialize a reference calibration run from expected Daily/Weekly artifacts. */
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -16,7 +16,8 @@ import {
 } from "./unified-weekly-review-eval.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const goldenRoot = resolve(projectRoot, "automations/examples/golden");
+const dailyExpectedRoot = resolve(projectRoot, "evals/daily/expected");
+const weeklyExpectedRoot = resolve(projectRoot, "evals/weekly/expected");
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 function writeJson(path, value) {
@@ -37,12 +38,12 @@ export function prepareFreshCompanyOperatingEvalRun({ deploymentRoot }) {
   const packetRoot = resolve(root, "judge-packets");
 
   const dailyMappings = [
-    ["daily-context-diff-2026-08-25.json", "daily/context/daily-context-diff-2026-08-25.json"],
-    ["daily-review-result-2026-08-25.json", "daily/review/daily-review-result-2026-08-25.json"],
-    ["daily-integration-receipt-2026-08-25.json", "daily/receipts/daily-integration-receipt-2026-08-25.json"],
-    ["daily-idempotency-rerun-receipt-2026-08-25.json", "daily/receipts/daily-idempotency-rerun-receipt-2026-08-25.json"],
+    ["context.json", "daily/context/daily-context-diff-2026-08-25.json"],
+    ["result.json", "daily/review/daily-review-result-2026-08-25.json"],
+    ["integration-receipt.json", "daily/receipts/daily-integration-receipt-2026-08-25.json"],
+    ["idempotency-receipt.json", "daily/receipts/daily-idempotency-rerun-receipt-2026-08-25.json"],
   ];
-  for (const [source, destination] of dailyMappings) copy(resolve(goldenRoot, source), resolve(dailyRoot, destination));
+  for (const [source, destination] of dailyMappings) copy(resolve(dailyExpectedRoot, source), resolve(dailyRoot, destination));
   const dailySuite = loadDailyReviewEvalSuite();
   const daily = validateUnifiedDailyRun({ runRoot: dailyRoot, suite: dailySuite });
   const dailyResultPath = resolve(dailyRoot, "daily/review/daily-review-result-2026-08-25.json");
@@ -62,13 +63,13 @@ export function prepareFreshCompanyOperatingEvalRun({ deploymentRoot }) {
   }
 
   const weeklyMappings = [
-    ["weekly-run-manifest-2026-W34.json", "weekly/run-manifest-2026-W34.json"],
-    ["weekly-context-2026-W34.json", "weekly/context/weekly-context-2026-W34.json"],
-    ["weekly-review-result-2026-W34.json", "weekly/review/weekly-review-result-2026-W34.json"],
-    ["weekly-integration-receipt-2026-W34.json", "weekly/receipts/weekly-integration-receipt-2026-W34.json"],
-    ["weekly-integration-read-back-2026-W34.json", "weekly/read-back/weekly-integration-read-back-2026-W34.json"],
+    ["run-manifest.json", "weekly/run-manifest-2026-W34.json"],
+    ["context.json", "weekly/context/weekly-context-2026-W34.json"],
+    ["result.json", "weekly/review/weekly-review-result-2026-W34.json"],
+    ["integration-receipt.json", "weekly/receipts/weekly-integration-receipt-2026-W34.json"],
+    ["integration-read-back.json", "weekly/read-back/weekly-integration-read-back-2026-W34.json"],
   ];
-  for (const [source, destination] of weeklyMappings) copy(resolve(goldenRoot, source), resolve(weeklyRoot, destination));
+  for (const [source, destination] of weeklyMappings) copy(resolve(weeklyExpectedRoot, source), resolve(weeklyRoot, destination));
   const weeklySuite = loadWeeklyReviewEvalSuite();
   const weekly = validateUnifiedWeeklyRun({ runRoot: weeklyRoot, suite: weeklySuite });
   const weeklyResultPath = resolve(weeklyRoot, "weekly/review/weekly-review-result-2026-W34.json");
@@ -91,7 +92,7 @@ export function prepareFreshCompanyOperatingEvalRun({ deploymentRoot }) {
   writeJson(resolve(root, "candidate-provenance.json"), {
     schema_version: "kamdar-eval-candidate-provenance@1.0.0",
     origin: "reference_fixture",
-    producer: "automations/examples/golden",
+    producer: "evals/daily/expected + evals/weekly/expected",
     generated_at: new Date().toISOString(),
     daily_result_sha256: sha256(readFileSync(dailyResultPath)),
     weekly_result_sha256: sha256(readFileSync(weeklyResultPath)),

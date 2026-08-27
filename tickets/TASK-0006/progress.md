@@ -330,3 +330,72 @@ created_at: 2026-08-21T22:15:00+08:00
   may select or publish them. Deployment 06/07 remains the latest judged and
   operated dashboard evidence; no old deployment was deleted.
 - `artifact:` `tickets/TASK-0006/artifacts/qa/deployments/seed-v4-2026-08-26-08/deployment-proof.md`.
+
+## 2026-08-26 21:23 +0800 — receipt-bound W34 dossier deployment
+
+- `correction:` Replaced the public page’s old `3c7...` seeded evidence and
+  legacy evaluator presentation with a receipt-only W34 operating story. The
+  static build no longer attempts to promote the old v1 evaluator manifest to
+  current `agent_execution` proof.
+- `story:` The deployed dossier links the isolated `3c8...` Notion root, Daily
+  receipt, Daily documentation-quality result, Weekly result, source Work,
+  Aisha/Jun Gmail test threads with mailbox caveats, the full Project →
+  Department → Company report chain, Deepavali Decision, retained SOP evidence,
+  and CMT Issue.
+- `deployment:` Published `dpl_5nNA4n3SX9prpjHpdN4Z4YD8r7eB` at
+  `https://kamdar-company-os-evidence.vercel.app` (immutable deployment:
+  `https://kamdar-company-os-evidence-gu2q4y2zy-kenjipcxs-projects.vercel.app`).
+- `proof:` Full filesystem suite: 119 passed, 10 intentionally skipped;
+  company-context validation and `git diff --check` passed. Public HTTP
+  read-back returned 200 for the alias, public model, and Daily receipt; it
+  contains the W34 root and story links, no old `3c7...` root, and no local
+  filesystem path.
+- `visual_qa:` Desktop 1280px and mobile 375px captures passed; the mobile
+  correction removed a body-scroll trap and showed no horizontal overflow.
+- `artifacts:` operated evidence, visual QA, and deployment proof under
+  `tickets/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/`.
+## 2026-08-27 — Case-bound human evidence inspector
+
+- Replaced the W34 story-only public build with the existing grouped evaluator
+  plus case-specific operated evidence.
+- Bound real source inputs and human-facing outputs to exact primary case IDs;
+  regression, failure, and rerun cases receive no unrelated platform links.
+- Added four honest metrics: Features, Cases, required Checks, and linked Outputs.
+- Kept receipts and raw JSON out of the primary inspector surface.
+- Focused dashboard/build tests pass, and desktop/mobile visual QA passes at
+  `artifacts/qa/2026-08-27-evidence-inspector/visual-qa.md`.
+
+## 2026-08-27 — Compact JSON source records
+
+- Replaced the five bespoke seed-record card layouts with one shared,
+  collapsible JSON renderer.
+- Collapsed records expose type, name, state, and the matching safe platform
+  link inside the card; expansion exposes the complete labelled source payload.
+- Removed the duplicate source-link grid. Identity binding puts four operated
+  Work URLs into their four matching Work cards; unmatched inputs remain compact
+  cards in the same source-record list rather than floating links.
+- Focused dashboard/build coverage passes 32/32. Desktop and mobile probes show
+  five records, zero legacy UI nodes, and zero horizontal overflow.
+- Repository-wide filesystem coverage reaches 115 passing and 10 skipped, with
+  five unrelated failures caused by the already-missing
+  `skills/daily-project-memory` eval package in the dirty worktree.
+- Visual proof: `artifacts/qa/2026-08-27-json-records/visual-qa.md`.
+
+## 2026-08-27 — Single-column Assertion Review
+
+- Stacked Actual agent output above Expected criteria at every viewport width.
+- Removed the desktop-only two-column split; focused dashboard coverage guards
+  the single-column contract.
+
+## 2026-08-27 — Complete Notion source-link backfill
+
+- Added `evals/filesystem/scripts/backfill-operated-entity-links.mjs` to query
+  the isolated Notion data sources and reconcile URLs by canonical entity ID.
+- Upgraded the W34 evidence payload to `kamdar-operated-evidence@2.1.0` with 17
+  canonical entity links. Apply added/corrected 17; the second provider check
+  returned zero missing.
+- Preserved source URLs through the public-model projection. The rebuilt HTML
+  contains the actual TASK-203 Listing pipeline handoff link, and all 49 entity
+  instances across 11 cases have a URL.
+- Focused dashboard/build coverage passes 33/33 with a backfill idempotency
+  case and a public-dossier zero-unlinked assertion.

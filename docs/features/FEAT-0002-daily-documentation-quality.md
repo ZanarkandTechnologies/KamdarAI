@@ -1,11 +1,11 @@
 ---
-title: Ask for the missing information
+title: Review Done Work for documentation sufficiency
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
 owner: KamdarAI
 created_at: 2026-08-21
-updated_at: 2026-08-24
+updated_at: 2026-08-27
 tags: [kamdar, feature, daily, documentation]
 feature_id: FEAT-0002
 feature_key: daily.document-quality
@@ -14,9 +14,6 @@ category: quality
 public: true
 surfaces:
   - automations/daily-operating-update.md
-  - skills/daily-documentation-quality/SKILL.md
-  - skills/daily-documentation-quality/templates/employee-message-plan.md
-  - skills/dispatch-employee-messages/SKILL.md
   - templates/task.md
   - templates/feature.md
   - templates/issue.md
@@ -25,14 +22,14 @@ source_refs:
   - workspace.hermes.md
   - tickets/TASK-0007/ticket.md
 evidence_refs:
-  - skills/daily-documentation-quality/evals/evals.json
-known_limits: "No delivery adapter is shipped. Production messages remain proposal-only."
+known_limits: "The next Daily run guarantees re-review while AI review is not Processed; deterministic event-driven re-review from a Notion reply remains follow-up work."
 ---
 
-# Ask for the missing information
+# Review Done Work for documentation sufficiency
 
-Kamdar turns evidence-backed missing Work-record information into a precise,
-grouped employee message plan and its guarded preferred-channel handoff.
+Kamdar gives every selected Done Work item one versioned documentation verdict.
+It asks a precise question when required evidence is missing and marks AI review
+Processed only after documentation is sufficient and required effects settle.
 
 ## Why it exists
 
@@ -42,64 +39,71 @@ detail” is not.
 
 ## Trigger and inputs
 
-The Daily automation collects one bounded `daily-context-diff-YYYY-MM-DD.json`
-containing fully read changed Work pages, their record type, People route facts,
-source IDs, and source gaps. This skill resolves the matching static
-Task/Feature/Issue/Meeting field contract locally; it does not query Notion,
-chat, Drive, or a provider.
+The Daily automation collects active Projects, linked open or changed Work for
+Project progress, and fully read Work where `Status = Done` and
+`AI review != Processed`. The matching Task/Feature/Issue/Meeting template and
+`task-completion@1.0.0` rubric ID bound the review.
 
 ## Pipeline signature
 
 ```text
-run_daily_documentation_quality(context_diff, dispatch_mode = prepare)
-  -> employee-message-plan.md + channel-dispatch result | configuration_gap
+Done Work + template + task-completion@1.0.0
+  -> sufficient | needs_information
+  -> Processed | Needs information | Blocked
 ```
 
-[`daily-documentation-quality`](../../skills/daily-documentation-quality/SKILL.md)
-owns this pipeline: it produces one reviewable Daily plan grouped by person,
-then calls [`dispatch-employee-messages`](../../skills/dispatch-employee-messages/SKILL.md)
-with that plan. It preserves a missing or unapproved contact route as
-`blocked_delivery`; `prepare` has no provider effect and `send` invokes only
-the selected channel skill.
+The [Daily automation](../../automations/daily-operating-update.md) owns the
+extraction and writes only through the Notion route authorized by
+`workspace.hermes.md`. Missing write authority leaves the review blocked.
 
 ## Flow
 
 ```text
-context diff → documentation-quality plan → dispatcher
-                                           → prepared / sent / blocked
+Done, AI review != Processed
+          |
+          v
+documentation_reviews[]
+       |                 |
+  sufficient      needs_information
+       |                 |
+settle effects   post one deduplicated question
+       |                 |
+   Processed        Needs information
 ```
 
 ## State changes and artifacts
 
-- Creates one `kamdar-employee-message-plan` Markdown artifact per Daily run.
-- Each selected entry names the Work record, missing mapped fields, known facts,
-  exact update location, source IDs, and idempotency key.
-- Groups requests by verified person ID but keeps any route failure in the plan.
-- Does not post a Work comment, update a record, create a Task, or send a message.
+- Emits exactly one `documentation_reviews[]` row per selected Done Work item.
+- A `needs_information` row names missing requirement IDs, a stable
+  `question_key`, exact Work and owner IDs, source IDs, and the comment text.
+- A `sufficient` row cannot carry a question or missing requirement.
+- Business `Status` stays Done throughout the AI review lifecycle.
 
 ## Downstream application
 
-The pipeline returns a redacted prepared result by default. Its nested
-dispatcher may hand reviewed content unchanged to the named preferred-channel
-skill only in explicit `send` mode. A local plan or prepared result is never
-evidence of delivery.
+The Daily automation posts a reviewed question to the exact Work item only when
+the active environment authorizes it. A successful comment sets `AI review` to
+`Needs information`, not `Processed`. The human edits the named page section
+and can request re-review in the same Notion discussion; otherwise the next
+Daily run re-fetches the item.
 
 ## Failure modes
 
-An unread page, unknown record type, or absent source ID is a configuration
-gap. A complete record is `no_finding`. Plain text `@Name`, an unapproved
-channel, or an absent endpoint does not create a deliverable recipient.
+An unread page, unknown record type, absent source ID, or missing AI review
+property is a configuration gap. A blocked, conflicted, or failed required
+effect sets `AI review = Blocked` and leaves the review version empty.
 
 ## Proof contract
 
-The skill's local eval suite covers a grounded normal plan, a route/template
-gap, and a complete-record suppression case. Readiness additionally requires a
-candidate-versus-baseline run and a retained judge verdict; no provider proof is
-claimed by the artifact skill.
+The Daily eval proves that Done-unprocessed Work is selected, Processed Work is
+rejected, every selected item receives a verdict, a posted question remains
+Needs information, and only sufficient documentation plus settled effects can
+write `daily-review-v2` and Processed.
 
 ## Example
 
-Two replenishment tasks assigned to the same verified person lack an evidence
-link and a revised completion date. The plan groups them into one message with
-two source-linked entries and explicit locations to update; delivery stays
-blocked if that person's approved endpoint is absent.
+A Done performance ticket reports ROAS but lacks the reporting window, spend,
+revenue, attribution setting, comparison, and source export. Daily posts one
+question naming those gaps and sets AI review to Needs information. After the
+owner updates the page, the next review can return sufficient and process the
+item after all required effects settle.

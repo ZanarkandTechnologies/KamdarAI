@@ -13,7 +13,7 @@ feature_refs:
   - FEAT-0006
   - FEAT-0007
 refs:
-  - ../../evals/seed/kamdar-company-os.seed.json
+  - ../../seed/manifest.json
 ---
 
 # Seed caseboards

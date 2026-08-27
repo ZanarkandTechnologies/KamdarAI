@@ -34,7 +34,7 @@ observation: >-
   fixture-backed Daily-to-Weekly run with 132 receipt-backed Notion actions.
 evidence:
   - evals/filesystem/scripts/run-task0007-skill-evals.mjs
-  - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
   - evals/filesystem/scripts/operate-task0007-notion-seed.mjs
   - profile-private TASK-0007 seed state, receipt, and run output
 learning: >-
@@ -101,7 +101,7 @@ evidence:
   - tickets/TASK-0007/artifacts/audit/daily-weekly-artifact-flow-audit.md
   - automations/daily-operating-update.md
   - automations/weekly-operating-review.md
-  - evals/filesystem/scripts/run-task0007-fixture-automation.mjs
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
 learning: >-
   A typed local diff is useful as a transient integration input, but it must
   not become a second Weekly source of truth or be re-synthesized after it has
@@ -121,11 +121,11 @@ observation: >-
   same contract.
 evidence:
   - scripts/current_weekly_draft.mjs
-  - automations/templates/current-weekly-draft.md
+  - templates/current-weekly-draft.md
   - automations/daily-operating-update.md
   - automations/weekly-operating-review.md
   - evals/filesystem/tests/current-weekly-draft.test.mjs
-  - evals/filesystem/tests/run-task0007-fixture-automation.test.mjs
+  - evals/filesystem/tests/run-task0007-reference-automation.test.mjs
   - evals/filesystem/tests/operate-task0007-notion-seed.test.mjs
 learning: >-
   Direct local writes are reliable when their owners are disjoint, canonical
@@ -157,4 +157,167 @@ decision: conditional-source-acceptance
 remaining_budget: No operator-set numeric budget; do not add provider writes.
 next_action: Run model calibration and environment LSP diagnostics before any
   runtime installation or production activation.
+```
+
+## 2026-08-27 — Environment-bound automation and source consolidation
+
+```yaml
+observation: >-
+  The active automation contracts carried development execution modes and their
+  directory mixed deployable automation definitions with schemas, eval
+  workflows, examples, and legacy fixtures.
+evidence:
+  - automations/README.md
+  - automations/daily-operating-update.md
+  - automations/weekly-operating-review.md
+  - schemas/automations/
+  - evals/automations/
+  - evals/schemas/
+  - evals/fixtures/
+learning: >-
+  Automation definitions should be environment-neutral configuration. Runtime
+  authority belongs in workspace.hermes.md, while schemas and evaluation
+  material belong with their respective owners.
+decision: environment-bound-source-consolidation
+remaining_budget: No operator-set numeric budget; no live runtime cleanup or production activation is authorized.
+next_action: Review and approve a production workspace binding and schedule separately before activation.
+```
+
+## 2026-08-27 — Skill surface consolidated
+
+```yaml
+observation: >-
+  Daily and Weekly automation behavior was duplicated across eight installed
+  project skill packages.
+evidence:
+  - tickets/TASK-0007/artifacts/review/2026-08-27-skill-consolidation-audit.md
+  - tests/test_automation_contracts.py
+learning: >-
+  The automation Markdown files are sufficient runtime owners; only workspace
+  installation and optional webhook onboarding need reusable skill packages.
+decision: retain-only-setup-and-onboarding-skills
+remaining_budget: No operator-set numeric budget; no live runtime cleanup is authorized.
+next_action: Complete independent review and install only through the existing setup route.
+```
+
+## 2026-08-27 — Seed and eval surface consolidated
+
+```yaml
+observation: >-
+  Seed records, legacy fixture clusters, generated run evidence, and an
+  optional dashboard were mixed into the executable filesystem harness.
+evidence:
+  - seed/manifest.json
+  - seed/projects.json
+  - seed/people.json
+  - seed/tasks.json
+  - seed/meetings.json
+  - seed/reports.json
+  - seed/scenarios.json
+  - tickets/TASK-0007/artifacts/review/2026-08-27-seed-eval-consolidation-audit.md
+learning: >-
+  Seed tables are source inputs, golden fixtures are expected artifacts, and
+  filesystem is executable validation code; keeping those owners separate
+  removes hidden dependencies on ignored generated runs.
+decision: modular-seed-and-minimal-eval-harness
+remaining_budget: No operator-set numeric budget; no live runtime cleanup or production activation is authorized.
+next_action: Complete independent review, then install only through the existing setup route.
+```
+
+## 2026-08-27 — Seed and eval consolidation accepted
+
+```yaml
+observation: >-
+  The first independent review found stale active ticket/program references to
+  deleted skill and dashboard surfaces; those contracts were reconciled and
+  the review was rerun.
+evidence:
+  - tickets/TASK-0007/artifacts/review/2026-08-27-seed-eval-consolidation-audit.md
+  - node --test evals/filesystem/tests/*.test.mjs
+  - python3 -m unittest discover -s tests -p 'test_*.py' -q
+learning: >-
+  Deleting implementation surfaces also requires superseding every active goal
+  contract that still claims them as current owners.
+decision: accept-modular-seed-and-minimal-eval-harness
+remaining_budget: No operator-set numeric budget; no live runtime cleanup or production activation is authorized.
+next_action: Install only through the existing setup route after production workspace authority is separately approved.
+```
+
+## 2026-08-27 — Daily and Weekly eval packages own their expected artifacts
+
+```yaml
+observation: >-
+  The retained eval artifacts still lived in a generic fixtures/golden bucket,
+  obscuring whether they belonged to Daily or Weekly behavior.
+evidence:
+  - evals/daily/suite.json
+  - evals/daily/expected/
+  - evals/weekly/suite.json
+  - evals/weekly/expected/
+learning: >-
+  Expected automation artifacts are necessary deterministic test vectors, but
+  their owning workflow should be visible from the directory path.
+decision: colocate-suites-and-expected-artifacts-by-workflow
+remaining_budget: No operator-set numeric budget; no runtime or provider state changed.
+next_action: Complete independent behavior-preservation review.
+```
+
+## 2026-08-27 — Reference-runner idempotency proof repaired
+
+```yaml
+observation: >-
+  Independent review ran the formerly skipped reference automation test and
+  found that zero knowledge entries correctly repeated as no_finding while the
+  runner demanded duplicate.
+evidence:
+  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
+  - evals/filesystem/tests/run-task0007-reference-automation.test.mjs
+  - node --test evals/filesystem/tests/*.test.mjs
+learning: >-
+  A zero-write rerun is duplicate only after an applied first pass; a first-pass
+  no_finding must remain no_finding with identical bytes.
+decision: derive-valid-rerun-state-and-enable-proof
+remaining_budget: No operator-set numeric budget; no runtime or provider state changed.
+next_action: Rerun independent review of the repaired package move.
+```
+
+## 2026-08-27 — Daily and Weekly eval package refactor accepted
+
+```yaml
+observation: >-
+  The repaired reference runner, new Daily/Weekly paths, materializer, and full
+  deterministic suite passed independent acceptance review.
+evidence:
+  - tickets/TASK-0007/artifacts/review/2026-08-27-seed-eval-consolidation-audit.md
+  - evals/daily/
+  - evals/weekly/
+learning: >-
+  Workflow-owned expected artifacts keep deterministic proof without retaining
+  a generic fixture bucket or hiding inactive assumptions behind skipped tests.
+decision: accept-daily-weekly-eval-packages
+remaining_budget: No operator-set numeric budget; no runtime or provider state changed.
+next_action: Install only through the existing setup route after production workspace authority is separately approved.
+```
+
+## 2026-08-27 — Done Work review lifecycle hardened
+
+```yaml
+observation: >-
+  The Daily collector previously used business Status as its processing marker,
+  and a successfully posted documentation question could settle the effects
+  needed to mark incomplete Work processed.
+evidence:
+  - automations/daily-operating-update.md
+  - schemas/automations/daily-context-diff.zod.mjs
+  - schemas/automations/daily-review-result.zod.mjs
+  - schemas/automations/daily-integration-receipt.zod.mjs
+  - node --test evals/filesystem/tests/*.test.mjs
+  - python3 -m unittest discover -s tests -p 'test_*.py' -v
+learning: >-
+  Business completion and AI review are independent facts. Every selected Done
+  item needs an explicit documentation verdict, and comment delivery is not
+  evidence of documentation sufficiency.
+decision: separate-business-status-from-ai-review
+remaining_budget: No operator-set numeric budget; no production provider state changed.
+next_action: Install the reviewed source through the existing setup route only after separate runtime authority.
 ```

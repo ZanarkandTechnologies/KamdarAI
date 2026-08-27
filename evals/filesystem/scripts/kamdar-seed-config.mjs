@@ -1,13 +1,18 @@
 /** Validate and expand the compact Kamdar eval seed. */
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const filesystemRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const projectRoot = resolve(filesystemRoot, "../..");
-export const seedConfigPath = resolve(projectRoot, "evals/seed/kamdar-company-os.seed.json");
+export const seedRoot = resolve(projectRoot, "seed");
+export const seedConfigPath = resolve(seedRoot, "manifest.json");
 const templateRoot = resolve(projectRoot, "templates");
-const requiredFeatureIds = Array.from({ length: 7 }, (_value, index) => `FEAT-${String(index + 1).padStart(4, "0")}`);
+const requiredFeatureIds = Object.freeze([
+  ...Array.from({ length: 7 }, (_value, index) => `FEAT-${String(index + 1).padStart(4, "0")}`),
+  "FEAT-0010",
+]);
 const templateFiles = {
   project: "project.md",
   person: "person.md",
@@ -20,6 +25,52 @@ function readJson(path) { return JSON.parse(readFileSync(path, "utf8")); }
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
 function isObject(value) { return Boolean(value) && typeof value === "object" && !Array.isArray(value); }
 function fail(message) { throw new Error(`Kamdar seed config: ${message}`); }
+
+const tableKeys = ["projects", "people", "work_items", "meetings", "reports", "pipeline_cases"];
+
+function resolveTablePath(manifestPath, declaredPath, key) {
+  requiredString(declaredPath, `tables.${key}`);
+  const root = dirname(resolve(manifestPath));
+  const path = resolve(root, declaredPath);
+  const inner = relative(root, path);
+  if (!inner || inner === ".." || inner.startsWith(`..${sep}`)) fail(`tables.${key} must remain inside the seed directory.`);
+  return path;
+}
+
+export function loadKamdarSeedBundle({ path = seedConfigPath } = {}) {
+  const manifestPath = resolve(path);
+  const manifest = readJson(manifestPath);
+  if (!isObject(manifest)) fail("manifest must be an object.");
+  assertOnlyKeys(manifest, ["schema_version", "seed_id", "environments", "capture", "clock", "tables"], "manifest");
+  if (!isObject(manifest.tables)) fail("manifest.tables is required.");
+  assertOnlyKeys(manifest.tables, tableKeys, "manifest.tables");
+  for (const key of tableKeys) if (!(key in manifest.tables)) fail(`manifest.tables.${key} is required.`);
+
+  const tablePaths = Object.fromEntries(tableKeys.map((key) => [key, resolveTablePath(manifestPath, manifest.tables[key], key)]));
+  const tables = Object.fromEntries(tableKeys.map((key) => [key, readJson(tablePaths[key])]));
+  const source = {
+    schema_version: manifest.schema_version,
+    seed_id: manifest.seed_id,
+    environments: manifest.environments,
+    capture: manifest.capture,
+    clock: manifest.clock,
+    entities: {
+      projects: tables.projects,
+      people: tables.people,
+      work_items: tables.work_items,
+      meetings: tables.meetings,
+      reports: tables.reports,
+    },
+    pipeline_cases: tables.pipeline_cases,
+  };
+  const digest = createHash("sha256");
+  for (const [name, filePath] of [["manifest", manifestPath], ...tableKeys.map((key) => [key, tablePaths[key]])]) {
+    digest.update(`${name}\0`);
+    digest.update(readFileSync(filePath));
+    digest.update("\0");
+  }
+  return { source, sha256: digest.digest("hex"), manifestPath, tablePaths };
+}
 function requiredString(value, path) {
   if (typeof value !== "string" || !value.trim()) fail(`${path} must be a non-empty string.`);
 }
@@ -170,7 +221,7 @@ export function validateKamdarSeedConfig(source) {
 
   const pipelineCases = asArray(source.pipeline_cases, "pipeline_cases");
   const caseIds = pipelineCases.map((item) => item.feature_id);
-  if (caseIds.length !== requiredFeatureIds.length || [...new Set(caseIds)].length !== requiredFeatureIds.length || !requiredFeatureIds.every((id) => caseIds.includes(id))) fail("pipeline_cases must cover FEAT-0001 through FEAT-0007 exactly once.");
+  if (caseIds.length !== requiredFeatureIds.length || [...new Set(caseIds)].length !== requiredFeatureIds.length || !requiredFeatureIds.every((id) => caseIds.includes(id))) fail("pipeline_cases must cover FEAT-0001 through FEAT-0007 and FEAT-0010 exactly once.");
   for (const item of pipelineCases) {
     assertOnlyKeys(item, ["feature_id", "name", "entity_ids", "shows"], `pipeline case ${item.feature_id || "unknown"}`);
     requiredString(item.name, `${item.feature_id}.name`);
@@ -206,7 +257,11 @@ export function validateKamdarSeedConfig(source) {
 }
 
 export function loadKamdarSeedConfig({ path = seedConfigPath } = {}) {
-  return validateKamdarSeedConfig(readJson(path));
+  return validateKamdarSeedConfig(loadKamdarSeedBundle({ path }).source);
+}
+
+export function kamdarSeedBundleSha256({ path = seedConfigPath } = {}) {
+  return loadKamdarSeedBundle({ path }).sha256;
 }
 
 function slug(value) {

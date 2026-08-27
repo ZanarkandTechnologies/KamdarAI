@@ -20,7 +20,7 @@ source_refs:
   - workspace.hermes.md
   - tickets/TASK-0006/data-model-gap-report.md
 evidence_refs:
-  - evals/evals.json
+  - evals/weekly/suite.json
 known_limits: "Only operated-v4 may send the finalized Company artifact to the resolved private eval Telegram route with a receipt; production delivery remains proposal-only."
 ---
 

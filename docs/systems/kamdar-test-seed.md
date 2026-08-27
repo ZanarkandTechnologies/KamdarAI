@@ -13,22 +13,22 @@ feature_refs:
   - FEAT-0006
   - FEAT-0007
 refs:
-  - ../../evals/seed/kamdar-company-os.seed.json
-  - ../../scripts/schemas/kamdar-company-os-seed.schema.json
+  - ../../seed/manifest.json
+  - ../../evals/filesystem/scripts/kamdar-seed-config.mjs
 ---
 
 # Kamdar test seed
 
 ## Purpose
 
-[`evals/seed/kamdar-company-os.seed.json`](../../evals/seed/kamdar-company-os.seed.json)
-is the single reviewed input for frozen and isolated-Notion evaluations. Its
+[`seed/manifest.json`](../../seed/manifest.json) and its declared table files
+form the single reviewed input for frozen and isolated-Notion evaluations. Their
 seven Project names and Departments come from the approved private scrape; all
 other operating facts are explicitly synthetic evaluation scenarios. It stores
 the exact Notion-facing shape: template name, frontmatter-owned
 `properties`, one complete Markdown `body`, and eval-only metadata. The loader
-validates that shape against the template and derives only the frozen
-compatibility projection.
+validates that shape against the templates and derives the normalized evaluator
+input.
 
 ```text
 private capture fingerprint + seven captured Project identities
@@ -72,7 +72,7 @@ of capture verification.
 ## Scenario graph
 
 ```text
-Daily:  active Projects + today's unprocessed Work/Meetings
+Daily:  active Projects + linked open/changed Work + Done Work not yet AI-processed
           ├─ update Project memory
           ├─ request missing evidence
           ├─ prepare stale-work outreach

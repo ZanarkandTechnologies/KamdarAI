@@ -11,37 +11,36 @@ feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004]
 
 ## Context
 
-Run one bounded Daily Review for active Projects. Collect the relevant company
-context once, extract one validated JSON result, then give each result array
-unchanged to its integration owner.
+Run one bounded Daily Review for active Projects. Collect the company context
+once, produce and validate one JSON result, then pass each result array
+unchanged to the integration named in step 4.
 
-The default is `prepare`: do not mutate Notion, mark Work
-processed, or contact anyone. An operator may explicitly select
-`isolated-eval` for the dated evaluation workspace. That mode may apply the
-prepared Notion effects and relay proposed employee chases to the configured
-Telegram eval sink. An eval relay proves message rendering and provider
-delivery only; it is never recorded as delivery to the employee.
+## Authority
 
-Write boundary: only the declared local output artifacts are allowed in `prepare`.
-`isolated-eval` is bounded to the Notion root and eval sink aliases declared in
-`workspace.hermes.md`.
+`workspace.hermes.md` is the active environment binding. It supplies the exact
+Notion sources, write authority, and message routes for this run. Use only those
+resources and stop when a required action is not authorized. Never infer a
+destination or substitute another route.
 
 ## Todo List
 
 - [ ] **1 — Load the active-Project context.**
 
-  Read `workspace.hermes.md` and `skills/kamdar-company-os/SKILL.md` completely,
-  including its Notion CLI contract. Before the first provider call, run
-  `ntn --help`, `ntn datasources --help`, `ntn pages --help`, and
-  `ntn api --help`; use only syntax confirmed there or in the skill contract.
-  Never infer an `ntn` resource or argument shape. Then call
-  `kamdar-company-os` for its bounded Daily collection step only. Query
-  `notion.projects` for active Projects and
-  read their complete pages. From `notion.work_items_this_week`, read the
-  complete linked Work that is open, changed today, or Done with a different
-  `Daily review version`; include embedded Meetings from those Work pages.
-  Load the exact current-week Notion Report Draft and its full page content.
-  Write `daily/context/daily-context-diff-YYYY-MM-DD.json`.
+  - Read `workspace.hermes.md` completely for source routing and authority.
+  - Before the first provider call, run `ntn --help`,
+    `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
+    syntax confirmed by the installed CLI.
+  - Query `notion.projects` for active Projects and read their complete pages.
+  - From `notion.work_items_this_week`, read complete linked open or
+    changed-today Work for Project progress. For documentation review and
+    processing, read complete Work only when `Status = Done` and
+    `AI review != Processed`. Do not reload unchanged Done Work whose
+    `AI review = Processed`.
+  - Include embedded Meetings from the selected Work pages.
+  - Load the exact current-week Notion Report Draft and its full page content.
+  - Write `daily/context/daily-context-diff-YYYY-MM-DD.json`.
+
+  Never infer an `ntn` resource or argument shape.
 
   Keep stable owner Person IDs in the context. Do not fetch contact details yet.
   A missing relation, full page, or processing field is a `configuration_gap`,
@@ -49,20 +48,15 @@ Write boundary: only the declared local output artifacts are allowed in `prepare
 
 - [ ] **2 — Extract one Zod-shaped Daily Review.**
 
-  Read `automations/schemas/daily-review-result.zod.mjs` completely. Give its
-  `DailyReviewResultSchema`, `.describe()` instructions and golden examples,
-  plus the context JSON, to one structured extraction call. Extract:
-
-  | Result array | Feature | Required result |
-  | --- | --- | --- |
-  | `project_updates[].section_replacements[]` | FEAT-0001 | Complete replacements for Project `Overview`, `Project knowledge`, and `This week's attention` |
-  | `completed_ticket_comments[]` | FEAT-0002 | Complete clarification comments for Done Work whose important rationale or evidence is missing |
-  | `weekly_progress_chases[]` | FEAT-0003 | Complete accountable-owner messages when weekly targets are stale, blocked, or unlikely to finish |
-  | `knowledge_updates[].draft_entries[]` | FEAT-0004 | Complete source-linked Weekly Draft entries carrying structured current-workflow observations, measurable problem baselines or explicit measurement gaps, decisions, and SOP promotion candidates |
-
-  Validate the result against `DailyReviewResultSchema` and write it unchanged
-  to `daily/review/daily-review-result-YYYY-MM-DD.json`. On validation failure,
-  stop before integrations.
+  - Read `schemas/automations/daily-review-result.zod.mjs` completely.
+  - Give `DailyReviewResultSchema`, its `.describe()` instructions, golden
+    examples, and the context JSON to one structured extraction call.
+  - Treat the call as schema-driven form completion. Do not add fields or
+    requirements outside the schema.
+  - Validate the returned object against `DailyReviewResultSchema`.
+  - Write the exact validated bytes to
+    `daily/review/daily-review-result-YYYY-MM-DD.json`.
+  - Stop before integrations if validation fails.
 
   Daily observation does not require an already-approved SOP. Capture the
   current employee method first, including inefficient or informal steps. A
@@ -75,58 +69,77 @@ Write boundary: only the declared local output artifacts are allowed in `prepare
   Give the exact result bytes, frozen context, destination templates, and
   `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
   reviewer. Validate its response with
-  `automations/schemas/artifact-quality-review.zod.mjs` and write
+  `schemas/automations/artifact-quality-review.zod.mjs` and write
   `daily/review/daily-artifact-quality-review-YYYY-MM-DD.json`. Require exact
   coverage of every output row. Only tier A may proceed to integration calls.
   Route B/C readability findings through `unslop`, regenerate the result, and
   rerun the review against the new hash; the reviewer never edits the result.
 
-- [ ] **4 — Use each JSON section with its integration.**
+- [ ] **4 — Apply each JSON section and verify its effects.**
 
-  Resolve the exact tables, URLs, and channel aliases from
-  `workspace.hermes.md`, then apply this mapping:
+  Resolve the exact tables, URLs, write authority, and message routes from
+  `workspace.hermes.md`. Then apply each result through its integration:
 
-  | Use this JSON section | To do this | With this integration |
-  | --- | --- | --- |
-  | `project_updates[].section_replacements[]` | Replace the named section on the exact Project only when `expected_current_text` still matches | `notion` skill via `ntn` on `notion.projects` |
-  | `completed_ticket_comments[]` and `knowledge_updates[].missing_information_comment` | Add the rendered clarification comment to the exact Work item | `notion` skill via `ntn` on `notion.work_items_this_week` |
-  | Current Weekly Draft Report + `knowledge_updates[].draft_entries[]` + `weekly_progress_chases[]` | Return one complete replacement Draft: preserve still-current content, render the structured workflow/problem payloads without losing baseline fields, apply the findings to the four sections, increment `draft_version` by one, and set `last_updated` to the run timestamp | `notion` skill via `ntn` on the exact current-week Report Draft |
-  | `weekly_progress_chases[]` | Load the exact Person, resolve their approved preferred channel and safe route alias, then either prepare the chase or dispatch it under the mode rules below | `notion` skill via `ntn`, then `$telegram-message`, `email-message`, or `whatsapp-message` |
+  - `project_updates[].section_replacements[]`: use the `notion` skill via
+    `ntn` on `notion.projects`. Replace the named section only when
+    `expected_current_text` still matches.
+  - `documentation_reviews[]` with `verdict = needs_information`: use the
+    `notion` skill via `ntn` on `notion.work_items_this_week`. Add the rendered
+    comment to the exact Work item using `question_key` for deduplication.
+  - `knowledge_updates[].draft_entries[]` and `weekly_progress_chases[]`: use
+    the `notion` skill via `ntn` on the exact current-week Report Draft. Build
+    the complete replacement Draft using the procedure below.
+  - `weekly_progress_chases[]`: load the exact Person, resolve its
+    `Contact endpoint` through the active environment binding, and send through
+    that approved route only.
 
-  Never infer a table, Report, person, route alias, or fallback channel. The current Report
-  Draft ID/URL must be present in the collected context. If the Reports source,
-  required integration, or approved route is unavailable, report `blocked` and
-  keep the JSON result.
+  Never infer a table, Report, person, route alias, or fallback channel. The
+  current Report Draft ID/URL must be present in the collected context. If the
+  Reports source, required integration, or approved route is unavailable,
+  report `blocked` and keep the JSON result.
 
-  **Contact routing by execution mode**
+  For the current Weekly Draft:
 
-  - In `prepare`, record the intended Person, preferred channel, approved route
-    alias, and rendered message. Make no provider call.
-  - In `isolated-eval`, never send to a seeded employee address or account.
-    Wrap each unchanged `message_text` in an eval envelope naming the intended
-    Person, requested channel, and route alias, then send it only to the
-    explicitly configured Telegram eval sink. Record the result as
-    `delivered_to_eval_sink`, not `delivered_to_employee`.
-  - A missing email or WhatsApp provider is `channel_unavailable`. It must not
-    silently fall back to Telegram. The separately authorized Telegram eval
-    relay may still run, but its receipt must preserve the unavailable intended
-    channel and identify Telegram as the proof sink.
-  - Every provider attempt needs a receipt with the action key, intended Person,
-    intended channel, approved route alias, actual sink alias, provider state,
-    provider message ID when returned, and timestamp. Never invent success or a
-    provider message ID.
+  1. Load the exact current-week Report Draft.
+  2. Preserve content that is still current.
+  3. Render the structured workflow and problem payloads without dropping any
+     baseline fields.
+  4. Apply the findings to the four required sections.
+  5. Increment `draft_version` by one.
+  6. Set `last_updated` to the run timestamp.
+  7. Write one complete replacement Draft.
 
-  Only after every required effect for a Done Work item is `applied`,
-  `duplicate`, or truthfully `no_finding` may the `notion` skill set that Work
-  item's `Status` to `Processed` and `Daily review version` to
-  `daily-review-v1`. The receipt must read both values back. Prepared, blocked,
-  conflicted, or failed effects leave `Status` as `Done` and the review version
-  empty so the item remains eligible for retry.
+  **Message delivery**
+
+  - Use only the route authorized by the active environment binding.
+  - Before the first Gmail send, run
+    `gws gmail users getProfile --params '{"userId":"me"}'` and
+    `gws schema gmail.users.messages.send`.
+  - Before the first Telegram send, run `kamdar send --help`.
+  - If the intended route is missing or unauthorized, record
+    `channel_unavailable`. Do not select another channel, recipient, or fallback.
+  - For every provider attempt, record the action key, intended Person, intended
+    channel, approved route alias, actual destination, provider state, provider
+    message ID when returned, and timestamp. Never invent success or a provider
+    message ID.
+
+  Posting a documentation question does not complete documentation review. A
+  `needs_information` verdict must keep `Status = Done`, set
+  `AI review = Needs information`, and leave `Daily review version` empty.
+
+  Only after a Done Work item has `documentation verdict = sufficient` and
+  every required effect is `applied`, `duplicate`, or truthfully `no_finding`
+  may the `notion` skill set `AI review = Processed` and
+  `Daily review version = daily-review-v2`. Keep `Status = Done`. The receipt
+  must read all three properties back. A blocked, conflicted, or failed effect
+  sets `AI review = Blocked` and leaves the review version empty.
 
 ## Output
 
 - `daily/context/daily-context-diff-YYYY-MM-DD.json`
 - `daily/review/daily-review-result-YYYY-MM-DD.json`
 - `daily/review/daily-artifact-quality-review-YYYY-MM-DD.json`
-- One receipt recording Notion effects, processing outcomes, and each prepared,
-  blocked, or provider-confirmed message route
+- `daily/receipts/daily-integration-receipt-YYYY-MM-DD.json`, validated against
+  `schemas/automations/daily-integration-receipt.zod.mjs`, recording Notion
+  effects, processing outcomes, and each blocked or provider-confirmed message
+  route

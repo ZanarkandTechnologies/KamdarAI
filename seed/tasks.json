@@ -1,0 +1,271 @@
+[
+  {
+    "id": "TASK-101",
+    "template": "task",
+    "properties": {
+      "name": "Confirm corrected baju kurung tech pack",
+      "work_item_id": "TASK-101",
+      "project": "PROJ-CMT-CMT_PIPELINE",
+      "department": "CMT (Cut Make Trim)",
+      "owner": "PERSON-AISHA",
+      "type": "Task",
+      "status": "Blocked",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "2026-08-18",
+      "due_date": "2026-08-20",
+      "progress": "The corrected baju kurung tech pack is overdue and still lacks the approved collar tolerance and approver.",
+      "last_meaningful_update": "2026-08-18"
+    },
+    "body": "## Notes\n\nAisha 18/8 — sleeve still pulling on M sample. Collar is +1.5 cm vs issued sheet. Jun said corrected number was agreed at fitting but I cannot find the signed page. Do not release bulk cut yet.\n\n- [x] Re-measure blue sample\n- [ ] Get signed tolerance + approver\n- [ ] Tell sample room which sizes change\n- [ ] Book recheck once TASK-104 is ready\n\n### Blocker\n\nThe sewn sample measures 1.5 cm wider at the collar than the issued tech pack, but the proposed correction has no named approver.\n\n### Next action\n\nRecord the approved measurement, approver, affected sizes, and revised sample-check date.\n\n### Planned hours\n\n6\n\n### Actual hours\n\n10\n\n### Hourly cost myr\n\n90\n\n### Documentation missing\n\n- Approved collar measurement\n- Approver\n- Effective size range\n- Revised sample-check date\n\n### Problem analysis\n\n- **Cause:** The fitting correction was discussed beside the sample but not transferred to the canonical tech pack.\n- **Contributing factors:** Sample notes and the issued measurement table are stored separately.\n- **Confidence:** high\n- **Confirmation needed:** Link the signed corrected page and name who approved it.\n",
+    "metadata": {
+      "include_daily": true,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-104",
+    "template": "task",
+    "properties": {
+      "name": "Correct and recheck baju kurung sample",
+      "work_item_id": "TASK-104",
+      "project": "PROJ-CMT-CMT_PIPELINE",
+      "department": "CMT (Cut Make Trim)",
+      "owner": "PERSON-NUR",
+      "type": "Task",
+      "status": "In progress",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-23",
+      "progress": "The sample correction is waiting on the approved tech-pack measurement but remains scheduled for 23 Aug.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nSample room note — hold alteration until the signed number lands. Blue sample is on rack B2. Need same machinist if possible; she knows where the seam was opened.\n\n- [ ] photograph before opening seam\n- [ ] write old/new measurement on one sheet\n- [ ] Aisha recheck, not self-check\n\n### Working summary\n\nRework the collar on the baju kurung sample after TASK-101 publishes the signed measurement.\n\n### Evidence required\n\n- Before-and-after measurement sheet\n- Front, side, and collar photographs\n- Checker name and check date\n\n### Next action\n\nComplete the recheck within one working day of TASK-101 approval.\n",
+    "metadata": {
+      "include_daily": true,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-105",
+    "template": "task",
+    "properties": {
+      "name": "Complete pre-production sample check",
+      "work_item_id": "TASK-105",
+      "project": "PROJ-CMT-CMT_PIPELINE",
+      "department": "CMT (Cut Make Trim)",
+      "owner": "PERSON-NUR",
+      "type": "Task",
+      "status": "Done",
+      "ai_review": "Processed",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-19",
+      "progress": "The pre-production sample check recorded fabric, colour, seam, trim, and measurement evidence with checker approval.",
+      "last_meaningful_update": "2026-08-19"
+    },
+    "body": "## Notes\n\nFinal check 20/8: fabric/colour/seams/trims okay. Photos uploaded with CMT-SAMPLE-22. Only collar exception remains — moved that to TASK-101 so this check is done, but bulk cutting stays on hold.\n\n- [x] fabric and shade\n- [x] seams and trim\n- [x] signed check sheet\n- [ ] collar correction (TASK-104)\n\n### Completion summary\n\nThe sample passed fabric, colour, seam, and trim checks; the collar measurement exception was isolated and routed to TASK-101.\n\n### Evidence\n\nSigned check sheet CMT-SAMPLE-22 and dated sample photographs.\n\n### Decision\n\nHold bulk cutting until the single measurement exception is corrected.\n\n### Decision reason\n\nAll other construction checks passed, so a focused correction is lower-risk than restarting the sample.\n\n### Next action\n\nUse the signed check sheet when TASK-104 verifies the correction.\n",
+    "metadata": {
+      "include_daily": false,
+      "daily_review_version": "daily-review-v2",
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-110",
+    "template": "task",
+    "properties": {
+      "name": "Confirm sewing-line capacity",
+      "work_item_id": "TASK-110",
+      "project": "PROJ-CMT-CMT_PIPELINE",
+      "department": "CMT (Cut Make Trim)",
+      "owner": "PERSON-AISHA",
+      "type": "Task",
+      "status": "On track",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-23",
+      "progress": "Line 3 has provisional capacity for 1,200 pieces after sample approval; allocation remains current.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nLine 3 pencilled in, not confirmed. 1,200 pcs at roughly 480/day. If sample approval slips past Thursday the school-uniform repeat takes the slot. Check again after TASK-104.\n\n### Working summary\n\nLine 3 can take the baju kurung run after the corrected sample is approved.\n\n### Evidence reviewed\n\n- Current line loading sheet\n- 1,200-piece planned quantity\n- Estimated 480 pieces per day\n\n### Next action\n\nConfirm the start slot after TASK-104 closes.\n",
+    "metadata": {
+      "include_daily": true,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-109",
+    "template": "task",
+    "properties": {
+      "name": "Compare India cotton sample and landed cost",
+      "work_item_id": "TASK-109",
+      "project": "PROJ-MERCH-INDIA_SOURCING",
+      "department": "Merchandising",
+      "owner": "PERSON-NUR",
+      "type": "Task",
+      "status": "On track",
+      "ai_review": "Pending",
+      "priority": "Medium",
+      "start_date": "",
+      "due_date": "2026-08-23",
+      "progress": "The supplier sample, mill certificate, minimum order, and landed-cost quote are current for the 23 Aug decision.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nNur — swatch IND-COT-07 feels closest to approved hand-feel. MOQ 1,500 m; landed estimate MYR 8.40/m. Colourfastness sheet says 4/5. Need Maya to look at the warmer white under store lighting before sign-off.\n\n### Working summary\n\nCompare the shortlisted India cotton against the approved hand-feel, colourfastness, minimum-order, and landed-cost criteria.\n\n### Evidence reviewed\n\n- Swatch IND-COT-07 and mill certificate\n- 1,500-metre minimum order\n- MYR 8.40 estimated landed cost per metre\n- Colourfastness result 4/5\n\n### Next action\n\nSign the final side-by-side comparison by 23 Aug.\n\n### Problem analysis\n\n- **Cause:** No current problem; this is the healthy no-chase control.\n- **Confidence:** high\n- **Confirmation needed:** Final signed comparison only.\n",
+    "metadata": {
+      "include_daily": true,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-115",
+    "template": "task",
+    "properties": {
+      "name": "Publish weekly Meta performance update",
+      "work_item_id": "TASK-115",
+      "project": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "department": "Marketing",
+      "owner": "PERSON-JUN",
+      "type": "Task",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-21",
+      "progress": "The update claims ROAS improved to 4.2 but omits the reporting window, spend, attributed revenue, attribution setting, and source export.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nJun 4:10pm — ROAS showing 4.2, green kurta video looks strongest. Think we should move more budget there tomorrow. Screenshot is in the WhatsApp thread; will attach later.\n\n### Completion summary\n\nMeta ROAS improved to 4.2 and the top-performing creative should receive more budget.\n\n### Decision\n\nIncrease budget on the top-performing creative.\n\n### Next action\n\nAsk how the result and recommendation were determined.\n\n### Documentation missing\n\n- Reporting window\n- Spend and attributed revenue\n- Attribution setting\n- Campaign export or report link\n- Comparison baseline\n- Recommendation rationale\n\n### Problem analysis\n\n- **Cause:** A headline result was copied into the Work item without its weekly evidence table.\n- **Contributing factors:** Completion did not require the source export or budget-change rationale.\n- **Confidence:** high\n- **Confirmation needed:** Add every missing field above and explain why the proposed budget change follows.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T14:00:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-116",
+    "template": "task",
+    "properties": {
+      "name": "Publish documented Meta performance control",
+      "work_item_id": "TASK-116",
+      "project": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+      "department": "Marketing",
+      "owner": "PERSON-MAYA",
+      "type": "Task",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-21",
+      "progress": "The control update records spend, attributed revenue, ROAS, reporting window, attribution setting, comparison, and decision rationale.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nPulled 14–20 Aug export before stand-up. Spend 2,400; attributed revenue 8,160; ROAS 3.4. 7d click / 1d view. Frequency still okay. Maya checked the comparison sheet — keep control budget flat.\n\n### Completion summary\n\nFor 14–20 Aug, the control ad set spent MYR 2,400 and recorded MYR 8,160 attributed revenue at 3.4 ROAS using a seven-day click and one-day view setting.\n\n### Evidence\n\nMeta export META-W34-CONTROL and the signed weekly comparison table are linked.\n\n### Decision\n\nHold the control budget unchanged for the next weekly window.\n\n### Decision reason\n\nROAS remains above the 3.0 floor and creative frequency is below the review threshold.\n\n### Next action\n\nReview again after the 21–27 Aug window closes.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T14:15:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-102",
+    "template": "task",
+    "properties": {
+      "name": "Fix missing guest order confirmation",
+      "work_item_id": "TASK-102",
+      "project": "PROJ-ECOM-ECOM_FIXES",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "type": "Task",
+      "status": "Done",
+      "ai_review": "Pending",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-21",
+      "progress": "The guest-checkout confirmation defect was marked fixed without an affected order sample, webhook trace, root cause, or post-fix proof.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nDarren — tried guest checkout after the change and confirmation arrived. Marking done. Might have been the payment return but not 100% sure. Test order number is in my browser history somewhere.\n\n### Completion summary\n\nGuest order confirmation messages are now working.\n\n### Next action\n\nAsk for the affected checkout condition, root cause, and verification evidence.\n\n### Documentation missing\n\n- Affected order reference\n- Exact guest-checkout condition\n- Payment-return webhook trace\n- Root cause\n- Post-fix successful guest order\n\n### Problem analysis\n\n- **Cause:** Not established; asynchronous payment return is suspected.\n- **Contributing factors:** The task was closed from a manual spot check without linking the order or trace.\n- **Confidence:** low\n- **Confirmation needed:** Add one failed sample, the trace, the code/config change, and one successful post-fix sample.\n",
+    "metadata": {
+      "include_daily": true,
+      "completed_at": "2026-08-21T10:30:00+08:00",
+      "daily_review_version": null,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-114",
+    "template": "task",
+    "properties": {
+      "name": "Verify registered checkout confirmation",
+      "work_item_id": "TASK-114",
+      "project": "PROJ-ECOM-ECOM_FIXES",
+      "department": "Ecommerce",
+      "owner": "PERSON-DARREN",
+      "type": "Task",
+      "status": "On track",
+      "ai_review": "Pending",
+      "priority": "Medium",
+      "start_date": "",
+      "due_date": "2026-08-23",
+      "progress": "Five registered-account orders produced confirmations within two minutes; monitoring remains current through 23 Aug.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nMonitoring sheet: 5 registered-user orders so far, card + FPX. Confirmations 38s / 44s / 61s / 75s / 96s. All visible in order history. Leave open through 23 Aug; this is the comparison for TASK-102.\n\n### Working summary\n\nUse registered checkout as the healthy comparison while TASK-102 isolates the guest-checkout defect.\n\n### Evidence reviewed\n\n- Five test orders across card and online-banking payments\n- Confirmation timestamps between 38 and 96 seconds\n- No missing email or order-history entry\n\n### Next action\n\nComplete the monitoring window on 23 Aug without a stale-work chase.\n",
+    "metadata": {
+      "include_daily": true,
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  },
+  {
+    "id": "TASK-122",
+    "template": "task",
+    "properties": {
+      "name": "Complete Deepavali campaign asset handoff",
+      "work_item_id": "TASK-122",
+      "project": "PROJ-MKT-DEEPAVALI_MARKETING",
+      "department": "Marketing",
+      "owner": "PERSON-JUN",
+      "type": "Task",
+      "status": "Done",
+      "ai_review": "Processed",
+      "priority": "High",
+      "start_date": "",
+      "due_date": "2026-08-21",
+      "progress": "The master creative is approved, but final store, Meta, and website crops and receiver acknowledgments are incomplete.",
+      "last_meaningful_update": "2026-08-21"
+    },
+    "body": "## Notes\n\nMaster artwork approved. Maya: use the same offer line everywhere. I sent the main file to Retail + Ecom, but the folder still has old crops mixed in. Not sure Lina has the mobile hero.\n\n### Completion summary\n\nThe master Deepavali campaign artwork and offer wording were approved for handoff.\n\n### Decision\n\nUse the approved offer wording across stores, Meta placements, and the website.\n\n### Blocker\n\nThe channel asset matrix does not show every final crop, file location, receiver, or acknowledgment.\n\n### Next action\n\nAttach the final ratio-specific assets and confirm receipt with Retail and Ecommerce owners.\n\n### Documentation missing\n\n- Store-banner crop and receiver acknowledgment\n- Meta feed and story crops\n- Website hero and mobile crops\n- Final asset owner by channel\n\n### Problem analysis\n\n- **Cause:** Approval was recorded at master-creative level, while delivery occurs by channel and ratio.\n- **Confidence:** high\n- **Confirmation needed:** Complete the channel matrix and record each receiver acknowledgment.\n",
+    "metadata": {
+      "include_daily": false,
+      "completed_at": "2026-08-21T16:20:00+08:00",
+      "daily_review_version": "daily-review-v2",
+      "provenance": {
+        "operating_scenario": "synthetic_eval"
+      }
+    }
+  }
+]

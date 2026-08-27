@@ -1,0 +1,472 @@
+{
+  "schema_version": "kamdar-daily-review-evals@2.0.0",
+  "suite": "kamdar-unified-daily-review",
+  "target": {
+    "automation": "automations/daily-operating-update.md",
+    "schema": "schemas/automations/daily-review-result.zod.mjs",
+    "seed": "seed/manifest.json",
+    "expected_result": "evals/daily/expected/result.json"
+  },
+  "run_artifacts": [
+    {
+      "path": "daily/context/daily-context-diff-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-context"
+    },
+    {
+      "path": "daily/review/daily-review-result-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-review-result"
+    },
+    {
+      "path": "daily/receipts/daily-integration-receipt-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-integration-receipt"
+    },
+    {
+      "path": "daily/receipts/daily-idempotency-rerun-receipt-2026-08-25.json",
+      "stage": "base",
+      "kind": "daily-idempotency-rerun-receipt"
+    },
+    {
+      "path": "eval/deterministic.json",
+      "stage": "judged",
+      "kind": "deterministic-checks"
+    },
+    {
+      "path": "eval/judges/FEAT-0001.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0001"
+    },
+    {
+      "path": "eval/judges/FEAT-0002.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0002"
+    },
+    {
+      "path": "eval/judges/FEAT-0003.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0003"
+    },
+    {
+      "path": "eval/judges/FEAT-0004.json",
+      "stage": "judged",
+      "kind": "feature-judge:FEAT-0004"
+    },
+    {
+      "path": "eval/evidence-review.json",
+      "stage": "judged",
+      "kind": "evidence-review"
+    },
+    {
+      "path": "eval/artifact-quality-review.json",
+      "stage": "judged",
+      "kind": "artifact-quality-review"
+    },
+    {
+      "path": "eval/integrations.json",
+      "stage": "judged",
+      "kind": "integration-checks"
+    },
+    {
+      "path": "eval/result.json",
+      "stage": "judged",
+      "kind": "suite-result"
+    }
+  ],
+  "artifact_policy": {
+    "all_manifest_rows_required": true,
+    "unexpected_intermediate_files": "fail",
+    "json_files_must_parse": true,
+    "review_result_must_validate_with_target_schema": true
+  },
+  "features": [
+    {
+      "feature_id": "FEAT-0001",
+      "result_path": "project_updates",
+      "entity_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "claim": "CMT Pipeline receives conflict-safe section replacements that reconcile sample and capacity checks and preserve production blockers.",
+      "assertions": [
+        "Exactly one Project update targets PROJ-CMT-CMT_PIPELINE.",
+        "All three complete sections have expected-current and replacement text.",
+        "The checklist checks sample and capacity evidence and retains tech-pack and collar gates.",
+        "Every construction and production fact is source-linked."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "result_path": "documentation_reviews",
+      "entity_ids": [
+        "TASK-102",
+        "TASK-115",
+        "TASK-116",
+        "TASK-201",
+        "TASK-202",
+        "TASK-203",
+        "PERSON-JUN"
+      ],
+      "claim": "Every selected Done record receives an explicit documentation verdict; incomplete records receive precise questions and complete records receive no comment.",
+      "assertions": [
+        "TASK-115 receives one precise comment.",
+        "It asks for spend, revenue, attribution window, comparison period, source report, and rationale.",
+        "TASK-116 receives a sufficient verdict and no comment.",
+        "TASK-102 receives a needs-information verdict and remains reviewable.",
+        "No generic request or invented metric appears."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "result_path": "weekly_progress_chases",
+      "entity_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-109",
+        "PERSON-AISHA"
+      ],
+      "claim": "The stale CMT tech-pack gate produces one evidence-led production recovery request addressed to Aisha while healthy India Sourcing work is suppressed.",
+      "assertions": [
+        "One chase targets PERSON-AISHA for TASK-101 under CMT Pipeline.",
+        "It states the pack blocker, expiring line hold, recovery step, revised commitment, and capacity question.",
+        "TASK-109 is absent because it is healthy.",
+        "Extraction contains no delivery claim."
+      ]
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "result_path": "knowledge_updates",
+      "entity_ids": [
+        "TASK-201",
+        "TASK-203",
+        "TASK-102",
+        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+      ],
+      "claim": "Complete Done work yields source-linked workflow observations, measurable problem baselines, decisions, and promotion candidates; missing time or cost evidence becomes a source-record measurement question instead of an invented estimate.",
+      "assertions": [
+        "TASK-201 yields a structured current campaign workflow, a problem linked to its affected step, a two-day wait baseline, and precise questions for missing volume, active minutes, and hourly cost.",
+        "TASK-203 yields the approved repeated listing workflow with actors, ordered steps, systems, handoff, evidence window, confidence, and explicit timing gaps.",
+        "TASK-102 yields no knowledge and one precise defect-evidence question.",
+        "Every entry has a routable anchor and source ID; SOP candidates carry workflow_observation and problem/inefficiency candidates carry problem_baseline.",
+        "No direct cost is present without a visible formula and sourced inputs."
+      ]
+    }
+  ],
+  "evals": [
+    {
+      "id": "updates-project-context-from-progress",
+      "prompt": "Review the current CMT operating evidence and prepare the grounded Project context update.",
+      "expected_output": "The existing Project receives one conflict-safe update that preserves its real progress, blockers, source links, and weekly attention items.",
+      "files": [],
+      "assertions": [
+        "Exactly one Project update targets CMT Pipeline.",
+        "The complete Project sections contain both expected-current and replacement text.",
+        "Sample and capacity progress is preserved without losing the tech-pack and collar blockers.",
+        "Every construction and production fact is source-linked."
+      ],
+      "metadata": {
+        "title": "Updates Project context from operating progress",
+        "context": "The CMT Pipeline Project has new sample and capacity evidence while its tech-pack approval and collar correction remain blocked.",
+        "tags": [
+          "daily",
+          "feature",
+          "project-context"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0001"
+            ],
+            "entity_ids": [
+              "PROJ-CMT-CMT_PIPELINE",
+              "TASK-101",
+              "TASK-104",
+              "TASK-105",
+              "TASK-110"
+            ],
+            "result_paths": [
+              "project_updates"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "checks-completed-work-documentation",
+      "prompt": "Review both completed Work items and ask only for the documentation that is genuinely missing.",
+      "expected_output": "TASK-115 receives one precise evidence request and stays in Needs information; TASK-116 receives a sufficient verdict and no unnecessary comment.",
+      "files": [],
+      "assertions": [
+        "TASK-115 receives one precise completion-quality question.",
+        "The question asks for the missing spend, revenue, attribution, comparison, source, and rationale.",
+        "TASK-115 remains Done with AI review set to Needs information until its documentation passes.",
+        "TASK-116 receives a sufficient verdict and no comment because its documentation is complete.",
+        "No generic request or invented metric appears."
+      ],
+      "metadata": {
+        "title": "Checks completed work for missing documentation",
+        "context": "TASK-115 is marked Done without its measurement basis while TASK-116 already contains complete operating evidence.",
+        "tags": [
+          "daily",
+          "feature",
+          "documentation-quality"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0002"
+            ],
+            "entity_ids": [
+              "TASK-115",
+              "TASK-116",
+              "PERSON-JUN"
+            ],
+            "result_paths": [
+              "documentation_reviews"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "chases-owner-from-stalled-progress",
+      "prompt": "Prepare the accountable-owner progress chase from the grounded Project, Work, and People evidence.",
+      "expected_output": "Aisha receives one evidence-led recovery request for the stale CMT commitment, and healthy Work is not chased.",
+      "files": [],
+      "assertions": [
+        "One chase targets Aisha for TASK-101 under CMT Pipeline.",
+        "It states the blocker, expiring line hold, recovery step, revised commitment, and capacity question.",
+        "Healthy TASK-109 is suppressed.",
+        "The prepared result makes no delivery claim."
+      ],
+      "metadata": {
+        "title": "Chases the right owner when progress is stalled",
+        "context": "The CMT tech-pack approval is overdue and blocks a time-limited production hold, while the India Sourcing work is current and healthy.",
+        "tags": [
+          "daily",
+          "feature",
+          "progress-chase"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0003"
+            ],
+            "entity_ids": [
+              "PROJ-CMT-CMT_PIPELINE",
+              "TASK-101",
+              "TASK-109",
+              "PERSON-AISHA"
+            ],
+            "result_paths": [
+              "weekly_progress_chases"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "updates-weekly-draft-knowledge",
+      "prompt": "Turn the grounded completed Work evidence into the Weekly Draft knowledge updates and precise follow-up questions.",
+      "expected_output": "Qualified problems, decisions, and SOP candidates remain source-linked and structured; missing evidence becomes a question instead of invented knowledge.",
+      "files": [],
+      "assertions": [
+        "The campaign work records its current workflow, problem baseline, decision, and repeatable handoff method.",
+        "The listing work records the approved repeated workflow with actors, steps, systems, handoff, evidence window, and timing gaps.",
+        "The under-documented defect creates a precise evidence question rather than a knowledge entry.",
+        "Every entry has a routable Draft anchor and source ID, with no unsupported direct cost."
+      ],
+      "metadata": {
+        "title": "Updates the Weekly Draft with problems, decisions, and SOPs",
+        "context": "Completed campaign and listing work contains reusable workflow evidence, problem baselines, decisions, and one insufficiently documented defect.",
+        "tags": [
+          "daily",
+          "feature",
+          "weekly-draft"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0004"
+            ],
+            "entity_ids": [
+              "TASK-201",
+              "TASK-203",
+              "TASK-102",
+              "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+            ],
+            "result_paths": [
+              "knowledge_updates"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "applies-and-verifies-prepared-changes",
+      "prompt": "Apply the prepared Daily changes through the configured test integrations and verify what actually changed.",
+      "expected_output": "Every claimed applied or delivered change has a matching target, payload, provider receipt, and read-back that agrees with the intended result.",
+      "files": [],
+      "assertions": [
+        "Every claimed provider effect matches a declared Daily result entry and target.",
+        "Applied or delivered effects have provider evidence and matching read-back.",
+        "A provider URL by itself is not treated as proof."
+      ],
+      "metadata": {
+        "title": "Applies prepared changes and verifies them",
+        "context": "The Daily review has prepared changes for the seeded test integrations, and provider receipts plus read-back evidence are available.",
+        "tags": [
+          "daily",
+          "integration",
+          "read-back"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0001",
+              "FEAT-0002",
+              "FEAT-0003",
+              "FEAT-0004"
+            ],
+            "entity_ids": [
+              "PROJ-CMT-CMT_PIPELINE",
+              "TASK-101",
+              "TASK-102",
+              "TASK-115",
+              "TASK-116",
+              "TASK-201",
+              "TASK-203"
+            ],
+            "result_paths": [
+              "project_updates",
+              "documentation_reviews",
+              "weekly_progress_chases",
+              "knowledge_updates"
+            ],
+            "integration_gate_ids": [
+              "effects-match-receipt",
+              "read-back-matches-intent"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "keeps-work-open-on-required-failure",
+      "prompt": "Apply the prepared Daily update and record whether TASK-203 can be marked reviewed.",
+      "expected_output": "TASK-203 remains Done with AI review Blocked, has no review version, and records the blocked action and reason.",
+      "files": [],
+      "assertions": [
+        "TASK-203 remains Done while a required documentation effect is blocked, conflicted, or failed.",
+        "AI review becomes Blocked and no Daily review version is written for TASK-203.",
+        "The integration receipt records the unresolved required effect and its reason."
+      ],
+      "metadata": {
+        "title": "Keeps work open when a required change fails",
+        "context": "TASK-203 requires a Draft update, but the test provider cannot confirm that required change.",
+        "tags": [
+          "daily",
+          "safe-failure",
+          "processing"
+        ],
+        "notes": "A blocked provider action is expected here; the eval passes only when the workflow handles that failure safely.",
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0004"
+            ],
+            "entity_ids": [
+              "TASK-203"
+            ],
+            "result_paths": [
+              "knowledge_updates"
+            ],
+            "integration_gate_ids": [
+              "processing-safety"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "no-finding-counts-as-reviewed",
+      "prompt": "Review TASK-116 and record whether the Daily review completed safely when no change is needed.",
+      "expected_output": "TASK-116 records a truthful no-finding outcome, creates no unnecessary comment, and is marked processed.",
+      "files": [],
+      "assertions": [
+        "TASK-116 receives no completion-quality comment because its evidence is complete.",
+        "The receipt records no_finding rather than inventing a provider write.",
+        "The Work item is processed because all required review effects settled safely."
+      ],
+      "metadata": {
+        "title": "Treats nothing needed as successfully reviewed",
+        "context": "TASK-116 already contains complete measurement evidence and needs no follow-up comment.",
+        "tags": [
+          "daily",
+          "no-finding",
+          "processing"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0002"
+            ],
+            "entity_ids": [
+              "TASK-116"
+            ],
+            "result_paths": [
+              "documentation_reviews"
+            ],
+            "integration_gate_ids": [
+              "processing-safety"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "unchanged-rerun-creates-no-duplicates",
+      "prompt": "Rerun the unchanged Daily review through the configured test integrations.",
+      "expected_output": "The repeated run creates no duplicate provider row, comment, message, Draft entry, or processing transition.",
+      "files": [],
+      "assertions": [
+        "A repeated unchanged run creates no duplicate provider row, comment, message, Draft entry, or processing transition."
+      ],
+      "metadata": {
+        "title": "Creates nothing twice when the review is rerun",
+        "context": "The same Daily result has already been applied once and the source input has not changed.",
+        "tags": [
+          "daily",
+          "rerun",
+          "idempotency"
+        ],
+        "extensions": {
+          "kamdar": {
+            "feature_ids": [
+              "FEAT-0001",
+              "FEAT-0002",
+              "FEAT-0003",
+              "FEAT-0004"
+            ],
+            "entity_ids": [
+              "PROJ-CMT-CMT_PIPELINE",
+              "TASK-101",
+              "TASK-102",
+              "TASK-115",
+              "TASK-116",
+              "TASK-201",
+              "TASK-203"
+            ],
+            "integration_gate_ids": [
+              "idempotency"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

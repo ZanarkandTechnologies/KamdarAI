@@ -6,9 +6,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { payloadSha256 } from "./unified-weekly-review-eval.mjs";
 import { validateDailyIdempotencyRerun } from "./unified-daily-review-eval.mjs";
-import { DailyContextDiffSchema } from "../../../automations/schemas/daily-context-diff.zod.mjs";
-import { DailyReviewResultSchema } from "../../../automations/schemas/daily-review-result.zod.mjs";
-import { DailyIntegrationReceiptSchema, assertDailyProcessingSafety } from "../../../automations/schemas/daily-integration-receipt.zod.mjs";
+import { DailyContextDiffSchema } from "../../../schemas/automations/daily-context-diff.zod.mjs";
+import { DailyReviewResultSchema } from "../../../schemas/automations/daily-review-result.zod.mjs";
+import { DailyIntegrationReceiptSchema, assertDailyProcessingSafety } from "../../../schemas/automations/daily-integration-receipt.zod.mjs";
 
 function readJson(path) { return JSON.parse(readFileSync(path, "utf8")); }
 function writeJson(path, value) {
@@ -22,7 +22,7 @@ function parse(schema, value, label) {
   return parsed.data;
 }
 function dailyPointers(result) {
-  return ["project_updates", "completed_ticket_comments", "weekly_progress_chases", "knowledge_updates"]
+  return ["project_updates", "documentation_reviews", "weekly_progress_chases", "knowledge_updates"]
     .flatMap((key) => result[key].map((_, index) => `/${key}/${index}`));
 }
 function validateDailyEffects(result, receipt) {

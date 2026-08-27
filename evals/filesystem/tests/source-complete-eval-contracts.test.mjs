@@ -5,9 +5,9 @@ import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 
-import { DailyContextDiffSchema } from "../../../automations/schemas/daily-context-diff.zod.mjs";
-import { WeeklyContextSchema } from "../../../automations/schemas/weekly-context.zod.mjs";
-import { DailyIdempotencyRerunReceiptSchema } from "../../../automations/schemas/daily-idempotency-rerun-receipt.zod.mjs";
+import { DailyContextDiffSchema } from "../../../schemas/automations/daily-context-diff.zod.mjs";
+import { WeeklyContextSchema } from "../../../schemas/automations/weekly-context.zod.mjs";
+import { DailyIdempotencyRerunReceiptSchema } from "../../../schemas/automations/daily-idempotency-rerun-receipt.zod.mjs";
 import { buildFeatureJudgePacket, validateDailyIdempotencyRerun, validateFeatureJudgeVerdict } from "../scripts/unified-daily-review-eval.mjs";
 import { buildWeeklyFeatureJudgePacket, validateWeeklyFeatureJudgeVerdict } from "../scripts/unified-weekly-review-eval.mjs";
 
@@ -42,7 +42,8 @@ function dailyContext() {
     }],
     work_items: [{
       id: "TASK-1", source_id: "TASK-1", source_url: "notion://TASK-1", project_id: "PROJ-1", record_type: "Task", full_page_read: true,
-      owner_person_id: "PERSON-1", status: "blocked", due_date: "2026-08-25", last_meaningful_update: "2026-08-24", blocker: "Approval is missing.",
+      owner_person_id: "PERSON-1", status: "blocked", ai_review: "Pending", daily_review_version: null,
+      selection_reason: "linked_open_or_changed", due_date: "2026-08-25", last_meaningful_update: "2026-08-24", blocker: "Approval is missing.",
       cause: { value: "The approver is unnamed.", confidence: "high" },
       plan_actual: { currency: null, estimated_amount: null, actual_amount: null },
       documentation: {
@@ -97,19 +98,19 @@ function originalDailyReceipt() {
     daily_result_id: "RESULT-1",
     effects: [
       { effect_id: "E-APPLIED", result_pointer: "/project_updates/0", payload_hash: "a".repeat(64), target: { target_id: "PROJ-1" }, outcome: { state: "applied", provider_response: { response_id: "RESP-1" } } },
-      { effect_id: "E-NONE", result_pointer: "/completed_ticket_comments", payload_hash: "b".repeat(64), target: { target_id: "TASK-1" }, outcome: { state: "no_finding", provider_response: null } },
+      { effect_id: "E-NONE", result_pointer: "/documentation_reviews/0", payload_hash: "b".repeat(64), target: { target_id: "TASK-1" }, outcome: { state: "no_finding", provider_response: null } },
       { effect_id: "E-BLOCKED", result_pointer: "/knowledge_updates/0", payload_hash: "c".repeat(64), target: { target_id: "TASK-1" }, outcome: { state: "blocked", provider_response: null } },
     ],
     work_processing: [
-      { work_item_id: "TASK-1", state: "processed", status_after: "Processed", daily_review_version_after: "daily-review-v1" },
-      { work_item_id: "TASK-2", state: "unprocessed", status_after: null, daily_review_version_after: null },
+      { work_item_id: "TASK-1", state: "processed", status_after: "Done", ai_review_after: "Processed", daily_review_version_after: "daily-review-v2" },
+      { work_item_id: "TASK-2", state: "blocked", status_after: "Done", ai_review_after: "Blocked", daily_review_version_after: null },
     ],
   };
 }
 
 function rerunReceipt(original, originalBytes, contextBytes, resultBytes) {
   return {
-    schema_version: "kamdar-daily-idempotency-rerun-receipt@1.0.0",
+    schema_version: "kamdar-daily-idempotency-rerun-receipt@1.1.0",
     rerun_receipt_id: "RERUN-1",
     original_receipt_id: original.receipt_id,
     original_receipt_sha256: hash(originalBytes),
@@ -121,12 +122,12 @@ function rerunReceipt(original, originalBytes, contextBytes, resultBytes) {
     live_provider_calls: false,
     audit_effects: [
       { original_effect_id: "E-APPLIED", result_pointer: "/project_updates/0", action_key: "apply-project-1", target_id: "PROJ-1", payload_hash: "a".repeat(64), original_outcome: "applied", outcome: "duplicate", new_provider_mutations: 0, lookup_read_back: { provider_response_id: "RESP-1", target_id: "PROJ-1", payload_hash: "a".repeat(64), matched: true, created: false }, reason: "Existing exact effect found." },
-      { original_effect_id: "E-NONE", result_pointer: "/completed_ticket_comments", action_key: "comment-control", target_id: "TASK-1", payload_hash: "b".repeat(64), original_outcome: "no_finding", outcome: "no_finding", new_provider_mutations: 0, lookup_read_back: null, reason: "No finding remains." },
+      { original_effect_id: "E-NONE", result_pointer: "/documentation_reviews/0", action_key: "comment-control", target_id: "TASK-1", payload_hash: "b".repeat(64), original_outcome: "no_finding", outcome: "no_finding", new_provider_mutations: 0, lookup_read_back: null, reason: "No finding remains." },
       { original_effect_id: "E-BLOCKED", result_pointer: "/knowledge_updates/0", action_key: "knowledge-blocked", target_id: "TASK-1", payload_hash: "c".repeat(64), original_outcome: "blocked", outcome: "blocked", new_provider_mutations: 0, lookup_read_back: null, reason: "Original configuration gap remains." },
     ],
     work_processing: [
-      { work_item_id: "TASK-1", original_state: "processed", rerun_state: "processed", status_after: "Processed", daily_review_version_after: "daily-review-v1", changed: false },
-      { work_item_id: "TASK-2", original_state: "unprocessed", rerun_state: "unprocessed", status_after: null, daily_review_version_after: null, changed: false },
+      { work_item_id: "TASK-1", original_state: "processed", rerun_state: "processed", status_after: "Done", ai_review_after: "Processed", daily_review_version_after: "daily-review-v2", changed: false },
+      { work_item_id: "TASK-2", original_state: "blocked", rerun_state: "blocked", status_after: "Done", ai_review_after: "Blocked", daily_review_version_after: null, changed: false },
     ],
     summary: { original_effect_count: 3, audited_effect_count: 3, duplicate_count: 1, no_finding_count: 1, blocked_count: 1, conflicted_count: 0, failed_count: 0, new_provider_mutations: 0, processing_changes: 0 },
     run_notes: "Synthetic unchanged rerun.",
@@ -149,6 +150,19 @@ test("Daily context requires complete current Project sections and manifested re
   unmanifested.source_manifest[0].source_ids.pop();
   unmanifested.source_manifest[0].record_count -= 1;
   assert.equal(DailyContextDiffSchema.safeParse(unmanifested).success, false);
+});
+
+test("Daily documentation selection accepts Done-unprocessed Work and rejects Processed Work", () => {
+  const eligible = dailyContext();
+  eligible.work_items[0].status = "Done";
+  eligible.work_items[0].ai_review = "Pending";
+  eligible.work_items[0].selection_reason = "done_unprocessed";
+  assert.equal(DailyContextDiffSchema.safeParse(eligible).success, true);
+
+  const alreadyProcessed = structuredClone(eligible);
+  alreadyProcessed.work_items[0].ai_review = "Processed";
+  alreadyProcessed.work_items[0].daily_review_version = "daily-review-v2";
+  assert.equal(DailyContextDiffSchema.safeParse(alreadyProcessed).success, false);
 });
 
 test("Weekly context is complete Draft evidence and rejects raw Work or omitted rendered facts", () => {

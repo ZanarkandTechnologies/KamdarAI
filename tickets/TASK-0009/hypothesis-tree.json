@@ -21,7 +21,7 @@
       "reward_basis": "2026-08-26 evidence review found fixture mismatch in project-memory and documentation-quality; current goldens confirm drift.",
       "source_refs": [
         "tickets/TASK-0009/artifacts/qa/model-calibration-2026-08-26/evidence-review.json",
-        "automations/examples/golden/daily-context-diff-2026-08-24.json",
+        "evals/daily/expected/reference-context.json",
         "skills/daily-project-memory/evals/evals.json",
         "skills/daily-documentation-quality/evals/evals.json",
         "skills/daily-knowledge-capture/evals/evals.json"

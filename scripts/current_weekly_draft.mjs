@@ -21,7 +21,7 @@ const kindAnchor = Object.freeze({
   cost: "Problems and inefficiencies"
 });
 const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const canonicalTemplatePath = resolve(sourceRoot, "automations/templates/current-weekly-draft.md");
+const canonicalTemplatePath = resolve(sourceRoot, "templates/current-weekly-draft.md");
 
 function fail(message) { throw new Error(`Current Weekly Draft: ${message}`); }
 function normalize(value) { return String(value || "").replace(/\r\n/g, "\n").trim(); }

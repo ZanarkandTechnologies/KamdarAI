@@ -13,31 +13,31 @@ import {
   reconcileJudgedWeeklyRun,
   validateUnifiedWeeklyRun,
 } from "../scripts/unified-weekly-review-eval.mjs";
-import { WeeklyReviewResultSchema } from "../../../automations/schemas/weekly-review-result.zod.mjs";
-import { ArtifactQualityReviewSchema } from "../../../automations/schemas/artifact-quality-review.zod.mjs";
+import { WeeklyReviewResultSchema } from "../../../schemas/automations/weekly-review-result.zod.mjs";
+import { ArtifactQualityReviewSchema } from "../../../schemas/automations/artifact-quality-review.zod.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const suitePath = resolve(projectRoot, "evals/weekly-review-evals.json");
-const automationPath = resolve(projectRoot, "automations/evaluate-weekly-review.md");
-const goldenRoot = resolve(projectRoot, "automations/examples/golden");
+const suitePath = resolve(projectRoot, "evals/weekly/suite.json");
+const automationPath = resolve(projectRoot, "evals/automations/evaluate-weekly-review.md");
+const expectedRoot = resolve(projectRoot, "evals/weekly/expected");
 
 function loadSuite() { return JSON.parse(readFileSync(suitePath, "utf8")); }
 function json(path) { return JSON.parse(readFileSync(path, "utf8")); }
 function sha256(bytes) { return createHash("sha256").update(bytes).digest("hex"); }
 function writeJson(path, value) { writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`); }
-function goldenRun() {
+function expectedRun() {
   const root = mkdtempSync(resolve(tmpdir(), "kamdar-weekly-eval-"));
   const mappings = [
-    ["weekly-run-manifest-2026-W34.json", "weekly/run-manifest-2026-W34.json"],
-    ["weekly-context-2026-W34.json", "weekly/context/weekly-context-2026-W34.json"],
-    ["weekly-review-result-2026-W34.json", "weekly/review/weekly-review-result-2026-W34.json"],
-    ["weekly-integration-receipt-2026-W34.json", "weekly/receipts/weekly-integration-receipt-2026-W34.json"],
-    ["weekly-integration-read-back-2026-W34.json", "weekly/read-back/weekly-integration-read-back-2026-W34.json"],
+    ["run-manifest.json", "weekly/run-manifest-2026-W34.json"],
+    ["context.json", "weekly/context/weekly-context-2026-W34.json"],
+    ["result.json", "weekly/review/weekly-review-result-2026-W34.json"],
+    ["integration-receipt.json", "weekly/receipts/weekly-integration-receipt-2026-W34.json"],
+    ["integration-read-back.json", "weekly/read-back/weekly-integration-read-back-2026-W34.json"],
   ];
   for (const [source, destination] of mappings) {
     const target = resolve(root, destination);
     mkdirSync(dirname(target), { recursive: true });
-    copyFileSync(resolve(goldenRoot, source), target);
+    copyFileSync(resolve(expectedRoot, source), target);
   }
   return root;
 }
@@ -219,7 +219,7 @@ test("Weekly Zod contract blocks false Company finalization", () => {
 });
 
 test("promoted knowledge renders the complete destination template", () => {
-  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const result = json(resolve(expectedRoot, "result.json"));
   const promoted = Object.fromEntries(result.promotion_dispositions
     .filter((row) => row.disposition === "promoted")
     .map((row) => [row.kind, row.rendered_markdown]));
@@ -235,7 +235,7 @@ test("promoted knowledge renders the complete destination template", () => {
 });
 
 test("Weekly promotion rejects software skill cards for employee workflows", () => {
-  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const result = json(resolve(expectedRoot, "result.json"));
   const invalid = structuredClone(result);
   const workflow = invalid.promotion_dispositions.find((row) => row.kind === "sop" && row.disposition === "promoted");
   workflow.rendered_markdown = workflow.rendered_markdown.replace("template_id: kamdar-employee-sop", "template_id: company-os-skill");
@@ -243,7 +243,7 @@ test("Weekly promotion rejects software skill cards for employee workflows", () 
 });
 
 test("Weekly promotion rejects missing or placeholder problem baselines", () => {
-  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const result = json(resolve(expectedRoot, "result.json"));
   const missingProof = structuredClone(result);
   missingProof.promotion_dispositions[0].problem_baseline_proof = null;
   assert.equal(WeeklyReviewResultSchema.safeParse(missingProof).success, false);
@@ -262,7 +262,7 @@ test("Weekly promotion rejects missing or placeholder problem baselines", () => 
 });
 
 test("Weekly promotion preserves only reusable or material Decisions with advise-style options", () => {
-  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const result = json(resolve(expectedRoot, "result.json"));
   const decision = result.promotion_dispositions.find((row) => row.kind === "decision" && row.disposition === "promoted");
   assert.ok(decision.decision_preservation_proof);
   assert.ok(decision.decision_preservation_proof.options_considered.length >= 2);
@@ -282,7 +282,7 @@ test("Weekly promotion preserves only reusable or material Decisions with advise
 });
 
 test("Company reports require structured executive context rendered into the report", () => {
-  const result = json(resolve(goldenRoot, "weekly-review-result-2026-W34.json"));
+  const result = json(resolve(expectedRoot, "result.json"));
   const company = result.report_results.find((row) => row.report_level === "Company");
   assert.ok(company.company_executive_context.problems.length);
   assert.ok(company.company_executive_context.decisions.length);
@@ -317,8 +317,8 @@ test("artifact quality review requires workflow reconstruction and baseline inte
   assert.equal(ArtifactQualityReviewSchema.safeParse(review).success, false);
 });
 
-test("golden Weekly run passes manifest, inventory, Zod, provenance, and mock integration checks", () => {
-  const proof = validateUnifiedWeeklyRun({ runRoot: goldenRun() });
+test("expected Weekly run passes manifest, inventory, Zod, provenance, and mock integration checks", () => {
+  const proof = validateUnifiedWeeklyRun({ runRoot: expectedRun() });
   assert.equal(proof.pass, true);
   assert.equal(proof.immutable_inputs.length, 4);
   assert.deepEqual(proof.feature_checks.map((row) => row.rows), [7, 5, 1]);
@@ -328,7 +328,7 @@ test("golden Weekly run passes manifest, inventory, Zod, provenance, and mock in
 });
 
 test("feature judge packets use exact frozen Draft-backed evidence", () => {
-  const root = goldenRun();
+  const root = expectedRun();
   const rerunProof = validateUnifiedWeeklyRun({ runRoot: root });
   const packets = ["FEAT-0005", "FEAT-0006", "FEAT-0007"].map((featureId) => buildWeeklyFeatureJudgePacket({ featureId, result: rerunProof.result, context: rerunProof.context, runRoot: root }));
   assert.deepEqual(packets.map((packet) => packet.candidate.length), [7, 5, 1]);
@@ -348,26 +348,26 @@ test("feature judge packets use exact frozen Draft-backed evidence", () => {
 });
 
 test("FEAT-0007 packet rejects missing, stale, or extra runtime evidence", () => {
-  const baseRoot = goldenRun();
+  const baseRoot = expectedRun();
   const base = validateUnifiedWeeklyRun({ runRoot: baseRoot });
   const suite = loadWeeklyReviewEvalSuite();
   const build = (root) => buildWeeklyFeatureJudgePacket({ featureId: "FEAT-0007", result: base.result, context: base.context, runRoot: root, suite });
 
-  const missing = goldenRun();
+  const missing = expectedRun();
   const missingReceiptPath = resolve(missing, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
   const missingReceipt = json(missingReceiptPath);
   missingReceipt.effects = missingReceipt.effects.filter((row) => row.feature_id !== "FEAT-0007");
   writeJson(missingReceiptPath, missingReceipt);
   assert.throws(() => build(missing), /exactly one matching receipt effect/);
 
-  const stale = goldenRun();
+  const stale = expectedRun();
   const staleReadBackPath = resolve(stale, "weekly/read-back/weekly-integration-read-back-2026-W34.json");
   const staleReadBack = json(staleReadBackPath);
   staleReadBack.observations.find((row) => row.feature_id === "FEAT-0007").observed_sha256 = "0".repeat(64);
   writeJson(staleReadBackPath, staleReadBack);
   assert.throws(() => build(stale), /read-back is stale/);
 
-  const extra = goldenRun();
+  const extra = expectedRun();
   const extraReceiptPath = resolve(extra, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
   const extraReceipt = json(extraReceiptPath);
   extraReceipt.effects.push({
@@ -381,7 +381,7 @@ test("FEAT-0007 packet rejects missing, stale, or extra runtime evidence", () =>
 });
 
 test("judged Weekly run requires three tier-A testers, a separate reviewer, and matching integration checks", () => {
-  const root = goldenRun();
+  const root = expectedRun();
   const base = validateUnifiedWeeklyRun({ runRoot: root });
   addJudgedEvidence(root, base);
   const deterministic = validateUnifiedWeeklyRun({ runRoot: root, stage: "judged" });
@@ -396,7 +396,7 @@ test("judged Weekly run requires three tier-A testers, a separate reviewer, and 
 });
 
 test("judged Weekly runner rejects a stale artifact quality review", () => {
-  const root = goldenRun();
+  const root = expectedRun();
   const base = validateUnifiedWeeklyRun({ runRoot: root });
   addJudgedEvidence(root, base);
   const qualityPath = resolve(root, "eval/artifact-quality-review.json");
@@ -408,20 +408,20 @@ test("judged Weekly runner rejects a stale artifact quality review", () => {
 });
 
 test("Weekly runner rejects changed immutable bytes and undeclared intermediates", () => {
-  const changed = goldenRun();
+  const changed = expectedRun();
   const contextPath = resolve(changed, "weekly/context/weekly-context-2026-W34.json");
   const context = json(contextPath);
   context.source_gaps.push("tampered");
   writeJson(contextPath, context);
   assert.throws(() => validateUnifiedWeeklyRun({ runRoot: changed }), /manifest hash or byte count/);
 
-  const extra = goldenRun();
+  const extra = expectedRun();
   writeFileSync(resolve(extra, "weekly/debug.json"), "{}\n");
   assert.throws(() => validateUnifiedWeeklyRun({ runRoot: extra }), /unexpected=\[weekly\/debug\.json\]/);
 });
 
 test("Weekly runner rejects raw Work runtime input and missing Draft provenance even with refreshed hashes", () => {
-  const rawWork = goldenRun();
+  const rawWork = expectedRun();
   const contextPath = resolve(rawWork, "weekly/context/weekly-context-2026-W34.json");
   const context = json(contextPath);
   context.work_items = [{ id: "TASK-101", body: "raw Work must not be loaded Weekly" }];
@@ -429,7 +429,7 @@ test("Weekly runner rejects raw Work runtime input and missing Draft provenance 
   refreshManifest(rawWork, "weekly/context/weekly-context-2026-W34.json");
   assert.throws(() => validateUnifiedWeeklyRun({ runRoot: rawWork }), /must not contain raw Work or Meeting/);
 
-  const missing = goldenRun();
+  const missing = expectedRun();
   const missingPath = resolve(missing, "weekly/context/weekly-context-2026-W34.json");
   const missingContext = json(missingPath);
   missingContext.draft_candidate_refs[0].source_ids = missingContext.draft_candidate_refs[0].source_ids.filter((id) => id !== "TASK-110");
@@ -440,7 +440,7 @@ test("Weekly runner rejects raw Work runtime input and missing Draft provenance 
 });
 
 test("Weekly runner rejects forged payload hashes and receipt-only applied claims", () => {
-  const forged = goldenRun();
+  const forged = expectedRun();
   const receiptPath = resolve(forged, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
   const receipt = json(receiptPath);
   receipt.effects[0].payload_sha256 = "0".repeat(64);
@@ -448,7 +448,7 @@ test("Weekly runner rejects forged payload hashes and receipt-only applied claim
   refreshManifest(forged, "weekly/receipts/weekly-integration-receipt-2026-W34.json");
   assert.throws(() => validateUnifiedWeeklyRun({ runRoot: forged }), /does not match exact result payload/);
 
-  const receiptOnly = goldenRun();
+  const receiptOnly = expectedRun();
   const readBackPath = resolve(receiptOnly, "weekly/read-back/weekly-integration-read-back-2026-W34.json");
   const readBack = json(readBackPath);
   readBack.observations = readBack.observations.filter((row) => row.result_pointer !== "/next_week_project_replacements/0");
@@ -458,7 +458,7 @@ test("Weekly runner rejects forged payload hashes and receipt-only applied claim
 });
 
 test("judged Weekly runner rejects tester self-approval and mismatched saved reconciliation", () => {
-  const root = goldenRun();
+  const root = expectedRun();
   const base = validateUnifiedWeeklyRun({ runRoot: root });
   addJudgedEvidence(root, base);
   const reviewPath = resolve(root, "eval/evidence-review.json");
@@ -470,7 +470,7 @@ test("judged Weekly runner rejects tester self-approval and mismatched saved rec
 });
 
 test("judged Weekly runner rejects missing or wrong tester verdict_path", () => {
-  const missing = goldenRun();
+  const missing = expectedRun();
   const missingBase = validateUnifiedWeeklyRun({ runRoot: missing });
   addJudgedEvidence(missing, missingBase);
   const missingVerdictPath = resolve(missing, "eval/judges/FEAT-0005.json");
@@ -480,7 +480,7 @@ test("judged Weekly runner rejects missing or wrong tester verdict_path", () => 
   const missingDeterministic = validateUnifiedWeeklyRun({ runRoot: missing, stage: "judged" });
   assert.throws(() => reconcileJudgedWeeklyRun({ runRoot: missing, deterministic: missingDeterministic }), /exact absolute manifest verdict path/);
 
-  const wrong = goldenRun();
+  const wrong = expectedRun();
   const wrongBase = validateUnifiedWeeklyRun({ runRoot: wrong });
   addJudgedEvidence(wrong, wrongBase);
   const wrongVerdictPath = resolve(wrong, "eval/judges/FEAT-0006.json");
@@ -492,7 +492,7 @@ test("judged Weekly runner rejects missing or wrong tester verdict_path", () => 
 });
 
 test("judged Weekly runner rejects a missing five-grade rubric", () => {
-  const root = goldenRun();
+  const root = expectedRun();
   const base = validateUnifiedWeeklyRun({ runRoot: root });
   addJudgedEvidence(root, base);
   const verdictPath = resolve(root, "eval/judges/FEAT-0005.json");

@@ -1,8 +1,0 @@
-{
-  "name": "kamdar-evals",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "ui": "node filesystem/scripts/serve-eval-dashboard.mjs"
-  }
-}

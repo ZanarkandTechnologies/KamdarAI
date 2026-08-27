@@ -20,7 +20,7 @@ Kamdar AI is the AI transformation workspace for Kamdar, a Malaysian fabrics, fu
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `kamdar-company-os` skill via `ntn` | [Grounded v4 eval workspace](https://app.notion.com/p/EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26-3c7d43a23942810caff1d937e577ae91) → [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) | These isolated databases are the active evaluation sources. Projects are canonical manager memory; Work contains the seeded Tasks and Meetings used by the Daily and Weekly automations. Fetch each selected page in full. Production Kamdar records are outside this route. |
+| Notion | Daily and Weekly automations via `ntn` | [Operated Daily–Weekly eval workspace](https://app.notion.com/p/EVAL-Kamdar-Company-OS-operated-Daily-and-Weekly-2026-08-26-3c8d43a2394281ebbf3bcc96103b30a1) → [Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [Work items](https://app.notion.com/p/884c39fd534940be9f5f885b448cbcf0) | These isolated databases are the active evaluation sources. Projects are canonical manager memory; Work contains the seeded Tasks and Meetings used by the Daily and Weekly automations. Fetch each selected page in full. Production Kamdar records are outside this route. |
 
 ## Daily source catalog
 
@@ -30,56 +30,56 @@ and gap in `daily-context-diff.json`.
 
 | Source key | Configured source | Default collection | Boundary |
 | --- | --- | --- | --- |
-| `notion.projects` | [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) | Active seeded Projects related to selected Work | Read the Project's `Project knowledge` and `This week's attention` sections. |
-| `notion.work_items_this_week` | [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) | Unprocessed seeded Work completed or changed from local-week start through the current local day | Fetch each selected Work page in full. |
+| `notion.projects` | [Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) | Active seeded Projects related to selected Work | Read the Project's `Project knowledge` and `This week's attention` sections. |
+| `notion.work_items_this_week` | [Work items](https://app.notion.com/p/884c39fd534940be9f5f885b448cbcf0) | Linked open or changed Work for Project progress, plus Work where `Status = Done` and `AI review != Processed` for documentation review | Fetch each selected page in full. Do not reload unchanged Done Work whose AI review is Processed. |
 | `notion.embedded_meetings` | Full selected Work pages | Meeting blocks and `Meeting notes and updates` found in selected Work | This is not a second database query. |
-| `notion.people` | [People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) | Only seeded people referenced by selected Projects or Work | Use contact preferences for routing decisions; sending remains proposal-only unless a run explicitly authorizes it. |
-| `gmail.kamdar` | `kenji@znrknd.com` | Disabled unless a run explicitly enables a bounded Kamdar query | Never infer a recipient, route, or send authority from a search result. |
+| `notion.people` | [People](https://app.notion.com/p/8f796be4a629420f9148105da2cb8221) | Only seeded people referenced by selected Projects or Work | Use contact preferences for routing decisions; sending remains proposal-only unless a run explicitly authorizes it. |
+| `gmail.kamdar` | `gws gmail` as `kenji@znrknd.com` | Operator-owned test inbox | In `isolated-eval`, `operator_primary_email` and `operator_secondary_email` both resolve only to this test inbox. Use it for a bounded send/read-back, never for recipient discovery. |
 | `drive.kamdar` | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Disabled unless a run explicitly enables a bounded file query | Retrieval only; no file creation or publishing. |
 
 ## Isolated eval proof environment
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | current-seed operator and `kamdar-company-os` skill via `ntn` | [Grounded seven-project seed](https://app.notion.com/p/EVAL-Kamdar-Company-OS-grounded-v4-2026-08-26-3c7d43a23942810caff1d937e577ae91) → [Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) · [Work items](https://app.notion.com/p/b9049586b05e4a0f9f401103a9bb93a8) · [Decisions](https://app.notion.com/p/6fb5b0c509414d5ca503cdd0804ecb61) · [SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) · [Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Automation artifacts](https://app.notion.com/p/4062c8a0c6804841a33f9be92561acd0) | This dated root is the active operated eval environment. It contains 30 template-complete seeded records plus receipt-backed Daily updates, three Project reports, three Department reports, and one Company report. Daily and Weekly may write only inside these databases. `frozen` remains local-only; production Kamdar sources are not active. |
+| Notion | current-seed operator and Daily/Weekly automations via `ntn` | [Operated Daily–Weekly seed](https://app.notion.com/p/EVAL-Kamdar-Company-OS-operated-Daily-and-Weekly-2026-08-26-3c8d43a2394281ebbf3bcc96103b30a1) → [Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [People](https://app.notion.com/p/8f796be4a629420f9148105da2cb8221) · [Work items](https://app.notion.com/p/884c39fd534940be9f5f885b448cbcf0) · [Decisions](https://app.notion.com/p/f4f78dbab22b423fab1e4d0fc8bd5787) · [SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) · [Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) · [Automation artifacts](https://app.notion.com/p/3af2b3e6940c431a9dfa9d60af5a17b2) | This dated root is the active operated eval environment. It contains 30 template-complete seeded records and no generated Daily/Weekly effects yet. Daily and Weekly may write only inside these databases. `frozen` remains local-only; production Kamdar sources are not active. |
 
 ## People
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `kamdar-company-os` skill via `ntn` | [Eval People](https://app.notion.com/p/a07785104a504d3e89423d1f81df42e1) | Isolated seeded directory for evaluation. Use only stored preferred and approved contact channels; never infer a route. Contact remains proposal-only unless the run explicitly authorizes a test send. |
+| Notion | Daily and Weekly automations via `ntn` | [Eval People](https://app.notion.com/p/8f796be4a629420f9148105da2cb8221) | Isolated seeded directory for evaluation. Use only stored preferred and approved contact channels; never infer a route. Contact remains proposal-only unless the run explicitly authorizes a test send. |
 
 ## Knowledge
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
 | Google Drive | profile-scoped `google-workspace` skill | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Canonical root for Kamdar files. Keep retrieval and new company files inside this folder unless explicitly approved otherwise. |
-| Notion | `kamdar-company-os` skill via `ntn` | [Eval Projects](https://app.notion.com/p/2b5c8184d6ea4e6ead62851660fb2a87) · [Eval Reports](https://app.notion.com/p/d5470f29ffdd41988e558b38a216719a) · [Eval SOPs](https://app.notion.com/p/ff8690b2cb7f463ab90dd18a6a98bd41) | During evaluation, Project pages hold canonical project knowledge, Reports stage Daily observations and finalized rollups, SOPs hold canonical employee workflow baselines, and material Problems remain Issue records in Work linked to the affected SOP step. Do not read or write the production Kamdar root. |
+| Notion | Daily and Weekly automations via `ntn` | [Eval Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) · [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | During evaluation, Project pages hold canonical project knowledge, Reports stage Daily observations and finalized rollups, SOPs hold canonical employee workflow baselines, and material Problems remain Issue records in Work linked to the affected SOP step. Do not read or write the production Kamdar root. |
 | Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. `skill.md` is software-only; employee workflow baselines use `sop.md`. The skill resolves template ID/version here; it never relies on a profile-local copy. |
 
 ## Communications
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Telegram eval sink | `$telegram-message` / `kamdar send` | `telegram` route alias stored on every fictional Eval Person | Operated eval messages go to the operator-owned sink, include the intended Person in the message, and are receipted as `delivered_to_eval_sink`—never as employee delivery. |
-| Email | unavailable | No configured provider | Do not prepare or claim an email send. Record `channel_unavailable` until a provider and approved recipient route exist. |
+| Telegram eval sink | `kamdar send --to telegram --json` | Hermes-configured operator-owned home target | Operated eval messages include the intended Person and are receipted as `delivered_to_eval_sink`—never as employee delivery. |
+| Gmail eval sink | `gws gmail users messages send` | `kenji@znrknd.com` | `operator_primary_email` and `operator_secondary_email` resolve only to this operator-owned inbox. Capture the returned Gmail message/thread identifier in the run receipt. |
 
-## Communication channel aliases
+## Isolated-eval delivery map
 
-`dispatch-employee-messages` resolves a person's approved preferred channel
-through this table. It never picks a fallback channel.
-
-| Preferred channel | Channel skill | Availability and scope |
+| Person `Contact endpoint` | Direct command | Actual destination |
 | --- | --- | --- |
-| `telegram` | `$telegram-message` | Available only for Kenji; the skill's own recipient and gateway rules apply. |
-| `email` | `email-message` | Planned. No Kamdar-owned email sender is enabled yet. |
-| `whatsapp` | `whatsapp-message` via Baileys | Planned. It remains disabled until the Baileys integration is installed and approved. |
+| `operator_primary_email` or `operator_secondary_email` | `gws gmail users messages send` | `kenji@znrknd.com` only |
+| `telegram` | `kamdar send --to telegram --json` | Hermes-configured operator-owned Telegram target only |
+
+The Daily and Weekly automations use this map directly. They do not call a
+generic message dispatcher or fallback channel. Every test delivery must retain
+the fictional intended Person in its subject or first line.
 
 ## Decisions
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | `kamdar-company-os` skill via `ntn` | [Eval Decisions](https://app.notion.com/p/6fb5b0c509414d5ca503cdd0804ecb61) | Promote source-backed decisions from the current Weekly Draft into this isolated database. Preserve the source Work or Report link and never invent rationale. |
+| Notion | Daily and Weekly automations via `ntn` | [Eval Decisions](https://app.notion.com/p/f4f78dbab22b423fab1e4d0fc8bd5787) | Promote source-backed decisions from the current Weekly Draft into this isolated database. Preserve the source Work or Report link and never invent rationale. |
 
 ## Notion mention and comment policy
 
@@ -140,8 +140,8 @@ databases.
 
 - Use `Asia/Kuala_Lumpur` for time-bounded Kamdar automations.
 - Treat the Kamdar AI Drive folder as the canonical root for company files.
-- Treat `kenji@znrknd.com` as the only currently authorized Gmail read/send identity.
-- Keep Google OAuth profile-scoped under `$HERMES_HOME`; do not rely on machine-global `gws` credentials.
+- Treat `kenji@znrknd.com` as the only currently authorized Gmail read/send identity and the only email test sink.
+- Use the configured `gws` account for this profile. Before a Gmail send, verify the account with a bounded `gws gmail users getProfile` call and inspect `gws schema gmail.users.messages.send`; never expose its credential material.
 - Links prove reachability, not authority. `isolated-eval` is the sole source of
   eval write authority and must name the dated namespace; extending production
   scope still needs a separate owner authorization.
