@@ -19,6 +19,8 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
   `.hermes.md` in the live runtime.
 - `automations/`: readable automation contracts; scheduling and generated runs
   remain runtime concerns.
+- `seed/`: canonical modular synthetic seed tables and their hash-bound realism
+  review; private company captures remain outside Git.
 - `docs/features/` and `docs/systems/`: stable capability contracts and the
   Company OS composition map. Eval rows reference feature IDs; features do not
   create separate runtime scans.
@@ -26,6 +28,8 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
   workspace. Canonical imports retain an upstream template ID and version.
 - `skills/`: Kamdar-owned skill source, including the explicit workspace setup
   path. Installed profile copies are derived artifacts.
+- `plugins/`: Kamdar-owned Hermes platform connector source. Installed profile
+  copies are derived artifacts and update only through the setup route.
 - `evals/`: behavioral cases, filesystem assertions, local authoring UI, and
   run tooling. Generated eval runs are ignored.
 - `scripts/` and `tests/`: deterministic helpers and repository checks.

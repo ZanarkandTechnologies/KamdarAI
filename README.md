@@ -37,15 +37,15 @@ this repository owns the reviewed inputs used to configure and test it.
    ```
 
    The preview is safe; `--apply` copies the approved context, automations,
-   templates, and skills without deleting runtime files. Then open a fresh
-   Hermes session from that profile.
+   templates, skills, and source-owned plugins without deleting runtime files.
+   Then open a fresh Hermes session from that profile.
 
 3. Set up Notion as a separate test root first. The current config is
    evaluation-only and production writes are proposal-only. Use
    [`templates/`](templates/README.md) for the database shape, then approve
    real database routes and write authority before using production records.
 
-4. Optional: add the Notion comment bridge on the Linux Hermes VPS.
+4. Optional: activate the Notion comment bridge on the Linux Hermes VPS.
 
    ```bash
    export KAMDAR_NOTION_ONBOARD="$KAMDAR_PROFILE_HOME/skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py"
@@ -115,7 +115,9 @@ automations/   Daily and weekly operating contracts
 docs/          Feature specs and the Kamdar Company OS system map
 templates/     Kamdar record and report configuration contracts
 skills/        Kamdar skill source and workspace setup
-evals/         Template-first assertions and retained legacy proof baseline
+plugins/       Source-owned Hermes platform plugins installed into the profile
+seed/          Synthetic projects, people, tasks, meetings, reports, and scenarios
+evals/         Daily/Weekly acceptance contracts and deterministic proof tooling
 scripts/       Deterministic helpers
 tests/         Repository contract tests
 ```
@@ -148,32 +150,24 @@ python3 skills/setup-kamdar-workspace/scripts/setup_workspace.py \
 
 The command is preview-only unless `--apply` is supplied, refuses an
 unapproved workspace context, manages only `.hermes.md`, `automations/`,
-`templates/`, and project-owned `skills/`, and never deletes target files.
+`templates/`, project-owned `skills/`, and project-owned `plugins/`, and never
+deletes target files.
 
-`evals/evals.json` is the frozen comparison assertion contract for the legacy
-template-first runner. The active filesystem dashboard renders the canonical
-cases in `evals/daily-review-evals.json` and `evals/weekly-review-evals.json`,
-then joins their Kamdar proof bindings to saved run evidence. The current
-TASK-0007 direct-Draft proof is separate: it
-updates one local Weekly Draft through its two Daily owners, verifies a
-zero-write rerun, then finalizes that same file. Every assertion is owned by
-one [documented feature](docs/features/README.md); neither lane makes provider
-calls:
+Daily and Weekly acceptance is defined in `evals/daily/` and `evals/weekly/`.
+Each package contains its suite and expected artifacts. Every assertion is owned by one
+[documented feature](docs/features/README.md), and local evaluation makes no
+provider call:
 
 ```bash
 cd evals/filesystem
 npm test
-npm run ui
 ```
 
 ## Private capture seed
 
 The supplied Notion browser capture is private profile state, never a tracked
-fixture. Compile it explicitly into a mode-`0600` private seed; the repository
-only tracks its aggregate fingerprint (49 rows, 39 Projects, 10 source gaps,
-seven departments). The canonical scenario seed stores the 39 Project
-name/Department pairs but retains only the seven active scenarios and the one
-source gap that changes automation behavior.
+fixture. Compile it explicitly into a mode-`0600` private seed. The tracked,
+synthetic scenario seed is split into tables under `seed/`.
 
 ```bash
 node scripts/compile_private_kamdar_seed.mjs \
@@ -181,18 +175,14 @@ node scripts/compile_private_kamdar_seed.mjs \
   --output "$HERMES_HOME/state/kamdar-eval/private-seed.json" \
   --manifest "$HERMES_HOME/state/kamdar-eval/private-seed-manifest.json"
 
-# The private seed remains input to the isolated legacy v4 showcase only.
-# Current Daily/Weekly acceptance is owned by the unified golden-run validators:
+# Current Daily/Weekly acceptance is owned by the unified validators:
 node --test evals/filesystem/tests/unified-daily-review-eval.test.mjs \
   evals/filesystem/tests/weekly-review-evals.test.mjs
 ```
 
 The runner records only the source hash and `private_seed_verified` boolean in
 its result. It never renders raw capture names or contacts. Private compilation
-does not authorize a Notion mutation or provider delivery. The old
-`template-first-kamdar.mjs` runner and operated v4 showcase are retained for
-historical comparison; they are not current feature-acceptance or TASK-0009
-proof surfaces.
+does not authorize a Notion mutation or provider delivery.
 
 ## Private Company OS application seed
 
