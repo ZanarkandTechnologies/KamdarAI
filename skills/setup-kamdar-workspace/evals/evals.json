@@ -4,13 +4,14 @@
     {
       "id": "separate_runtime_01",
       "prompt": "I have the Kamdar source repo and an existing Hermes profile. Set the agent up so we can iterate configs, automations, and skills in Git without turning the repo into its live workspace.",
-      "expected_output": "Uses a separate runtime workspace, previews the allowlisted install, and keeps live state out of the source project.",
+      "expected_output": "Uses a separate runtime workspace, previews the allowlisted install and cron delta, and keeps live state out of the source project.",
       "files": [],
       "assertions": [
         "Keeps the Hermes runtime workspace outside the source project",
         "Runs or proposes a preview before applying file changes",
         "Treats configs, automations, and skills as source-owned inputs",
-        "Does not introduce a tracked profile overlay or workspace symlink"
+        "Does not introduce a tracked profile overlay or workspace symlink",
+        "Reconciles the canonical Daily and Weekly jobs with the runtime workspace"
       ]
     },
     {
@@ -35,6 +36,30 @@
         "Explains that generated reports, memory, sessions, and credentials are runtime state",
         "Keeps the repository authoritative for reviewable inputs and evals",
         "Does not propose gitignore as the primary isolation boundary"
+      ]
+    },
+    {
+      "id": "installed_distribution_01",
+      "prompt": "I installed KamdarAI with hermes profile install. Set up this profile and its scheduled jobs without cloning the repository again.",
+      "expected_output": "Uses verified installed-distribution mode, installs the profile-local workspace, sets terminal.cwd, and creates the two canonical jobs.",
+      "files": [],
+      "assertions": [
+        "Requires distribution source and installed-at metadata before allowing profile-local source mode",
+        "Installs only into the profile's workspace",
+        "Creates Daily at 0 8 * * 1-5 and Weekly at 0 18 * * 5",
+        "Keeps Notion webhook setup as a separate explicit handoff"
+      ]
+    },
+    {
+      "id": "cron_drift_and_gateway_01",
+      "prompt": "The Daily job points to an old workspace, there are two Weekly jobs with the same name, and the gateway is stopped. Make setup ready.",
+      "expected_output": "Updates an unambiguous drifted job, blocks duplicate-name reconciliation, and never calls a stopped scheduler ready.",
+      "files": [],
+      "assertions": [
+        "Updates the Daily schedule, prompt, and workdir through native Hermes commands",
+        "Blocks on duplicate canonical job names instead of guessing which one to edit",
+        "Reports scheduler readiness as partial while the gateway is stopped",
+        "Does not claim the Notion webhook is configured"
       ]
     }
   ]

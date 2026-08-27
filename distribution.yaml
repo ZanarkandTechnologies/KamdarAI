@@ -1,0 +1,36 @@
+name: kamdar-company-os
+version: 1.0.0
+description: "Kamdar Company OS workspace, automations, onboarding, and Notion connector"
+hermes_requires: ">=0.20.4"
+author: "Zanarkand Technologies"
+
+# Secrets and model configuration are client-owned. These integrations are
+# optional until their dedicated onboarding flow is invoked.
+env_requires:
+  - name: NOTION_TOKEN
+    description: "Notion integration token for Company OS data access"
+    required: false
+  - name: NGROK_AUTHTOKEN
+    description: "ngrok token for the optional Notion comment webhook"
+    required: false
+
+# This is the client installation boundary. The repository remains a complete
+# development/evaluation harness, while Hermes copies only these runtime files.
+distribution_owned:
+  - distribution.yaml
+  - workspace.hermes.md
+  - automations
+  - schemas/automations
+  - evals/rubrics/end-user-artifact-quality.md
+  - templates
+  - skills/setup-kamdar-workspace/SKILL.md
+  - skills/setup-kamdar-workspace/scripts/setup_workspace.py
+  - skills/setup-kamdar-workspace/scripts/setup_profile.py
+  - skills/notion-webhook-onboarding/SKILL.md
+  - skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py
+  - plugins/platforms/notion/__init__.py
+  - plugins/platforms/notion/adapter.py
+  - plugins/platforms/notion/api.py
+  - plugins/platforms/notion/cli.py
+  - plugins/platforms/notion/plugin.yaml
+  - plugins/platforms/notion/protocol.py

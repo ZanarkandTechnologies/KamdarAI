@@ -17,6 +17,8 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
 
 - `workspace.hermes.md`: the reviewed, nonsecret workspace context installed as
   `.hermes.md` in the live runtime.
+- `distribution.yaml`: the native Hermes client-install allowlist. It packages
+  runtime contracts and the two setup skills without copying development proof.
 - `automations/`: readable automation contracts; scheduling and generated runs
   remain runtime concerns.
 - `seed/`: canonical modular synthetic seed tables and their hash-bound realism

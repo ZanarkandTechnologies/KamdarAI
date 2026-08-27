@@ -155,6 +155,43 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertEqual(receipt["state"], "changes_pending")
 
+    def test_installed_distribution_may_install_its_own_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary) / "profile"
+            workspace = profile_home / "workspace"
+            (profile_home / "automations").mkdir(parents=True)
+            (profile_home / "schemas/automations").mkdir(parents=True)
+            (profile_home / "evals/rubrics").mkdir(parents=True)
+            (profile_home / "templates").mkdir()
+            (profile_home / "skills/example").mkdir(parents=True)
+            (profile_home / "plugins/platforms/notion").mkdir(parents=True)
+            workspace.mkdir()
+            config = profile_home / "workspace.hermes.md"
+            config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
+            (profile_home / "distribution.yaml").write_text(
+                "name: test\nsource: /tmp/source\ninstalled_at: 2026-08-27T00:00:00Z\n",
+                encoding="utf-8",
+            )
+            (profile_home / "automations/daily.md").write_text("daily\n", encoding="utf-8")
+            with patch.object(SETUP, "PROJECT", profile_home), patch.object(SETUP, "CONFIG", config):
+                code = SETUP.run(workspace, profile_home, apply=True, installed_distribution=True)
+            self.assertEqual(code, 0)
+            self.assertEqual((workspace / ".hermes.md").read_text(encoding="utf-8"), config.read_text(encoding="utf-8"))
+            self.assertEqual((workspace / "automations/daily.md").read_text(encoding="utf-8"), "daily\n")
+
+    def test_source_checkout_cannot_claim_installed_distribution_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary) / "profile"
+            workspace = profile_home / "workspace"
+            workspace.mkdir(parents=True)
+            code, receipt = self.run_setup(
+                workspace, profile_home, "--installed-distribution"
+            )
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                receipt["blocker"], "installed_distribution_profile_home_must_equal_source"
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

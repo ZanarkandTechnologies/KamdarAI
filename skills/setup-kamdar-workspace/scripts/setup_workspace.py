@@ -36,16 +36,31 @@ def inside(path: Path, parent: Path) -> bool:
         return False
 
 
-def validate_target(path: Path, label: str) -> Path:
+def validate_target(path: Path, label: str, *, allow_inside_project: bool = False) -> Path:
     if not path.exists() or not path.is_dir():
         raise SetupError(f"{label}_must_be_existing_directory")
     if path.is_symlink():
         raise SetupError(f"{label}_must_not_be_symlink")
     resolved = path.resolve()
     project = PROJECT.resolve()
-    if resolved == project or inside(resolved, project):
+    if not allow_inside_project and (resolved == project or inside(resolved, project)):
         raise SetupError(f"{label}_must_be_outside_source_project")
     return resolved
+
+
+def validate_installed_distribution(workspace: Path, profile_home: Path) -> None:
+    manifest = PROJECT / "distribution.yaml"
+    if profile_home.resolve() != PROJECT.resolve():
+        raise SetupError("installed_distribution_profile_home_must_equal_source")
+    if workspace.resolve() != (profile_home / "workspace").resolve():
+        raise SetupError("installed_distribution_workspace_must_be_profile_workspace")
+    if not manifest.is_file():
+        raise SetupError("installed_distribution_manifest_missing")
+    content = manifest.read_text(encoding="utf-8")
+    if not re.search(r"^source:\s*\S+", content, re.MULTILINE):
+        raise SetupError("installed_distribution_source_missing")
+    if not re.search(r"^installed_at:\s*\S+", content, re.MULTILINE):
+        raise SetupError("installed_distribution_timestamp_missing")
 
 
 def context_status() -> str:
@@ -107,10 +122,21 @@ def atomic_copy(source: Path, destination: Path) -> None:
         temporary_path.unlink(missing_ok=True)
 
 
-def run(workspace_arg: Path, profile_home_arg: Path, apply: bool) -> int:
+def run(
+    workspace_arg: Path,
+    profile_home_arg: Path,
+    apply: bool,
+    installed_distribution: bool = False,
+) -> int:
     try:
-        workspace = validate_target(workspace_arg, "workspace")
-        profile_home = validate_target(profile_home_arg, "profile_home")
+        workspace = validate_target(
+            workspace_arg, "workspace", allow_inside_project=installed_distribution
+        )
+        profile_home = validate_target(
+            profile_home_arg, "profile_home", allow_inside_project=installed_distribution
+        )
+        if installed_distribution:
+            validate_installed_distribution(workspace, profile_home)
         if workspace == profile_home or inside(profile_home, workspace):
             raise SetupError("profile_home_must_not_be_workspace_or_its_child")
         status = context_status()
@@ -149,12 +175,17 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument("--workspace", type=Path, required=True)
     command.add_argument("--profile-home", type=Path, required=True)
     command.add_argument("--apply", action="store_true", help="Copy changed allowlisted files; never deletes files.")
+    command.add_argument(
+        "--installed-distribution",
+        action="store_true",
+        help="Allow the verified native distribution profile to install its own workspace.",
+    )
     return command
 
 
 def main() -> int:
     args = parser().parse_args()
-    return run(args.workspace, args.profile_home, args.apply)
+    return run(args.workspace, args.profile_home, args.apply, args.installed_distribution)
 
 
 if __name__ == "__main__":
