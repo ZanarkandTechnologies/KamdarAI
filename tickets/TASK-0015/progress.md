@@ -9,6 +9,7 @@ status: complete
 ## Changed
 
 - Added a Hermes `distribution.yaml` with an explicit runtime-only allowlist.
+- Named the installed product/profile `kamdar-ai`; Company OS remains its capability.
 - Extended `setup-kamdar-workspace` for verified installed distributions.
 - Added profile setup that configures cwd and reconciles Daily/Weekly jobs.
 - Replaced manual clone-first client instructions with native profile install.

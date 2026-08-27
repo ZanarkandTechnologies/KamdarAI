@@ -15,7 +15,7 @@ class DistributionTests(unittest.TestCase):
         self.owned = self.manifest["distribution_owned"]
 
     def test_manifest_installs_only_runtime_owned_surfaces(self) -> None:
-        self.assertEqual(self.manifest["name"], "kamdar-company-os")
+        self.assertEqual(self.manifest["name"], "kamdar-ai")
         required = {
             "workspace.hermes.md",
             "automations",

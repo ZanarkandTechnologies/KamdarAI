@@ -12,7 +12,7 @@ does not install this repository's tickets, tests, seed, screenshots, or Git
 history.
 
 ```bash
-export KAMDAR_PROFILE=client-company-os
+export KAMDAR_PROFILE=kamdar-ai
 
 hermes profile install \
   https://github.com/ZanarkandTechnologies/KamdarAI \

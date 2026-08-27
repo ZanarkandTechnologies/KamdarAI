@@ -1,5 +1,5 @@
-name: kamdar-company-os
-version: 1.0.0
+name: kamdar-ai
+version: 1.0.1
 description: "Kamdar Company OS workspace, automations, onboarding, and Notion connector"
 hermes_requires: ">=0.20.4"
 author: "Zanarkand Technologies"

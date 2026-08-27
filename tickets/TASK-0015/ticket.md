@@ -40,7 +40,7 @@ scheduled jobs without shipping the development harness.
 > sub-megabyte runtime payload. The existing `setup-kamdar-workspace` skill
 > installs the workspace and reconciles both jobs.
 >
-> **Example:** Installing as `acme-company-os` preserves client credentials and
+> **Example:** Installing as `kamdar-ai` preserves client credentials and
 > state, excludes `tickets/`, `tests/`, `seed/`, and full eval suites, and
 > schedules Daily at 08:00 weekdays and Weekly at 18:00 Friday.
 
@@ -91,7 +91,7 @@ checks:
   - python3 -m unittest discover -s skills/setup-kamdar-workspace/tests -v
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
   - node --test evals/filesystem/tests/*.test.mjs
-  - HOME=<temporary> hermes profile install . --name kamdar-install-smoke -y
+  - HERMES_HOME=<temporary> hermes profile install . --name kamdar-ai-smoke -y
 evidence_paths: [tickets/TASK-0015/progress.md, tickets/TASK-0015/artifacts/review/]
 final_checkpoint: payload inspection plus skill-contract review
 residual_risk: Live provider credentials and Notion authority remain client-owned onboarding gates.
