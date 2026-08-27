@@ -1,0 +1,615 @@
+{
+  "schema_version": "kamdar-operated-evidence@2.1.0",
+  "deployment": "operated-w34-2026-08-26",
+  "root_url": "https://app.notion.com/p/EVAL-Kamdar-Company-OS-operated-Daily-and-Weekly-2026-08-26-3c8d43a2394281ebbf3bcc96103b30a1",
+  "features": [
+    {
+      "feature_id": "FEAT-0001",
+      "summary": "Daily updated and read back the CMT Pipeline Project memory from W34 Work evidence.",
+      "cases": [
+        {
+          "case_id": "updates-project-context-from-progress",
+          "source_inputs": [
+            {
+              "id": "task-101",
+              "label": "TASK-101 — Corrected tech pack",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+            },
+            {
+              "id": "task-104",
+              "label": "TASK-104 — Recheck sample",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Correct-and-recheck-baju-kurung-sample-3c8d43a2394281a5bff2d6cae5b41864"
+            },
+            {
+              "id": "task-105",
+              "label": "TASK-105 — Pre-production check",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Complete-pre-production-sample-check-3c8d43a239428188b36bf49e0e702334"
+            },
+            {
+              "id": "task-110",
+              "label": "TASK-110 — Sewing capacity",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Confirm-sewing-line-capacity-3c8d43a2394281e0ac17fed8092754ed"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "cmt-project",
+              "label": "Updated CMT Pipeline Project",
+              "kind": "project",
+              "state": "linked",
+              "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "summary": "Daily reviewed TASK-102 and TASK-115, recorded specific Notion comments, and requested the missing documentation through the configured Gmail test route.",
+      "cases": [
+        {
+          "case_id": "checks-completed-work-documentation",
+          "source_inputs": [
+            {
+              "id": "task-115-source",
+              "label": "TASK-115 — Meta performance update",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c8d43a2394281b7b81df4b7a8e663e0"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "task-115-processed",
+              "label": "Processed TASK-115 with documentation comment",
+              "kind": "work",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c8d43a2394281b7b81df4b7a8e663e0"
+            },
+            {
+              "id": "gmail-jun",
+              "label": "Documentation request to Jun",
+              "kind": "email",
+              "state": "linked",
+              "url": "https://mail.google.com/mail/u/0/#all/1a03d03e43458a87",
+              "access_note": "Requires the operator test mailbox."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "summary": "The overdue CMT chase was sent through the configured Gmail test route and read back by its provider thread; it is test-route evidence, not a claim of employee delivery.",
+      "cases": [
+        {
+          "case_id": "chases-owner-from-stalled-progress",
+          "source_inputs": [
+            {
+              "id": "cmt-project-source",
+              "label": "CMT Pipeline Project",
+              "kind": "project",
+              "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+            },
+            {
+              "id": "task-101-overdue",
+              "label": "Overdue TASK-101",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "gmail-aisha",
+              "label": "Progress chase to Aisha",
+              "kind": "email",
+              "state": "linked",
+              "url": "https://mail.google.com/mail/u/0/#all/1a03cfea714b9746",
+              "access_note": "Requires the operator test mailbox."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "summary": "Daily accumulated source-linked CMT operating knowledge into the W34 report draft and processed the reviewed Work exactly once.",
+      "cases": [
+        {
+          "case_id": "updates-weekly-draft-knowledge",
+          "source_inputs": [
+            {
+              "id": "task-101-knowledge",
+              "label": "TASK-101 — Corrected tech pack",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+            },
+            {
+              "id": "task-104-knowledge",
+              "label": "TASK-104 — Recheck sample",
+              "kind": "work",
+              "url": "https://app.notion.com/p/Correct-and-recheck-baju-kurung-sample-3c8d43a2394281a5bff2d6cae5b41864"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "cmt-weekly-capture",
+              "label": "CMT W34 captured knowledge",
+              "kind": "report",
+              "state": "linked",
+              "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0005",
+      "summary": "Weekly finalized three Project reports, three Department reports, and the Company report for W34.",
+      "cases": [
+        {
+          "case_id": "weekly-report-hierarchy-and-finalization-gate",
+          "source_inputs": [
+            {
+              "id": "ecom-project-report",
+              "label": "Ecom W34 Project report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/Ecom-Fixes-Week-of-2026-08-17-3c8d43a2394281f8b374e121fd0bb0d6"
+            },
+            {
+              "id": "deepavali-project-report",
+              "label": "Deepavali W34 Project report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c8d43a2394281618e5fe9c01f11e5fd"
+            },
+            {
+              "id": "cmt-project-report",
+              "label": "CMT W34 Project report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "ecommerce-area-report",
+              "label": "Ecommerce Area report",
+              "kind": "report",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Ecommerce-Week-of-2026-08-17-3c8d43a2394281f0aa1bc6622ae61cea"
+            },
+            {
+              "id": "marketing-area-report",
+              "label": "Marketing Area report",
+              "kind": "report",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Marketing-Week-of-2026-08-17-3c8d43a239428179a263d8fea08e8803"
+            },
+            {
+              "id": "cmt-area-report",
+              "label": "CMT Area report",
+              "kind": "report",
+              "state": "linked",
+              "url": "https://app.notion.com/p/CMT-Cut-Make-Trim-Week-of-2026-08-17-3c8d43a2394281cab84fe44d2d50d370"
+            },
+            {
+              "id": "company-report",
+              "label": "W34 Company report",
+              "kind": "report",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Kamdar-Week-of-2026-08-17-3c8d43a2394281d392bae243475b94e3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "summary": "Weekly promoted the earned Deepavali Decision and CMT Issue, while retaining four SOP candidates as monitored because their promotion gates were not met.",
+      "cases": [
+        {
+          "case_id": "weekly-promotion-disposition-matrix",
+          "source_inputs": [
+            {
+              "id": "deepavali-promotion-source",
+              "label": "Deepavali W34 report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c8d43a2394281618e5fe9c01f11e5fd"
+            },
+            {
+              "id": "cmt-promotion-source",
+              "label": "CMT W34 report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "promoted-decision",
+              "label": "Promoted Deepavali Decision",
+              "kind": "decision",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Use-one-approved-offer-wording-across-all-Deepavali-campaign-channels-3c8d43a23942812abb37e1d7789923f4"
+            },
+            {
+              "id": "promoted-issue",
+              "label": "Promoted CMT Issue",
+              "kind": "issue",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Baju-kurung-tech-pack-correction-not-signed-into-the-canonical-record-3c8d43a239428173846ce0aa54086d43"
+            },
+            {
+              "id": "retained-sops",
+              "label": "CMT report with retained SOP candidates",
+              "kind": "sop",
+              "state": "linked",
+              "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "summary": "Weekly carried W35 attention forward on CMT Pipeline, Ecom Fixes, and Deepavali Marketing without duplicating the W34 final reports.",
+      "cases": [
+        {
+          "case_id": "weekly-canonical-project-carry-forward",
+          "source_inputs": [
+            {
+              "id": "cmt-carry-source",
+              "label": "CMT W34 report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+            },
+            {
+              "id": "ecom-carry-source",
+              "label": "Ecom W34 report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/Ecom-Fixes-Week-of-2026-08-17-3c8d43a2394281f8b374e121fd0bb0d6"
+            },
+            {
+              "id": "deepavali-carry-source",
+              "label": "Deepavali W34 report",
+              "kind": "report",
+              "url": "https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c8d43a2394281618e5fe9c01f11e5fd"
+            }
+          ],
+          "output_artifacts": [
+            {
+              "id": "cmt-carry-output",
+              "label": "CMT Pipeline next-week attention",
+              "kind": "project",
+              "state": "linked",
+              "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+            },
+            {
+              "id": "ecom-carry-output",
+              "label": "Ecom Fixes next-week attention",
+              "kind": "project",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Ecom-Fixes-3c8d43a23942810fa939e81f6ccabbff"
+            },
+            {
+              "id": "deepavali-carry-output",
+              "label": "Deepavali Marketing next-week attention",
+              "kind": "project",
+              "state": "linked",
+              "url": "https://app.notion.com/p/Deepavali-Marketing-3c8d43a23942819fb3a5d36d067f0210"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "story": {
+    "kicker": "Operated W34 run · receipt-bound",
+    "title": "Kamdar Company OS — W34",
+    "goal": "Give the exact presentation links for the operated Daily and Weekly stories.",
+    "track": "One evidence trail per feature.",
+    "progress": "Notion evidence is inside the isolated test root; Gmail references use the operator test mailbox.",
+    "root": {
+      "label": "Kamdar Company OS — operated Daily and Weekly — 2026-08-26",
+      "url": "https://app.notion.com/p/EVAL-Kamdar-Company-OS-operated-Daily-and-Weekly-2026-08-26-3c8d43a2394281ebbf3bcc96103b30a1"
+    },
+    "receipts": [
+      {
+        "label": "Daily receipt",
+        "document_id": "daily-receipt"
+      },
+      {
+        "label": "Daily review result",
+        "document_id": "daily-review-result"
+      },
+      {
+        "label": "Weekly review result",
+        "document_id": "weekly-review-result"
+      }
+    ],
+    "sections": [
+      {
+        "id": "project-memory-update",
+        "title": "Project memory update",
+        "items": [
+          {
+            "label": "Source Work",
+            "text": "The Daily run used four CMT Work records as its current operating evidence.",
+            "links": [
+              {
+                "label": "TASK-101",
+                "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+              },
+              {
+                "label": "TASK-104",
+                "url": "https://app.notion.com/p/Correct-and-recheck-baju-kurung-sample-3c8d43a2394281a5bff2d6cae5b41864"
+              },
+              {
+                "label": "TASK-105",
+                "url": "https://app.notion.com/p/Complete-pre-production-sample-check-3c8d43a239428188b36bf49e0e702334"
+              },
+              {
+                "label": "TASK-110",
+                "url": "https://app.notion.com/p/Confirm-sewing-line-capacity-3c8d43a2394281e0ac17fed8092754ed"
+              }
+            ]
+          },
+          {
+            "label": "Daily result",
+            "text": "The Daily receipt above records the in-place Project update and provider read-back.",
+            "links": [
+              {
+                "label": "Updated CMT Pipeline Project memory",
+                "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "progress-chase",
+        "title": "Chasing people on knowledge",
+        "items": [
+          {
+            "label": "Context",
+            "text": "CMT Pipeline and an overdue TASK-101 supplied the chase context.",
+            "links": [
+              {
+                "label": "CMT Pipeline",
+                "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+              },
+              {
+                "label": "Overdue TASK-101",
+                "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+              }
+            ]
+          },
+          {
+            "label": "Actual chase",
+            "text": "Provider thread read-back for the configured Aisha test route.",
+            "links": [
+              {
+                "label": "Test Gmail to Aisha",
+                "url": "https://mail.google.com/mail/u/0/#all/1a03cfea714b9746",
+                "access_note": "Requires the operator test mailbox."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "document-quality",
+        "title": "Document quality",
+        "items": [
+          {
+            "label": "Weakly captured Work item",
+            "text": "Daily detected a specific documentation gap on the Meta performance update; the sanitized review result is linked above.",
+            "links": [
+              {
+                "label": "TASK-115 — Meta performance update",
+                "url": "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c8d43a2394281b7b81df4b7a8e663e0"
+              }
+            ]
+          },
+          {
+            "label": "Result and request",
+            "text": "TASK-115 was Processed with a specific Notion comment, and the documentation request was sent through the configured Jun test route.",
+            "links": [
+              {
+                "label": "Processed TASK-115",
+                "url": "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c8d43a2394281b7b81df4b7a8e663e0"
+              },
+              {
+                "label": "Test Gmail to Jun",
+                "url": "https://mail.google.com/mail/u/0/#all/1a03d03e43458a87",
+                "access_note": "Requires the operator test mailbox."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "weekly-knowledge",
+        "title": "SOP, Decision, and Problem accumulation",
+        "items": [
+          {
+            "label": "Weekly report chain",
+            "text": "Weekly finalized the Project → Department → Company roll-up for W34.",
+            "links": [
+              {
+                "label": "Ecom Final Project report",
+                "url": "https://app.notion.com/p/Ecom-Fixes-Week-of-2026-08-17-3c8d43a2394281f8b374e121fd0bb0d6"
+              },
+              {
+                "label": "Deepavali Final Project report",
+                "url": "https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c8d43a2394281618e5fe9c01f11e5fd"
+              },
+              {
+                "label": "CMT W34 report draft",
+                "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+              },
+              {
+                "label": "Ecommerce Department report",
+                "url": "https://app.notion.com/p/Ecommerce-Week-of-2026-08-17-3c8d43a2394281f0aa1bc6622ae61cea"
+              },
+              {
+                "label": "Marketing Department report",
+                "url": "https://app.notion.com/p/Marketing-Week-of-2026-08-17-3c8d43a239428179a263d8fea08e8803"
+              },
+              {
+                "label": "CMT Department report",
+                "url": "https://app.notion.com/p/CMT-Cut-Make-Trim-Week-of-2026-08-17-3c8d43a2394281cab84fe44d2d50d370"
+              },
+              {
+                "label": "W34 Company report",
+                "url": "https://app.notion.com/p/Kamdar-Week-of-2026-08-17-3c8d43a2394281d392bae243475b94e3"
+              }
+            ]
+          },
+          {
+            "label": "Decision, SOP, and problem result",
+            "text": "The Deepavali Decision earned promotion. The four CMT SOP candidates stayed monitored because their gates were not met; a CMT Issue was promoted instead of being left only in the report.",
+            "links": [
+              {
+                "label": "Promoted Decision",
+                "url": "https://app.notion.com/p/Use-one-approved-offer-wording-across-all-Deepavali-campaign-channels-3c8d43a23942812abb37e1d7789923f4"
+              },
+              {
+                "label": "CMT report with retained SOP candidates",
+                "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+              },
+              {
+                "label": "Promoted CMT Issue",
+                "url": "https://app.notion.com/p/Baju-kurung-tech-pack-correction-not-signed-into-the-canonical-record-3c8d43a239428173846ce0aa54086d43"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "note": "Gmail links require the kenji@znrknd.com operator test mailbox. Telegram delivery evidence remains in the receipt because the private bot/home chat has no stable public deep link.",
+    "evaluator_note": "The retained evaluator is not evidence for this W34 run. The operated story is proven by the linked receipts and provider read-backs.",
+    "documents": [
+      {
+        "id": "daily-receipt",
+        "title": "Daily Operating Update receipt — 2026-08-24 (W34)",
+        "body": "Run: operated-2026-W34 / Daily\n\nNotion read-backs\n- CMT Pipeline, Ecom Fixes, and Weekly Meta Ads Updates were updated in the isolated test root.\n- TASK-102 and TASK-115 received specific documentation-quality comments and were marked Processed only after the required Daily review steps.\n- The CMT W34 report draft was updated from the reviewed Work evidence.\n\nProvider read-backs\n- Aisha progress chase: Gmail provider thread 1a03cfea714b9746, routed through the configured operator test mailbox.\n- Jun documentation-quality request: Gmail provider thread 1a03d03e43458a87, routed through the configured operator test mailbox.\n- Darren documentation notice: Telegram provider receipt retained in the private run record.\n\nThis public receipt is a sanitized presentation readout. It contains no profile credentials, local paths, private route identity, or raw provider payload."
+      },
+      {
+        "id": "daily-review-result",
+        "title": "Daily review result — 2026-08-24 (W34)",
+        "body": "Scope: documentation-quality review in the operated W34 Daily run.\n\nDetected condition\n- TASK-115 (Publish weekly Meta performance update) lacked the required concrete supporting documentation.\n\nApplied result\n- A specific Notion comment records what was missing and what to provide.\n- The Work item was marked Processed only after that review record existed.\n- The corresponding request was delivered through the configured Jun Gmail test route and read back by its provider thread.\n\nThis is a sanitized public readout of the review result; the canonical Work page remains the source record."
+      },
+      {
+        "id": "weekly-review-result",
+        "title": "Weekly Operating Review result — 2026-W34",
+        "body": "Run: operated-2026-W34 / Weekly\n\nFinalized report chain\n- Three Final Project reports: Ecom Fixes, Deepavali Marketing, and CMT Pipeline.\n- Three Final Department reports: Ecommerce, Marketing, and CMT (Cut, Make & Trim).\n- One Final Company report: Kamdar Week of 2026-08-17.\n\nKnowledge promotion\n- Promoted: one Deepavali Decision and one CMT Issue, both linked from the story.\n- Retained: four CMT SOP candidates as monitored candidates because their promotion gates were not met. No standalone SOP page was created.\n\nNext cycle\n- W35 attention was carried into CMT Pipeline, Ecom Fixes, and Deepavali Marketing.\n\nThis public receipt is a sanitized presentation readout. It omits private routing details and raw provider payloads."
+      }
+    ]
+  },
+  "entity_links": [
+    {
+      "entity_id": "PERSON-AISHA",
+      "entity_type": "people",
+      "label": "Aisha Rahman",
+      "url": "https://app.notion.com/p/Aisha-Rahman-3c8d43a23942814a9b64ec71ea9898f9"
+    },
+    {
+      "entity_id": "PERSON-JUN",
+      "entity_type": "people",
+      "label": "Jun Wong",
+      "url": "https://app.notion.com/p/Jun-Wong-3c8d43a23942818e8b3ec6dabfe3b7b3"
+    },
+    {
+      "entity_id": "PROJ-CMT-CMT_PIPELINE",
+      "entity_type": "projects",
+      "label": "CMT Pipeline",
+      "url": "https://app.notion.com/p/CMT-Pipeline-3c8d43a2394281afac73d7fecf523a3f"
+    },
+    {
+      "entity_id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
+      "entity_type": "reports",
+      "label": "CMT Pipeline — Week of 2026-08-10",
+      "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-10-3c8d43a2394281beafddc48ab1c199ca"
+    },
+    {
+      "entity_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+      "entity_type": "reports",
+      "label": "CMT Pipeline — Week of 2026-08-17",
+      "url": "https://app.notion.com/p/CMT-Pipeline-Week-of-2026-08-17-3c8d43a2394281a6a44df5b798ee3f98"
+    },
+    {
+      "entity_id": "RPT-PROJ-ECOM-ECOM_FIXES-W34",
+      "entity_type": "reports",
+      "label": "Ecom Fixes — Week of 2026-08-17",
+      "url": "https://app.notion.com/p/Ecom-Fixes-Week-of-2026-08-17-3c8d43a2394281f8b374e121fd0bb0d6"
+    },
+    {
+      "entity_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+      "entity_type": "reports",
+      "label": "Deepavali Marketing — Week of 2026-08-17",
+      "url": "https://app.notion.com/p/Deepavali-Marketing-Week-of-2026-08-17-3c8d43a2394281618e5fe9c01f11e5fd"
+    },
+    {
+      "entity_id": "TASK-101",
+      "entity_type": "work_items",
+      "label": "Confirm corrected baju kurung tech pack",
+      "url": "https://app.notion.com/p/Confirm-corrected-baju-kurung-tech-pack-3c8d43a23942813c8006db6ffc189dd7"
+    },
+    {
+      "entity_id": "TASK-102",
+      "entity_type": "work_items",
+      "label": "Fix missing guest order confirmation",
+      "url": "https://app.notion.com/p/Fix-missing-guest-order-confirmation-3c8d43a2394281208dfce3b5019a232d"
+    },
+    {
+      "entity_id": "TASK-104",
+      "entity_type": "work_items",
+      "label": "Correct and recheck baju kurung sample",
+      "url": "https://app.notion.com/p/Correct-and-recheck-baju-kurung-sample-3c8d43a2394281a5bff2d6cae5b41864"
+    },
+    {
+      "entity_id": "TASK-105",
+      "entity_type": "work_items",
+      "label": "Complete pre-production sample check",
+      "url": "https://app.notion.com/p/Complete-pre-production-sample-check-3c8d43a239428188b36bf49e0e702334"
+    },
+    {
+      "entity_id": "TASK-109",
+      "entity_type": "work_items",
+      "label": "Compare India cotton sample and landed cost",
+      "url": "https://app.notion.com/p/Compare-India-cotton-sample-and-landed-cost-3c8d43a23942810086b3ea366a93250f"
+    },
+    {
+      "entity_id": "TASK-110",
+      "entity_type": "work_items",
+      "label": "Confirm sewing-line capacity",
+      "url": "https://app.notion.com/p/Confirm-sewing-line-capacity-3c8d43a2394281e0ac17fed8092754ed"
+    },
+    {
+      "entity_id": "TASK-115",
+      "entity_type": "work_items",
+      "label": "Publish weekly Meta performance update",
+      "url": "https://app.notion.com/p/Publish-weekly-Meta-performance-update-3c8d43a2394281b7b81df4b7a8e663e0"
+    },
+    {
+      "entity_id": "TASK-116",
+      "entity_type": "work_items",
+      "label": "Publish documented Meta performance control",
+      "url": "https://app.notion.com/p/Publish-documented-Meta-performance-control-3c8d43a23942812084fdfcc1e40dbe56"
+    },
+    {
+      "entity_id": "TASK-201",
+      "entity_type": "meetings",
+      "label": "Deepavali campaign review",
+      "url": "https://app.notion.com/p/Deepavali-campaign-review-3c8d43a239428149b120fccba32f7440"
+    },
+    {
+      "entity_id": "TASK-203",
+      "entity_type": "meetings",
+      "label": "Listing pipeline handoff review",
+      "url": "https://app.notion.com/p/Listing-pipeline-handoff-review-3c8d43a2394281caa9f0f829feb0af7f"
+    }
+  ]
+}
