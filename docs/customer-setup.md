@@ -95,9 +95,10 @@ Download and unzip the repository, or clone it with Git. Then double-click
 `setup.cmd` from the repository folder. Git is optional.
 
 The launcher checks Docker, Linux-container mode, and Compose. It then starts
-the single interactive `setup.py` owner inside the Hermes image. Docker pulls a
-missing image when required; opening an existing installation does not perform
-an unconditional update or pull.
+the packaged `setup.py` entry point inside the Hermes image; that entry point
+dispatches the guided flow in `scripts/setup_cli/`. Docker pulls a missing image
+when required; opening an existing installation does not perform an
+unconditional update or pull.
 Docker Desktop is the only host prerequisite; if it is absent, setup opens the
 official installer page but does not silently install system software.
 
@@ -114,11 +115,11 @@ failed prerequisite:
 
 | Message | What to do |
 | --- | --- |
-| `Docker Desktop is not installed or is not on PATH.` | Install Docker Desktop with its WSL2 backend, then rerun `setup.cmd`. |
-| `Docker Desktop is installed but not running.` | Start Docker Desktop and wait until it reports **Ready**. |
-| `WSL2 is not installed or is not ready.` | Install or finish configuring WSL2, restart Windows if requested, then rerun setup. |
+| `Docker Desktop is required and was not found.` | Install Docker Desktop with its WSL2 backend, then rerun `setup.cmd`. |
+| `Docker Desktop is installed but is not ready.` | Start Docker Desktop and wait until it reports **Ready**. |
+| `WSL2 is required and is not ready.` | Install or finish configuring WSL2, restart Windows if requested, then rerun setup. |
 | `Docker Desktop is running Windows containers.` | Switch Docker Desktop to Linux containers, then rerun setup. |
-| `Docker Compose is unavailable.` | Update Docker Desktop, then rerun setup. |
+| `Docker Compose is unavailable. Update Docker Desktop, then try again.` | Update Docker Desktop, then rerun setup. |
 
 On a new profile, the interactive wizard asks for company details and shows a
 selectable **Data Sources** list. Use the arrow keys to move, Space to select,
@@ -228,7 +229,7 @@ The final panel should show one of these states:
 | State | Meaning | Next action |
 | --- | --- | --- |
 | `READY` | Required setup and checks passed. | Open <http://127.0.0.1:9119>. |
-| `PARTIAL` | Core setup works, but an optional live-comment check did not pass. | Follow the failed lane in the receipt, then rerun setup. |
+| `PARTIAL` | Core setup works, but provider certification was deferred or an optional integration check needs attention. | Follow the named lane in the receipt, then rerun setup and choose **Test integrations** or **Run health check**. |
 | `BLOCKED` | A required check failed. | Fix the named lane before relying on automations. |
 
 > **What you should see:** An **Installation verification** table followed by

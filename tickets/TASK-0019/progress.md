@@ -7,6 +7,20 @@ state: implementation_in_progress
 
 # TASK-0019 progress
 
+## 2026-08-29 — Hermes profile invocation and reproducible generated contracts
+
+- Removed the undocumented `kamdar` executable dependency from report sync.
+  That executable was only a Hermes profile alias; the sync command now invokes
+  `hermes -p vishan-kamdar-ai` directly and supports
+  `KAMDAR_HERMES_PROFILE` when the maintained source profile has a different
+  ID. Customer setup still runs Hermes inside Docker and installs no host CLI.
+- Narrowed the root report-output ignore rule so `schemas/reports/*.zod.mjs`
+  are committed derived contracts. A clean clone can therefore run the
+  model-free `npm run report:sync -- --check` without first reconstructing
+  missing generated state.
+- Added a unit assertion that the interpreter uses the raw Hermes profile
+  command and never depends on a `kamdar` alias.
+
 ## 2026-08-29 — Interactive report-template synchronization
 
 - Added `npm run report:sync`: it scans every report template, compares the

@@ -91,8 +91,10 @@ owners and never import the interactive package.
 
 Windows uses Docker Desktop with Linux containers on its WSL2 backend. The
 customer downloads or clones the repository and starts `setup.cmd`; Hermes,
-Python, and `cloudflared` are supplied by pinned container images rather than
-host installations. The persistent named Docker volume owns the Hermes profile.
+Python, and `cloudflared` are supplied by container images rather than host
+installations. The Hermes image is digest-pinned and `cloudflared` is
+version-pinned in `compose.yaml`. The persistent named Docker volume owns the
+Hermes profile.
 
 Scheduled work uses the official hosted Notion MCP. Real-time comments use the
 profile-owned Notion webhook adapter because inbound events cannot arrive over

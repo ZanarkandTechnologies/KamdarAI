@@ -34,11 +34,16 @@ Use this smaller loop while changing setup, distribution, or webhook code:
 
 ```bash
 python3 -m unittest \
+  tests.test_setup_architecture \
   tests.test_setup_init \
   tests.test_setup_launch \
   tests.test_setup_runtime \
   tests.test_setup_profile \
   tests.test_setup_workspace \
+  tests.test_setup_certify_ux \
+  tests.test_provider_catalog \
+  tests.test_connection_evals \
+  tests.test_composio_session \
   tests.test_distribution \
   tests.test_notion_comment_adapter \
   tests.test_notion_webhook_protocol -v

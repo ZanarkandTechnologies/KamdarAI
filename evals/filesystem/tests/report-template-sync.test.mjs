@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 
-import { syncReportTemplates } from "../../../scripts/sync_report_templates.mjs";
+import { defaultInterpreter, syncReportTemplates } from "../../../scripts/sync_report_templates.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
 const fixtureRoot = resolve(root, "tickets/TASK-0019/artifacts/template-drift-cases");
@@ -36,6 +36,43 @@ function weeklyInterpretation() {
     },
   };
 }
+
+test("default interpretation uses the Hermes profile directly without a project alias", () => {
+  let invocation;
+  const response = JSON.stringify({ interpretation: { template_id: "synthetic", template_version: "1" } });
+  defaultInterpreter({
+    markdown: "# Synthetic",
+    observed: {},
+    profile: "test-company-profile",
+    commandRunner(command, commandArguments, options) {
+      invocation = { command, commandArguments, options };
+      return { status: 0, stdout: response, stderr: "" };
+    },
+  });
+  assert.equal(invocation.command, "hermes");
+  assert.deepEqual(invocation.commandArguments.slice(0, 4), [
+    "-p",
+    "test-company-profile",
+    "--ignore-rules",
+    "--oneshot",
+  ]);
+  assert.equal(invocation.commandArguments.includes("kamdar"), false);
+  assert.equal(invocation.options.encoding, "utf8");
+});
+
+test("missing Hermes CLI reports an actionable interpreter error", () => {
+  assert.throws(
+    () => defaultInterpreter({
+      markdown: "# Synthetic",
+      observed: {},
+      profile: "test-company-profile",
+      commandRunner() {
+        return { status: null, stdout: "", stderr: undefined, error: new Error("spawn hermes ENOENT") };
+      },
+    }),
+    /hermes profile test-company-profile, exit not started.*ENOENT/,
+  );
+});
 
 test("sync detects the changed report automatically, writes Zod, and asks before previewing", async () => {
   const target = workspace();

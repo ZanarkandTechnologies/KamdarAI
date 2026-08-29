@@ -15,7 +15,7 @@ evals/filesystem/.vercel-static/
 evals/viewer/dist/
 runs/
 receipts/
-reports/
+/reports/
 proposals/
 project-memory/
 tasks/

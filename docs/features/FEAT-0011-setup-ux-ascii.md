@@ -101,7 +101,7 @@ Review setup plan
 +--------------------+----------------------------------+
 | Runtime            | Docker Desktop / WSL2            |
 | Storage            | Persistent Hermes profile        |
-| Notion MCP         | Configure or Disabled            |
+| Provider MCPs      | Selected provider connections    |
 | Real-time comments | Configure or Set up later        |
 | Automations        | Daily + Weekly                    |
 | Report template    | Reviewed repository template     |

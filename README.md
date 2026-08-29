@@ -86,7 +86,8 @@ docker compose run --rm setup verify --live
 
 | Path | Purpose |
 | --- | --- |
-| `setup.py` | State-aware setup, maintenance, and verification wizard |
+| `setup.py` | Stable dependency bootstrap and public setup command entry point |
+| `scripts/setup_cli/` | Guided setup, maintenance, certification, and verification flows |
 | `workspace.hermes.md` | Reviewed company configuration |
 | `automations/` | Daily and Weekly automation contracts |
 | `templates/` | Project and report templates |
@@ -106,12 +107,19 @@ Report maintainers edit the Markdown files in `templates/`, then run:
 npm run report:sync
 ```
 
-The command detects changed report templates by content hash, asks the AI to
+The maintainer command uses the installed Hermes CLI directly with profile
+`vishan-kamdar-ai`; set `KAMDAR_HERMES_PROFILE` only when the maintained source
+profile has a different ID. A separate `kamdar` alias is neither required nor
+installed by customer setup. Customer setup continues to use the Hermes CLI
+inside Docker, so customers do not install Hermes on Windows.
+
+The command detects changed report templates by content hash, asks Hermes to
 interpret only those templates, shows the contract diff, and updates the
-generated Zod modules in `schemas/reports/`. It then asks before creating each
-synthetic preview in the private, ignored `.reports-preview/` directory. Use
-`npm run report:sync -- --check` for a model-free, non-writing drift check or
-`--preview` when an explicit non-interactive run should generate previews.
+committed generated Zod modules in `schemas/reports/`. It then asks before
+creating each synthetic preview in the private, ignored `.reports-preview/`
+directory. Use `npm run report:sync -- --check` for a model-free, non-writing
+drift check or `--preview` when an explicit non-interactive run should generate
+previews.
 
 Then run:
 
