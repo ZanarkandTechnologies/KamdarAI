@@ -13,8 +13,8 @@ from typing import Any
 from unittest.mock import patch
 
 
-PROJECT = Path(__file__).resolve().parents[3]
-SCRIPT = PROJECT / "skills/setup-kamdar-workspace/scripts/setup_workspace.py"
+PROJECT = Path(__file__).resolve().parents[1]
+SCRIPT = PROJECT / "scripts/setup_workspace.py"
 SPEC = importlib.util.spec_from_file_location("setup_workspace", SCRIPT)
 assert SPEC and SPEC.loader
 SETUP = importlib.util.module_from_spec(SPEC)
@@ -43,8 +43,6 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertIn("workspace:.hermes.md", receipt["pending"])
             self.assertTrue(any(item.startswith("workspace:templates/")
                                 for item in receipt["pending"]))
-            self.assertTrue(any(item.startswith("profile:skills/setup-kamdar-workspace/")
-                                for item in receipt["pending"]))
             self.assertIn("profile:plugins/platforms/notion/plugin.yaml", receipt["pending"])
             self.assertFalse((workspace / ".hermes.md").exists())
             self.assertEqual(receipt["deletion_count"], 0)
@@ -57,7 +55,6 @@ class SetupWorkspaceTests(unittest.TestCase):
             source.mkdir()
             (source / "automations").mkdir()
             (source / "templates").mkdir()
-            (source / "skills").mkdir()
             workspace.mkdir()
             profile_home.mkdir()
             config = source / "workspace.hermes.md"
@@ -81,7 +78,6 @@ class SetupWorkspaceTests(unittest.TestCase):
             (source / "schemas/automations").mkdir(parents=True)
             (source / "evals/rubrics").mkdir(parents=True)
             (source / "templates").mkdir()
-            (source / "skills/example").mkdir(parents=True)
             (source / "plugins/platforms/notion").mkdir(parents=True)
             workspace.mkdir(parents=True)
             config = source / "workspace.hermes.md"
@@ -90,7 +86,6 @@ class SetupWorkspaceTests(unittest.TestCase):
             (source / "schemas/automations/daily.mjs").write_text("schema\n", encoding="utf-8")
             (source / "evals/rubrics/quality.md").write_text("rubric\n", encoding="utf-8")
             (source / "templates/project.md").write_text("project\n", encoding="utf-8")
-            (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
             (source / "plugins/platforms/notion/plugin.yaml").write_text("name: notion-platform\n", encoding="utf-8")
             with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config):
                 code = SETUP.run(workspace, profile_home, apply=True)
@@ -100,11 +95,85 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertEqual((workspace / "schemas/automations/daily.mjs").read_text(encoding="utf-8"), "schema\n")
             self.assertEqual((workspace / "evals/rubrics/quality.md").read_text(encoding="utf-8"), "rubric\n")
             self.assertEqual((workspace / "templates/project.md").read_text(encoding="utf-8"), "project\n")
-            self.assertEqual((profile_home / "skills/example/SKILL.md").read_text(encoding="utf-8"), "# Example\n")
             self.assertEqual(
                 (profile_home / "plugins/platforms/notion/plugin.yaml").read_text(encoding="utf-8"),
                 "name: notion-platform\n",
             )
+
+    def test_apply_retires_only_legacy_setup_skill_directories(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            profile_home = root / "profile"
+            workspace = profile_home / "workspace"
+            for directory in (
+                source / "automations",
+                source / "schemas/automations",
+                source / "evals/rubrics",
+                source / "templates",
+                source / "plugins",
+                workspace,
+            ):
+                directory.mkdir(parents=True, exist_ok=True)
+            config = source / "workspace.hermes.md"
+            config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
+            retired = (
+                profile_home / "skills/setup-kamdar-workspace",
+                profile_home / "skills/notion-webhook-onboarding",
+            )
+            preserved = profile_home / "skills/customer-owned"
+            for directory in (*retired, preserved):
+                directory.mkdir(parents=True)
+                (directory / "SKILL.md").write_text("owned\n", encoding="utf-8")
+
+            preview = io.StringIO()
+            with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config), redirect_stdout(preview):
+                self.assertEqual(SETUP.run(workspace, profile_home, apply=False), 0)
+            preview_receipt = json.loads(preview.getvalue())
+            self.assertEqual(
+                preview_receipt["pending_retirements"],
+                ["skills/setup-kamdar-workspace", "skills/notion-webhook-onboarding"],
+            )
+            self.assertTrue(all(path.is_dir() for path in retired))
+
+            applied = io.StringIO()
+            with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config), redirect_stdout(applied):
+                self.assertEqual(SETUP.run(workspace, profile_home, apply=True), 0)
+            receipt = json.loads(applied.getvalue())
+            self.assertEqual(receipt["deletion_count"], 2)
+            self.assertFalse(any(path.exists() for path in retired))
+            self.assertTrue((preserved / "SKILL.md").is_file())
+
+    def test_retired_skill_symlink_blocks_all_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            profile_home = root / "profile"
+            workspace = profile_home / "workspace"
+            for directory in (
+                source / "automations",
+                source / "schemas/automations",
+                source / "evals/rubrics",
+                source / "templates",
+                source / "plugins",
+                workspace,
+            ):
+                directory.mkdir(parents=True, exist_ok=True)
+            config = source / "workspace.hermes.md"
+            config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
+            outside = root / "outside"
+            outside.mkdir()
+            legacy = profile_home / "skills/setup-kamdar-workspace"
+            legacy.parent.mkdir()
+            legacy.symlink_to(outside, target_is_directory=True)
+            output = io.StringIO()
+            with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config), redirect_stdout(output):
+                self.assertEqual(SETUP.run(workspace, profile_home, apply=True), 2)
+            self.assertEqual(
+                json.loads(output.getvalue())["blocker"],
+                "retired_path_must_not_be_symlink:skills/setup-kamdar-workspace",
+            )
+            self.assertFalse((workspace / ".hermes.md").exists())
 
     def test_apply_preflights_all_destinations_before_copying(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -115,13 +184,11 @@ class SetupWorkspaceTests(unittest.TestCase):
             source.mkdir(parents=True)
             (source / "automations").mkdir()
             (source / "templates").mkdir()
-            (source / "skills/example").mkdir(parents=True)
             (workspace / "automations/daily.md").mkdir(parents=True)
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
             (source / "templates/project.md").write_text("project\n", encoding="utf-8")
-            (source / "skills/example/SKILL.md").write_text("# Example\n", encoding="utf-8")
             with patch.object(SETUP, "PROJECT", source), patch.object(SETUP, "CONFIG", config):
                 code = SETUP.run(workspace, profile_home, apply=True)
             self.assertEqual(code, 2)
@@ -163,7 +230,6 @@ class SetupWorkspaceTests(unittest.TestCase):
             (profile_home / "schemas/automations").mkdir(parents=True)
             (profile_home / "evals/rubrics").mkdir(parents=True)
             (profile_home / "templates").mkdir()
-            (profile_home / "skills/example").mkdir(parents=True)
             (profile_home / "plugins/platforms/notion").mkdir(parents=True)
             workspace.mkdir()
             config = profile_home / "workspace.hermes.md"

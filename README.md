@@ -10,6 +10,11 @@ retain that name while the generic product is proven here. Those names are
 source compatibility details, not product requirements. The live Hermes
 profile is stored separately and is never committed.
 
+For now, the distribution name, profile name, Compose resources, and legacy
+environment variables are the rendered Kamdar client-pack identity. Renaming
+those deployment identifiers belongs to the later HermesCorp migration; the
+setup workflow and product-facing contracts remain company-neutral here.
+
 ## Install on Windows
 
 You need Windows, Docker Desktop, and the WSL2 backend.
@@ -85,7 +90,7 @@ docker compose run --rm setup verify --live
 | `workspace.hermes.md` | Reviewed company configuration |
 | `automations/` | Daily and Weekly automation contracts |
 | `templates/` | Project and report templates |
-| `skills/` and `plugins/` | Hermes capabilities installed into the profile |
+| `plugins/` | Hermes connectors installed into the profile |
 | `evals/` | Network-free feature tests and expected results |
 | `scripts/` and `tests/` | Setup helpers and repository checks |
 
@@ -99,14 +104,15 @@ Edit files here first, then run:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 -m unittest discover -s skills/setup-kamdar-workspace/tests -v
-python3 -m unittest discover -s skills/notion-webhook-onboarding/tests -v
 node --test evals/filesystem/tests/*.test.mjs
 python3 scripts/validate_company_context.py --context workspace.hermes.md
+python3 scripts/run_installed_evals.py --root .
 ```
 
 Local evals use packaged fixtures and make no provider calls. Private Notion
 captures and generated private seeds must remain outside the repository.
+The [autonomous testing runbook](docs/autonomous-testing.md) defines the safe
+default loop, targeted setup checks, live-test gates, and required evidence.
 
 For the detailed setup screens and recovery paths, see
 [`docs/features/FEAT-0011-setup-ux-ascii.md`](docs/features/FEAT-0011-setup-ux-ascii.md).

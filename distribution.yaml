@@ -1,6 +1,6 @@
 name: kamdar-ai
-version: 1.0.2
-description: "Kamdar Company OS workspace, automations, onboarding, and Notion connector"
+version: 1.6.0
+description: "Kamdar Company OS workspace, provider catalog, automations, onboarding, and connectors"
 hermes_requires: ">=0.20.4"
 author: "Zanarkand Technologies"
 
@@ -10,24 +10,30 @@ env_requires:
   - name: NOTION_TOKEN
     description: "Notion integration token for Company OS data access"
     required: false
-  - name: NGROK_AUTHTOKEN
-    description: "ngrok token for the optional Notion comment webhook"
-    required: false
 
 # This is the client installation boundary. The repository remains a complete
 # development/evaluation harness, while Hermes copies only these runtime files.
 distribution_owned:
   - distribution.yaml
-  - workspace.hermes.md
+  - setup.py
+  - setup.cmd
+  - compose.yaml
+  - scripts/setup_runtime.py
+  - scripts/setup_workspace.py
+  - scripts/setup_profile.py
+  - scripts/provider_catalog.py
+  - scripts/composio_session.py
+  - scripts/run_connection_evals.py
+  - scripts/run_installed_evals.py
+  - catalog/data-sources
+  - evals/daily
+  - evals/weekly
+  - evals/meeting-intake
+  - workspace.hermes.template.md
   - automations
   - schemas/automations
   - evals/rubrics/end-user-artifact-quality.md
   - templates
-  - skills/setup-kamdar-workspace/SKILL.md
-  - skills/setup-kamdar-workspace/scripts/setup_workspace.py
-  - skills/setup-kamdar-workspace/scripts/setup_profile.py
-  - skills/notion-webhook-onboarding/SKILL.md
-  - skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py
   - plugins/platforms/notion/__init__.py
   - plugins/platforms/notion/adapter.py
   - plugins/platforms/notion/api.py

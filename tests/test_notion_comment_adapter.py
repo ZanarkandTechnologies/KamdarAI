@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
@@ -56,6 +57,10 @@ class NotionCommentAdapterTests(unittest.IsolatedAsyncioTestCase):
         instance.handle_message = AsyncMock()
         instance.state = adapter.WebhookState(Path(self.state_directory.name) / "state.json")
         return instance
+
+    def test_default_trigger_is_company_neutral(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(adapter.api.comment_trigger(), "@hermes")
 
     async def dispatch(
         self,

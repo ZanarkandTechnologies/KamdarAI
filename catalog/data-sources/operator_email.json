@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "operator_email",
+  "label": "Operator email",
+  "providers": [
+    {
+      "id": "gmail",
+      "label": "Gmail via Composio",
+      "mcp": {
+        "source": "composio_session",
+        "name": "composio-google",
+        "toolkit": "gmail",
+        "tools": [
+          "GMAIL_GET_PROFILE",
+          "GMAIL_FETCH_EMAILS",
+          "GMAIL_SEND_EMAIL"
+        ]
+      },
+      "test": {
+        "risk": "irreversible",
+        "requires_confirmation": true,
+        "prompt": "Use only the configured Composio Gmail tools. Confirm the authenticated Gmail profile exactly matches the configured isolated test inbox {{source}}. Send exactly one plain-text email from that account to the same address with subject '[Kamdar connection test {{run_id}}] Gmail' and a body containing the same run ID. Fetch that message after sending and report the authenticated address, message ID, thread ID, exact subject, recipient, and read-back result. Do not send to any other address and do not modify any existing message.",
+        "expected_output": "The configured Gmail account is confirmed, one self-addressed setup-test email is sent, and the same message is fetched successfully.",
+        "assertions": [
+          "The authenticated Gmail profile exactly matches the configured isolated test inbox.",
+          "Exactly one email is sent and its only recipient is that same inbox.",
+          "The response reports the sent message ID and thread ID.",
+          "The sent message is fetched and its subject and run ID exactly match the request."
+        ]
+      }
+    }
+  ]
+}

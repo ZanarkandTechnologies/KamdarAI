@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+import subprocess
+import sys
+import tempfile
+import unittest
+import shutil
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ANSWERS = "\n".join(
+    (
+        "Acme",
+        "Operations workspace",
+        "Asia/Kuala_Lumpur",
+        "all",
+        "linear", "https://linear.app/acme/projects",
+        "linear", "https://linear.app/acme/tasks",
+        "notion", "https://notion.so/acme/people",
+        "notion", "https://notion.so/acme/knowledge",
+        "notion", "https://notion.so/acme/reports",
+        "gmail", "ops@example.invalid",
+        "telegram", "company-operators",
+        "y",
+    )
+)
+
+
+class SetupInitTests(unittest.TestCase):
+    @staticmethod
+    def copy_setup(target: Path) -> None:
+        for name in ("setup.py", "workspace.hermes.template.md"):
+            (target / name).write_bytes((ROOT / name).read_bytes())
+        (target / "scripts").mkdir()
+        (target / "scripts" / "provider_catalog.py").write_bytes(
+            (ROOT / "scripts" / "provider_catalog.py").read_bytes()
+        )
+        shutil.copytree(ROOT / "catalog", target / "catalog")
+
+    def run_setup(
+        self, target: Path, command: str, answers: str = ANSWERS, *arguments: str
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, str(target / "setup.py"), command, *arguments],
+            input=answers,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    def test_selector_uses_public_prompt_toolkit_api(self) -> None:
+        source = (ROOT / "setup.py").read_text(encoding="utf-8")
+        self.assertIn("from prompt_toolkit.widgets import CheckboxList", source)
+        self.assertNotIn("hermes_cli.curses_ui", source)
+        self.assertNotIn("import curses", source)
+
+    def test_interactive_init_and_reconfigure_preserve_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+
+            first = self.run_setup(target, "init")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            workspace = target / "workspace.hermes.md"
+            content = workspace.read_text(encoding="utf-8")
+            self.assertIn('company_name: "Acme"', content)
+            self.assertIn("| `projects` | linear | https://linear.app/acme/projects |", content)
+            self.assertNotIn("REPLACE_ME", content)
+            self.assertIn("status: draft", content)
+
+            content = content.replace("# Company Workspace", "# Owner-edited Workspace")
+            workspace.write_text(content, encoding="utf-8")
+            second = self.run_setup(target, "configure", "\n" * 8)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertIn("# Owner-edited Workspace", workspace.read_text(encoding="utf-8"))
+
+    def test_configure_preserves_owner_content(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            first = self.run_setup(target, "init")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            workspace = target / "workspace.hermes.md"
+            workspace.write_text(
+                workspace.read_text(encoding="utf-8").replace(
+                    "# Company Workspace", "# Owner-edited Workspace"
+                ),
+                encoding="utf-8",
+            )
+            result = self.run_setup(target, "configure", "\n" * 8)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("# Owner-edited Workspace", workspace.read_text(encoding="utf-8"))
+
+    def test_init_reuses_existing_workspace_values(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            first = self.run_setup(target, "init")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            workspace = target / "workspace.hermes.md"
+            result = self.run_setup(target, "init", "\n" * 8)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Using existing", result.stdout)
+            self.assertIn('company_name: "Acme"', workspace.read_text(encoding="utf-8"))
+
+    def test_explicit_workspace_starts_from_company_neutral_template(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            (target / "workspace.hermes.md").write_text(
+                'company_name: "Existing Company"\n', encoding="utf-8"
+            )
+            clean = target / "new-company.md"
+            result = self.run_setup(
+                target, "init", ANSWERS, "--workspace", str(clean)
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn("Existing Company", result.stdout)
+            self.assertIn('company_name: "Acme"', clean.read_text(encoding="utf-8"))
+            self.assertNotIn("kamdar", (target / "workspace.hermes.template.md").read_text().lower())
+
+    def test_declining_review_writes_nothing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            answers = ANSWERS.rsplit("\n", 1)[0] + "\nn"
+            result = self.run_setup(target, "init", answers)
+            self.assertEqual(result.returncode, 1)
+            self.assertFalse((target / "workspace.hermes.md").exists())
+            self.assertIn("No changes written", result.stdout)
+
+    def test_data_source_selection_only_prompts_for_selected_roles(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            answers = "\n".join((
+                "Acme", "Operations workspace", "Asia/Kuala_Lumpur",
+                "1,5",
+                "linear", "https://linear.app/acme/projects",
+                "notion", "https://notion.so/acme/reports",
+                "gmail", "ops@example.invalid",
+                "telegram", "company-operators", "y",
+            ))
+            result = self.run_setup(target, "init", answers)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            content = (target / "workspace.hermes.md").read_text(encoding="utf-8")
+            self.assertIn("| `projects` | linear |", content)
+            self.assertIn("| `reports` | notion |", content)
+            self.assertIn("| `tasks` | — | — |", content)
+            self.assertNotIn("REPLACE_ME", content)
+
+    def test_data_sources_can_be_skipped_and_configured_later(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            answers = "\n".join((
+                "Acme", "Operations workspace", "Asia/Kuala_Lumpur",
+                "",
+                "gmail", "ops@example.invalid",
+                "telegram", "company-operators", "y",
+            ))
+            result = self.run_setup(target, "init", answers)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            content = (target / "workspace.hermes.md").read_text(encoding="utf-8")
+            self.assertIn("Data sources skipped", result.stdout)
+            self.assertIn("| `projects` | — | — |", content)
+            self.assertNotIn("REPLACE_ME", content)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "reports",
+  "label": "Reports",
+  "providers": [
+    {
+      "id": "notion",
+      "label": "Notion",
+      "mcp": {"source": "hermes_catalog", "name": "notion"},
+      "test": {
+        "risk": "reversible",
+        "requires_confirmation": true,
+        "prompt": "Use the configured Notion MCP tools. Fetch the configured Reports destination at {{source}}. Create one test report titled '[Kamdar connection test {{run_id}}] Reports' inside that destination, fetch it after creation, archive it after the read-back succeeds, and report the destination identity, created page ID and URL, exact fetched title, and cleanup result. Do not change any existing report.",
+        "expected_output": "The configured Reports destination is readable and writable and one isolated report is created, fetched, and archived.",
+        "assertions": [
+          "The configured Reports destination is fetched successfully.",
+          "The response reports one created report ID and URL.",
+          "The report is fetched after creation and its title exactly matches the requested title.",
+          "The test report is archived and no existing report is changed."
+        ]
+      }
+    },
+    {
+      "id": "google-drive",
+      "label": "Google Drive via Composio",
+      "mcp": {
+        "source": "composio_session",
+        "name": "composio-google",
+        "toolkit": "googledrive",
+        "tools": [
+          "GOOGLEDRIVE_GET_ABOUT",
+          "GOOGLEDRIVE_FIND_FILE",
+          "GOOGLEDRIVE_CREATE_FILE_FROM_TEXT",
+          "GOOGLEDRIVE_GET_FILE_METADATA",
+          "GOOGLEDRIVE_TRASH_FILE"
+        ]
+      },
+      "test": {
+        "risk": "reversible",
+        "requires_confirmation": true,
+        "prompt": "Use only the configured Composio Google Drive tools. Confirm the connected Drive identity, inspect the configured Reports folder at {{source}}, create exactly one text file named '[Kamdar connection test {{run_id}}] Report.txt' in that folder, fetch its metadata, move that test file to trash, and report the account identity, file ID, URL, exact name, parent folder, and cleanup result. Do not change any existing file.",
+        "expected_output": "The configured Google Drive account and Reports folder are reachable and writable and one isolated report file is created, read back, and moved to trash.",
+        "assertions": [
+          "The connected Google Drive identity and configured Reports folder are confirmed.",
+          "The response reports one created file ID and URL.",
+          "The file metadata is fetched and its exact name and parent folder match the request.",
+          "The test file is moved to trash and no existing file is changed."
+        ]
+      }
+    }
+  ]
+}

@@ -18,9 +18,12 @@ class AutomationContractTests(unittest.TestCase):
         self.assertIn("DailyReviewResultSchema", daily)
         self.assertIn("weekly-review-result.zod.mjs", weekly)
 
-    def test_only_setup_and_onboarding_skills_remain(self) -> None:
-        skills = sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir())
-        self.assertEqual(skills, ["notion-webhook-onboarding", "setup-kamdar-workspace"])
+    def test_runtime_setup_does_not_depend_on_agent_skills(self) -> None:
+        skills = ROOT / "skills"
+        packages = sorted(path.parent.name for path in skills.glob("*/SKILL.md")) if skills.exists() else []
+        self.assertEqual(packages, [])
+        self.assertTrue((ROOT / "scripts/setup_profile.py").is_file())
+        self.assertTrue((ROOT / "scripts/setup_workspace.py").is_file())
 
 
 if __name__ == "__main__":

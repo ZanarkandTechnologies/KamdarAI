@@ -143,7 +143,7 @@ Done. Sheet updated.
 
 ## 2. Chat with the agent through Notion ticket comments
 
-Start a new discussion with the configured mention, such as `@vishanai`. After
+Start a new discussion with the configured mention, such as `@hermes`. After
 Hermes joins that open discussion, follow-up comments in the same thread do not
 need the tag. A separate discussion still requires the mention. Keep the
 conversation on the source ticket so the page, question, answer, and evidence
@@ -152,7 +152,7 @@ stay together.
 Useful requests:
 
 ```text
-@vishanai review this ticket for completion quality. Tell me only what is
+@hermes review this ticket for completion quality. Tell me only what is
 missing, why it matters, and which section I should update.
 ```
 
@@ -162,7 +162,7 @@ Re-review the page and tell me whether anything required is still missing.
 ```
 
 ```text
-@vishanai summarize the current blocker and propose the next owner action. Do
+@hermes summarize the current blocker and propose the next owner action. Do
 not change the ticket.
 ```
 
@@ -198,7 +198,7 @@ The safe interaction is proposal first. Put the request on the relevant Project
 or source Work page and include the desired outcome, owner, timing, and evidence.
 
 ```text
-@vishanai draft a Task for the remaining two store comparisons.
+@hermes draft a Task for the remaining two store comparisons.
 Project: Penang Replenishment.
 Owner: Nur.
 Due: 28 August 2026.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preview or install reviewed Kamdar sources into a separate Hermes runtime."""
+"""Preview or install reviewed Company OS sources into a Hermes runtime."""
 
 from __future__ import annotations
 
@@ -13,11 +13,14 @@ import tempfile
 from pathlib import Path
 
 
-PACKAGE = Path(__file__).resolve().parents[1]
-PROJECT = PACKAGE.parents[1]
+PROJECT = Path(__file__).resolve().parents[1]
 CONFIG = PROJECT / "workspace.hermes.md"
 EXCLUDED_NAMES = {".DS_Store", "__pycache__"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+RETIRED_PROFILE_PATHS = (
+    Path("skills/setup-kamdar-workspace"),
+    Path("skills/notion-webhook-onboarding"),
+)
 
 
 class SetupError(Exception):
@@ -78,7 +81,6 @@ def source_files() -> list[tuple[Path, str, Path]]:
         ("workspace", PROJECT / "schemas" / "automations", Path("schemas/automations")),
         ("workspace", PROJECT / "evals" / "rubrics", Path("evals/rubrics")),
         ("workspace", PROJECT / "templates", Path("templates")),
-        ("profile", PROJECT / "skills", Path("skills")),
         ("profile", PROJECT / "plugins", Path("plugins")),
     ):
         for source in sorted(source_root.rglob("*")):
@@ -112,7 +114,7 @@ def check_destination(destination: Path, root: Path) -> None:
 
 def atomic_copy(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary = tempfile.mkstemp(prefix=".kamdar-setup-", dir=destination.parent)
+    descriptor, temporary = tempfile.mkstemp(prefix=".company-os-setup-", dir=destination.parent)
     os.close(descriptor)
     temporary_path = Path(temporary)
     try:
@@ -120,6 +122,19 @@ def atomic_copy(source: Path, destination: Path) -> None:
         os.replace(temporary_path, destination)
     finally:
         temporary_path.unlink(missing_ok=True)
+
+
+def retired_profile_paths(profile_home: Path) -> list[tuple[Path, Path]]:
+    retired: list[tuple[Path, Path]] = []
+    for relative in RETIRED_PROFILE_PATHS:
+        destination = profile_home / relative
+        if destination.is_symlink():
+            raise SetupError(f"retired_path_must_not_be_symlink:{relative.as_posix()}")
+        if destination.exists():
+            if not destination.is_dir():
+                raise SetupError(f"retired_path_must_be_directory:{relative.as_posix()}")
+            retired.append((destination, relative))
+    return retired
 
 
 def run(
@@ -140,6 +155,7 @@ def run(
         if workspace == profile_home or inside(profile_home, workspace):
             raise SetupError("profile_home_must_not_be_workspace_or_its_child")
         status = context_status()
+        retired = retired_profile_paths(profile_home)
         changes: list[tuple[Path, Path, str, Path]] = []
         for source, owner, relative in source_files():
             root = workspace if owner == "workspace" else profile_home
@@ -155,13 +171,17 @@ def run(
         if apply:
             for source, destination, _, _ in changes:
                 atomic_copy(source, destination)
+            for destination, _ in retired:
+                shutil.rmtree(destination)
         emit(
-            "configured" if apply else ("changes_pending" if changes else "in_sync"),
+            "configured" if apply else ("changes_pending" if changes or retired else "in_sync"),
             mode="apply" if apply else "preview",
             context_status=status,
             changed=public_changes if apply else [],
             pending=[] if apply else public_changes,
-            deletion_count=0,
+            retired=[relative.as_posix() for _, relative in retired] if apply else [],
+            pending_retirements=[] if apply else [relative.as_posix() for _, relative in retired],
+            deletion_count=len(retired) if apply else 0,
             source_project=str(PROJECT),
         )
         return 0
@@ -174,7 +194,11 @@ def parser() -> argparse.ArgumentParser:
     command = argparse.ArgumentParser(description=__doc__)
     command.add_argument("--workspace", type=Path, required=True)
     command.add_argument("--profile-home", type=Path, required=True)
-    command.add_argument("--apply", action="store_true", help="Copy changed allowlisted files; never deletes files.")
+    command.add_argument(
+        "--apply",
+        action="store_true",
+        help="Copy allowlisted files and remove only the two retired setup skill directories.",
+    )
     command.add_argument(
         "--installed-distribution",
         action="store_true",

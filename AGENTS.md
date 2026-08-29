@@ -26,11 +26,9 @@ inputs here; install reviewed inputs into the separate runtime explicitly.
 - `docs/features/` and `docs/systems/`: stable capability contracts and the
   Company OS composition map. Eval rows reference feature IDs; features do not
   create separate runtime scans.
-- `templates/`: Kamdar-owned record/report contracts installed into the runtime
+- `templates/`: record/report contracts installed into the runtime
   workspace. Canonical imports retain an upstream template ID and version.
-- `skills/`: Kamdar-owned skill source, including the explicit workspace setup
-  path. Installed profile copies are derived artifacts.
-- `plugins/`: Kamdar-owned Hermes platform connector source. Installed profile
+- `plugins/`: Hermes platform connector source. Installed profile
   copies are derived artifacts and update only through the setup route.
 - `evals/`: behavioral cases, filesystem assertions, local authoring UI, and
   run tooling. Generated eval runs are ignored.
@@ -42,10 +40,10 @@ here.
 
 ## Development flow
 
-1. Edit the workspace context, automations, templates, skills, and eval cases in this repository first.
+1. Edit the workspace context, automations, templates, plugins, and eval cases in this repository first.
 2. Run the narrow deterministic tests and filesystem eval tests locally.
 3. Preview source-to-runtime changes with
-   `skills/setup-kamdar-workspace/scripts/setup_workspace.py`.
+   `scripts/setup_workspace.py`.
 4. Apply only after `workspace.hermes.md` has owner-approved status.
    The setup command copies an allowlist and never deletes runtime files.
 5. Set `terminal.cwd` with Hermes' native config command, then verify behavior
@@ -64,7 +62,7 @@ copies and treat them as co-equal sources.
 - `.gitignore` is cleanup protection, not the runtime isolation boundary.
 - External Notion, Drive, Gmail, messaging, scheduling, and webhook writes
   require their own bounded integration checks and the authority stated in the
-  automation or skill contract.
+  automation or setup contract.
 - Preserve unknown live-workspace files. Archive or delete them only through a
   separately approved cleanup.
 
@@ -72,9 +70,11 @@ copies and treat them as co-equal sources.
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 -m unittest discover -s skills/setup-kamdar-workspace/tests -v
-python3 -m unittest discover -s skills/notion-webhook-onboarding/tests -v
 node --test evals/filesystem/tests/*.test.mjs
 python3 scripts/validate_company_context.py --context workspace.hermes.md
-kamdar config get terminal.cwd
+python3 scripts/run_installed_evals.py --root .
+hermes config get terminal.cwd
 ```
+
+Follow `docs/autonomous-testing.md`. Network and provider writes remain explicit
+human gates; autonomous verification is offline by default.

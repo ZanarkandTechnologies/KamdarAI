@@ -14,7 +14,8 @@ category: platform
 public: true
 surfaces:
   - distribution.yaml
-  - skills/setup-kamdar-workspace
+  - scripts/setup_workspace.py
+  - scripts/setup_profile.py
   - evals
 source_refs:
   - ../prd.md

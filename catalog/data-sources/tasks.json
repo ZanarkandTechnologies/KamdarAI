@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "tasks",
+  "label": "Tasks",
+  "providers": [
+    {
+      "id": "notion",
+      "label": "Notion",
+      "mcp": {"source": "hermes_catalog", "name": "notion"},
+      "test": {
+        "risk": "read_only",
+        "requires_confirmation": false,
+        "prompt": "Use the configured Notion MCP tools to fetch the configured Tasks source at {{source}}. Report its provider identity, title, URL, available structure, and whether at least one record or an honestly empty source was read. Make no changes.",
+        "expected_output": "The configured Notion Tasks source is fetched and described without a write.",
+        "assertions": [
+          "The response identifies the fetched source and URL.",
+          "The source structure or an honestly empty result is reported.",
+          "No provider mutation is attempted."
+        ]
+      }
+    },
+    {
+      "id": "linear",
+      "label": "Linear",
+      "mcp": {"source": "hermes_catalog", "name": "linear"},
+      "test": {
+        "risk": "read_only",
+        "requires_confirmation": false,
+        "prompt": "Use the configured Linear MCP tools to fetch the configured Tasks source or team at {{source}}. Report its identity, URL, team, and whether at least one issue or an honestly empty source was read. Make no changes.",
+        "expected_output": "The configured Linear Tasks source is fetched and described without a write.",
+        "assertions": [
+          "The response identifies the fetched Linear source or team.",
+          "At least one issue or an honestly empty result is reported.",
+          "No provider mutation is attempted."
+        ]
+      }
+    }
+  ]
+}

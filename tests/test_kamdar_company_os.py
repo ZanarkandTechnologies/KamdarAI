@@ -10,16 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class KamdarCompanyOSTests(unittest.TestCase):
     def test_repository_uses_lean_source_layout(self) -> None:
-        for expected in ("automations", "docs", "templates", "skills", "evals", "scripts", "tests"):
+        for expected in ("automations", "docs", "templates", "evals", "scripts", "tests"):
             self.assertTrue((ROOT / expected).is_dir(), expected)
         for removed in ("profile", "context", "deploy", "hermes-distribution"):
             self.assertFalse((ROOT / removed).exists(), removed)
-        self.assertTrue((ROOT / "skills/setup-kamdar-workspace/SKILL.md").is_file())
-        self.assertTrue((ROOT / "skills/notion-webhook-onboarding/SKILL.md").is_file())
-        self.assertEqual(
-            sorted(path.name for path in (ROOT / "skills").iterdir() if path.is_dir()),
-            ["notion-webhook-onboarding", "setup-kamdar-workspace"],
-        )
+        self.assertFalse(list((ROOT / "skills").glob("*/SKILL.md")))
+        self.assertTrue((ROOT / "scripts/setup_profile.py").is_file())
+        self.assertTrue((ROOT / "scripts/setup_workspace.py").is_file())
         self.assertTrue((ROOT / "workspace.hermes.md").is_file())
         self.assertFalse((ROOT / "configs").exists())
         self.assertFalse((ROOT / "hermes-profile.yaml").exists())

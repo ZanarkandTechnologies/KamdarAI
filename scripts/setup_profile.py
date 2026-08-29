@@ -1,32 +1,34 @@
 #!/usr/bin/env python3
-"""Install a Kamdar distribution workspace and reconcile its native cron jobs."""
+"""Install a Company OS workspace and reconcile its native Hermes jobs."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 
-PACKAGE = Path(__file__).resolve().parents[1]
-SOURCE_ROOT = PACKAGE.parents[1]
-SETUP_WORKSPACE = PACKAGE / "scripts" / "setup_workspace.py"
+SOURCE_ROOT = Path(__file__).resolve().parents[1]
+SETUP_WORKSPACE = SOURCE_ROOT / "scripts" / "setup_workspace.py"
 NOTION_PLUGIN_NAME = "notion-platform"
 NOTION_PLUGIN_KEY = "platforms/notion"
 
 SCHEDULES = (
     {
-        "name": "Kamdar Daily Operating Update",
+        "name": "Company OS Daily Operating Update",
+        "legacy_names": ("Kamdar Daily Operating Update",),
         "schedule": "0 8 * * 1-5",
         "contract": "automations/daily-operating-update.md",
         "cadence": "Daily",
     },
     {
-        "name": "Kamdar Weekly Operating Review",
+        "name": "Company OS Weekly Operating Review",
+        "legacy_names": ("Kamdar Weekly Operating Review",),
         "schedule": "0 18 * * 5",
         "contract": "automations/weekly-operating-review.md",
         "cadence": "Weekly",
@@ -113,13 +115,38 @@ def read_jobs(profile_home: Path) -> list[dict[str, Any]]:
     return [job for job in jobs if isinstance(job, dict)]
 
 
-def desired_job(spec: dict[str, str], workspace: Path) -> dict[str, str]:
+def workspace_setting(workspace: Path, key: str, default: str) -> str:
+    """Read one nonsecret managed setting from the installed workspace."""
+    content = ""
+    for path in (workspace / ".hermes.md", SOURCE_ROOT / "workspace.hermes.md"):
+        try:
+            content = path.read_text(encoding="utf-8")
+            break
+        except OSError:
+            continue
+    if not content:
+        return default
+    match = re.search(rf"^{re.escape(key)}:\s*(.+?)\s*$", content, re.MULTILINE)
+    if not match:
+        return default
+    raw = match.group(1).strip()
+    if raw.startswith('"') and raw.endswith('"'):
+        try:
+            raw = str(json.loads(raw))
+        except json.JSONDecodeError:
+            return default
+    return raw if raw and raw != "REPLACE_ME" else default
+
+
+def desired_job(spec: dict[str, Any], workspace: Path) -> dict[str, str]:
     contract = workspace / spec["contract"]
+    company_name = workspace_setting(workspace, "company_name", "Company")
+    timezone = workspace_setting(workspace, "company_timezone", "UTC")
     prompt = (
-        f"Execute the installed Kamdar {spec['cadence']} operating automation. "
+        f"Execute the installed {company_name} Company OS {spec['cadence']} operating automation. "
         f"Read {workspace / '.hermes.md'} and {contract} completely, then follow "
         "the contract's authority, validation, receipt, idempotency, and stop conditions. "
-        "Use Asia/Kuala_Lumpur as the company timezone and never infer production authority."
+        f"Use {timezone} as the company timezone and never infer production authority."
     )
     return {
         "name": spec["name"],
@@ -142,7 +169,8 @@ def cron_plan(profile_home: Path, workspace: Path) -> list[dict[str, Any]]:
     actions: list[dict[str, Any]] = []
     for spec in SCHEDULES:
         desired = desired_job(spec, workspace)
-        matches = [job for job in jobs if job.get("name") == desired["name"]]
+        accepted_names = {desired["name"], *spec.get("legacy_names", ())}
+        matches = [job for job in jobs if job.get("name") in accepted_names]
         if len(matches) > 1:
             raise ProfileSetupError(f"duplicate_cron_name:{desired['name']}")
         if not matches:
@@ -150,7 +178,8 @@ def cron_plan(profile_home: Path, workspace: Path) -> list[dict[str, Any]]:
             continue
         current = matches[0]
         exact = (
-            schedule_expression(current) == desired["schedule"]
+            current.get("name") == desired["name"]
+            and schedule_expression(current) == desired["schedule"]
             and current.get("prompt") == desired["prompt"]
             and current.get("workdir") == desired["workdir"]
             and current.get("deliver", "local") == "local"
@@ -188,7 +217,7 @@ def apply_cron(profile_home: Path, actions: list[dict[str, Any]]) -> None:
             run_command(["hermes", "cron", "resume", job["id"]], profile_home)
 
 
-def run(profile_home: Path, apply: bool) -> int:
+def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) -> int:
     try:
         profile_home = profile_home.expanduser().resolve()
         if not profile_home.is_dir():
@@ -218,12 +247,14 @@ def run(profile_home: Path, apply: bool) -> int:
         setup_result = run_command(workspace_command, profile_home)
         setup_receipt = json.loads(setup_result.stdout)
         actions = cron_plan(profile_home, workspace)
-        plugin_action = "in_sync" if notion_plugin_enabled(profile_home) else "enable"
+        plugin_action = (
+            "in_sync" if notion_plugin_enabled(profile_home) else "enable"
+        ) if enable_notion_webhook else "not_requested"
         if not apply:
             emit(
                 "changes_pending" if setup_receipt.get("pending") or any(
                     item["action"] != "in_sync" for item in actions
-                ) or plugin_action != "in_sync" else "in_sync",
+                ) or plugin_action == "enable" else "in_sync",
                 profile_home=str(profile_home),
                 workspace=str(workspace),
                 workspace_setup=setup_receipt,
@@ -233,7 +264,8 @@ def run(profile_home: Path, apply: bool) -> int:
             )
             return 0
 
-        enable_notion_plugin(profile_home)
+        if enable_notion_webhook:
+            enable_notion_plugin(profile_home)
         run_command(["hermes", "config", "set", "terminal.cwd", str(workspace)], profile_home)
         cwd_result = run_command(["hermes", "config", "get", "terminal.cwd"], profile_home)
         if Path(cwd_result.stdout.strip()).expanduser().resolve() != workspace.resolve():
@@ -252,14 +284,14 @@ def run(profile_home: Path, apply: bool) -> int:
             profile_home=str(profile_home),
             workspace=str(workspace),
             workspace_setup=setup_receipt,
-            notion_plugin_action="in_sync",
+            notion_plugin_action="in_sync" if enable_notion_webhook else "not_requested",
             terminal_cwd=str(workspace),
             cron_jobs=verified,
             scheduler_ready=scheduler_ready,
             next_action=(
-                "run_notion_webhook_onboarding"
+                "verify_installation"
                 if scheduler_ready
-                else "start_or_install_the_profile_gateway_then_verify_cron_status"
+                else "start_the_profile_gateway_then_run_setup_verify"
             ),
         )
         return 0
@@ -276,6 +308,11 @@ def parser() -> argparse.ArgumentParser:
         help="Installed distribution profile root; defaults to HERMES_HOME.",
     )
     command.add_argument("--apply", action="store_true")
+    command.add_argument(
+        "--enable-notion-webhook",
+        action="store_true",
+        help="Enable and validate the optional Notion webhook plugin.",
+    )
     return command
 
 
@@ -284,7 +321,7 @@ def main() -> int:
     if args.profile_home is None:
         emit("blocked", blocker="profile_home_required")
         return 2
-    return run(args.profile_home, args.apply)
+    return run(args.profile_home, args.apply, args.enable_notion_webhook)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "knowledge",
+  "label": "Knowledge",
+  "providers": [
+    {
+      "id": "notion",
+      "label": "Notion",
+      "mcp": {"source": "hermes_catalog", "name": "notion"},
+      "test": {
+        "risk": "read_only",
+        "requires_confirmation": false,
+        "prompt": "Use the configured Notion MCP tools to fetch the configured Knowledge source at {{source}}. Report its identity, URL, content type, and a concise factual observation proving content was read. Make no changes.",
+        "expected_output": "The configured Notion Knowledge source is fetched and one source-grounded observation is returned without a write.",
+        "assertions": [
+          "The response identifies the fetched Knowledge source and URL.",
+          "One factual observation is grounded in fetched content.",
+          "No provider mutation is attempted."
+        ]
+      }
+    },
+    {
+      "id": "google-drive",
+      "label": "Google Drive via Composio",
+      "mcp": {
+        "source": "composio_session",
+        "name": "composio-google",
+        "toolkit": "googledrive",
+        "tools": [
+          "GOOGLEDRIVE_GET_ABOUT",
+          "GOOGLEDRIVE_FIND_FILE",
+          "GOOGLEDRIVE_CREATE_FILE_FROM_TEXT",
+          "GOOGLEDRIVE_GET_FILE_METADATA",
+          "GOOGLEDRIVE_TRASH_FILE"
+        ]
+      },
+      "test": {
+        "risk": "reversible",
+        "requires_confirmation": true,
+        "prompt": "Use only the configured Composio Google Drive tools. Confirm the connected Drive identity, inspect the configured Knowledge folder at {{source}}, create exactly one text file named '[Kamdar connection test {{run_id}}] Knowledge.txt' in that folder, fetch its metadata, move that test file to trash, and report the account identity, file ID, URL, exact name, parent folder, and cleanup result. Do not change any existing file.",
+        "expected_output": "The configured Google Drive account and Knowledge folder are reachable and one isolated text file is created, read back, and moved to trash.",
+        "assertions": [
+          "The connected Google Drive identity and configured Knowledge folder are confirmed.",
+          "The response reports one created file ID and URL.",
+          "The file metadata is fetched and its exact name and parent folder match the request.",
+          "The test file is moved to trash and no existing file is changed."
+        ]
+      }
+    }
+  ]
+}

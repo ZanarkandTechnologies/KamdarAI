@@ -9,8 +9,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 
-PROJECT = Path(__file__).resolve().parents[3]
-SCRIPT = PROJECT / "skills/setup-kamdar-workspace/scripts/setup_profile.py"
+PROJECT = Path(__file__).resolve().parents[1]
+SCRIPT = PROJECT / "scripts/setup_profile.py"
 SPEC = importlib.util.spec_from_file_location("setup_profile", SCRIPT)
 assert SPEC and SPEC.loader
 PROFILE = importlib.util.module_from_spec(SPEC)
@@ -65,6 +65,10 @@ class SetupProfileTests(unittest.TestCase):
             profile_home = Path(temporary)
             workspace = profile_home / "workspace"
             workspace.mkdir()
+            (workspace / ".hermes.md").write_text(
+                'company_name: "Example Co"\ncompany_timezone: "Europe/London"\n',
+                encoding="utf-8",
+            )
             actions = PROFILE.cron_plan(profile_home, workspace)
             self.assertEqual([item["action"] for item in actions], ["create", "create"])
             self.assertEqual(actions[0]["schedule"], "0 8 * * 1-5")
@@ -72,6 +76,28 @@ class SetupProfileTests(unittest.TestCase):
             for action in actions:
                 self.assertEqual(action["workdir"], str(workspace))
                 self.assertIn(str(workspace / ".hermes.md"), action["prompt"])
+                self.assertIn("Example Co Company OS", action["prompt"])
+                self.assertIn("Europe/London", action["prompt"])
+
+    def test_legacy_job_names_are_migrated_to_generic_names(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary)
+            workspace = profile_home / "workspace"
+            cron = profile_home / "cron"
+            workspace.mkdir()
+            cron.mkdir()
+            (cron / "jobs.json").write_text(
+                json.dumps({"jobs": [{
+                    "id": "daily-id",
+                    "name": "Kamdar Daily Operating Update",
+                    "schedule": "0 8 * * 1-5",
+                }]}),
+                encoding="utf-8",
+            )
+            actions = PROFILE.cron_plan(profile_home, workspace)
+            self.assertEqual(actions[0]["action"], "update")
+            self.assertEqual(actions[0]["id"], "daily-id")
+            self.assertEqual(actions[0]["name"], "Company OS Daily Operating Update")
 
     def test_exact_jobs_are_in_sync(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

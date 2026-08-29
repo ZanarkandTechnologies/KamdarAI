@@ -15,7 +15,7 @@ API_ROOT = "https://api.notion.com/v1"
 DEFAULT_VERSION = "2026-03-11"
 _PAGE_ID = re.compile(r"^(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})$")
 _BOT_ID = ""
-DEFAULT_TRIGGER = "@vishanai"
+DEFAULT_TRIGGER = "@hermes"
 
 
 def _setting(name: str, default: str = "") -> str:
