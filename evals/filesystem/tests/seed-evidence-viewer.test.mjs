@@ -9,7 +9,7 @@ import { renderEvidenceHtml } from "../../viewer/build.mjs";
 import { buildEvidenceModel } from "../../viewer/model.mjs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const operatedEvidencePath = resolve(projectRoot, "tickets/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json");
+const operatedEvidencePath = resolve(projectRoot, "tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json");
 
 function model(options = {}) {
   return buildEvidenceModel({ projectRoot, evidencePath: operatedEvidencePath, ...options });

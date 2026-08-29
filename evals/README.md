@@ -23,7 +23,7 @@ ignored local state.
 ```bash
 node --test evals/filesystem/tests/*.test.mjs
 node evals/viewer/build.mjs --out evals/viewer/dist \
-  --evidence tickets/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json
+  --evidence tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json
 node evals/viewer/serve.mjs
 ```
 
