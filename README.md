@@ -100,7 +100,20 @@ private runtime data into Git.
 
 ## Develop and verify
 
-Edit files here first, then run:
+Report maintainers edit the Markdown files in `templates/`, then run:
+
+```bash
+npm run report:sync
+```
+
+The command detects changed report templates by content hash, asks the AI to
+interpret only those templates, shows the contract diff, and updates the
+generated Zod modules in `schemas/reports/`. It then asks before creating each
+synthetic preview in the private, ignored `.reports-preview/` directory. Use
+`npm run report:sync -- --check` for a model-free, non-writing drift check or
+`--preview` when an explicit non-interactive run should generate previews.
+
+Then run:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v

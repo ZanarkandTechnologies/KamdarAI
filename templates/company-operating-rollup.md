@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-company-operating-rollup
-template_version: "0.5.0"
+template_version: "0.6.0"
 name: "Kamdar — Week of {{WEEK_START}}"
 report_type: "Company"
 week_start: "{{WEEK_START}}"
@@ -25,6 +25,22 @@ highest-leverage attention, and next company priority. -->
 | Area | Current result | Open attention | Next owner action | Source report |
 | --- | --- | --- | --- | --- |
 {{DEPARTMENT_RESULT_ROWS}}
+
+## Employee actions
+
+<!-- Roll up only evidence-backed employee actions that require Company
+visibility because they cross Areas, gate a material company outcome, or need
+executive follow-up. Preserve the canonical Person label or link and source
+Area report. Do not infer intent, personality, or a performance rating. The
+section may be empty when no action needs Company visibility.
+
+GOLDEN EXAMPLE — replace every fact below.
+| Darren (PERSON-DARREN) | Prove the guest checkout path | Ecommerce | Unverified; failed order and trace are missing | [Area report](report://ECOM-W35) | 2026-08-29 | Ecommerce lead reviews the reproduced failure and passing order |
+END GOLDEN EXAMPLE -->
+
+| Employee | Action or commitment | Area | Current state | Evidence / source report | Due or review date | Company follow-up |
+| --- | --- | --- | --- | --- | --- | --- |
+{{EMPLOYEE_ACTION_ROWS}}
 
 ## Problems and inefficiencies
 

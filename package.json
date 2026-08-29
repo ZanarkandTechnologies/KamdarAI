@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "report:sync": "node scripts/sync_report_templates.mjs",
     "eval:judge:operated-w34": "npm --prefix evals/filesystem run judge:operated-w34",
     "eval:view:build": "npm --prefix evals/filesystem run view:build:operated-w34",
     "eval:view:serve": "npm --prefix evals/filesystem run view:serve"

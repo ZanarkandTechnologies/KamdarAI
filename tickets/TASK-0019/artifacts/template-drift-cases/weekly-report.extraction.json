@@ -1,0 +1,42 @@
+{
+  "summary": "PROJ-PENANG reduced stock variance to 4.2% in 2026-W35, evidenced by [TASK-105](task://TASK-105). The highest-leverage attention is the 18-minute supplier-file wait at route://ops/penang. Next, OWNER-OPS will test one import map by 2026-09-02.",
+  "outcomes": [
+    {
+      "outcome": "Stock variance",
+      "current_state": "Reduced from 7.1% to 4.2% in 2026-W35",
+      "evidence": "[TASK-105](task://TASK-105)",
+      "next_owner_action": "OWNER-OPS verifies the next five-store comparison by 2026-09-02"
+    }
+  ],
+  "employee_actions": [
+    {
+      "employee": "Aisha (PERSON-AISHA)",
+      "action": "Approve the controlled supplier import map",
+      "expected_result": "One accepted map before the next five-store comparison",
+      "current_state": "Progressing; test evidence is scheduled",
+      "evidence": "[TASK-105](task://TASK-105)",
+      "due_or_review_date": "2026-09-02",
+      "next_follow_up": "OWNER-OPS reviews the five-store comparison after the test"
+    }
+  ],
+  "problems": [
+    {
+      "workflow": "Supplier intake / file normalization",
+      "problem": "Three formats require repeated mapping before the five-store comparison",
+      "baseline": "2026-W35; 12 files across 5 stores",
+      "time_loss": "18 minutes per file; 216 minutes total",
+      "cost": "MYR 300 over plan; 12 × MYR 25",
+      "confidence": "High for time; transport cost remains a measurement gap",
+      "next_proof": "OWNER-OPS tests one map by 2026-09-02",
+      "evidence": "[TASK-105](task://TASK-105)"
+    }
+  ],
+  "decisions": "- DEC-042 — Keep the five-store comparison as the acceptance gate. Evidence: [TASK-105](task://TASK-105)",
+  "sops": "- Proposed SOP-IMPORT-01 — Normalize supplier files before comparison; pending recurrence proof from OWNER-OPS.",
+  "next_week": "1. OWNER-OPS tests the import map against 12 files by 2026-09-02.\n2. Preserve [TASK-105](task://TASK-105) as the acceptance evidence.",
+  "evidence_window": "2026-08-24T00:00:00+08:00",
+  "evidence_window_end": "2026-08-30T23:59:59+08:00",
+  "sources_checked": "notion://project/PROJ-PENANG, drive://evidence/W35",
+  "source_gaps": "Transport cost evidence missing for COST-TRANSPORT-01",
+  "last_receipt": "receipt://daily/2026-08-29/PROJ-PENANG"
+}

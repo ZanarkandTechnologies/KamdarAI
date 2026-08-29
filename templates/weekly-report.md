@@ -1,6 +1,6 @@
 ---
 template_id: company-os-weekly-report
-template_version: "0.8.0"
+template_version: "0.9.0"
 name: "{{PROJECT_NAME}} — Week of {{WEEK_START}}"
 report_type: "Project"
 project: "{{PROJECT}}"
@@ -27,6 +27,23 @@ attention, and next priority. No raw activity log. -->
 | Outcome or attention | Current state | Evidence | Next owner action |
 | --- | --- | --- | --- |
 {{OUTCOME_ROWS}}
+
+## Employee actions
+
+<!-- Track evidence-backed employee actions or commitments that materially
+affect this Project. Use the canonical Person label or link, state the expected
+result, distinguish completed, progressing, blocked, missed, or unverified,
+and name the next follow-up. Do not infer intent, personality, or a performance
+rating from activity alone. The section may be empty when no material employee
+action is evidenced in the reporting window.
+
+GOLDEN EXAMPLE — replace every fact below.
+| Aisha (PERSON-AISHA) | Sign the corrected construction pack | One approved measurement source before sample recheck | Blocked; approver is still missing | [TASK-101](task://TASK-101) | 2026-08-27 | Aisha names the approver; Nur rechecks within one working day |
+END GOLDEN EXAMPLE -->
+
+| Employee | Action or commitment | Expected result | Current state | Evidence | Due or review date | Next follow-up |
+| --- | --- | --- | --- | --- | --- | --- |
+{{EMPLOYEE_ACTION_ROWS}}
 
 ## Problems and inefficiencies
 

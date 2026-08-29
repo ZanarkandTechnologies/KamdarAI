@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-area-operating-rollup
-template_version: "0.5.0"
+template_version: "0.6.0"
 name: "{{AREA_NAME}} — Week of {{WEEK_START}}"
 report_type: "Area"
 area: "{{AREA_NAME}}"
@@ -26,6 +26,22 @@ highest-leverage attention, and next Area priority. -->
 | Project | Current result | Open attention | Next owner action | Source report |
 | --- | --- | --- | --- | --- |
 {{PROJECT_RESULT_ROWS}}
+
+## Employee actions
+
+<!-- Roll up only evidence-backed employee actions that require Area visibility
+because they unblock multiple Projects, need management follow-up, or show a
+material completed result. Preserve the canonical Person label or link and the
+source Project report. Do not infer intent, personality, or a performance
+rating. The section may be empty when no action needs Area visibility.
+
+GOLDEN EXAMPLE — replace every fact below.
+| Aisha (PERSON-AISHA) | Close the controlled-pack handoff | CMT Pipeline | Blocked; signed approver missing | [Project report](report://PROJECT-W35) | 2026-08-27 | Area lead reviews the signed pack before line booking |
+END GOLDEN EXAMPLE -->
+
+| Employee | Action or commitment | Project | Current state | Evidence / source report | Due or review date | Area follow-up |
+| --- | --- | --- | --- | --- | --- | --- |
+{{EMPLOYEE_ACTION_ROWS}}
 
 ## Problems and inefficiencies
 

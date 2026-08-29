@@ -1,0 +1,79 @@
+{
+  "template_id": "kamdar-area-operating-rollup",
+  "template_version": "0.6.0",
+  "fields": [
+    {
+      "name": "summary",
+      "heading": "Summary",
+      "placeholder": "SUMMARY",
+      "kind": "scalar",
+      "optional": false,
+      "sentences": 3,
+      "cleanup": true,
+      "description": "Exactly three evidence-backed sentences: material change across Projects,\nhighest-leverage attention, and next Area priority."
+    },
+    {
+      "name": "project_results",
+      "heading": "Outcomes and open attention",
+      "placeholder": "PROJECT_RESULT_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 1,
+      "cleanup": true,
+      "description": "One evidence-backed row per Project result.",
+      "columns": [
+        { "key": "project", "heading": "Project" },
+        { "key": "current_result", "heading": "Current result" },
+        { "key": "open_attention", "heading": "Open attention" },
+        { "key": "next_owner_action", "heading": "Next owner action" },
+        { "key": "source_report", "heading": "Source report" }
+      ]
+    },
+    {
+      "name": "employee_actions",
+      "heading": "Employee actions",
+      "placeholder": "EMPLOYEE_ACTION_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 0,
+      "cleanup": false,
+      "description": "Roll up only evidence-backed employee actions that require Area visibility\nbecause they unblock multiple Projects, need management follow-up, or show a\nmaterial completed result. Preserve the canonical Person label or link and the\nsource Project report. Do not infer intent, personality, or a performance\nrating. The section may be empty when no action needs Area visibility.",
+      "columns": [
+        { "key": "employee", "heading": "Employee" },
+        { "key": "action", "heading": "Action or commitment" },
+        { "key": "project", "heading": "Project" },
+        { "key": "current_state", "heading": "Current state" },
+        { "key": "evidence", "heading": "Evidence / source report" },
+        { "key": "due_or_review_date", "heading": "Due or review date" },
+        { "key": "area_follow_up", "heading": "Area follow-up" }
+      ]
+    },
+    {
+      "name": "problems",
+      "heading": "Problems and inefficiencies",
+      "placeholder": "PROBLEM_OPPORTUNITY_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 1,
+      "cleanup": true,
+      "description": "Group only problems whose evidence crosses Projects or is material to the\nArea. Each row has a bounded first test, never a generic AI wish.",
+      "columns": [
+        { "key": "problem", "heading": "Problem" },
+        { "key": "projects", "heading": "Projects / workflows" },
+        { "key": "evidence", "heading": "Evidence and recurrence" },
+        { "key": "baseline", "heading": "Quantified baseline or measurement gap" },
+        { "key": "confidence", "heading": "Confidence" },
+        { "key": "intervention", "heading": "Narrow intervention" },
+        { "key": "test", "heading": "First test and success signal" }
+      ]
+    },
+    { "name": "decisions", "heading": "Decisions", "placeholder": "DECISIONS_VIEW_OR_LIST", "kind": "scalar", "optional": false, "cleanup": false, "description": "Complete grounded Decisions view or Markdown list." },
+    { "name": "sops", "heading": "SOPs", "placeholder": "SOPS_VIEW_OR_LIST", "kind": "scalar", "optional": false, "cleanup": false, "description": "Complete grounded SOPs view or Markdown list." },
+    { "name": "next_week", "heading": "Next-week priorities", "placeholder": "NEXT_WEEK_HANDOFF", "kind": "scalar", "optional": false, "cleanup": true, "description": "Area-level handoff for the next reporting week." },
+    { "name": "evidence_window", "heading": "Automation receipt", "placeholder": "START_TIMESTAMP", "kind": "scalar", "optional": false, "cleanup": false, "description": "Start of the exact evidence window." },
+    { "name": "evidence_window_end", "heading": "Automation receipt", "placeholder": "END_TIMESTAMP", "kind": "scalar", "optional": false, "cleanup": false, "description": "End of the exact evidence window." },
+    { "name": "project_reports", "heading": "Automation receipt", "placeholder": "Canonical Project report locators", "kind": "scalar", "optional": false, "cleanup": false, "description": "Canonical Project report locators." },
+    { "name": "source_gaps", "heading": "Automation receipt", "placeholder": "Missing Project reports or source evidence, or none", "kind": "scalar", "optional": false, "cleanup": false, "description": "Missing Project reports or source evidence, or none." },
+    { "name": "previous_report", "heading": "Automation receipt", "placeholder": "Report locator or none", "kind": "scalar", "optional": false, "cleanup": false, "description": "Previous Area report locator or none." }
+  ]
+}

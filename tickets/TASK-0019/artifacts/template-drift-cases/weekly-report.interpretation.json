@@ -1,0 +1,143 @@
+{
+  "template_id": "company-os-weekly-report",
+  "template_version": "0.9.0",
+  "fields": [
+    {
+      "name": "summary",
+      "heading": "Summary",
+      "placeholder": "SUMMARY",
+      "kind": "scalar",
+      "optional": false,
+      "sentences": 3,
+      "cleanup": true,
+      "description": "Exactly three evidence-backed sentences: material change, highest-leverage\nattention, and next priority. No raw activity log."
+    },
+    {
+      "name": "outcomes",
+      "heading": "Outcomes and open attention",
+      "placeholder": "OUTCOME_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 1,
+      "cleanup": true,
+      "description": "Evidence-backed outcomes and open attention, one row per distinct outcome or attention item.",
+      "columns": [
+        { "key": "outcome", "heading": "Outcome or attention" },
+        { "key": "current_state", "heading": "Current state" },
+        { "key": "evidence", "heading": "Evidence" },
+        { "key": "next_owner_action", "heading": "Next owner action" }
+      ]
+    },
+    {
+      "name": "problems",
+      "heading": "Problems and inefficiencies",
+      "placeholder": "PROBLEM_OPPORTUNITY_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 1,
+      "cleanup": true,
+      "description": "Combine grounded problems, inefficiencies, risks, blockers, and cost\nconsequences. Preserve the affected workflow step, dated baseline, impact,\nrecurrence/volume, time/wait loss, cost formula or explicit measurement gap,\nconfidence, next proof, and source links.",
+      "columns": [
+        { "key": "workflow", "heading": "Workflow / affected step" },
+        { "key": "problem", "heading": "Problem definition" },
+        { "key": "baseline", "heading": "Baseline window and volume" },
+        { "key": "time_loss", "heading": "Time / wait loss" },
+        { "key": "cost", "heading": "Cost consequence and formula" },
+        { "key": "confidence", "heading": "Confidence / measurement gaps" },
+        { "key": "next_proof", "heading": "Next proof / intervention" },
+        { "key": "evidence", "heading": "Evidence" }
+      ]
+    },
+    {
+      "name": "employee_actions",
+      "heading": "Employee actions",
+      "placeholder": "EMPLOYEE_ACTION_ROWS",
+      "kind": "table",
+      "optional": false,
+      "min_rows": 0,
+      "cleanup": false,
+      "description": "Track evidence-backed employee actions or commitments that materially\naffect this Project. Use the canonical Person label or link, state the expected\nresult, distinguish completed, progressing, blocked, missed, or unverified,\nand name the next follow-up. Do not infer intent, personality, or a performance\nrating from activity alone. The section may be empty when no material employee\naction is evidenced in the reporting window.",
+      "columns": [
+        { "key": "employee", "heading": "Employee" },
+        { "key": "action", "heading": "Action or commitment" },
+        { "key": "expected_result", "heading": "Expected result" },
+        { "key": "current_state", "heading": "Current state" },
+        { "key": "evidence", "heading": "Evidence" },
+        { "key": "due_or_review_date", "heading": "Due or review date" },
+        { "key": "next_follow_up", "heading": "Next follow-up" }
+      ]
+    },
+    {
+      "name": "decisions",
+      "heading": "Decisions",
+      "placeholder": "DECISIONS_VIEW_OR_LIST",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Complete grounded Decisions view or Markdown list."
+    },
+    {
+      "name": "sops",
+      "heading": "SOPs",
+      "placeholder": "SOPS_VIEW_OR_LIST",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Staged Daily candidates are clearly marked `Proposed` until Weekly\nfinalization verifies recurrence, owner, and proof. Do not mistake a candidate\nfor an adopted procedure."
+    },
+    {
+      "name": "next_week",
+      "heading": "Next-week priorities",
+      "placeholder": "NEXT_WEEK_HANDOFF",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": true,
+      "description": "This is the report's handoff, not a second live plan. Weekly updates the\ncanonical Project's This week's attention checklist separately."
+    },
+    {
+      "name": "evidence_window",
+      "heading": "Automation receipt",
+      "placeholder": "START_TIMESTAMP",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Start of the exact evidence window."
+    },
+    {
+      "name": "evidence_window_end",
+      "heading": "Automation receipt",
+      "placeholder": "END_TIMESTAMP",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "End of the exact evidence window."
+    },
+    {
+      "name": "sources_checked",
+      "heading": "Automation receipt",
+      "placeholder": "Stable source names or locators",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Stable source names or locators."
+    },
+    {
+      "name": "source_gaps",
+      "heading": "Automation receipt",
+      "placeholder": "Missing or stale sources, or none",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Missing or stale sources, or none."
+    },
+    {
+      "name": "last_receipt",
+      "heading": "Automation receipt",
+      "placeholder": "Receipt locator",
+      "kind": "scalar",
+      "optional": false,
+      "cleanup": false,
+      "description": "Receipt locator for the last successful Daily run."
+    }
+  ]
+}
