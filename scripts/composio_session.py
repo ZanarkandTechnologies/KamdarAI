@@ -7,6 +7,7 @@ import json
 import os
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from pathlib import Path
@@ -141,7 +142,11 @@ def ensure_session(
     mcp_url = mcp.get("url") if isinstance(mcp, dict) else None
     if not isinstance(session_id, str) or not isinstance(mcp_url, str):
         raise ComposioSessionError("composio_session_response_invalid")
-    if not mcp_url.startswith("https://") or ".composio.dev/" not in mcp_url:
+    parsed = urllib.parse.urlsplit(mcp_url)
+    hostname = (parsed.hostname or "").lower()
+    if parsed.scheme != "https" or not (
+        hostname == "composio.dev" or hostname.endswith(".composio.dev")
+    ):
         raise ComposioSessionError("composio_mcp_url_invalid")
     state = {
         "schema_version": 1,
@@ -191,7 +196,8 @@ def connected_toolkits(
     names = ",".join(sorted(toolkits))
     result = request(
         "GET",
-        f"/api/v3/tool_router/session/{session_id}/toolkits?limit=50&toolkits={names}",
+        f"/api/v3/tool_router/session/{session_id}/toolkits"
+        f"?limit=50&is_connected=true&toolkits={names}",
         api_key,
         None,
     )

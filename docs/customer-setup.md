@@ -26,6 +26,9 @@ renamed; the actions and expected states are the same.
 - This repository, obtained with Git or Download ZIP.
 - A Hermes model login or API key.
 - Notion authorization for the official hosted MCP.
+- When Gmail or Google Drive is selected: one Composio project API key and the
+  Google account login. Setup stores the API key in Hermes and opens hosted
+  OAuth links; no Composio CLI is installed.
 - For real-time comments only: a Notion internal connection token and one
   named Cloudflare Tunnel created in the Cloudflare dashboard.
 
@@ -47,6 +50,7 @@ Download or clone the Company OS source
                 +--Docker preflight
                 +--Hermes profile and model setup
                 +--official Notion MCP authorization
+                +--optional Gmail/Drive Composio MCP authorization
                 +--optional tunnel token + stable hostname
                 +--workspace, schedules, and templates
                 +--start containers
@@ -124,8 +128,33 @@ existing profile instead shows the maintenance menu documented below.
 
 > **What you should see:** Your chosen company values and data sources appear
 > in the review table. If Notion is selected, setup offers browser
-> authorization. If real-time comments are enabled, it asks for the two hidden
+> authorization. If Gmail or Drive is selected, setup asks once for the hidden
+> Composio project API key and shows a hosted OAuth link for each selected
+> Google toolkit. If real-time comments are enabled, it asks for the two hidden
 > tokens and the stable HTTPS hostname. Secret values do not appear afterward.
+
+The setup creates one restricted Composio session containing only the selected
+Gmail/Drive tools, disables Composio's remote workbench, and registers that
+session in Hermes as `composio-google`. Gmail and Drive share the session but
+retain separate Google OAuth connections. The Composio project key and hosted
+MCP URL remain inside the private Hermes profile.
+This follows Composio's current
+[session MCP](https://docs.composio.dev/docs/sessions-via-mcp),
+[session configuration](https://docs.composio.dev/docs/configuring-sessions),
+and [hosted authentication](https://docs.composio.dev/docs/authentication)
+contracts.
+
+After authorization, setup certifies every configured provider. If a row
+fails, its reason is shown and setup offers only:
+
+```text
+retry  - rerun the same certification immediately
+defer  - keep the installation and test later
+```
+
+Deferring does not undo setup. Health reports `PARTIAL`, and the customer
+reruns `setup.cmd` and chooses **Test integrations**. The underlying
+container command is `setup.py certify`; customers do not need to type it.
 
 When prompted for real-time comments, provide:
 
@@ -190,8 +219,9 @@ When comments are selected, the optional webhook lanes additionally check:
 - stable public HTTPS reachability;
 - one new reply in the exact Notion discussion.
 
-A skipped comment integration remains visibly skipped. A failed optional
-comment lane produces `partial`; it never becomes a false pass.
+A skipped comment integration remains visibly skipped. A deferred integration
+certification or failed optional comment lane produces `partial`; neither
+becomes a false pass.
 
 The final panel should show one of these states:
 
@@ -217,17 +247,20 @@ Rerunning `setup.cmd` on an existing installation shows:
 ```text
 1. Update workspace configuration
 2. Update Company OS software
-3. Run full health check
-4. Repair setup
-5. Open dashboard
-6. Exit
+3. Test integrations
+4. Run full health check
+5. Repair setup
+6. Open dashboard
+7. Exit
 ```
 
 Choose **Update workspace configuration** to edit the profile-owned desired
 workspace, apply it, and run a static check without repeating model or Notion
 authorization. After downloading repository updates, choose **Update Company OS
 software**; setup updates the distribution allowlist, preserves unknown runtime
-files, reconciles schedules, and runs static verification. Use **Run full
+files, reconciles schedules, and runs static verification. Use **Test
+integrations** to retry the same provider certification without reinstalling
+anything. Use **Run full
 health check** when browser OAuth, webhook ingress, and the live Notion comment
 path must be tested again.
 
@@ -249,6 +282,9 @@ observed on Windows:
 - fresh `setup.cmd` run without a host Hermes, Python, Notion, or Cloudflare CLI;
 - dashboard reachable only at `http://127.0.0.1:9119`;
 - official Notion MCP connects;
+- restricted Composio MCP connects to Gmail and Google Drive without a host CLI;
+- one self-addressed Gmail test is sent and read back, and one isolated Drive
+  test file is created, read back, and trashed;
 - valid webhook verification is accepted and an invalid signature is rejected;
 - one `@hermes` comment receives exactly one threaded reply;
 - duplicate delivery produces no duplicate reply;

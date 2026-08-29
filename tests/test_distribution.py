@@ -21,6 +21,7 @@ class DistributionTests(unittest.TestCase):
             "setup.cmd",
             "compose.yaml",
             "scripts/setup_runtime.py",
+            "scripts/setup_cli",
             "scripts/setup_workspace.py",
             "scripts/setup_profile.py",
             "scripts/provider_catalog.py",

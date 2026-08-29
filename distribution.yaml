@@ -1,5 +1,5 @@
 name: kamdar-ai
-version: 1.6.0
+version: 1.7.0
 description: "Kamdar Company OS workspace, provider catalog, automations, onboarding, and connectors"
 hermes_requires: ">=0.20.4"
 author: "Zanarkand Technologies"
@@ -19,6 +19,7 @@ distribution_owned:
   - setup.cmd
   - compose.yaml
   - scripts/setup_runtime.py
+  - scripts/setup_cli
   - scripts/setup_workspace.py
   - scripts/setup_profile.py
   - scripts/provider_catalog.py

@@ -36,6 +36,10 @@ class SetupInitTests(unittest.TestCase):
         (target / "scripts" / "provider_catalog.py").write_bytes(
             (ROOT / "scripts" / "provider_catalog.py").read_bytes()
         )
+        (target / "scripts" / "setup_runtime.py").write_bytes(
+            (ROOT / "scripts" / "setup_runtime.py").read_bytes()
+        )
+        shutil.copytree(ROOT / "scripts" / "setup_cli", target / "scripts" / "setup_cli")
         shutil.copytree(ROOT / "catalog", target / "catalog")
 
     def run_setup(
@@ -50,7 +54,9 @@ class SetupInitTests(unittest.TestCase):
         )
 
     def test_selector_uses_public_prompt_toolkit_api(self) -> None:
-        source = (ROOT / "setup.py").read_text(encoding="utf-8")
+        source = (ROOT / "scripts" / "setup_cli" / "ui.py").read_text(
+            encoding="utf-8"
+        )
         self.assertIn("from prompt_toolkit.widgets import CheckboxList", source)
         self.assertNotIn("hermes_cli.curses_ui", source)
         self.assertNotIn("import curses", source)
@@ -74,6 +80,65 @@ class SetupInitTests(unittest.TestCase):
             second = self.run_setup(target, "configure", "\n" * 8)
             self.assertEqual(second.returncode, 0, second.stderr)
             self.assertIn("# Owner-edited Workspace", workspace.read_text(encoding="utf-8"))
+
+    def test_blank_required_input_reprompts_instead_of_crashing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            result = self.run_setup(target, "init", "\n" + ANSWERS)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("A value is required", result.stdout)
+            self.assertNotIn("AttributeError", result.stderr)
+            self.assertIn(
+                'company_name: "Acme"',
+                (target / "workspace.hermes.md").read_text(encoding="utf-8"),
+            )
+
+    def test_installed_resume_reprompts_blank_input_before_any_runtime_apply(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            answers = "\n" + ANSWERS + "\nn\nn\n"
+            result = self.run_setup(
+                target,
+                "install",
+                answers,
+                "--profile-home",
+                str(target),
+                "--installed",
+            )
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("A value is required", result.stdout)
+            self.assertIn("No runtime services or credentials changed", result.stdout)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_early_runtime_error_does_not_crash_the_error_handler(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            profile = target / "profile"
+            result = self.run_setup(
+                target,
+                "install",
+                "",
+                "--profile-home",
+                str(profile),
+                "--installed",
+                "--non-interactive",
+            )
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertIn("Run setup interactively", result.stdout)
+            self.assertNotIn("AttributeError", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_end_of_input_stops_without_a_traceback(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            result = self.run_setup(target, "init", "")
+            self.assertEqual(result.returncode, 130, result.stderr)
+            self.assertIn("Stopped safely", result.stdout)
+            self.assertNotIn("Traceback", result.stderr)
 
     def test_configure_preserves_owner_content(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

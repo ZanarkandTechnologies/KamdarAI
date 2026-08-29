@@ -67,6 +67,19 @@ class ProviderCatalogTests(unittest.TestCase):
                 {"hermes_catalog:notion"},
             )
 
+    def test_current_workspace_provider_rows_are_all_supported(self) -> None:
+        bindings = provider_catalog.selected_bindings(
+            ROOT / "workspace.hermes.md", provider_catalog.load_catalog()
+        )
+        self.assertEqual(
+            {binding["data_source"] for binding in bindings},
+            {"projects", "tasks", "meetings", "people", "operator_email", "knowledge"},
+        )
+        self.assertEqual(
+            {provider_catalog.connection_key(binding["provider"]) for binding in bindings},
+            {"hermes_catalog:notion", "composio_session:composio-google"},
+        )
+
     def test_unknown_provider_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             workspace = Path(temporary) / "workspace.md"

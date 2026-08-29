@@ -22,7 +22,7 @@
     },
     {
       "id": "google-drive",
-      "label": "Google Drive via Composio",
+      "label": "Google Drive (Composio)",
       "mcp": {
         "source": "composio_session",
         "name": "composio-google",

@@ -35,6 +35,7 @@ defaults and names them in the plan; later tuning requires its own proven flow.
   +--review plan and Apply
   +--Hermes model authorization when missing
   +--Hermes MCP install/login/test once per unique connection
+  +--restricted Composio MCP session for selected Gmail/Drive roles
   +--parallel configured-source evals -> one consolidated judge
   +--optional Cloudflare/Notion webhook values
   `--return action: start runtime + live verification
@@ -42,10 +43,11 @@ defaults and names them in the plan; later tuning requires its own proven flow.
 [S5] Maintenance menu
   |--1 workspace------> [S6] Configure -> preview -> apply -> static check
   |--2 software-------> update distribution -> reconcile -> static check
-  |--3 health---------> start runtime -> live verification
-  |--4 repair---------> reconcile setup -> start runtime -> live verification
-  |--5 dashboard------> start runtime -> open local dashboard
-  `--6 exit-----------> no changes
+  |--3 integrations---> certify -> pass OR retry/defer
+  |--4 health---------> start runtime -> live verification
+  |--5 repair---------> reconcile setup -> start runtime -> live verification
+  |--6 dashboard------> start runtime -> open local dashboard
+  `--7 exit-----------> no changes
 
 [S7] Verification
   |--required lanes pass---------------------> [S8] READY
@@ -135,10 +137,11 @@ promise an unsupported per-screen checkpoint. Exit performs no update.
 +------------------------------------------------------------+
   1. Update workspace configuration
   2. Update Company OS software
-  3. Run full health check
-  4. Repair setup
-  5. Open dashboard
-  6. Exit
+  3. Test integrations
+  4. Run full health check
+  5. Repair setup
+  6. Open dashboard
+  7. Exit
 Select [1]:
 ```
 
@@ -188,6 +191,11 @@ redacted trace. Cheap process, session, and tool-result checks run first; one
 model call then judges every case against its expected output and assertions.
 Tests that create isolated records require explicit confirmation. Changing a
 selected provider or source invalidates the previous receipt.
+
+When a row fails, setup shows the row reason and offers only `retry` or
+`defer`. Retry reruns the same configuration immediately. Defer keeps the
+installed profile and records an explicit deferred receipt; health becomes
+`PARTIAL`, and **Test integrations** is the one re-entry point.
 
 ## S8/S9/F2 — Result
 

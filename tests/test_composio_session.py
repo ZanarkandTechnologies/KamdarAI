@@ -96,6 +96,8 @@ class ComposioSessionTests(unittest.TestCase):
                 state, "secret-test-key", request=fake
             )
             self.assertEqual(connected, {"gmail"})
+            status_call = next(call for call in fake.calls if "/toolkits?" in call[1])
+            self.assertIn("is_connected=true", status_call[1])
             url = composio_session.create_connect_link(
                 state, "googledrive", "secret-test-key", request=fake
             )

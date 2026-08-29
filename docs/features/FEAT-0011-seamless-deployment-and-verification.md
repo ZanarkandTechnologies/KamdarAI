@@ -14,6 +14,8 @@ category: platform
 public: true
 surfaces:
   - distribution.yaml
+  - setup.py
+  - scripts/setup_cli/
   - scripts/setup_workspace.py
   - scripts/setup_profile.py
   - evals
@@ -68,10 +70,22 @@ The live workspace owns generated operating artifacts. Setup emits one redacted,
 resumable receipt containing versions, lane verdicts, and the exact next action.
 
 Selectable providers are owned by one JSON file per data-source role under
-`catalog/data-sources/`. A provider row references an approved Hermes MCP plus
-one natural eval prompt, expected output, assertions, and side-effect class.
-Setup derives Hermes commands from that reference; catalog files never contain
-raw commands or credentials.
+`catalog/data-sources/`. A provider row references an approved Hermes catalog
+MCP or the restricted Composio session driver plus one natural eval prompt,
+expected output, assertions, and side-effect class. Setup derives connection
+operations from that reference; catalog files never contain raw commands or
+credentials. Gmail and Google Drive share one fixed-tool, workbench-disabled
+Composio MCP session without installing a Composio CLI.
+
+## Implementation ownership
+
+`setup.py` is the stable public bootstrap and contains no product flow logic.
+`scripts/setup_cli/app.py` owns command parsing and exit-code dispatch;
+`scripts/setup_cli/ui.py` is the only interactive-input boundary; and the
+`flows/` modules separately own workspace configuration, lifecycle,
+connections, webhook onboarding, and verification. Deterministic filesystem,
+Hermes, MCP, and eval operations remain in their existing `scripts/` backend
+owners and never import the interactive package.
 
 ## Supported deployment boundary
 
@@ -123,6 +137,10 @@ bounded concurrency, performs deterministic process/session/tool checks, and
 uses one consolidated judge call. Its owner-only receipt is bound to the exact
 selected providers and sources; health rejects a missing or stale receipt.
 Doctor remains a later read-only output-quality proof.
+
+A failed certification row renders its reason and offers `retry` or `defer`.
+Defer preserves installation, writes a configuration-bound receipt, and makes
+health `partial`; **Test integrations** is the single retry entry point.
 
 The exact customer steps and acceptance matrix are owned by
 [`docs/customer-setup.md`](../customer-setup.md). This feature owns behavior;

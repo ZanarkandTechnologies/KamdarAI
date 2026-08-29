@@ -30,8 +30,8 @@ destination or substitute another route.
   - Before the first provider call, run `ntn --help`,
     `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
     syntax confirmed by the installed CLI.
-  - Query `notion.projects` for active Projects and read their complete pages.
-  - From `notion.work_items_this_week`, read complete linked open or
+  - Query the `projects` source for active Projects and read their complete pages.
+  - From the `tasks` source, read complete linked open or
     changed-today Work for Project progress. For documentation review and
     processing, read complete Work only when `Status = Done` and
     `AI review != Processed`. Do not reload unchanged Done Work whose
@@ -81,10 +81,10 @@ destination or substitute another route.
   `workspace.hermes.md`. Then apply each result through its integration:
 
   - `project_updates[].section_replacements[]`: use the `notion` skill via
-    `ntn` on `notion.projects`. Replace the named section only when
+    configured provider on `projects`. Replace the named section only when
     `expected_current_text` still matches.
   - `documentation_reviews[]` with `verdict = needs_information`: use the
-    `notion` skill via `ntn` on `notion.work_items_this_week`. Add the rendered
+    configured provider on `tasks`. Add the rendered
     comment to the exact Work item using `question_key` for deduplication.
   - `knowledge_updates[].draft_entries[]` and `weekly_progress_chases[]`: use
     the `notion` skill via `ntn` on the exact current-week Report Draft. Build

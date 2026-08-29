@@ -233,6 +233,28 @@ class ConnectionEvalTests(unittest.TestCase):
             self.assertFalse(lane["required"])
             self.assertIn("Test integrations", lane["detail"])
 
+    def test_deferring_after_failure_preserves_the_failed_run_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            workspace_path = workspace(profile / "workspace.hermes.md")
+            previous = {
+                "run_id": "failed-run",
+                "status": "failed",
+                "cases": [{"case_id": "projects:notion", "status": "failed"}],
+            }
+            run_connection_evals.write_receipt(profile, previous)
+            deferred = run_connection_evals.defer_connection_evals(
+                profile, workspace_path, previous=previous
+            )
+            self.assertNotEqual(deferred["run_id"], previous["run_id"])
+            self.assertEqual(deferred["previous_run_id"], previous["run_id"])
+            self.assertEqual(
+                json.loads(
+                    (profile / "state/connection-evals/failed-run.json").read_text()
+                )["status"],
+                "failed",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

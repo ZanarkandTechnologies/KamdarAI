@@ -82,7 +82,7 @@ the automation must not invent another organizational layer.
   | `Problems and inefficiencies` | Promote each qualifying problem or record its disposition | `notion` skill via `ntn` on the existing Work/Issue database |
   | `Decisions` | Promote each qualifying reusable Decision or record its disposition | `notion` skill via `ntn` on the Decisions database |
   | `SOPs` | Promote each qualifying approved employee workflow or record its disposition | `notion` skill via `ntn` on the existing SOPs database |
-  | `Next-week priorities` | Replace the related Project's complete `This week's attention` section for the new week | `notion` skill via `ntn` on `notion.projects` |
+  | `Next-week priorities` | Replace the related Project's complete `This week's attention` section for the new week | Configured provider on `projects` |
 
   Apply these rules in order:
 

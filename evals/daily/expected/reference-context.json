@@ -15,7 +15,7 @@
   },
   "source_manifest": [
     {
-      "source_key": "notion.projects",
+      "source_key": "projects",
       "status": "fetched",
       "source_url": "notion://projects",
       "collection_scope": "Active Projects linked to selected Work.",
@@ -31,7 +31,7 @@
       "gap": null
     },
     {
-      "source_key": "notion.work_items_this_week",
+      "source_key": "tasks",
       "status": "fetched",
       "source_url": "notion://work",
       "collection_scope": "Work created or changed during 2026-W34.",
@@ -52,7 +52,7 @@
       "gap": null
     },
     {
-      "source_key": "notion.embedded_meetings",
+      "source_key": "meetings",
       "status": "fetched",
       "source_url": "notion://work",
       "collection_scope": "Completed Meetings selected for knowledge extraction.",
@@ -66,7 +66,7 @@
       "gap": null
     },
     {
-      "source_key": "notion.people",
+      "source_key": "people",
       "status": "fetched",
       "source_url": "notion://people",
       "collection_scope": "Referenced People with approved test route references.",

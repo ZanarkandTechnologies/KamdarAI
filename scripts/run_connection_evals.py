@@ -422,15 +422,16 @@ def defer_connection_evals(
         workspace, provider_catalog.load_catalog(catalog_directory)
     )
     receipt = dict(previous or {})
+    previous_run_id = receipt.get("run_id")
     receipt.update(
         {
             "schema_version": SCHEMA_VERSION,
-            "run_id": receipt.get("run_id")
-            or time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+            "run_id": time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
             + "-"
             + uuid.uuid4().hex[:8],
             "status": "deferred",
             "last_attempt_status": (previous or {}).get("status", "not_run"),
+            "previous_run_id": previous_run_id,
             "deferred_reason": reason,
             "deferred_at": time.time(),
             "profile": setup_runtime.PROFILE_NAME,
@@ -439,6 +440,25 @@ def defer_connection_evals(
     )
     write_receipt(profile_home, receipt)
     return receipt
+
+
+def resolve_certification(
+    run: Callable[[], dict[str, Any]],
+    render: Callable[[dict[str, Any]], None],
+    choose: Callable[[], str],
+    defer: Callable[[dict[str, Any]], dict[str, Any]],
+    *,
+    interactive: bool,
+) -> dict[str, Any]:
+    """Resolve certification by passing, retrying, or explicitly deferring."""
+    while True:
+        receipt = run()
+        render(receipt)
+        if receipt.get("status") == "passed" or not interactive:
+            return receipt
+        if choose() == "retry":
+            continue
+        return defer(receipt)
 
 
 def parser() -> argparse.ArgumentParser:

@@ -103,14 +103,20 @@ class SetupLaunchTests(unittest.TestCase):
             self.assertIn("Test integrations", result.stdout)
 
     def test_workspace_action_uses_profile_owned_configuration(self) -> None:
-        source = (ROOT / "setup.py").read_text(encoding="utf-8")
+        source = (
+            ROOT / "scripts" / "setup_cli" / "flows" / "lifecycle.py"
+        ).read_text(encoding="utf-8")
         self.assertIn('workspace = profile_home / "workspace.hermes.md"', source)
         self.assertIn('template = profile_home / "workspace.hermes.template.md"', source)
         self.assertIn('source_root / "scripts" / "setup_profile.py"', source)
         self.assertIn('receipt["entry_point"] = "setup.py workspace"', source)
 
     def test_install_calls_webhook_selector_with_supported_arguments(self) -> None:
-        tree = ast.parse((ROOT / "setup.py").read_text(encoding="utf-8"))
+        tree = ast.parse(
+            (ROOT / "scripts" / "setup_cli" / "flows" / "lifecycle.py").read_text(
+                encoding="utf-8"
+            )
+        )
         selector = next(
             node
             for node in ast.walk(tree)

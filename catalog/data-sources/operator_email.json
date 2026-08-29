@@ -5,7 +5,7 @@
   "providers": [
     {
       "id": "gmail",
-      "label": "Gmail via Composio",
+      "label": "Gmail (Composio)",
       "mcp": {
         "source": "composio_session",
         "name": "composio-google",

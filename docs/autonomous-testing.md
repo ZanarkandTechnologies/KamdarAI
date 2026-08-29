@@ -43,7 +43,8 @@ python3 -m unittest \
   tests.test_notion_comment_adapter \
   tests.test_notion_webhook_protocol -v
 python3 -m py_compile \
-  setup.py scripts/setup_runtime.py scripts/setup_profile.py scripts/setup_workspace.py
+  setup.py scripts/setup_cli/*.py scripts/setup_cli/flows/*.py \
+  scripts/setup_runtime.py scripts/setup_profile.py scripts/setup_workspace.py
 ```
 
 After the targeted lane passes, run the complete safe default lane before
