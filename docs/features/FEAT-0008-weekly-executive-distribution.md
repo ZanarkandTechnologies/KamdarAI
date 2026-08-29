@@ -3,10 +3,10 @@ title: Deliver the completed company review to the owner
 status: active
 execution_modes: [frozen, operated-v4]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-21
-tags: [kamdar, feature, weekly, distribution]
+updated_at: 2026-08-29
+tags: [company-os, feature, weekly, distribution]
 feature_id: FEAT-0008
 feature_key: weekly.distribution
 system_id: SYS-0001
@@ -18,7 +18,7 @@ surfaces:
   - templates/company-operating-rollup.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0006/data-model-gap-report.md
+  - tickets/archive/TASK-0006/data-model-gap-report.md
 evidence_refs:
   - evals/weekly/suite.json
 known_limits: "Only operated-v4 may send the finalized Company artifact to the resolved private eval Telegram route with a receipt; production delivery remains proposal-only."
@@ -26,7 +26,7 @@ known_limits: "Only operated-v4 may send the finalized Company artifact to the r
 
 # Deliver the completed company review to the owner
 
-Kamdar turns the final Company report into one concise owner message and sends
+The Company OS turns the final Company report into one concise owner message and sends
 it through the approved Telegram route only after all Project and Department
 reports are complete.
 

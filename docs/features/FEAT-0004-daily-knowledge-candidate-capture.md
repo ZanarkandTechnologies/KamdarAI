@@ -3,10 +3,10 @@ title: Accumulate workflow and problem baselines in the Weekly Draft
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-25
-tags: [kamdar, feature, daily, knowledge]
+updated_at: 2026-08-29
+tags: [company-os, feature, daily, knowledge]
 feature_id: FEAT-0004
 feature_key: daily.knowledge-capture
 system_id: SYS-0001
@@ -18,7 +18,7 @@ surfaces:
   - automations/weekly-operating-review.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0007/ticket.md
+  - tickets/archive/TASK-0007/ticket.md
 evidence_refs:
   - evals/filesystem/scripts/run-task0007-reference-automation.mjs
 known_limits: "Daily writes only its local Markdown anchors. It does not promote knowledge or call a provider."
@@ -26,7 +26,7 @@ known_limits: "Daily writes only its local Markdown anchors. It does not promote
 
 # Accumulate grounded knowledge in the Weekly Draft
 
-Kamdar extracts source-backed Decisions, current employee workflow observations,
+The Company OS extracts source-backed Decisions, current employee workflow observations,
 and measurable problem baselines from Daily Work and Meeting context. It writes
 them into the supplied current Weekly Draft. A workflow may be observed before
 it is approved or reusable; Weekly owns promotion into canonical SOP and Issue

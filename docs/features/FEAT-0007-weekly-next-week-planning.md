@@ -3,10 +3,10 @@ title: Carry commitments into next week
 status: active
 execution_modes: [frozen, operated-v4]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-21
-tags: [kamdar, feature, weekly, planning]
+updated_at: 2026-08-29
+tags: [company-os, feature, weekly, planning]
 feature_id: FEAT-0007
 feature_key: weekly.next-week-planning
 system_id: SYS-0001
@@ -18,7 +18,7 @@ surfaces:
   - templates/task.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0006/data-model-gap-report.md
+  - tickets/archive/TASK-0006/data-model-gap-report.md
 evidence_refs:
   - evals/weekly/suite.json
 known_limits: "Only operated-v4 may apply receipt-backed Project and Work updates in the eval root; production updates remain proposal-only."
@@ -26,7 +26,7 @@ known_limits: "Only operated-v4 may apply receipt-backed Project and Work update
 
 # Carry commitments into next week
 
-Kamdar turns approved owner attention and unresolved Work into explicit next
+The Company OS turns approved owner attention and unresolved Work into explicit next
 commitments on the same Project and Work records rather than clearing lists or
 creating a parallel Project plan file.
 

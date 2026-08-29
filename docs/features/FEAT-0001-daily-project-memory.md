@@ -3,10 +3,10 @@ title: Keep Project pages current
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-24
-tags: [kamdar, feature, daily, memory]
+updated_at: 2026-08-29
+tags: [company-os, feature, daily, memory]
 feature_id: FEAT-0001
 feature_key: daily.project-memory
 system_id: SYS-0001
@@ -17,14 +17,14 @@ surfaces:
   - templates/project.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0007/ticket.md
+  - tickets/archive/TASK-0007/ticket.md
 evidence_refs:
 known_limits: "No Project adapter is shipped. Production Project updates remain proposal-only."
 ---
 
 # Keep Project pages current
 
-Kamdar turns one collector snapshot into minimal, source-linked Project changes.
+The Company OS turns one collector snapshot into minimal, source-linked Project changes.
 Project-specific facts remain in `Project knowledge`; current-week operational
 work remains in `This week's attention`. It does not create a copied task list,
 child memory page, generic Docs record, or Project summary from memory.
@@ -69,7 +69,8 @@ collector context diff → classify evidence
 
 ## State changes and artifacts
 
-- Creates a `kamdar-project-diff-plan` JSON proposal with source IDs, explicit
+- Creates a `kamdar-project-diff-plan` JSON proposal (a temporary compatibility
+  identifier) with source IDs, explicit
   gaps, expected current value, and append/replace intent.
 - May target only `Project knowledge` and `This week's attention`.
 - Creates zero `daily/projects/*.md` files and zero Project-memory child pages.

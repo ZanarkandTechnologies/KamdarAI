@@ -3,10 +3,10 @@ title: Review Done Work for documentation sufficiency
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-27
-tags: [kamdar, feature, daily, documentation]
+updated_at: 2026-08-29
+tags: [company-os, feature, daily, documentation]
 feature_id: FEAT-0002
 feature_key: daily.document-quality
 system_id: SYS-0001
@@ -20,14 +20,14 @@ surfaces:
   - templates/meeting.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0007/ticket.md
+  - tickets/archive/TASK-0007/ticket.md
 evidence_refs:
 known_limits: "The next Daily run guarantees re-review while AI review is not Processed; deterministic event-driven re-review from a Notion reply remains follow-up work."
 ---
 
 # Review Done Work for documentation sufficiency
 
-Kamdar gives every selected Done Work item one versioned documentation verdict.
+The Company OS gives every selected Done Work item one versioned documentation verdict.
 It asks a precise question when required evidence is missing and marks AI review
 Processed only after documentation is sufficient and required effects settle.
 

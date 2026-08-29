@@ -3,10 +3,10 @@ title: Turn the current Weekly Draft into an operating review
 status: active
 execution_modes: [source-contract, isolated-task0007-seed]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-25
-tags: [kamdar, feature, weekly, reporting]
+updated_at: 2026-08-29
+tags: [company-os, feature, weekly, reporting]
 feature_id: FEAT-0005
 feature_key: weekly.report-finalization
 system_id: SYS-0001
@@ -20,7 +20,7 @@ surfaces:
   - templates/company-operating-rollup.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0007/ticket.md
+  - tickets/archive/TASK-0007/ticket.md
 evidence_refs:
   - evals/filesystem/scripts/run-task0007-reference-automation.mjs
   - evals/filesystem/scripts/operate-task0007-notion-seed.mjs
@@ -29,7 +29,7 @@ known_limits: "Production report publication and executive delivery remain propo
 
 # Turn the current Weekly Draft into an operating review
 
-Kamdar turns the one current Weekly Draft into Project, Department, and Company
+The Company OS turns the one current Weekly Draft into Project, Department, and Company
 reports. The Draft is accumulated by Daily pipelines during the week; Weekly
 reads it once and never re-synthesizes or edits its five anchors.
 

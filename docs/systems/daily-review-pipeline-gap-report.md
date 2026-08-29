@@ -1,9 +1,9 @@
 ---
 title: Daily Review schema sanity check and lifecycle hardening
 status: implemented_with_followups
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-25
-updated_at: 2026-08-27
+updated_at: 2026-08-29
 system_id: SYS-0001
 feature_refs:
   - FEAT-0001
@@ -21,7 +21,7 @@ refs:
   - ../../schemas/automations/daily-integration-receipt.zod.mjs
   - ../../schemas/automations/weekly-review-result.zod.mjs
   - ../../evals/rubrics/end-user-artifact-quality.md
-  - kamdar-company-os-operator-manual.md
+  - company-os-operator-manual.md
 ---
 
 # Daily Review schema sanity check and lifecycle hardening

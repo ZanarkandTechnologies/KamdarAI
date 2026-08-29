@@ -3,10 +3,10 @@ title: Turn Meeting commitments into accountable Work
 status: active
 execution_modes: [source-contract, frozen, operated-v4]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-27
-updated_at: 2026-08-27
-tags: [kamdar, feature, meeting, work]
+updated_at: 2026-08-29
+tags: [company-os, feature, meeting, work]
 feature_id: FEAT-0010
 feature_key: meeting.commitment-intake
 system_id: SYS-0001
@@ -18,7 +18,7 @@ surfaces:
   - templates/task.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0014/ticket.md
+  - tickets/archive/TASK-0014/ticket.md
 evidence_refs:
 known_limits: "Live provider creation requires a separately authorized operated run."
 ---

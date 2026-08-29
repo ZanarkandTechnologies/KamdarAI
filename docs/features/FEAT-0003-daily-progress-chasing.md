@@ -3,10 +3,10 @@ title: Chase delayed work once, with context
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-26
-tags: [kamdar, feature, daily, outreach]
+updated_at: 2026-08-29
+tags: [company-os, feature, daily, outreach]
 feature_id: FEAT-0003
 feature_key: daily.project-control
 system_id: SYS-0001
@@ -18,7 +18,7 @@ surfaces:
   - templates/person.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0007/ticket.md
+  - tickets/archive/TASK-0007/ticket.md
 evidence_refs:
   - evals/filesystem/scripts/run-task0007-reference-automation.mjs
 known_limits: "Fictional eval People have no personal endpoint. Isolated-eval delivery goes only to the operator-owned Telegram sink and never proves employee delivery."
@@ -26,7 +26,7 @@ known_limits: "Fictional eval People have no personal endpoint. Isolated-eval de
 
 # Chase delayed work once, with context
 
-Kamdar detects dated, stale, or blocked Work once from the Daily context. It
+The Company OS detects dated, stale, or blocked Work once from the Daily context. It
 records its evidence-bound PM, risk, and cost findings in the current Weekly
 Draft, then prepares one accountable-owner message for direct Daily delivery.
 

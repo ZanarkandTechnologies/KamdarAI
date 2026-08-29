@@ -3,10 +3,10 @@ title: Make every action inspectable and safe to rerun
 status: active
 execution_modes: [frozen, operated-v4]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-21
-tags: [kamdar, feature, shared, safety]
+updated_at: 2026-08-29
+tags: [company-os, feature, shared, safety]
 feature_id: FEAT-0009
 feature_key: system.safety
 system_id: SYS-0001
@@ -16,7 +16,7 @@ surfaces:
   - workspace.hermes.md
   - templates/automation-receipt.md
 source_refs:
-  - tickets/TASK-0006/data-model-gap-report.md
+  - tickets/archive/TASK-0006/data-model-gap-report.md
 evidence_refs:
   - evals/daily/suite.json
   - evals/weekly/suite.json
@@ -25,7 +25,7 @@ known_limits: "A frozen local receipt is not evidence of an external provider wr
 
 # Make every action inspectable and safe to rerun
 
-Kamdar bounds each Daily and Weekly run to declared sources, templates,
+The Company OS bounds each Daily and Weekly run to declared sources, templates,
 authority, and delivery routes, then records what was proposed, applied,
 blocked, failed, or safely skipped.
 

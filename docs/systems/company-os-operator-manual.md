@@ -1,12 +1,12 @@
 ---
-title: Kamdar Company OS operator manual
+title: Company OS operator manual
 status: active
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-27
-updated_at: 2026-08-27
+updated_at: 2026-08-29
 system_id: SYS-0001
 refs:
-  - kamdar-company-os.md
+  - company-os.md
   - daily-review-pipeline-gap-report.md
   - ../../automations/daily-operating-update.md
   - ../../automations/weekly-operating-review.md
@@ -14,15 +14,16 @@ refs:
   - ../../workspace.hermes.md
 ---
 
-# Kamdar Company OS operator manual
+# Company OS operator manual
 
 ## Purpose
 
-Use the Company OS to keep work, Project memory, management follow-up, weekly
+Use the Company OS to keep work, private management state, follow-up, weekly
 reporting, Decisions, and SOPs connected to the same source evidence. People
-work in Notion tickets and comments. The Daily agent reconciles current work.
-The Weekly agent turns reviewed evidence into management reports and promotes
-only knowledge that has earned a durable home.
+work in Notion tickets and comments. The Daily agent reconciles current work
+into private, week-scoped Project reports and outbound requests. The Weekly
+agent finalizes and rolls up those reports and promotes only knowledge that has
+earned a durable home.
 
 The current repository is configured for frozen or isolated evaluation.
 Production Notion writes and employee messages remain proposal-only until the
@@ -32,13 +33,13 @@ production routes and authority are approved.
 
 | Database | What it owns | What it does not own |
 | --- | --- | --- |
-| **Projects** | Canonical manager memory: goal, current position, durable Project knowledge, this week's attention, owner, Department, and links to related records. | Ticket-level work logs or full meeting transcripts. |
+| **Projects** | Human-operated source records: goal, owner, Department, current plan, and links to related Work. | Private management assessments, accumulated agent memory, or weekly report history. |
 | **Work items** | Tasks, Features, Issues, and Meetings. This is where people record progress, evidence, blockers, decisions, completion notes, commitments, and discussion. | Cross-Project precedent or reusable procedures after promotion. |
 | **People** | Identity, role, authority, preferred contact channel, approved channels, and route references. | Guessed contact details or inferred permissions. |
-| **Reports** | Current Project weekly drafts, finalized Project reports, Department rollups, and the Company report. | Canonical source detail; reports summarize and link back. |
+| **Reports** | An optional destination, configured by URL, for approved finalized Project, Department, or Company reports. Notion owns its permissions. | Intermediary management state or the agent's accumulating private report files. |
 | **Decisions** | Provenance database for choices worth remembering: context, options, selected option, authority, rationale, accepted tradeoff, consequences, review trigger, and sources. | Routine next actions or every choice made during execution. |
 | **SOPs** | Reusable employee operating procedures: trigger, owner, inputs, ordered workflow, handoffs, baseline, exceptions, controls, and verification. | Software-agent skills or a one-off personal trick with no reuse proof. |
-| **Automation artifacts** | Immutable run inputs, validated results, write receipts, read-back proof, blocked effects, and processing decisions. | Project memory or human-facing reports. |
+| **Hermes weekly workspace** | Private accumulating Project reports, finalized report hierarchy, and outbound artifacts under `weeks/<week>/`. | Provider permissions or an employee-facing database. |
 
 Problems do not need a separate database. A material problem becomes an
 `Issue` in Work, linked to the affected workflow or SOP step. Its page preserves
@@ -54,7 +55,7 @@ After measurement.
                                  v
 +----------+       +-------------+-------------+       +-----------+
 | Projects |<----->| Work: Task/Feature/Issue  |------>| Decisions |
-| memory   |       | and embedded Meetings     |       | provenance|
+| source   |       | and embedded Meetings     |       | provenance|
 +----+-----+       +-------------+-------------+       +-----------+
      |                           |
      |                           v
@@ -62,17 +63,16 @@ After measurement.
      |                     |   SOPs    |
      |                     | reusable  |
      |                     +-----+-----+
-     |                           ^
-     v                           |
-+----+---------------------------+----+
-| Reports: Project -> Department -> Company |
-+-------------------+-----------------------+
-                    |
-                    v
-          +---------+-----------+
-          | Automation artifacts|
-          | results and receipts|
-          +---------------------+
+     v
++----+--------------------------------+
+| Private weeks/<week>/              |
+| reports/ Project -> Dept -> Company|
+| outbound/ approved requests        |
++------------------+-----------------+
+                   |
+                   v
+       configured Notion / Drive URLs
+       and approved message routes
 ```
 
 ## The normal operating loop
@@ -83,10 +83,16 @@ Human logs Work in Notion
           v
 Daily agent reads active Projects + selected Work
           |
-          +--> updates grounded Project memory
-          +--> asks precise documentation questions
-          +--> chases threatened weekly targets
-          `--> stages Problem / Decision / SOP candidates in the Weekly Draft
+          v
+one validated platform-neutral Zod result
+          |
+          v
+deterministic field mapping into the private week
+          |
+          +--> accumulates one report per Project
+          +--> prepares precise documentation requests
+          +--> prepares threatened-target chases
+          `--> stages Problem / Decision / SOP report entries
                                       |
                                       v
 Weekly agent finalizes Project reports
@@ -226,8 +232,9 @@ evaluated. The agent must never guess the Project, owner, database, or due date.
 ## 4. Chat with the agent over Telegram
 
 Use Telegram for short manager interactions, not as the canonical work log.
-Ask for a summary, a list of blockers, or a ticket proposal; then put durable
-facts and evidence back on the relevant Notion record.
+Ask for a summary, a list of blockers, or a ticket proposal. Source facts remain
+on the relevant Notion record; derived management state belongs in the private
+weekly report unless an approved outbound mapping publishes it elsewhere.
 
 Useful requests:
 
@@ -254,7 +261,7 @@ Agent reads authorized canonical records
        |
        +--> answer or proposal in Telegram
        |
-       `--> durable fact/change -> Notion source record + receipt
+       `--> derived management state -> private weekly report
 ```
 
 Do not paste credentials, personal contact details, or private files into
@@ -271,45 +278,49 @@ ACTIVE PROJECTS
       +
 linked open or changed Work + Done Work where AI review != Processed
       +
-embedded Meetings + People route facts + current Weekly Draft
+embedded Meetings + People route facts + current private Project reports
       |
       v
 one immutable Daily context
       |
       v
 one validated Daily result
-      |
-      v
+          |
+          v
 independent artifact-quality review
-      |
-      v
-guarded writes + provider receipts + per-Work processing decision
+          |
+          v
+deterministic report/outbound mapping
+          |
+          v
+optional guarded writes to configured URLs/routes + hidden run metadata
 ```
 
 Daily responsibilities:
 
 1. Reconcile current Work against each Project's weekly attention.
-2. Update only Project sections whose source evidence changed.
-3. Ask precise completion questions on Done Work that lacks important context.
-4. Identify threatened weekly targets and prepare one factual owner chase.
-5. Stage grounded Problem, Decision, and SOP observations in the current Weekly
-   Draft.
-6. Record every effect, conflict, blocked route, duplicate, and read-back.
+2. Accumulate only grounded changes in that Project's private weekly report.
+3. Map precise completion questions for Done Work into `outbound`.
+4. Map one factual owner chase for each threatened weekly target into `outbound`.
+5. Stage grounded Problem, Decision, and SOP observations in the Project report.
+6. Keep effect, conflict, blocked-route, duplicate, and read-back metadata in
+   hidden run state rather than adding operator-facing artifact classes.
 
 Daily must not:
 
 - Scan all historical Work because a relation is missing.
 - Invent progress, causes, costs, owners, contact routes, or destinations.
 - Promote a canonical Decision, Issue, or SOP.
+- Publish intermediary management state to Notion or Drive.
 - Mark an item `Processed` merely because a question was posted.
 
 ## 6. Weekly agent task
 
-Weekly reads finalized Project Draft evidence; it does not rescan raw Work or
-Meeting pages.
+Weekly reads all accumulating Project reports for the current week; it does not
+rescan raw Work or Meeting pages.
 
 ```text
-Project Report Drafts
+weeks/<week>/reports/project--*.md
         |
         +--> finalize Project reports
         +--> disposition every Problem / Decision / SOP candidate
@@ -353,7 +364,7 @@ Done ticket
     v
 documentation verdict = needs_information
     |
-    +--> grounded Project memory may still update
+    +--> grounded private Project report may still update
     +--> partial observation may be staged with explicit gaps
     +--> one Notion question thread opens
     `--> AI review = Needs information

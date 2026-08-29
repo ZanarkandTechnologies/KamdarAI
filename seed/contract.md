@@ -1,5 +1,5 @@
 ---
-title: Kamdar test-seed contract
+title: Kamdar reference test-seed contract
 status: proposed
 owner: KamdarAI
 created_at: 2026-08-25
@@ -13,15 +13,23 @@ feature_refs:
   - FEAT-0006
   - FEAT-0007
 refs:
-  - ../../seed/manifest.json
-  - ../../evals/filesystem/scripts/kamdar-seed-config.mjs
+  - manifest.json
+  - ../evals/filesystem/scripts/kamdar-seed-config.mjs
 ---
 
-# Kamdar test seed
+# Kamdar reference test seed
+
+## Evidence boundary
+
+This is a client-grounded reference fixture used to prove generic Company OS
+behavior. It is not a default company profile and must not be presented as
+generic product truth. Captured identifiers remain because provenance is part
+of the proof; setup replaces company identity and integrations for each
+deployment.
 
 ## Purpose
 
-[`seed/manifest.json`](../../seed/manifest.json) and its declared table files
+[`manifest.json`](manifest.json) and its declared table files
 form the single reviewed input for frozen and isolated-Notion evaluations. Their
 seven Project names and Departments come from the approved private scrape; all
 other operating facts are explicitly synthetic evaluation scenarios. It stores

@@ -64,12 +64,12 @@ class KamdarCompanyOSTests(unittest.TestCase):
                 "## Example",
             ):
                 self.assertIn(section, content, f"{path.name}: {section}")
-        system = (ROOT / "docs/systems/kamdar-company-os.md").read_text(encoding="utf-8")
+        system = (ROOT / "docs/systems/company-os.md").read_text(encoding="utf-8")
         for index in range(1, 8):
             self.assertIn(f"FEAT-{index:04d}", system)
         for destination in ("NOTION / WIKI", "GOOGLE DRIVE", "EMAIL / TELEGRAM"):
             self.assertIn(destination, system)
-        ui_prototype = (ROOT / "tickets/TASK-0002/ascii-prototype.md").read_text(encoding="utf-8")
+        ui_prototype = (ROOT / "tickets/archive/TASK-0002/ascii-prototype.md").read_text(encoding="utf-8")
         self.assertIn("CURRENT TEMPLATE CONTENT ASSERTIONS", ui_prototype)
         self.assertIn("PROPOSED FEATURE CONTENT ASSERTIONS", ui_prototype)
         self.assertIn("replaces only Section 5", ui_prototype)

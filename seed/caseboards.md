@@ -1,5 +1,5 @@
 ---
-title: Kamdar seed caseboards
+title: Kamdar reference seed caseboards
 status: proposed
 owner: KamdarAI
 created_at: 2026-08-25
@@ -13,13 +13,15 @@ feature_refs:
   - FEAT-0006
   - FEAT-0007
 refs:
-  - ../../seed/manifest.json
+  - manifest.json
 ---
 
 # Seed caseboards
 
-These are human-readable views of the seven cases in the canonical seed. The
-JSON owns the exact input; Daily and Weekly eval suites own exact assertions.
+These are human-readable views of the seven cases in the Kamdar reference seed.
+They demonstrate generic Company OS behavior with client-grounded identifiers;
+they are not default setup data. The JSON owns the exact input; Daily and Weekly
+eval suites own exact assertions.
 
 ## FEAT-0001 — Update Project memory
 

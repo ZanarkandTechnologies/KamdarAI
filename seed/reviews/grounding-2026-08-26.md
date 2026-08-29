@@ -6,7 +6,10 @@ status: reviewed-local-and-public-sources
 decision: rebuild-seed-scenarios
 ---
 
-# Kamdar seed grounding
+# Kamdar reference seed grounding
+
+This report is historical client-specific evidence for the reference eval
+fixture. It does not define generic Company OS behavior or default setup data.
 
 ## Decision
 

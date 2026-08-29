@@ -1,23 +1,23 @@
 ---
-title: Kamdar feature docs
+title: Company OS feature docs
 status: active
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-21
+updated_at: 2026-08-29
 refs:
-  - ../systems/kamdar-company-os.md
+  - ../systems/company-os.md
   - ../../automations/README.md
   - ../../evals/daily/suite.json
   - ../../evals/weekly/suite.json
 ---
 
-# Kamdar feature docs
+# Company OS feature docs
 
-Each `FEAT-*` page owns one buyer-visible capability of the Kamdar manager and
-is the canonical explanation rendered above that feature's grouped proof. The
-[Kamdar Company OS system spec](../systems/kamdar-company-os.md) owns how the
-features run together; automation files own cadence and procedure;
-The Daily and Weekly eval suites own runnable assertions and tag each case with
+Each `FEAT-*` page owns one buyer-visible Company OS capability and is the
+canonical explanation rendered above that feature's grouped proof. The
+[Company OS system spec](../systems/company-os.md) owns how the
+features run together. Automation files own cadence and procedure. The Daily
+and Weekly eval suites own runnable assertions and tag each case with
 the feature it proves.
 
 One Daily run reads the bounded source window once and produces several feature
@@ -54,7 +54,7 @@ Every feature supports the same source-of-truth distinction:
 | Mode | Meaning |
 | --- | --- |
 | `frozen` | Local deterministic evidence only. It performs no network or external write. |
-| `operated-v4` | Applies the reviewed effect only to the isolated Kamdar AI · Eval Demo v4 root and resolved private eval routes, then preserves redacted receipts. |
+| `operated-v4` | Applies the reviewed effect only to the isolated client reference environment and resolved private eval routes, then preserves redacted receipts. |
 | production | Remains proposal-only. It is not selected by the operated eval command. |
 
 Feature pages may describe an intended downstream system, but a provider is
@@ -73,6 +73,7 @@ artifact, draft, or frozen receipt is not external delivery proof.
 | `FEAT-0006` | [Promote earned knowledge](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated employee SOP promotion to the existing SOPs database and problem promotion to Issues in existing Work |
 | `FEAT-0007` | [Carry commitments into next week](FEAT-0007-weekly-next-week-planning.md) | Weekly | Canonical Project and Work updates |
 | `FEAT-0010` | [Turn Meeting commitments into accountable Work](FEAT-0010-meeting-commitment-intake.md) | Event workflow | Explicit Meeting commitments become canonical, deduplicated Task records |
+| `FEAT-0011` | [Install and verify the Company OS from one entry point](FEAT-0011-seamless-deployment-and-verification.md) | Install / update | Implemented local contract; clean Windows/Notion/Cloudflare operation pending |
 
 ## Update rule
 
@@ -84,6 +85,7 @@ artifact, draft, or frozen receipt is not external delivery proof.
    Do not split source reads to match UI groups.
 5. Run the repository tests listed in the root README.
 
-The active product registry contains eight ROI-bearing workflows. Delivery is
+The active product registry contains eight ROI-bearing workflows plus one
+in-progress deployment platform capability. Delivery is
 an optional integration after the Company report; safety, receipts, and rerun
 behavior are acceptance requirements on every workflow rather than features.

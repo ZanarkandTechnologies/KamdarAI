@@ -1,149 +1,101 @@
-# KamdarAI
+# Company OS for Hermes
 
-KamdarAI is the source-controlled configuration and evaluation harness for the
-Kamdar Hermes manager. The live agent runs from a separate Hermes workspace;
-this repository owns the reviewed inputs used to configure and test it.
+This repository is the current proving ground for a self-service Company OS on
+Hermes. It contains reusable configuration, automations, templates, setup, and
+tests. A setup run supplies the company identity and integrations; the product
+docs do not assume a specific client.
 
-## Client installation
+The repository is still named `KamdarAI`, and some implementation identifiers
+retain that name while the generic product is proven here. Those names are
+source compatibility details, not product requirements. The live Hermes
+profile is stored separately and is never committed.
 
-Install the public repository as a native Hermes distribution. Hermes creates
-the profile and copies only the runtime allowlist in `distribution.yaml`; it
-does not install this repository's tickets, tests, seed, screenshots, or Git
-history.
+## Install on Windows
 
-```bash
-export KAMDAR_PROFILE=kamdar-ai
+You need Windows, Docker Desktop, and the WSL2 backend.
 
-hermes profile install \
-  https://github.com/ZanarkandTechnologies/KamdarAI \
-  --name "$KAMDAR_PROFILE" \
-  --alias
+1. Clone or download this repository.
+2. Start Docker Desktop.
+3. Double-click `setup.cmd`.
 
-hermes -p "$KAMDAR_PROFILE" setup
-```
+Before continuing, check that:
 
-Preview and apply the Company OS workspace and native schedules:
+- the downloaded folder contains `setup.cmd` and `compose.yaml`;
+- Docker Desktop reports that its engine is running;
+- double-clicking `setup.cmd` opens the setup window.
 
-```bash
-export KAMDAR_PROFILE_HOME="${HOME}/.hermes/profiles/${KAMDAR_PROFILE}"
-export KAMDAR_SETUP="${KAMDAR_PROFILE_HOME}/skills/setup-kamdar-workspace/scripts/setup_profile.py"
-
-python3 "$KAMDAR_SETUP" --profile-home "$KAMDAR_PROFILE_HOME"
-python3 "$KAMDAR_SETUP" --profile-home "$KAMDAR_PROFILE_HOME" --apply
-
-hermes -p "$KAMDAR_PROFILE" config get terminal.cwd
-hermes -p "$KAMDAR_PROFILE" cron status
-```
-
-The first command is non-mutating. Apply copies reviewed workspace inputs,
-enables and validates the distribution-shipped `platforms/notion` plugin
-without granting built-in tool replacement, sets `terminal.cwd`, and creates or
-reconciles the weekday Daily and Friday Weekly jobs without deleting client
-files. A stopped gateway produces a truthful `partial` receipt because scheduled
-jobs cannot fire until the gateway or Hermes desktop scheduler is running.
-
-The same flow can be run inside Hermes chat by saying
-`Run setup-kamdar-workspace.`
-
-The Notion connector is private distribution code copied from this repository;
-it does not need a community-registry deployment. Verify it with:
-
-```bash
-hermes -p "$KAMDAR_PROFILE" plugins show platforms/notion
-hermes -p "$KAMDAR_PROFILE" plugins doctor platforms/notion
-```
-
-## Optional Notion webhook
-
-Set up Notion as a separate test root first. The current config is
-evaluation-only and production writes are proposal-only. Use
-[`templates/`](templates/README.md) for the database shape, then approve real
-database routes and write authority before using production records.
-
-On a Linux Hermes VPS, say `Run notion-webhook-onboarding.` in the configured
-profile, or begin directly with its preflight:
-
-```bash
-export KAMDAR_NOTION_ONBOARD="$KAMDAR_PROFILE_HOME/skills/notion-webhook-onboarding/scripts/notion_webhook_onboard.py"
-python3 "$KAMDAR_NOTION_ONBOARD" preflight
-```
-
-Follow the JSON receipt's `next_action` through each phase. Login, sharing,
-subscription creation, and webhook verification remain human gates:
-
-```bash
-export NOTION_ROOT_URL="https://www.notion.so/<root-page-id>"
-
-   python3 "$KAMDAR_NOTION_ONBOARD" configure \
-     --root-page-url "$NOTION_ROOT_URL" \
-     --mention @vishanai
-   python3 "$KAMDAR_NOTION_ONBOARD" verification
-   # Paste the one-time token into Notion and verify the subscription.
-   python3 "$KAMDAR_NOTION_ONBOARD" discover
-   # Leave one harmless comment beginning with @vishanai.
-   python3 "$KAMDAR_NOTION_ONBOARD" finalize
-python3 "$KAMDAR_NOTION_ONBOARD" status
-```
-
-Before `discover`, share the root page and every database that may receive an
-agent comment with the same Notion connection used by `NOTION_TOKEN`. Sharing a
-sibling page or similarly named database is insufficient: Hermes authorizes the
-exact parent data-source ID. Rerun `discover` after granting new access.
-
-Setup is complete only when `status` reports all of these conditions:
-
-- `hermes_health=true` and `ngrok_online=true`
-- `verification_token_captured=true`
-- `data_sources_configured=true`
-- `workspace_locked=true`
-- `reply_observed=true`
-
-Poll `verification` after requesting a token and `finalize` after the test
-comment. A `human_required` receipt is a normal security gate, not an error.
-
-## Notion comment bridge troubleshooting
-
-The onboarding script is the current Notion-specific doctor. Run its `status`
-phase first; transport health alone does not prove that a page is authorized or
-that Hermes posted a reply.
-
-| Symptom | Likely boundary | Next action |
-| --- | --- | --- |
-| No webhook request arrives | Paused subscription or stale public URL | Confirm the Notion subscription is active and uses the current ngrok `/notion/webhook` endpoint. Free ngrok URLs can change after a tunnel restart. |
-| Verification returns HTTP 401 | Stale verification token or signature state | Run `hermes -p "$KAMDAR_PROFILE" notion-webhook reset-token`, use Notion's **Resend token**, and complete `verification` again. Never paste credentials into chat or logs. |
-| Webhook returns 200 but no reply appears | The event was accepted but failed during enrichment or reply generation | Check the gateway log and the connector state instead of recreating the subscription immediately. |
-| Log says the page is outside the configured data-source scope | The exact database is not shared or its data source is absent from the allowlist | Share the database containing the commented page with the token's Notion connection, then rerun `discover` and leave a new test comment. |
-| Notion adapter is unavailable after a restart | The gateway started without the Doppler-scoped `NOTION_TOKEN` | Restart the managed, Doppler-backed Hermes service; do not replace it with a bare `hermes gateway restart`. |
-
-The generic Hermes doctor does not currently validate Notion subscription URL
-drift or per-page data-source access. Until a unified `kamdar notion doctor
---page <url>` command exists, use `status`, the exact test page, and one observed
-reply as the acceptance path.
-
-## Layout
+The window should move through these stages:
 
 ```text
-workspace.hermes.md  Reviewable, nonsecret workspace context
-automations/   Daily and weekly operating contracts
-docs/          Feature specs and the Kamdar Company OS system map
-templates/     Kamdar record and report configuration contracts
-skills/        Kamdar skill source and workspace setup
-plugins/       Source-owned Hermes platform plugins installed into the profile
-seed/          Synthetic projects, people, tasks, meetings, reports, and scenarios
-evals/         Daily/Weekly acceptance contracts and deterministic proof tooling
-scripts/       Deterministic helpers
-tests/         Repository contract tests
+Checking Docker Desktop and WSL2
+Interactive setup wizard
+  +--new or incomplete: install/resume
+  `--existing: workspace, update, health, repair, or dashboard
+Selected action
+Focused or full verification
 ```
 
-A live workspace follows the layout
-`~/.hermes/profiles/<profile>/workspace`; private profile state is one level
-above it. Neither is committed or symlinked into this repo. Reusable,
-company-agnostic improvements belong in HermesCorp after Kamdar data has been
-removed.
+The setup wizard creates the Hermes profile, connects the services you choose,
+installs the automations, and runs the health checks and feature evals. When it
+finishes, open the local dashboard at <http://127.0.0.1:9119>.
+
+The complete [Windows setup guide](docs/customer-setup.md) shows what each
+screen means and what you should see before moving to the next step. It also
+covers the one-time Cloudflare steps for optional real-time Notion comments.
+
+Run `setup.cmd` again after an update or an interrupted installation. An
+incomplete profile offers Resume; an existing profile opens a maintenance menu.
+Opening the menu alone makes no changes.
+
+## What the wizard configures
+
+- Company details and data sources
+- Hermes model authorization
+- Notion through its hosted MCP, when selected
+- Daily and Weekly schedules
+- Optional real-time Notion comments through a stable named Cloudflare Tunnel
+- Installation receipts, health checks, and packaged feature evals
+
+Secrets are stored in the persistent Hermes profile. You do not need to edit an
+`.env` file.
+
+Temporary `*.trycloudflare.com` Quick Tunnels are not supported because their
+URL changes across restarts. The supported path uses Cloudflare's web dashboard
+once to create a named tunnel; the included container runs it afterward.
+
+The data-source picker uses the arrow keys and Space. Press Enter to continue or
+Escape to skip the step.
+
+## Install on another Docker host
+
+Use the same Compose stack on Linux or a VPS:
+
+```bash
+docker compose run --rm setup launch
+docker compose up -d gateway dashboard
+docker compose --profile webhook up -d cloudflared  # only when enabled
+docker compose run --rm setup verify --live
+```
+
+## Repository guide
+
+| Path | Purpose |
+| --- | --- |
+| `setup.py` | State-aware setup, maintenance, and verification wizard |
+| `workspace.hermes.md` | Reviewed company configuration |
+| `automations/` | Daily and Weekly automation contracts |
+| `templates/` | Project and report templates |
+| `skills/` and `plugins/` | Hermes capabilities installed into the profile |
+| `evals/` | Network-free feature tests and expected results |
+| `scripts/` and `tests/` | Setup helpers and repository checks |
+
+The repository owns reviewed configuration. The Hermes profile owns secrets,
+OAuth sessions, logs, generated reports, and other runtime state. Do not copy
+private runtime data into Git.
 
 ## Develop and verify
 
-Edit and test here first:
+Edit files here first, then run:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
@@ -153,59 +105,8 @@ node --test evals/filesystem/tests/*.test.mjs
 python3 scripts/validate_company_context.py --context workspace.hermes.md
 ```
 
-Preview the explicit source-to-runtime install:
+Local evals use packaged fixtures and make no provider calls. Private Notion
+captures and generated private seeds must remain outside the repository.
 
-```bash
-python3 skills/setup-kamdar-workspace/scripts/setup_workspace.py \
-  --workspace /Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai/workspace \
-  --profile-home /Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai
-```
-
-The command is preview-only unless `--apply` is supplied, refuses an
-unapproved workspace context, manages only `.hermes.md`, `automations/`,
-`templates/`, project-owned `skills/`, and project-owned `plugins/`, and never
-deletes target files.
-
-Daily and Weekly acceptance is defined in `evals/daily/` and `evals/weekly/`.
-Each package contains its suite and expected artifacts. Every assertion is owned by one
-[documented feature](docs/features/README.md), and local evaluation makes no
-provider call:
-
-```bash
-cd evals/filesystem
-npm test
-```
-
-## Private capture seed
-
-The supplied Notion browser capture is private profile state, never a tracked
-fixture. Compile it explicitly into a mode-`0600` private seed. The tracked,
-synthetic scenario seed is split into tables under `seed/`.
-
-```bash
-node scripts/compile_private_kamdar_seed.mjs \
-  --input /absolute/path/to/private-capture.json \
-  --output "$HERMES_HOME/state/kamdar-eval/private-seed.json" \
-  --manifest "$HERMES_HOME/state/kamdar-eval/private-seed-manifest.json"
-
-# Current Daily/Weekly acceptance is owned by the unified validators:
-node --test evals/filesystem/tests/unified-daily-review-eval.test.mjs \
-  evals/filesystem/tests/weekly-review-evals.test.mjs
-```
-
-The runner records only the source hash and `private_seed_verified` boolean in
-its result. It never renders raw capture names or contacts. Private compilation
-does not authorize a Notion mutation or provider delivery.
-
-## Private Company OS application seed
-
-To prepare the full private seed used by an isolated Notion setup, combine the
-reviewed scenario config with the capture-derived Project catalog. The generated
-file uses the scrape's Project names and Departments, keeps all other scenario
-facts fictional, and is written mode 0600 outside this repository.
-
-~~~bash
-node scripts/compile_private_kamdar_company_os_seed.mjs \
-  --capture-seed "$HERMES_HOME/state/kamdar-eval/private-seed.json" \
-  --output "$HERMES_HOME/state/kamdar-eval/company-os-seed-2026-w34.json"
-~~~
+For the detailed setup screens and recovery paths, see
+[`docs/features/FEAT-0011-setup-ux-ascii.md`](docs/features/FEAT-0011-setup-ux-ascii.md).

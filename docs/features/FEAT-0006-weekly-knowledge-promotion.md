@@ -3,10 +3,10 @@ title: Promote only knowledge that earned a home
 status: active
 execution_modes: [frozen, operated-v4]
 production_mode: proposal-only
-owner: KamdarAI
+owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-24
-tags: [kamdar, feature, weekly, knowledge, promotion]
+updated_at: 2026-08-29
+tags: [company-os, feature, weekly, knowledge, promotion]
 feature_id: FEAT-0006
 feature_key: weekly.knowledge-promotion
 system_id: SYS-0001
@@ -19,7 +19,7 @@ surfaces:
   - templates/sop.md
 source_refs:
   - workspace.hermes.md
-  - tickets/TASK-0006/data-model-gap-report.md
+  - tickets/archive/TASK-0006/data-model-gap-report.md
 evidence_refs:
   - evals/weekly/suite.json
 known_limits: "Only operated-v4 may apply a reviewed canonical record in the eval root after authority, privacy, dedupe, and receipt checks; production remains proposal-only."
@@ -27,7 +27,7 @@ known_limits: "Only operated-v4 may apply a reviewed canonical record in the eva
 
 # Promote only knowledge that earned a home
 
-Kamdar reviews every Daily candidate and promotes only evidence-backed Problems,
+The Company OS reviews every Daily candidate and promotes only evidence-backed Problems,
 Decisions, and employee workflows to the correct canonical record. Problems
 remain Issues in the existing Work database; workflows remain records in the
 existing SOPs database.
