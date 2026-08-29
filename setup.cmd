@@ -28,7 +28,8 @@ docker compose version >nul 2>nul
 if errorlevel 1 goto compose_missing
 
 echo Opening the guided setup...
-docker compose --profile setup run --rm setup launch
+rem Arguments after the service name replace its Compose command, so keep the setup.py entry point explicit.
+docker compose --profile setup run --rm setup python /distribution/setup.py launch
 set "KAMDAR_ACTION=%ERRORLEVEL%"
 
 if "%KAMDAR_ACTION%"=="0" exit /b 0
@@ -46,7 +47,7 @@ if errorlevel 1 goto failed
 call :start_webhook_if_enabled
 if errorlevel 1 goto failed
 echo Running the full health check...
-docker compose --profile setup run --rm setup verify --live
+docker compose --profile setup run --rm setup python /distribution/setup.py verify --live
 set "VERIFY_EXIT=%ERRORLEVEL%"
 goto verification_result
 
@@ -54,7 +55,7 @@ goto verification_result
 call :start_runtime
 if errorlevel 1 goto failed
 echo Checking the updated installation...
-docker compose --profile setup run --rm setup verify
+docker compose --profile setup run --rm setup python /distribution/setup.py verify
 set "VERIFY_EXIT=%ERRORLEVEL%"
 goto verification_result
 
@@ -68,7 +69,7 @@ exit /b 0
 
 :certify
 echo Testing configured integrations...
-docker compose --profile setup run --rm setup certify
+docker compose --profile setup run --rm setup python /distribution/setup.py certify
 set "CERTIFY_EXIT=%ERRORLEVEL%"
 echo.
 if "%CERTIFY_EXIT%"=="0" (
@@ -98,7 +99,7 @@ docker compose up -d gateway dashboard
 exit /b %ERRORLEVEL%
 
 :start_webhook_if_enabled
-docker compose --profile setup run --rm setup webhook-enabled >nul 2>nul
+docker compose --profile setup run --rm setup python /distribution/setup.py webhook-enabled >nul 2>nul
 if errorlevel 1 exit /b 0
 echo Starting secure webhook ingress...
 docker compose --profile webhook up -d cloudflared

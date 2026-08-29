@@ -76,10 +76,10 @@ Escape to skip the step.
 Use the same Compose stack on Linux or a VPS:
 
 ```bash
-docker compose run --rm setup launch
+docker compose --profile setup run --rm setup python /distribution/setup.py launch
 docker compose up -d gateway dashboard
 docker compose --profile webhook up -d cloudflared  # only when enabled
-docker compose run --rm setup verify --live
+docker compose --profile setup run --rm setup python /distribution/setup.py verify --live
 ```
 
 ## Repository guide

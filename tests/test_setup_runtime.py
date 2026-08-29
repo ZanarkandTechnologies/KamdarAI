@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import stat
 import subprocess
 import tempfile
@@ -273,19 +274,63 @@ class SetupRuntimeTests(unittest.TestCase):
 
     def test_windows_launcher_exposes_only_one_setup_surface(self) -> None:
         launcher = (ROOT / "setup.cmd").read_text(encoding="utf-8")
-        self.assertIn("run --rm setup launch", launcher)
+        setup_command = "run --rm setup python /distribution/setup.py"
+        self.assertIn(f"{setup_command} launch", launcher)
         self.assertIn('if "%KAMDAR_ACTION%"=="10" goto live_verify', launcher)
         self.assertIn('if "%KAMDAR_ACTION%"=="11" goto static_verify', launcher)
         self.assertIn('if "%KAMDAR_ACTION%"=="14" goto certify', launcher)
-        self.assertIn("run --rm setup verify --live", launcher)
-        self.assertIn("run --rm setup verify", launcher)
-        self.assertIn("run --rm setup certify", launcher)
+        self.assertIn(f"{setup_command} verify --live", launcher)
+        self.assertIn(f"{setup_command} verify", launcher)
+        self.assertIn(f"{setup_command} certify", launcher)
+        self.assertIn(f"{setup_command} webhook-enabled", launcher)
+        self.assertNotIn("run --rm setup launch", launcher)
+        self.assertNotIn("run --rm setup verify", launcher)
+        self.assertNotIn("run --rm setup certify", launcher)
+        self.assertNotIn("run --rm setup webhook-enabled", launcher)
         self.assertIn("wsl.exe --status", launcher.lower())
         self.assertIn('docker info --format "{{.OSType}}"', launcher)
         self.assertIn("linux_containers_required", launcher)
         self.assertNotIn("compose --profile setup --profile webhook pull", launcher)
         self.assertNotIn("run --rm setup install", launcher)
         self.assertNotIn("NOTION_TOKEN", launcher)
+
+    def test_customer_compose_commands_preserve_the_setup_entry_point(self) -> None:
+        compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+        self.assertIn('command: ["python", "/distribution/setup.py"]', compose)
+
+        surfaces = [ROOT / "README.md"]
+        for pattern in ("*.cmd", "*.ps1", "*.sh"):
+            surfaces.extend(ROOT.glob(pattern))
+            surfaces.extend((ROOT / "scripts").rglob(pattern))
+        surfaces.extend((ROOT / "docs").rglob("*.md"))
+        setup_run = re.compile(
+            r"\bdocker(?:\s+compose|-compose)\b.*\brun\b.*?\bsetup\b(?P<command>.*)$",
+            re.IGNORECASE,
+        )
+
+        def preserves_setup_entry_point(line: str) -> bool:
+            match = setup_run.search(line)
+            if not match:
+                return True
+            command = match.group("command").strip()
+            return not command or command.startswith("python /distribution/setup.py")
+
+        for unsafe in (
+            "docker compose run setup launch",
+            "docker compose --profile setup run setup verify --live",
+            "docker-compose run --rm setup certify",
+        ):
+            self.assertFalse(preserves_setup_entry_point(unsafe))
+        self.assertTrue(preserves_setup_entry_point("docker compose run --rm setup"))
+
+        invalid: list[str] = []
+        for path in surfaces:
+            for line_number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), start=1
+            ):
+                if not preserves_setup_entry_point(line):
+                    invalid.append(f"{path.relative_to(ROOT)}:{line_number}: {line.strip()}")
+        self.assertEqual(invalid, [])
 
     def test_packaged_feature_evals_cover_buyer_visible_suites(self) -> None:
         from scripts.run_installed_evals import evaluate
