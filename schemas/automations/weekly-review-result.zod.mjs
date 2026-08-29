@@ -187,7 +187,7 @@ const NextWeekProjectReplacementSchema = z.object({
   source_report_id: StableIdSchema,
   section: z.literal("This week's attention"),
   expected_current_text: z.string().min(1),
-  replacement_text: z.string().min(1).describe("Complete next-week checklist; integrations apply this text unchanged after the conflict guard."),
+  replacement_text: z.string().min(1).describe("Complete next-week open-work checklist merged from accepted priorities and open-Work rows evidenced in the source Project report; integrations apply it unchanged after the conflict guard."),
   source_ids: SourceIdsSchema,
 }).strict();
 
@@ -219,7 +219,10 @@ Return one Weekly review result from finalized Project Draft evidence.
 - Every Company report returns company_executive_context and renders those
   structured Problem, Decision, and SOP entries into self-contained prose.
 - next_week_project_replacements contains complete conflict-safe Project
-  checklist replacements, never parallel plan files.
+  checklist replacements merged from accepted priorities and open-Work rows
+  evidenced in the source Project reports. Preserve open Work by stable ID,
+  omit completed or cancelled Work from the new open view without deleting its
+  source/history, do not rescan raw Work, and never create parallel plan files.
 - configuration_gaps remains explicit. A missing expected Area report prevents
   the Company report from becoming Final.
 

@@ -11,11 +11,12 @@ feature_refs: [FEAT-0005, FEAT-0006, FEAT-0007]
 
 ## Context
 
-Run one bounded sequence from Notion Reports. First, finalize every current-week
-Project Report Draft and promote its reviewed knowledge. Second, roll finalized
+Run one bounded sequence from private workspace reports. First, finalize every
+current-week Project report and promote its reviewed knowledge. Second, roll finalized
 Project reports into Department reports, then roll finalized Department reports
-into one Company report. Read Reports, Projects, and destination database URLs from
-`workspace.hermes.md`; never rescan raw Work or Meeting pages.
+into one Company report. Read the private report root, Projects, and optional
+destination URLs from `workspace.hermes.md`; never rescan raw Work or Meeting
+pages.
 
 ## Authority
 
@@ -41,10 +42,10 @@ the automation must not invent another organizational layer.
   - Before the first provider call, run `ntn --help`,
     `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
     syntax confirmed by the installed CLI.
-  - Load every current-week Project Report with `report_status = Draft`, its
-    related Project, the prior Reports, and the destination records needed for
-    dedupe.
-  - Read each full Report page and the complete Project, Issue, Decision, and
+  - Load every current-week private Project report with
+    `report_status = Draft`, its related Project, prior reports, and the
+    destination records needed for dedupe.
+  - Read each full private report and the complete Project, Issue, Decision, and
     Skill/SOP templates. Do not read raw Work or Meeting pages.
   - Freeze the input as `weekly/context/weekly-context-YYYY-Www.json`.
 
@@ -55,7 +56,8 @@ the automation must not invent another organizational layer.
   - Read `schemas/automations/weekly-review-result.zod.mjs` completely.
   - Give the schema instructions, golden examples, frozen context, and every
     destination template to one structured extraction call.
-  - Produce and validate one complete Weekly result before any Notion mutation.
+  - Produce and validate one complete Weekly result before any workspace or
+    provider mutation.
   - Write the exact result bytes to
     `weekly/review/weekly-review-result-YYYY-Www.json`.
   - Stop before integrations if validation fails.
@@ -70,7 +72,7 @@ the automation must not invent another organizational layer.
   - Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`.
   - Require exact coverage of every report, disposition, Project replacement,
     and gap.
-  - Proceed to Notion writes only for tier A.
+  - Proceed to workspace or provider writes only for tier A.
   - For B/C readability findings, run `unslop`, regenerate the result, and
     review the new hash.
 
@@ -78,11 +80,11 @@ the automation must not invent another organizational layer.
 
   | Source | Action | Destination |
   | --- | --- | --- |
-  | Complete Project Report Draft | Finalize the exact Report using the rules below | `notion` skill via `ntn` on the exact Report |
+  | Complete private Project report | Finalize the exact report using the rules below | Exact `weeks/<week>/reports/project--<id>.md` path |
   | `Problems and inefficiencies` | Promote each qualifying problem or record its disposition | `notion` skill via `ntn` on the existing Work/Issue database |
   | `Decisions` | Promote each qualifying reusable Decision or record its disposition | `notion` skill via `ntn` on the Decisions database |
   | `SOPs` | Promote each qualifying approved employee workflow or record its disposition | `notion` skill via `ntn` on the existing SOPs database |
-  | `Next-week priorities` | Replace the related Project's complete `This week's attention` section for the new week | Configured provider on `projects` |
+  | `Next-week priorities` + evidenced open-Work rows | Replace the related Project's complete `This week's attention` section with one merged open-work checklist for the new week | Configured provider on `projects` |
 
   Apply these rules in order:
 
@@ -104,8 +106,20 @@ the automation must not invent another organizational layer.
      its trigger, actors, ordered steps, systems, handoffs, timing or volume
      baseline, exceptions, output, owner, reuse proof, Project relation, and
      source provenance. Never use the Farplane `skill.md` registry card.
-  5. Replace the related Project's complete `This week's attention` section
-     with the accepted `Next-week priorities` for the new week.
+  5. Build the related Project's new-week `This week's attention` from accepted
+     `Next-week priorities` plus open-Work rows already evidenced in the
+     finalized Project report. Preserve stable Work IDs and current owners,
+     states, due/review conditions, expected artifacts, and evidence. Do not
+     rescan raw Work. Do not copy completed or cancelled Work into the new open
+     view, and never delete it from canonical Work or finalized report history.
+  6. Do not create the next accumulating report during Weekly. The first Daily
+     run of the new week initializes it from the bounded live Work context and
+     the canonical carry-forward checklist. New Meeting-created Work joins the
+     same view through Daily reconciliation.
+
+  A human response that arrives after finalization updates live Work or
+  documentation-review state and appears in the next accumulating report. Do
+  not reopen or rewrite finalized Project, Department, or Company reports.
 
   Record one disposition for every candidate: `promoted`, `duplicate`,
   `project_only`, `monitor`, `dismissed`, or `blocked`. Missing authority,
@@ -130,13 +144,15 @@ the automation must not invent another organizational layer.
   - Group only this week's Final Project reports by their Project's Department.
   - Read the previous Department report and the complete current source reports.
   - Create or replace one Report using
-    `templates/area-operating-rollup.md`.
+    `templates/area-operating-rollup.md` in the private weekly workspace.
   - Preserve the shared section structure, summarize cross-Project patterns,
     and link every source Project report.
   - Record missing Project or Department relations as `configuration_gap`.
-  - Write through the `notion` skill via `ntn` to Reports.
+  - Write the finalized rollup under the exact private weekly report root;
+    optional publication remains a separately authorized mapped effect.
 
-  Record the Notion URL and finalized version for every Department report. A
+  Record the private report locator and finalized version for every Department
+  report, plus an optional provider URL only when publication succeeds. A
   Department with expected active Projects but no Final Project report blocks
   the Company report; do not hide it by omitting the Department.
 
@@ -145,28 +161,30 @@ the automation must not invent another organizational layer.
   - Read all Final Department reports for the week and the previous Company
     report.
   - Create or replace one Company Report using
-    `templates/company-operating-rollup.md`.
+    `templates/company-operating-rollup.md` in the private weekly workspace.
   - Preserve the shared section structure.
   - Include only company-material patterns and link every Department report.
   - Set `report_status = Final`, increment `report_version`, and set
     `finalized_at`.
-  - Write through the `notion` skill via `ntn` to Reports.
+  - Write the finalized Company report under the exact private weekly report
+    root; optional publication remains a separately authorized mapped effect.
 
   Do not finalize the Company report when an expected Department report is
   missing or non-Final. Report the gap instead.
 
 - [ ] **4 — Deliver the actual Company report.**
 
-  After all expected Project, Department, and Company records have been read
-  back from Notion as Final:
+  After all expected Project, Department, and Company files have been read back
+  from the private weekly workspace as Final:
 
   - Load the owner Person record and resolve its approved Telegram route through
     the active environment binding.
   - Run `kamdar send --help`.
   - Render `templates/executive-distribution.md` with the complete Company
-    report Markdown, unchanged and not summarized; the title and Notion URL of
-    every source Department report; and the final Company report URL and
-    version.
+  report Markdown, unchanged and not summarized; the title and private locator
+  of every source Department report; and the final Company report locator and
+  version. Include provider URLs only for reports that were separately
+  published successfully.
   - Send the rendered document through the approved route.
 
   If the provider requires multiple messages, split only at Markdown section
@@ -179,16 +197,19 @@ the automation must not invent another organizational layer.
 
 ## Output
 
-- Final Project, Department, and Company Notion Report URLs
+- Final Project, Department, and Company private report locators, plus optional
+  provider URLs for successful publication effects
 - Promotion dispositions and destination record URLs
 - `weekly/context/weekly-context-YYYY-Www.json`
 - `weekly/review/weekly-review-result-YYYY-Www.json`
 - `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`
 - `weekly/receipts/weekly-integration-receipt-YYYY-Www.json`, containing source
-  Report versions, integration outcomes, gaps, the final Company Report URL,
-  approved Telegram route, and provider delivery receipts
+  report versions, integration outcomes, gaps, the final Company report
+  locator and optional provider URL, approved Telegram route, and provider
+  delivery receipts
 
-Write the validated Weekly result before any Notion mutation. Record each
-integration outcome in the receipt as it settles. Before any provider write,
+Write the validated Weekly result before any workspace or provider mutation.
+Record each integration outcome in the receipt as it settles. Before any
+provider write,
 prove that the active environment binding authorizes the exact target and
 action. Otherwise record `blocked` and stop that effect.

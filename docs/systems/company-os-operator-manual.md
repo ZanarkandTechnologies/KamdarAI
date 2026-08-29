@@ -306,6 +306,12 @@ Daily responsibilities:
 6. Keep effect, conflict, blocked-route, duplicate, and read-back metadata in
    hidden run state rather than adding operator-facing artifact classes.
 
+Daily also reconciles the Project report's open-work view against canonical
+Work by stable ID. It updates still-open rows in place, adds Work created from
+new Meeting commitments, and removes a row from the open view only after the
+Work's completed or cancelled disposition is evidenced. Removed rows remain in
+the appropriate finalized weekly history; Daily never deletes the source Work.
+
 Daily must not:
 
 - Scan all historical Work because a relation is missing.
@@ -336,6 +342,16 @@ weeks/<week>/reports/project--*.md
                           v
              approved executive delivery
 ```
+
+Weekly writes the accepted carry-forward checklist to the canonical Project
+attention surface; it does not mutate canonical Work or create another
+accumulating report. On the first
+Daily run of the new week, the private writer creates that week's Project report
+from the bounded live Work context and those carry-forward decisions. Its
+weekly narrative starts empty, while open Work, unresolved documentation
+requests, blockers, and expected artifacts remain live. A late human response
+settles the canonical Work or documentation state and is reflected by the next
+Daily run in the new week's report; finalized rollups are not reopened.
 
 Promotion rules:
 

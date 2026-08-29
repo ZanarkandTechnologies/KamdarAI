@@ -75,6 +75,52 @@ and retention can archive a complete week. Reports carry their own
 artifacts carry material intended to leave the private workspace; there is no
 publish queue or separate follow-up directory.
 
+## Continuous Project draft contract
+
+A weekly Project draft is a current-week view over canonical Work, not the
+owner of the task list. Crossing a week boundary finalizes the report snapshot
+but does not clear continuing work:
+
+```text
+canonical Work + new Meeting commitments + prior unresolved state
+                              |
+                              v
+                  current Project weekly draft
+                              |
+                +-------------+-------------+
+                |                           |
+          Work remains open           Work completes
+                |                           |
+     keep and update one row      record the evidenced result
+                |                 in the finalized week
+                |                           |
+                +-----------> next week <---+
+                     carry open only
+```
+
+- Open Work keeps the same stable Work ID and appears in the next week's
+  accumulating Project report with its latest owner, state, due/review
+  condition, expected artifact, and evidence.
+- Completed or cancelled Work is omitted from the next week's open-work view;
+  it remains in the finalized report for the week in which its disposition was
+  evidenced. This is removal from a view, never deletion of canonical Work.
+- Meeting intake creates source-linked canonical Work for new commitments and
+  deduplicates unchanged commitments. The next Daily reconciliation updates a
+  matching open-work row by stable Work ID or adds the newly created Work; it
+  never creates a second report-local todo list.
+- A human response received after finalization updates the still-live Work or
+  documentation-review state and appears in the next accumulating report. It
+  does not rewrite the finalized Project, Department, or Company reports.
+- On the first Daily run of a new week, the private writer initializes that
+  week's Project report. It resets bounded narrative such as Summary, weekly
+  outcomes, and completed-this-week evidence, while carrying the open Work,
+  unresolved documentation requests, active blockers, and unaccepted expected
+  artifacts present in the live bounded Daily context.
+
+The practical invariant is: **final reports are immutable weekly snapshots;
+canonical Work supplies continuity; the next Project draft carries only live
+open state.**
+
 ## System flow
 
 ```text

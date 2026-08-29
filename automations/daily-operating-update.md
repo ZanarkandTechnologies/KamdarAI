@@ -37,7 +37,10 @@ destination or substitute another route.
     `AI review != Processed`. Do not reload unchanged Done Work whose
     `AI review = Processed`.
   - Include embedded Meetings from the selected Work pages.
-  - Load the exact current-week Notion Report Draft and its full page content.
+  - Load each exact current-week private Project report from
+    `weeks/<week>/reports/`. If this is the first Daily run of the week, initialize
+    it through the private report writer from the bounded live Work context;
+    never copy the prior finalized report wholesale.
   - Write `daily/context/daily-context-diff-YYYY-MM-DD.json`.
 
   Never infer an `ntn` resource or argument shape.
@@ -86,28 +89,34 @@ destination or substitute another route.
   - `documentation_reviews[]` with `verdict = needs_information`: use the
     configured provider on `tasks`. Add the rendered
     comment to the exact Work item using `question_key` for deduplication.
-  - `knowledge_updates[].draft_entries[]` and `weekly_progress_chases[]`: use
-    the `notion` skill via `ntn` on the exact current-week Report Draft. Build
-    the complete replacement Draft using the procedure below.
+  - `knowledge_updates[].draft_entries[]` and `weekly_progress_chases[]`: map
+    them through the private report writer into the exact current-week Project
+    report. Build the complete replacement report using the procedure below.
   - `weekly_progress_chases[]`: load the exact Person, resolve its
     `Contact endpoint` through the active environment binding, and send through
     that approved route only.
 
-  Never infer a table, Report, person, route alias, or fallback channel. The
-  current Report Draft ID/URL must be present in the collected context. If the
-  Reports source, required integration, or approved route is unavailable,
-  report `blocked` and keep the JSON result.
+  Never infer a table, report path, person, route alias, or fallback channel.
+  The current private report path must resolve under `weeks/<week>/reports/`.
+  If a required provider integration or approved route is unavailable, keep the
+  private report update, report the external effect as `blocked`, and retain the
+  JSON result.
 
   For the current Weekly Draft:
 
-  1. Load the exact current-week Report Draft.
-  2. Preserve content that is still current.
-  3. Render the structured workflow and problem payloads without dropping any
+  1. Load or initialize the exact current-week private Project report.
+  2. Reconcile its open-work view against canonical Work by stable Work ID:
+     update still-open rows, add newly created Meeting-commitment Work, and
+     omit completed or cancelled rows only after their disposition is
+     evidenced in the current week's outcomes. Never delete the source Work.
+  3. Preserve unresolved documentation requests, blockers, unaccepted expected
+     artifacts, and other content that is still current.
+  4. Render the structured workflow and problem payloads without dropping any
      baseline fields.
-  4. Apply the findings to the four required sections.
-  5. Increment `draft_version` by one.
-  6. Set `last_updated` to the run timestamp.
-  7. Write one complete replacement Draft.
+  5. Apply the findings to the required sections.
+  6. Increment `draft_version` by one.
+  7. Set `last_updated` to the run timestamp.
+  8. Write one complete replacement Draft.
 
   **Message delivery**
 
