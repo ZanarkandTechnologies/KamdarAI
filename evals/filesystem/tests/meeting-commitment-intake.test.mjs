@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
@@ -6,6 +8,7 @@ import {
   renderTaskRecord,
   simulateApplication,
 } from "../scripts/meeting-commitment-intake-eval.mjs";
+import { MeetingCommitmentIntakeResultSchema } from "../../../schemas/automations/meeting-commitment-intake-result.zod.mjs";
 
 test("meeting commitment intake passes its three behavior cases", () => {
   const result = evaluateMeetingCommitmentIntake();
@@ -34,4 +37,12 @@ test("an unchanged application creates no duplicate Tasks", () => {
   const observed = simulateApplication(result, new Set(["meeting:TASK-M:commitment:TASK-X"]));
   assert.equal(observed.created.length, 0);
   assert.deepEqual(observed.duplicates, ["meeting:TASK-M:commitment:TASK-X"]);
+});
+
+test("blocked commitments cannot be reported as a fully produced intake", () => {
+  const expectedPath = fileURLToPath(new URL("../../meeting-intake/expected/result.json", import.meta.url));
+  const result = JSON.parse(readFileSync(expectedPath, "utf8"));
+  result.feature_outcomes[0].outcome = "produced";
+  result.feature_outcomes[0].information_gaps = [];
+  assert.equal(MeetingCommitmentIntakeResultSchema.safeParse(result).success, false);
 });

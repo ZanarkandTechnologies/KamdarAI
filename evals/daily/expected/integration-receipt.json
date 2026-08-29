@@ -3,7 +3,7 @@
   "receipt_id": "DAILY-INTEGRATION-2026-08-25-V4",
   "source_context_id": "daily-context-2026-08-25",
   "daily_result_id": "daily-review-result-2026-08-25",
-  "daily_result_sha256": "a8c0d9d38be389ee8472bedb3ce8c7909c79e7486df047f1a39acd90db040c63",
+  "daily_result_sha256": "951238c92593ad7b6bda7eedca61438b1af320b2682a6b459ddd2e4c46f29f21",
   "recorded_at": "2026-08-25T17:12:00+08:00",
   "effects": [
     {

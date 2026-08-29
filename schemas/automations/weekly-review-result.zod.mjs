@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { FeatureOutcomeSchema, validateFeatureOutcomeCoverage } from "./feature-outcome.zod.mjs";
 
 const StableIdSchema = z.string().min(1).describe("Use an exact ID from the immutable Weekly context.");
 const SourceIdsSchema = z.array(StableIdSchema).min(1).describe("Immediate source Report IDs first, followed by any retained source record IDs.");
@@ -200,6 +201,9 @@ const ConfigurationGapSchema = z.object({
 export const WEEKLY_REVIEW_RESULT_PROMPT = String.raw`
 Return one Weekly review result from finalized Project Draft evidence.
 
+- Return feature_outcomes exactly once for FEAT-0005 through FEAT-0007. Choose
+  produced, no_change_needed, or insufficient_information from the cited
+  evidence, and point produced outcomes to their output rows.
 - report_results contains complete versioned Project, Area, and Company reports.
 - promotion_dispositions gives every candidate exactly one disposition; only
   promoted candidates render a new canonical record. A promoted record must be
@@ -226,9 +230,10 @@ Golden disposition examples:
 `;
 
 export const WeeklyReviewResultSchema = z.object({
-  schema_version: z.literal("kamdar-weekly-review-result@1.0.0"),
+  schema_version: z.literal("kamdar-weekly-review-result@1.1.0"),
   context_id: StableIdSchema,
   week: z.string().regex(/^\d{4}-W\d{2}$/),
+  feature_outcomes: z.array(FeatureOutcomeSchema).length(3),
   report_results: z.array(ReportResultSchema).min(1),
   promotion_dispositions: z.array(PromotionDispositionSchema),
   next_week_project_replacements: z.array(NextWeekProjectReplacementSchema),
@@ -239,6 +244,36 @@ export const WeeklyReviewResultSchema = z.object({
   if (blocksCompany && result.report_results.some((report) => report.report_level === "Company" && report.report_status === "Final")) {
     context.addIssue({ code: "custom", message: "a blocking Area gap forbids a Final Company report." });
   }
+  const reportOutcome = result.feature_outcomes.find((outcome) => outcome.feature_id === "FEAT-0005");
+  const blockingGapCodes = result.configuration_gaps
+    .filter((gap) => gap.blocks_company_finalization)
+    .map((gap) => gap.code);
+  if (blockingGapCodes.length > 0) {
+    if (reportOutcome?.outcome !== "insufficient_information") {
+      context.addIssue({ code: "custom", path: ["feature_outcomes"], message: "a blocking Company configuration gap requires FEAT-0005 to report insufficient_information." });
+    } else {
+      const reportedCodes = new Set(reportOutcome.information_gaps.map((gap) => gap.code));
+      for (const gapCode of blockingGapCodes) {
+        if (!reportedCodes.has(gapCode)) {
+          context.addIssue({ code: "custom", path: ["feature_outcomes"], message: `FEAT-0005 must report blocking configuration gap ${gapCode}.` });
+        }
+      }
+    }
+  }
+  validateFeatureOutcomeCoverage({
+    outcomes: result.feature_outcomes,
+    expectedFeatureIds: ["FEAT-0005", "FEAT-0006", "FEAT-0007"],
+    outputRoots: {
+      "FEAT-0005": "report_results",
+      "FEAT-0006": "promotion_dispositions",
+      "FEAT-0007": "next_week_project_replacements",
+    },
+    outputCounts: {
+      "FEAT-0005": result.report_results.length,
+      "FEAT-0006": result.promotion_dispositions.length,
+      "FEAT-0007": result.next_week_project_replacements.length,
+    },
+  }, context);
 }).describe(WEEKLY_REVIEW_RESULT_PROMPT);
 
 export const WeeklyReviewResultJsonSchema = z.toJSONSchema(WeeklyReviewResultSchema, {

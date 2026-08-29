@@ -54,7 +54,7 @@ function weeklyResult() {
     report("RPT-AREA-ECOMMERCE-W34", "Area", null, "Ecommerce", [projects[2].report_id], "06")
   ];
   const weeklyResult = {
-    schema_version: "kamdar-weekly-review-result@1.0.0",
+    schema_version: "kamdar-weekly-review-result@1.1.0",
     context_id: "weekly-context-2026-W34",
     week: "2026-W34",
     report_results: [...projects, ...areas, report("RPT-COMPANY-W34", "Company", null, null, areas.map((row) => row.report_id), "07")],
@@ -67,6 +67,32 @@ function weeklyResult() {
     configuration_gaps: [],
     run_notes: "Provider-edge application fixture."
   };
+  weeklyResult.feature_outcomes = [
+    {
+      feature_id: "FEAT-0005",
+      outcome: "produced",
+      evidence: [{ source_id: "RPT-DRAFT-CMT-W34", observation: "The finalized Project Draft chain supports seven report rows." }],
+      reasoning_summary: "The complete Project-to-Area-to-Company source chain supports the generated reports.",
+      output_refs: weeklyResult.report_results.map((_, index) => `/report_results/${index}`),
+      information_gaps: [],
+    },
+    {
+      feature_id: "FEAT-0006",
+      outcome: "produced",
+      evidence: [{ source_id: "TASK-101", observation: "The reviewed candidates require explicit promotion dispositions." }],
+      reasoning_summary: "Each supplied candidate has enough report evidence for an explicit disposition.",
+      output_refs: weeklyResult.promotion_dispositions.map((_, index) => `/promotion_dispositions/${index}`),
+      information_gaps: [],
+    },
+    {
+      feature_id: "FEAT-0007",
+      outcome: "no_change_needed",
+      evidence: [{ source_id: "RPT-DRAFT-CMT-W34", observation: "The fixture contains no requested next-week checklist change." }],
+      reasoning_summary: "The checked Project Drafts do not require a replacement checklist.",
+      output_refs: [],
+      information_gaps: [],
+    },
+  ];
   weeklyResult.promotion_dispositions[0].problem_baseline_proof = {
     workflow_name: "Pre-production handoff",
     affected_step: "Approve the canonical pack",
@@ -360,6 +386,7 @@ test("Weekly application refuses incomplete Area coverage before Notion writes",
   provisionTask0007NotionSeed({ commandRunner: mock.runner, privateRoot, environment: currentEvalSeedEnvironment });
   const incomplete = weeklyResult();
   incomplete.report_results = incomplete.report_results.filter((report) => report.report_id !== "RPT-AREA-MARKETING-W34");
+  incomplete.feature_outcomes[0].output_refs = incomplete.report_results.map((_, index) => `/report_results/${index}`);
   const resultPath = resolve(privateRoot, "weekly-result.json");
   writeFileSync(resultPath, JSON.stringify(incomplete));
   const qualityReviewPath = writeTierAWeeklyReview(privateRoot, resultPath, incomplete);

@@ -14,19 +14,19 @@
       "path": "weekly/read-back/weekly-integration-read-back-2026-W34.json",
       "kind": "mock-provider-read-back",
       "bytes": 22946,
-      "sha256": "ca56fb1ebf51bae6f2b1fa86ef53f94b554241a90f635e5264ca8ddc41056669"
+      "sha256": "21aac83a44bb03bae5078201fc02a258d27c8422bf3cfca67464cac4dd9a604c"
     },
     {
       "path": "weekly/receipts/weekly-integration-receipt-2026-W34.json",
       "kind": "mock-integration-receipt",
       "bytes": 6474,
-      "sha256": "261d6eefb410d6e0c79d095960fd991d849cc14461b1ce96fa209a35aedb8828"
+      "sha256": "b3c3487051a4179c8d3b44ebbc005313d9e40ad9235ebc42a88baee7c98a5939"
     },
     {
       "path": "weekly/review/weekly-review-result-2026-W34.json",
       "kind": "weekly-review-result",
-      "bytes": 42886,
-      "sha256": "4e1960652063605428ce36dc03fefacaa9b95cefd4182f74bfc6a63271cf3e43"
+      "bytes": 45696,
+      "sha256": "837108bee6280f5105e2df60f452c222ec0da5e718459a7d1f8b83682ca60cff"
     }
   ]
 }

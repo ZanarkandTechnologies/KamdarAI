@@ -1,7 +1,6 @@
 import * as z from "zod";
+import { FeatureOutcomeSchema, validateFeatureOutcomeCoverage } from "./feature-outcome.zod.mjs";
 
-// Review-first MVP contract. Zod is not installed yet.
-//
 // The schema deliberately models rendered text, not the reasoning steps used
 // to produce it. The model receives fully read source records and returns the
 // complete replacement sections, comments, messages, and Draft entries that a
@@ -445,6 +444,9 @@ Return the complete result of one bounded Daily Project Review.
 
 Rules across all pipelines:
 - Use only the supplied Daily context and current Weekly Draft.
+- Return feature_outcomes exactly once for FEAT-0001 through FEAT-0004. Choose
+  produced, no_change_needed, or insufficient_information from the cited
+  evidence, and point produced outcomes to their output rows.
 - Return one documentation review for every selected Done Work item. Other
   arrays contain actions only.
 - Keep every claim traceable through source_ids.
@@ -456,14 +458,31 @@ Rules across all pipelines:
 
 export const DailyReviewResultSchema = z
   .object({
-    schema_version: z.literal("kamdar-daily-review-result@1.1.0"),
+    schema_version: z.literal("kamdar-daily-review-result@1.2.0"),
     context_id: StableIdSchema,
+    feature_outcomes: z.array(FeatureOutcomeSchema).length(4),
     project_updates: z.array(ProjectPageUpdateSchema),
     documentation_reviews: z.array(DocumentationReviewSchema),
     weekly_progress_chases: z.array(WeeklyProgressChaseSchema),
     knowledge_updates: z.array(KnowledgeUpdateSchema),
     run_notes: z.string(),
   })
+  .superRefine((result, context) => validateFeatureOutcomeCoverage({
+    outcomes: result.feature_outcomes,
+    expectedFeatureIds: ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"],
+    outputRoots: {
+      "FEAT-0001": "project_updates",
+      "FEAT-0002": "documentation_reviews",
+      "FEAT-0003": "weekly_progress_chases",
+      "FEAT-0004": "knowledge_updates",
+    },
+    outputCounts: {
+      "FEAT-0001": result.project_updates.length,
+      "FEAT-0002": result.documentation_reviews.length,
+      "FEAT-0003": result.weekly_progress_chases.length,
+      "FEAT-0004": result.knowledge_updates.length,
+    },
+  }, context))
   .describe(DAILY_REVIEW_RESULT_PROMPT);
 
 export const DailyReviewResultJsonSchema = z.toJSONSchema(DailyReviewResultSchema, {

@@ -185,9 +185,42 @@ test("Weekly eval uses separate tester and evidence-review subagents and mocked 
 
 test("Weekly Zod contract blocks false Company finalization", () => {
   const base = {
-    schema_version: "kamdar-weekly-review-result@1.0.0",
+    schema_version: "kamdar-weekly-review-result@1.1.0",
     context_id: "weekly-context-2026-W34",
     week: "2026-W34",
+    feature_outcomes: [
+      {
+        feature_id: "FEAT-0005",
+        outcome: "insufficient_information",
+        evidence: [{ source_id: "RPT-AREA-CMT-W34", observation: "The available Area report supports a blocked Company rollup." }],
+        reasoning_summary: "A useful Company report can be produced while explicitly preserving its blocked status.",
+        output_refs: ["/report_results/0"],
+        information_gaps: [{
+          code: "missing-area-report",
+          needed_field: "Content Area report",
+          source_ids_checked: ["RPT-AREA-CMT-W34"],
+          why_needed: "Every expected Area report is required before Company finalization.",
+          where_to_add: "Add the Content Area report to the Weekly evidence set.",
+          question: "Where is the Content Area report?",
+        }],
+      },
+      {
+        feature_id: "FEAT-0006",
+        outcome: "no_change_needed",
+        evidence: [{ source_id: "RPT-AREA-CMT-W34", observation: "No promotion candidates are present in this contract fixture." }],
+        reasoning_summary: "The checked evidence contains no candidate requiring a promotion disposition.",
+        output_refs: [],
+        information_gaps: [],
+      },
+      {
+        feature_id: "FEAT-0007",
+        outcome: "no_change_needed",
+        evidence: [{ source_id: "RPT-AREA-CMT-W34", observation: "No next-week project replacement is requested in this contract fixture." }],
+        reasoning_summary: "The checked evidence does not require a checklist replacement.",
+        output_refs: [],
+        information_gaps: [],
+      },
+    ],
     report_results: [{
       report_id: "RPT-COMPANY-W34",
       report_level: "Company",
@@ -216,6 +249,12 @@ test("Weekly Zod contract blocks false Company finalization", () => {
   base.report_results[0].report_status = "Final";
   base.report_results[0].finalized_at = "2026-08-25T17:00:00+08:00";
   assert.equal(WeeklyReviewResultSchema.safeParse(base).success, false);
+});
+
+test("Weekly outcome must reference every generated feature output", () => {
+  const result = json(resolve(expectedRoot, "result.json"));
+  result.feature_outcomes.find((item) => item.feature_id === "FEAT-0005").output_refs.pop();
+  assert.equal(WeeklyReviewResultSchema.safeParse(result).success, false);
 });
 
 test("promoted knowledge renders the complete destination template", () => {

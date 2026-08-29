@@ -1,7 +1,54 @@
 {
-  "schema_version": "kamdar-weekly-review-result@1.0.0",
+  "schema_version": "kamdar-weekly-review-result@1.1.0",
   "context_id": "weekly-context-2026-W34",
   "week": "2026-W34",
+  "feature_outcomes": [
+    {
+      "feature_id": "FEAT-0005",
+      "outcome": "insufficient_information",
+      "evidence": [
+        { "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34", "observation": "The current CMT Project Draft contains grounded outcomes, blockers, and next-week attention." },
+        { "source_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34", "observation": "The current Marketing Project Draft contains campaign outcomes and unresolved measurement needs." }
+      ],
+      "reasoning_summary": "Current Project Drafts support useful Project, Area, and blocked Company preview reports, but the missing Content Area report prevents a complete Company answer.",
+      "output_refs": ["/report_results/0", "/report_results/1", "/report_results/2", "/report_results/3", "/report_results/4", "/report_results/5", "/report_results/6"],
+      "information_gaps": [
+        {
+          "code": "missing-area-report",
+          "needed_field": "Content Area report",
+          "source_ids_checked": [
+            "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+            "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+          ],
+          "why_needed": "Every expected Area report is required before the Company report can be finalized.",
+          "where_to_add": "Add the current Content Project Draft and Content Area report to the Weekly evidence set.",
+          "question": "Where is the current Content Area report for 2026-W34?"
+        }
+      ]
+    },
+    {
+      "feature_id": "FEAT-0006",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "TASK-101", "observation": "The repeated production blocker includes a measurable Before baseline and intervention owner." },
+        { "source_id": "TASK-203", "observation": "The listing handoff workflow has repeated-use evidence with explicit measurement gaps." }
+      ],
+      "reasoning_summary": "Every knowledge candidate can receive a grounded promotion, duplicate, project-only, monitor, dismissed, or blocked disposition.",
+      "output_refs": ["/promotion_dispositions/0", "/promotion_dispositions/1", "/promotion_dispositions/2", "/promotion_dispositions/3", "/promotion_dispositions/4"],
+      "information_gaps": []
+    },
+    {
+      "feature_id": "FEAT-0007",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34", "observation": "The finalized CMT priorities retain unresolved work and one approved next priority." },
+        { "source_id": "TASK-104", "observation": "The sample recheck remains unresolved and must carry forward." }
+      ],
+      "reasoning_summary": "The finalized CMT report supports one complete conflict-safe Project checklist replacement for next week.",
+      "output_refs": ["/next_week_project_replacements/0"],
+      "information_gaps": []
+    }
+  ],
   "report_results": [
     {
       "report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",

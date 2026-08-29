@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "eval:feature-outcomes": "node scripts/feature-outcome-eval.mjs",
     "view:build": "node ../viewer/build.mjs --out evals/viewer/dist --evidence tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json",
     "judge:operated-w34": "node scripts/write-operated-w34-feature-judges.mjs",
     "view:build:operated-w34": "node ../viewer/build.mjs --out evals/viewer/dist --evidence tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json --daily-run /Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai/workspace/runs/operated-2026-W34/daily --weekly-run /Users/kenjipcx/.hermes/profiles/vishan-kamdar-ai/workspace/runs/operated-2026-W34/weekly",

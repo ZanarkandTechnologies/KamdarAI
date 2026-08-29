@@ -7,6 +7,8 @@ at the repository root under `seed/`; product templates live under `templates/`.
 
 - `daily/`: FEAT-0001–0004 suite and expected artifacts.
 - `weekly/`: FEAT-0005–0007 suite and expected artifacts.
+- `feature-outcomes/`: small generated-versus-expected cases for `produced`,
+  `no_change_needed`, and `insufficient_information` extraction outcomes.
 - `automations/`: evaluator procedures for the seed, Daily, and Weekly runs.
 - `rubrics/`: independent review criteria.
 - `schemas/`: evaluation-only structured review contracts.
@@ -22,6 +24,7 @@ ignored local state.
 
 ```bash
 node --test evals/filesystem/tests/*.test.mjs
+cd evals/filesystem && npm run eval:feature-outcomes
 node evals/viewer/build.mjs --out evals/viewer/dist \
   --evidence tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json
 node evals/viewer/serve.mjs

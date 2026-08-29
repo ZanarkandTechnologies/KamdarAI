@@ -1,6 +1,52 @@
 {
-  "schema_version": "kamdar-daily-review-result@1.1.0",
+  "schema_version": "kamdar-daily-review-result@1.2.0",
   "context_id": "daily-context-2026-08-25",
+  "feature_outcomes": [
+    {
+      "feature_id": "FEAT-0001",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "TASK-101", "observation": "The corrected collar measurement and approver are still missing." },
+        { "source_id": "TASK-105", "observation": "The signed pre-production sample check is complete." }
+      ],
+      "reasoning_summary": "The completed sample check and unresolved collar-approval blocker materially change the Project's current position and weekly attention.",
+      "output_refs": ["/project_updates/0"],
+      "information_gaps": []
+    },
+    {
+      "feature_id": "FEAT-0002",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "TASK-115", "observation": "The completed campaign update omits its measurement basis and decision rationale." },
+        { "source_id": "TASK-116", "observation": "The completed legal review already contains sufficient evidence." }
+      ],
+      "reasoning_summary": "Every selected completed Work item was reviewed; some require precise documentation questions while sufficient items require no comment.",
+      "output_refs": ["/documentation_reviews/0", "/documentation_reviews/1", "/documentation_reviews/2", "/documentation_reviews/3", "/documentation_reviews/4", "/documentation_reviews/5"],
+      "information_gaps": []
+    },
+    {
+      "feature_id": "FEAT-0003",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "TASK-101", "observation": "The overdue collar approval is blocking dependent production work." },
+        { "source_id": "PROJ-CMT-CMT_PIPELINE", "observation": "The Project names the blocked work and its accountable owner." }
+      ],
+      "reasoning_summary": "The overdue blocker has a known owner and material downstream impact, so a focused progress follow-up is warranted.",
+      "output_refs": ["/weekly_progress_chases/0"],
+      "information_gaps": []
+    },
+    {
+      "feature_id": "FEAT-0004",
+      "outcome": "produced",
+      "evidence": [
+        { "source_id": "TASK-201", "observation": "The completed campaign work contains reusable workflow, problem, and decision evidence." },
+        { "source_id": "TASK-203", "observation": "The listing handoff method was reused, with timing and volume retained as measurement gaps." }
+      ],
+      "reasoning_summary": "The completed Work contains source-backed knowledge candidates suitable for the Weekly Draft while preserving explicit measurement gaps.",
+      "output_refs": ["/knowledge_updates/0", "/knowledge_updates/1"],
+      "information_gaps": []
+    }
+  ],
   "project_updates": [
     {
       "project_id": "PROJ-CMT-CMT_PIPELINE",
