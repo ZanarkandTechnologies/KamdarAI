@@ -83,7 +83,8 @@ class SetupWorkspaceTests(unittest.TestCase):
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
-            (source / "schemas/automations/daily.mjs").write_text("schema\n", encoding="utf-8")
+            (source / "schemas/automations/daily.py").write_text("schema\n", encoding="utf-8")
+            (source / "schemas/automations/legacy.zod.mjs").write_text("development only\n", encoding="utf-8")
             (source / "evals/rubrics/quality.md").write_text("rubric\n", encoding="utf-8")
             (source / "templates/project.md").write_text("project\n", encoding="utf-8")
             (source / "plugins/platforms/notion/plugin.yaml").write_text("name: notion-platform\n", encoding="utf-8")
@@ -92,7 +93,8 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertEqual((workspace / ".hermes.md").read_text(encoding="utf-8"), config.read_text(encoding="utf-8"))
             self.assertEqual((workspace / "automations/daily.md").read_text(encoding="utf-8"), "daily\n")
-            self.assertEqual((workspace / "schemas/automations/daily.mjs").read_text(encoding="utf-8"), "schema\n")
+            self.assertEqual((workspace / "schemas/automations/daily.py").read_text(encoding="utf-8"), "schema\n")
+            self.assertFalse((workspace / "schemas/automations/legacy.zod.mjs").exists())
             self.assertEqual((workspace / "evals/rubrics/quality.md").read_text(encoding="utf-8"), "rubric\n")
             self.assertEqual((workspace / "templates/project.md").read_text(encoding="utf-8"), "project\n")
             self.assertEqual(

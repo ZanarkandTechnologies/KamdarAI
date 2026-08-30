@@ -17,7 +17,8 @@ setup workflow and product-facing contracts remain company-neutral here.
 
 ## Install on Windows
 
-You need Windows, Docker Desktop, and the WSL2 backend.
+You need Windows, Docker Desktop, and the WSL2 backend. The client runtime does
+not require a host Python, Node.js, or npm installation.
 
 1. Clone or download this repository.
 2. Start Docker Desktop.

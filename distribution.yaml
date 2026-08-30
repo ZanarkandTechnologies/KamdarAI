@@ -32,7 +32,17 @@ distribution_owned:
   - evals/meeting-intake
   - workspace.hermes.template.md
   - automations
-  - schemas/automations
+  - schemas/automations/__init__.py
+  - schemas/automations/artifact_quality_review.py
+  - schemas/automations/daily_context_diff.py
+  - schemas/automations/daily_idempotency_rerun_receipt.py
+  - schemas/automations/daily_integration_receipt.py
+  - schemas/automations/daily_review_result.py
+  - schemas/automations/feature_outcome.py
+  - schemas/automations/meeting_commitment_intake_result.py
+  - schemas/automations/weekly_context.py
+  - schemas/automations/weekly_review_result.py
+  - schemas/automations/validate.py
   - evals/rubrics/end-user-artifact-quality.md
   - templates
   - plugins/platforms/notion/__init__.py
@@ -41,3 +51,4 @@ distribution_owned:
   - plugins/platforms/notion/cli.py
   - plugins/platforms/notion/plugin.yaml
   - plugins/platforms/notion/protocol.py
+  - schemas/__init__.py

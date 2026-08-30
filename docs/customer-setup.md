@@ -3,7 +3,7 @@ title: Install the Company OS on Hermes for Windows
 status: in_progress
 owner: Company OS
 created_at: 2026-08-29
-updated_at: 2026-08-29
+updated_at: 2026-08-30
 feature_refs: [FEAT-0011]
 ---
 
@@ -12,7 +12,9 @@ feature_refs: [FEAT-0011]
 This is the customer runbook for the supported Windows deployment. The target
 is Docker Desktop using Linux containers on its WSL2 backend. Hermes,
 `cloudflared`, Python, and the Company OS runtime run inside containers; the
-customer does not install those CLIs on Windows or open a WSL terminal.
+customer does not install those CLIs, Node.js, or npm on Windows or open a WSL
+terminal. The installed extraction contracts execute with Hermes' bundled
+Python and Pydantic.
 
 The screens below use the generic product labels. The current KamdarAI proving
 build may still show legacy Kamdar labels until the setup implementation is

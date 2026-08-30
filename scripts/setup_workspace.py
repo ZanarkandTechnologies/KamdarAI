@@ -76,9 +76,10 @@ def context_status() -> str:
 
 def source_files() -> list[tuple[Path, str, Path]]:
     files: list[tuple[Path, str, Path]] = [(CONFIG, "workspace", Path(".hermes.md"))]
+    automation_schema_root = PROJECT / "schemas" / "automations"
     for owner, source_root, destination_root in (
         ("workspace", PROJECT / "automations", Path("automations")),
-        ("workspace", PROJECT / "schemas" / "automations", Path("schemas/automations")),
+        ("workspace", automation_schema_root, Path("schemas/automations")),
         ("workspace", PROJECT / "evals" / "rubrics", Path("evals/rubrics")),
         ("workspace", PROJECT / "templates", Path("templates")),
         ("profile", PROJECT / "plugins", Path("plugins")),
@@ -86,6 +87,8 @@ def source_files() -> list[tuple[Path, str, Path]]:
         for source in sorted(source_root.rglob("*")):
             relative = source.relative_to(source_root)
             if source.is_symlink() or any(part in EXCLUDED_NAMES for part in relative.parts):
+                continue
+            if source_root == automation_schema_root and source.is_file() and source.suffix != ".py":
                 continue
             if source.is_file() and source.suffix not in EXCLUDED_SUFFIXES:
                 files.append((source, owner, destination_root / relative))
