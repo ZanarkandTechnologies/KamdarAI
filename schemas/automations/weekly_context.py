@@ -1,184 +1,225 @@
-"""Pydantic contract for the immutable Weekly review context."""
+"""Pydantic contract for one immutable all-Project Weekly context."""
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import (
-    BaseModel,
-    BeforeValidator,
-    ConfigDict,
-    Field,
-    StringConstraints,
-    model_validator,
-)
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 
-TrimmedNonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
-StableId = TrimmedNonEmptyString
-PositiveInteger = Annotated[int, Field(strict=True, gt=0)]
+Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+Id = Text
+Sha256 = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
+NoteKey = Annotated[str, StringConstraints(pattern=r"^(?:[a-f0-9]{64}|legacy:[a-f0-9]{64})$")]
 Week = Annotated[str, StringConstraints(pattern=r"^\d{4}-W\d{2}$")]
-_DATE_SOURCE = (
-    r"(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|"
-    r"\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|"
-    r"(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))"
-)
-_OFFSET_DATETIME_PATTERN = (
-    rf"^{_DATE_SOURCE}T(?:[01]\d|2[0-3]):[0-5]\d"
-    rf"(?::[0-5]\d(?:\.\d+)?)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
-)
-OffsetDateTime = Annotated[
+
+
+def offset_datetime(value: str) -> str:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("datetime requires a UTC offset")
+    return value
+
+
+OffsetDatetime = Annotated[
     str,
-    StringConstraints(pattern=_OFFSET_DATETIME_PATTERN),
+    StringConstraints(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"),
+    AfterValidator(offset_datetime),
     Field(json_schema_extra={"format": "date-time"}),
 ]
 
 
-def _require_boolean(value: object) -> object:
-    if not isinstance(value, bool):
-        raise ValueError("Input should be a valid boolean")
-    return value
+class StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
 
 
-StrictFalse = Annotated[Literal[False], BeforeValidator(_require_boolean)]
+class Project(StrictModel):
+    id: Id
+    name: Text
+    area: Text
 
 
-class _StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-
-def _require_unique(values: list[str], label: str) -> None:
-    if len(set(values)) != len(values):
-        raise ValueError(f"{label} must be unique.")
-
-
-class CurrentProjectSections(_StrictModel):
-    overview: TrimmedNonEmptyString
-    project_knowledge: TrimmedNonEmptyString
-    this_weeks_attention: TrimmedNonEmptyString
-
-
-class Project(_StrictModel):
-    id: StableId
-    name: TrimmedNonEmptyString
-    area: TrimmedNonEmptyString
-    current_sections: CurrentProjectSections
-
-
-class ReportContent(_StrictModel):
-    summary: TrimmedNonEmptyString
-    outcomes_and_open_attention: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
-    problems_and_inefficiencies: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
-    decisions: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
-    sops: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
-    next_week_priorities: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
-    automation_receipt: TrimmedNonEmptyString
-
-
-class Report(_StrictModel):
-    id: StableId
-    report_level: Literal["Project"]
-    project_id: StableId
-    area: TrimmedNonEmptyString
-    status: Literal["Draft", "Final"]
-    version: PositiveInteger
-    finalized_at: OffsetDateTime | None
-    previous_report_id: StableId | None
-    source_ids: Annotated[list[StableId], Field(min_length=1)]
-    report_markdown: TrimmedNonEmptyString
-    content: ReportContent
+class ProjectNote(StrictModel):
+    note_key: NoteKey
+    observation_kind: Literal[
+        "work_snapshot", "completed_outcome", "documentation_question",
+        "problem", "inefficiency", "decision", "workflow_sample", "carry_forward",
+    ]
+    observed_at: OffsetDatetime
+    source_updated_at: OffsetDatetime
+    source_revision: Text
+    project_id: Id
+    section: Literal[
+        "Work and employee updates", "Completed outcomes and artifacts",
+        "Documentation questions", "Problems and inefficiencies", "Decisions",
+        "Workflow and SOP signals", "Carry-forward items",
+    ]
+    source_ids: Annotated[list[Id], Field(min_length=1)]
+    work_id: Id | None
+    employee_ids: list[Id]
+    workflow_key: Id | None
+    structured_payload: dict[str, object]
+    markdown: Text
 
     @model_validator(mode="after")
-    def validate_report(self) -> "Report":
-        _require_unique(self.source_ids, "IDs")
-        if (self.status == "Final") != (self.finalized_at is not None):
-            raise ValueError("finalized_at must be present only for Final reports.")
-
-        rendered_facts = [
-            self.content.summary,
-            *self.content.outcomes_and_open_attention,
-            *self.content.problems_and_inefficiencies,
-            *self.content.decisions,
-            *self.content.sops,
-            *self.content.next_week_priorities,
-            self.content.automation_receipt,
-        ]
-        if any(fact not in self.report_markdown for fact in rendered_facts):
-            raise ValueError("Every structured report fact must appear verbatim in report_markdown.")
+    def validate_unique_ids(self) -> "ProjectNote":
+        if len(set(self.employee_ids)) != len(self.employee_ids):
+            raise ValueError("employee_ids must be unique")
         return self
 
 
-class DraftCandidateRef(_StrictModel):
-    source_report_id: StableId
-    source_ids: Annotated[list[StableId], Field(min_length=1)]
+class FrozenProjectNotes(StrictModel):
+    project_id: Id
+    path: Text
+    sha256: Sha256
+    note_version: Annotated[int, Field(ge=0)]
+    source_note_keys: list[Id]
+    notes: list[ProjectNote]
 
     @model_validator(mode="after")
-    def validate_unique_source_ids(self) -> "DraftCandidateRef":
-        _require_unique(self.source_ids, "IDs")
+    def validate_notes(self) -> "FrozenProjectNotes":
+        if any(note.project_id != self.project_id for note in self.notes):
+            raise ValueError("Project Notes contains another Project's note")
+        if self.source_note_keys != [note.note_key for note in self.notes]:
+            raise ValueError("source_note_keys must match note order")
         return self
 
 
-class SourceGap(_StrictModel):
-    code: TrimmedNonEmptyString
-    scope_id: StableId
-    detail: TrimmedNonEmptyString
+class FreezeFile(StrictModel):
+    project_id: Id
+    path: Text
+    sha256: Sha256
+    note_keys: list[Id]
 
 
-class RuntimeInputPolicy(_StrictModel):
-    work_items_loaded: StrictFalse
-    meetings_loaded: StrictFalse
-    source: Literal["Project Draft reports only"]
+class FreezeManifest(StrictModel):
+    artifact_type: Literal["kamdar-project-notes-freeze"]
+    artifact_version: Literal["1.0.0"]
+    path: Text
+    sha256: Sha256
+    frozen_at: OffsetDatetime
+    files: Annotated[list[FreezeFile], Field(min_length=1)]
+
+    @model_validator(mode="after")
+    def validate_file_keys(self) -> "FreezeManifest":
+        for row in self.files:
+            if len(set(row.note_keys)) != len(row.note_keys):
+                raise ValueError("freeze note_keys must be unique")
+        return self
 
 
-class WeeklyContext(_StrictModel):
-    schema_version: Literal["kamdar-weekly-context@2.0.0"]
+class PriorReport(StrictModel):
+    id: Id
+    report_level: Literal["Project", "Area", "Company"]
+    project_id: Id | None
+    area: Text | None
+    status: Literal["Final"]
+    version: Annotated[int, Field(gt=0)]
+    finalized_at: OffsetDatetime
+    report_markdown: Text
+
+
+class PersonIndex(StrictModel):
+    person_id: Id
+    record_version: Annotated[int, Field(ge=0)]
+
+
+class SopIndex(StrictModel):
+    workflow_key: Id
+    sop_id: Id
+    record_version: Annotated[int, Field(ge=0)]
+    baseline_version: Annotated[int, Field(ge=0)]
+
+
+class ReferencedPerson(StrictModel):
+    person_id: Id
+    record_version: Annotated[int, Field(ge=0)]
+    persistent_text_sha256: Sha256
+    markdown: Text
+
+
+class ReferencedSop(StrictModel):
+    workflow_key: Id
+    sop_id: Id
+    record_version: Annotated[int, Field(ge=0)]
+    baseline_version: Annotated[int, Field(ge=0)]
+    markdown: Text
+
+
+class SourceGap(StrictModel):
+    code: Text
+    scope_id: Id
+    detail: Text
+
+
+class RuntimeInputPolicy(StrictModel):
+    work_items_loaded: Literal[False]
+    meetings_loaded: Literal[False]
+    source: Literal["Frozen Project Notes plus targeted persistent entity records"]
+
+
+class WeeklyContext(StrictModel):
+    schema_version: Literal["kamdar-weekly-context@3.0.0"]
     artifact_type: Literal["kamdar-weekly-context"]
-    context_id: StableId
+    context_id: Id
     week: Week
-    collected_at: OffsetDateTime
+    collected_at: OffsetDatetime
     runtime_input_policy: RuntimeInputPolicy
     projects: Annotated[list[Project], Field(min_length=1)]
-    reports: Annotated[list[Report], Field(min_length=1)]
-    draft_candidate_refs: list[DraftCandidateRef]
-    expected_areas: Annotated[list[TrimmedNonEmptyString], Field(min_length=1)]
+    freeze_manifest: FreezeManifest
+    project_notes: Annotated[list[FrozenProjectNotes], Field(min_length=1)]
+    prior_reports: list[PriorReport]
+    people_index: list[PersonIndex]
+    sop_index: list[SopIndex]
+    referenced_people: list[ReferencedPerson]
+    referenced_sops: list[ReferencedSop]
+    expected_areas: Annotated[list[Text], Field(min_length=1)]
     source_gaps: list[SourceGap]
 
     @model_validator(mode="after")
-    def validate_context(self) -> "WeeklyContext":
-        _require_unique([row.id for row in self.projects], "projects IDs")
-        _require_unique([row.id for row in self.reports], "reports IDs")
-        _require_unique(self.expected_areas, "expected_areas")
+    def validate_graph(self) -> "WeeklyContext":
+        def unique(values: list[str], label: str) -> None:
+            if len(set(values)) != len(values):
+                raise ValueError(f"{label} keys must be unique")
 
-        projects = {row.id: row for row in self.projects}
-        reports = {row.id: row for row in self.reports}
-        for report in self.reports:
-            project = projects.get(report.project_id)
-            if project is None:
-                raise ValueError(f"{report.id} project is absent from projects.")
-            if project.area != report.area:
-                raise ValueError(f"{report.id} area does not match its Project.")
-            if report.previous_report_id and report.previous_report_id not in reports:
-                raise ValueError(f"{report.id} previous report is absent from reports.")
-            if report.area not in self.expected_areas:
-                raise ValueError(f"{report.id} area is absent from expected_areas.")
-
-        for candidate in self.draft_candidate_refs:
-            source = reports.get(candidate.source_report_id)
-            if source is None or source.status != "Draft":
-                raise ValueError(f"{candidate.source_report_id} is not an immutable Project Draft.")
-            for source_id in candidate.source_ids:
-                if source_id not in source.source_ids:
-                    raise ValueError(f"{source_id} is not cited by {source.id}.")
+        unique([row.id for row in self.projects], "projects")
+        unique([row.project_id for row in self.project_notes], "project_notes")
+        unique([row.person_id for row in self.people_index], "people_index")
+        unique([row.workflow_key for row in self.sop_index], "sop_index")
+        unique([row.person_id for row in self.referenced_people], "referenced_people")
+        unique([row.workflow_key for row in self.referenced_sops], "referenced_sops")
+        unique([row.id for row in self.prior_reports], "prior_reports")
+        unique(self.expected_areas, "expected_areas")
+        expected = sorted(row.id for row in self.projects)
+        if expected != sorted(row.project_id for row in self.project_notes) or expected != sorted(row.project_id for row in self.freeze_manifest.files):
+            raise ValueError("every active Project requires exactly one frozen Project Notes file")
+        note_index = {row.project_id: row for row in self.project_notes}
+        for file in self.freeze_manifest.files:
+            notes = note_index[file.project_id]
+            if (notes.path, notes.sha256, notes.source_note_keys) != (file.path, file.sha256, file.note_keys):
+                raise ValueError(f"{file.project_id} does not match freeze manifest")
+        project_ids = {row.id for row in self.projects}
+        for report in self.prior_reports:
+            valid_level = (
+                report.report_level == "Project" and bool(report.project_id) and bool(report.area) and report.project_id in project_ids
+            ) or (
+                report.report_level == "Area" and report.project_id is None and bool(report.area)
+            ) or (
+                report.report_level == "Company" and report.project_id is None and report.area is None
+            )
+            if not valid_level:
+                raise ValueError(f"{report.id} has invalid level ownership or an unknown Project")
+        people = sorted({person for row in self.project_notes for note in row.notes for person in note.employee_ids})
+        if people != sorted(row.person_id for row in self.referenced_people):
+            raise ValueError("referenced_people must equal Project Notes references")
+        if any(person not in {row.person_id for row in self.people_index} for person in people):
+            raise ValueError("referenced Person absent from people_index")
+        workflows = {note.workflow_key for row in self.project_notes for note in row.notes if note.workflow_key}
+        known = {row.workflow_key for row in self.sop_index}
+        if sorted(workflows & known) != sorted(row.workflow_key for row in self.referenced_sops):
+            raise ValueError("referenced_sops must equal existing Project Notes workflow references")
         return self
 
 
-__all__ = [
-    "CurrentProjectSections",
-    "DraftCandidateRef",
-    "Project",
-    "Report",
-    "ReportContent",
-    "RuntimeInputPolicy",
-    "SourceGap",
-    "WeeklyContext",
-]
+WEEKLY_CONTEXT_JSON_SCHEMA = WeeklyContext.model_json_schema(mode="validation")

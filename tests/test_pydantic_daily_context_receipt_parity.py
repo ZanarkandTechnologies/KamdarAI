@@ -182,7 +182,7 @@ class DailyIntegrationReceiptParityTests(unittest.TestCase):
         first("no_finding", no_finding_route)["integration"] = "notion"
         cases.append(no_finding_route)
         whole_pointer = fixture("integration-receipt.json")
-        first("applied", whole_pointer)["result_pointer"] = "/project_updates"
+        first("applied", whole_pointer)["result_pointer"] = "/project_note_updates"
         cases.append(whole_pointer)
         fake_operation = fixture("integration-receipt.json")
         first("applied", fake_operation)["operation"] = "record_no_finding"
@@ -274,12 +274,12 @@ class DailyIdempotencyReceiptParityTests(unittest.TestCase):
         source = copy.deepcopy(first("duplicate", no_finding_with_readback)["lookup_read_back"])
         first("no_finding", no_finding_with_readback)["lookup_read_back"] = source
         cases.append(no_finding_with_readback)
-        blocked_with_readback = fixture("idempotency-receipt.json")
-        source = copy.deepcopy(first("duplicate", blocked_with_readback)["lookup_read_back"])
-        first("blocked", blocked_with_readback)["lookup_read_back"] = source
-        cases.append(blocked_with_readback)
+        failed_with_readback = fixture("idempotency-receipt.json")
+        source = copy.deepcopy(first("duplicate", failed_with_readback)["lookup_read_back"])
+        first("failed", failed_with_readback)["lookup_read_back"] = source
+        cases.append(failed_with_readback)
         whole_pointer = fixture("idempotency-receipt.json")
-        first("blocked", whole_pointer)["result_pointer"] = "/knowledge_updates"
+        first("failed", whole_pointer)["result_pointer"] = "/project_note_updates"
         cases.append(whole_pointer)
         readback_mismatch = fixture("idempotency-receipt.json")
         first("duplicate", readback_mismatch)["lookup_read_back"]["target_id"] = "OTHER"

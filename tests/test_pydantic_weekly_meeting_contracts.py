@@ -36,8 +36,8 @@ class WeeklyContextPydanticTests(unittest.TestCase):
         dumped = json.loads(context.model_dump_json())
         self.assertEqual(dumped["collected_at"], self.payload["collected_at"])
         self.assertEqual(
-            [row["finalized_at"] for row in dumped["reports"]],
-            [row["finalized_at"] for row in self.payload["reports"]],
+            [row["finalized_at"] for row in dumped["prior_reports"]],
+            [row["finalized_at"] for row in self.payload["prior_reports"]],
         )
         schema = WeeklyContext.model_json_schema()
         self.assertEqual(schema["properties"]["collected_at"]["format"], "date-time")
@@ -52,11 +52,12 @@ class WeeklyContextPydanticTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.assert_rejected(lambda payload, value=value: payload.update(collected_at=value))
 
-    def test_report_refinements_reject_invalid_payloads(self) -> None:
+    def test_frozen_input_refinements_reject_invalid_payloads(self) -> None:
         mutations = [
-            lambda p: p["reports"][0].update(finalized_at=None),
-            lambda p: p["reports"][0].update(report_markdown="structured facts omitted"),
-            lambda p: p["reports"][0].update(source_ids=["same", "same"]),
+            lambda p: p["prior_reports"][0].update(finalized_at=None),
+            lambda p: p["prior_reports"][0].update(report_markdown=""),
+            lambda p: p["project_notes"][0].update(source_note_keys=[]),
+            lambda p: p["freeze_manifest"]["files"][0].update(sha256="0" * 64),
         ]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
@@ -69,14 +70,10 @@ class WeeklyContextPydanticTests(unittest.TestCase):
         mutations = [
             duplicate_project,
             lambda p: p["expected_areas"].append(p["expected_areas"][0]),
-            lambda p: p["reports"][1].update(project_id="UNKNOWN"),
-            lambda p: p["reports"][1].update(area="Marketing"),
-            lambda p: p["reports"][1].update(previous_report_id="UNKNOWN"),
-            lambda p: p["expected_areas"].remove("CMT"),
-            lambda p: p["draft_candidate_refs"][0].update(
-                source_report_id="RPT-PROJ-CMT-CMT_PIPELINE-W33"
-            ),
-            lambda p: p["draft_candidate_refs"][0].update(source_ids=["NOT-CITED"]),
+            lambda p: p["prior_reports"][0].update(project_id="UNKNOWN"),
+            lambda p: p["prior_reports"][0].update(area=None),
+            lambda p: p["freeze_manifest"]["files"].pop(),
+            lambda p: p["project_notes"].pop(),
             lambda p: p.update(extra_field=True),
         ]
         for mutation in mutations:

@@ -14,7 +14,7 @@ feature_refs:
   - FEAT-0007
 refs:
   - manifest.json
-  - ../evals/filesystem/scripts/kamdar-seed-config.mjs
+  - ../schemas/seed.py
 ---
 
 # Kamdar reference test seed
@@ -104,9 +104,8 @@ endpoints, missing feature cases, template/body drift, and checklist or report
 citations pointing to another Project.
 
 ```bash
-node --test evals/filesystem/tests/kamdar-seed-config.test.mjs
-node --test evals/filesystem/tests/unified-daily-review-eval.test.mjs
-node --test evals/filesystem/tests/weekly-review-evals.test.mjs
+python3 -m unittest tests.test_seed_contracts -v
+python3 scripts/run_installed_evals.py --root .
 ```
 
 The operating events, People, metrics, dates, blockers, and evidence identifiers

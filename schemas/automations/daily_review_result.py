@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Annotated, Literal
 
 from pydantic import (
     BaseModel,
+    AfterValidator,
     ConfigDict,
     Field,
     StrictFloat,
@@ -14,7 +16,7 @@ from pydantic import (
     model_validator,
 )
 
-from .feature_outcome import FeatureOutcome, validate_feature_outcome_coverage
+from .feature_outcome import FeatureOutcome
 
 
 NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
@@ -38,6 +40,16 @@ SourceIds = Annotated[
         ),
     ),
 ]
+
+
+def _offset_datetime(value: str) -> str:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("datetime must include a UTC offset")
+    return value
+
+
+OffsetDatetime = Annotated[str, AfterValidator(_offset_datetime)]
 NonNegativeNumber = Annotated[StrictInt | StrictFloat, Field(ge=0)]
 
 
@@ -213,12 +225,17 @@ DAILY_REVIEW_RESULT_PROMPT = """
 Return the complete result of one bounded Daily Project Review.
 
 Rules across all pipelines:
-- Use only the supplied Daily context and current Weekly Draft.
+- Use only the supplied Daily context. Do not edit Notion Project narrative or
+  load Employee Memory, SOP records, or prior Daily source records.
 - Return feature_outcomes exactly once for FEAT-0001 through FEAT-0004. Choose
   produced, no_change_needed, or insufficient_information from the cited
   evidence, and point produced outcomes to their output rows.
 - Return one documentation review for every selected Done Work item. Other
   arrays contain actions only.
+- project_note_updates groups complete notes by Project. Progress and
+  documentation snapshots go in progress_notes; Problems, Decisions, and
+  workflow observations go in knowledge_notes. The deterministic applier
+  derives note keys and appends them to that Project's current-week file.
 - Keep every claim traceable through source_ids.
 - Never claim that a provider write or message delivery occurred.
 - Do not duplicate the same question in a ticket comment and owner chase.
@@ -324,7 +341,12 @@ class DocumentationReview(_StrictModel):
             issues.append(
                 "needs_information requires at least one missing requirement."
             )
-        if needs_information != bool(self.question_key and self.comment_text):
+        if (
+            needs_information
+            and not (self.question_key and self.comment_text)
+        ) or (
+            not needs_information and (self.question_key or self.comment_text)
+        ):
             issues.append(
                 "needs_information requires a question key and comment; "
                 "sufficient forbids both."
@@ -527,7 +549,121 @@ class KnowledgeUpdate(_Model):
     )
 
 
-class DailyReviewResult(_Model):
+class ProjectNote(_StrictModel):
+    observation_kind: Literal[
+        "work_snapshot",
+        "completed_outcome",
+        "documentation_question",
+        "problem",
+        "inefficiency",
+        "decision",
+        "workflow_sample",
+    ]
+    observed_at: OffsetDatetime
+    source_updated_at: OffsetDatetime
+    source_revision: NonEmptyString
+    section: Literal[
+        "Work and employee updates",
+        "Completed outcomes and artifacts",
+        "Documentation questions",
+        "Problems and inefficiencies",
+        "Decisions",
+        "Workflow and SOP signals",
+    ]
+    source_ids: SourceIds
+    work_id: StableId | None
+    employee_ids: list[StableId]
+    workflow_key: StableId | None
+    structured_payload: dict[str, object]
+    markdown: NonEmptyString
+
+    @model_validator(mode="after")
+    def validate_routing(self) -> ProjectNote:
+        section_by_kind = {
+            "work_snapshot": "Work and employee updates",
+            "completed_outcome": "Completed outcomes and artifacts",
+            "documentation_question": "Documentation questions",
+            "problem": "Problems and inefficiencies",
+            "inefficiency": "Problems and inefficiencies",
+            "decision": "Decisions",
+            "workflow_sample": "Workflow and SOP signals",
+        }
+        issues: list[str] = []
+        if self.section != section_by_kind[self.observation_kind]:
+            issues.append(
+                f"{self.observation_kind} must use "
+                f"{section_by_kind[self.observation_kind]}."
+            )
+        if self.observation_kind in {
+            "work_snapshot",
+            "completed_outcome",
+            "documentation_question",
+        } and self.work_id is None:
+            issues.append(f"{self.observation_kind} requires work_id.")
+        if self.observation_kind in {"work_snapshot", "completed_outcome"} and not self.employee_ids:
+            issues.append(f"{self.observation_kind} requires employee_ids.")
+        if self.observation_kind == "workflow_sample" and self.workflow_key is None:
+            issues.append("workflow_sample requires workflow_key.")
+        if self.observation_kind in {"problem", "inefficiency"}:
+            try:
+                ProblemBaseline.model_validate(
+                    self.structured_payload.get("problem_baseline")
+                )
+            except Exception as error:
+                issues.append(
+                    "problem and inefficiency notes require a valid structured "
+                    f"problem_baseline: {error}"
+                )
+        if self.observation_kind == "workflow_sample":
+            try:
+                WorkflowObservation.model_validate(
+                    self.structured_payload.get("workflow_observation")
+                )
+            except Exception as error:
+                issues.append(
+                    "workflow_sample requires a valid structured "
+                    f"workflow_observation: {error}"
+                )
+        if issues:
+            raise ValueError(" ".join(issues))
+        return self
+
+
+class ProjectNoteUpdate(_StrictModel):
+    project_id: StableId
+    project_name: NonEmptyString
+    week: Annotated[str, StringConstraints(pattern=r"^\d{4}-W\d{2}$")]
+    progress_notes: list[ProjectNote] = Field(
+        description=(
+            "Complete current Work, accepted outcome, and documentation-question "
+            "snapshots for this Project."
+        )
+    )
+    knowledge_notes: list[ProjectNote] = Field(
+        description=(
+            "Source-linked Problem, Decision, inefficiency, and workflow "
+            "observations for this Project."
+        )
+    )
+
+    @model_validator(mode="after")
+    def validate_lanes(self) -> ProjectNoteUpdate:
+        if any(
+            note.observation_kind
+            not in {"work_snapshot", "completed_outcome", "documentation_question"}
+            for note in self.progress_notes
+        ):
+            raise ValueError("progress_notes contains a knowledge observation.")
+        if any(
+            note.observation_kind
+            not in {"problem", "inefficiency", "decision", "workflow_sample"}
+            for note in self.knowledge_notes
+        ):
+            raise ValueError("knowledge_notes contains a progress observation.")
+        return self
+
+
+class DailyReviewResult(_StrictModel):
     model_config = ConfigDict(
         extra="ignore",
         json_schema_extra={
@@ -536,38 +672,58 @@ class DailyReviewResult(_Model):
         },
     )
 
-    schema_version: Literal["kamdar-daily-review-result@1.2.0"]
+    schema_version: Literal["kamdar-daily-review-result@2.0.0"]
     context_id: StableId
     feature_outcomes: Annotated[list[FeatureOutcome], Field(min_length=4, max_length=4)]
-    project_updates: list[ProjectPageUpdate]
+    project_note_updates: list[ProjectNoteUpdate]
     documentation_reviews: list[DocumentationReview]
     weekly_progress_chases: list[WeeklyProgressChase]
-    knowledge_updates: list[KnowledgeUpdate]
     run_notes: str
 
     @model_validator(mode="after")
     def validate_feature_coverage(self) -> DailyReviewResult:
-        validate_feature_outcome_coverage(
-            outcomes=self.feature_outcomes,
-            expected_feature_ids=[
-                "FEAT-0001",
-                "FEAT-0002",
-                "FEAT-0003",
-                "FEAT-0004",
-            ],
-            output_roots={
-                "FEAT-0001": "project_updates",
-                "FEAT-0002": "documentation_reviews",
-                "FEAT-0003": "weekly_progress_chases",
-                "FEAT-0004": "knowledge_updates",
-            },
-            output_counts={
-                "FEAT-0001": len(self.project_updates),
-                "FEAT-0002": len(self.documentation_reviews),
-                "FEAT-0003": len(self.weekly_progress_chases),
-                "FEAT-0004": len(self.knowledge_updates),
-            },
-        )
+        expected = {"FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"}
+        seen: set[str] = set()
+        issues: list[str] = []
+        for outcome in self.feature_outcomes:
+            if outcome.feature_id not in expected or outcome.feature_id in seen:
+                issues.append(f"unexpected or duplicate {outcome.feature_id}.")
+            seen.add(outcome.feature_id)
+            if outcome.feature_id == "FEAT-0001":
+                expected_refs = [
+                    f"/project_note_updates/{index}"
+                    for index, row in enumerate(self.project_note_updates)
+                    if row.progress_notes
+                ]
+            elif outcome.feature_id == "FEAT-0004":
+                expected_refs = [
+                    f"/project_note_updates/{index}"
+                    for index, row in enumerate(self.project_note_updates)
+                    if row.knowledge_notes
+                ]
+            elif outcome.feature_id == "FEAT-0002":
+                expected_refs = [
+                    f"/documentation_reviews/{index}"
+                    for index in range(len(self.documentation_reviews))
+                ]
+            else:
+                expected_refs = [
+                    f"/weekly_progress_chases/{index}"
+                    for index in range(len(self.weekly_progress_chases))
+                ]
+            if outcome.outcome in {"produced", "insufficient_information"}:
+                if set(outcome.output_refs) != set(expected_refs) or len(outcome.output_refs) != len(expected_refs):
+                    issues.append(
+                        f"{outcome.feature_id} must reference every owned output exactly once."
+                    )
+            elif expected_refs:
+                issues.append(
+                    f"{outcome.feature_id} has outputs and cannot be {outcome.outcome}."
+                )
+        for feature_id in expected - seen:
+            issues.append(f"missing outcome for {feature_id}.")
+        if issues:
+            raise ValueError(" ".join(issues))
         return self
 
 

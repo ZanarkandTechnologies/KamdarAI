@@ -66,7 +66,7 @@ class AuditEffect(StrictModel):
     result_pointer: Annotated[
         StrictStr,
         StringConstraints(
-            pattern=r"^/(project_updates|documentation_reviews|weekly_progress_chases|knowledge_updates)(?:/\d+)?$"
+            pattern=r"^/(project_note_updates|documentation_reviews|weekly_progress_chases)(?:/\d+)?$"
         ),
     ]
     action_key: StableId
@@ -157,7 +157,7 @@ class IdempotencySummary(StrictModel):
 
 
 class DailyIdempotencyRerunReceipt(StrictModel):
-    schema_version: Literal["kamdar-daily-idempotency-rerun-receipt@1.1.0"]
+    schema_version: Literal["kamdar-daily-idempotency-rerun-receipt@2.0.0"]
     rerun_receipt_id: StableId
     original_receipt_id: StableId
     original_receipt_sha256: Sha256

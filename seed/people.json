@@ -16,7 +16,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "tech packs; garment sampling; line planning; production handoff"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_primary_email test-sink alias and must name the intended recipient.\n\nOwns sample approval and the gate from corrected tech pack to bulk cutting.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_primary_email test-sink alias and must name the intended recipient.\n\nOwns sample approval and the gate from corrected tech pack to bulk cutting.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"
@@ -40,7 +40,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "fabric sourcing; supplier samples; landed cost; product readiness"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns supplier comparisons and evidence-backed sample acceptance.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns supplier comparisons and evidence-backed sample acceptance.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"
@@ -64,7 +64,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "Meta reporting; campaign assets; channel handoffs"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_secondary_email test-sink alias and must name the intended recipient.\n\nPrepares weekly Meta evidence and coordinates campaign asset delivery.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Email uses the private operator_secondary_email test-sink alias and must name the intended recipient.\n\nPrepares weekly Meta evidence and coordinates campaign asset delivery.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"
@@ -88,7 +88,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "campaign planning; media decisions; retail and ecommerce coordination"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nApproves Marketing priorities, offer wording, and media decisions.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nApproves Marketing priorities, offer wording, and media decisions.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"
@@ -112,7 +112,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "online orders; checkout defects; product listings; ecommerce operations"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns customer-facing store fixes and listing-pipeline acceptance.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns customer-facing store fixes and listing-pipeline acceptance.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"
@@ -136,7 +136,7 @@
       "timezone": "Asia/Kuala_Lumpur",
       "expertise": "brand launches; assortment; product story; channel readiness"
     },
-    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns the kalrah launch brief and cross-functional handoff.\n",
+    "body": "## Operating notes\n\n**Routing boundary:** This is a fictional eval Person, not a real employee contact. Telegram messages go only to the operator-owned test sink and must name the intended recipient.\n\nOwns the kalrah launch brief and cross-functional handoff.\n\n## Persistent operating memory\n\nNo accepted cross-week observation yet.\n\n## Latest weekly evidence\n\nNo consolidated weekly evidence yet.\n",
     "metadata": {
       "provenance": {
         "operating_scenario": "synthetic_eval"

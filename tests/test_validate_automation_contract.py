@@ -29,9 +29,10 @@ class ValidateAutomationContractTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         schema = json.loads(result.stdout)
         self.assertEqual(schema["type"], "object")
-        self.assertIn("project_updates", schema["properties"])
+        self.assertIn("project_note_updates", schema["properties"])
+        self.assertNotIn("project_updates", schema["properties"])
 
-    def test_all_packaged_golden_contracts_validate_without_node(self) -> None:
+    def test_all_packaged_golden_contracts_validate_with_pydantic(self) -> None:
         cases = (
             ("daily-context", "evals/daily/expected/context.json"),
             ("daily-review", "evals/daily/expected/result.json"),
@@ -64,14 +65,14 @@ class ValidateAutomationContractTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "fail")
         self.assertTrue(receipt["errors"])
 
-    def test_isolated_client_contract_package_runs_without_node_sources(self) -> None:
+    def test_isolated_client_contract_package_runs_with_python_sources_only(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)
             for source in (ROOT / "schemas/automations").glob("*.py"):
                 destination = target / source.relative_to(ROOT)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, destination)
-            self.assertFalse(any(target.rglob("*.mjs")))
+            self.assertTrue(all(path.suffix == ".py" for path in target.rglob("*.*")))
             environment = os.environ.copy()
             environment.pop("PYTHONPATH", None)
             result = subprocess.run(

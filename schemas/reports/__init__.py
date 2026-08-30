@@ -1,0 +1,1 @@
+"""Generated Pydantic report contracts."""

@@ -15,10 +15,9 @@ SUITES = {
     "daily": {
         "features": {"FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"},
         "result_keys": {
-            "project_updates",
+            "project_note_updates",
             "documentation_reviews",
             "weekly_progress_chases",
-            "knowledge_updates",
         },
         "contracts": (
             ("schemas.automations.daily_context_diff", "DailyContextDiff", "evals/daily/expected/context.json", None),
@@ -32,7 +31,9 @@ SUITES = {
         "result_keys": {
             "report_results",
             "promotion_dispositions",
-            "next_week_project_replacements",
+            "employee_memory_updates",
+            "sop_updates",
+            "carry_forward_updates",
         },
         "contracts": (
             ("schemas.automations.weekly_context", "WeeklyContext", "evals/weekly/expected/context.json", None),

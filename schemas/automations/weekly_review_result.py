@@ -298,21 +298,86 @@ class PromotionDisposition(_StrictModel):
         return self
 
 
-class NextWeekProjectReplacement(_StrictModel):
+class EmployeePersistentObservation(_StrictModel):
+    observation_key: StableId
     project_id: StableId
-    source_report_id: StableId
-    section: Literal["This week's attention"]
-    expected_current_text: NonEmptyString
-    replacement_text: Annotated[
-        NonEmptyString,
-        Field(
-            description=(
-                "Complete next-week open-work checklist merged from accepted priorities and open-Work rows "
-                "evidenced in the source Project report; integrations apply it unchanged after the conflict guard."
-            )
-        ),
-    ]
-    source_ids: SourceIds
+    work_id: StableId
+    accepted_outcome: NonEmptyString
+    accepted_artifact_ids: list[StableId]
+    elapsed_hours: Annotated[float, Field(ge=0)] | None
+    documentation_state: Literal["sufficient"]
+    accepted_at: NonEmptyString
+    evidence_refs: Annotated[list[StableId], Field(min_length=1)]
+
+
+class EmployeeMemoryUpdate(_StrictModel):
+    person_id: StableId
+    week: Week
+    source_project_ids: Annotated[list[StableId], Field(min_length=1)]
+    source_work_ids: Annotated[list[StableId], Field(min_length=1)]
+    source_note_keys: Annotated[list[StableId], Field(min_length=1)]
+    expected_record_version: NonNegativeInteger | None
+    expected_persistent_text_sha256: Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")] | None
+    persistent_observations: list[EmployeePersistentObservation]
+    latest_weekly_evidence_markdown: NonEmptyString
+    disposition: Literal["update", "no_change", "blocked"]
+    gaps: list[NonEmptyString]
+
+
+class WorkflowSample(_StrictModel):
+    sample_key: StableId
+    project_id: StableId
+    work_id: StableId
+    output_artifact_type: StableId
+    elapsed_hours: Annotated[float, Field(ge=0)]
+    active_hours: Annotated[float, Field(ge=0)] | None
+    wait_hours: Annotated[float, Field(ge=0)] | None
+    accepted_at: NonEmptyString
+    evidence_refs: Annotated[list[StableId], Field(min_length=1)]
+
+
+class CandidateTiming(_StrictModel):
+    sample_count: Annotated[int, Field(ge=3)]
+    project_count: Annotated[int, Field(ge=2)]
+    mean_elapsed_hours: Annotated[float, Field(ge=0)]
+    min_elapsed_hours: Annotated[float, Field(ge=0)]
+    max_elapsed_hours: Annotated[float, Field(ge=0)]
+    evidence_window_start: NonEmptyString
+    evidence_window_end: NonEmptyString
+    requires_owner_approval: Literal[True]
+
+
+class SopUpdate(_StrictModel):
+    workflow_key: StableId
+    sop_id: StableId | None
+    week: Week
+    source_project_ids: Annotated[list[StableId], Field(min_length=1)]
+    source_work_ids: Annotated[list[StableId], Field(min_length=1)]
+    source_note_keys: Annotated[list[StableId], Field(min_length=1)]
+    expected_record_version: NonNegativeInteger | None
+    expected_baseline_version: NonNegativeInteger | None
+    samples: list[WorkflowSample]
+    candidate_timing: CandidateTiming | None
+    latest_weekly_samples_markdown: NonEmptyString
+    disposition: Literal["samples_only", "baseline_proposed", "no_change", "blocked"]
+    gaps: list[NonEmptyString]
+
+    @model_validator(mode="after")
+    def validate_candidate(self) -> "SopUpdate":
+        if (self.disposition == "baseline_proposed") != (self.candidate_timing is not None):
+            raise ValueError("only baseline_proposed carries candidate_timing")
+        return self
+
+
+class CarryForwardUpdate(_StrictModel):
+    project_id: StableId
+    from_week: Week
+    to_week: Week
+    source_note_keys: Annotated[list[StableId], Field(min_length=1)]
+    work_ids: Annotated[list[StableId], Field(min_length=1)]
+    notes_markdown: NonEmptyString
+    disposition: Literal["carried_forward", "no_open_work", "blocked"]
+    gaps: list[NonEmptyString]
 
 
 class ConfigurationGap(_StrictModel):
@@ -323,7 +388,7 @@ class ConfigurationGap(_StrictModel):
 
 
 WEEKLY_REVIEW_RESULT_PROMPT = r"""
-Return one Weekly review result from finalized Project Draft evidence.
+Return one Weekly review result from the immutable all-Project Notes set.
 
 - Return feature_outcomes exactly once for FEAT-0005 through FEAT-0007. Choose
   produced, no_change_needed, or insufficient_information from the cited
@@ -342,11 +407,11 @@ Return one Weekly review result from finalized Project Draft evidence.
   tradeoff, consequences, and exact review trigger in an advise-style record.
 - Every Company report returns company_executive_context and renders those
   structured Problem, Decision, and SOP entries into self-contained prose.
-- next_week_project_replacements contains complete conflict-safe Project
-  checklist replacements merged from accepted priorities and open-Work rows
-  evidenced in the source Project reports. Preserve open Work by stable ID,
-  omit completed or cancelled Work from the new open view without deleting its
-  source/history, do not rescan raw Work, and never create parallel plan files.
+- employee_memory_updates groups accepted outcomes and current evidence by
+  person_id across Projects. sop_updates groups comparable samples by
+  workflow_key and never applies a baseline automatically.
+- carry_forward_updates initializes next-week Project Notes from unresolved
+  Work and documentation questions without editing the frozen source week.
 - configuration_gaps remains explicit. A missing expected Area report prevents
   the Company report from becoming Final.
 
@@ -360,13 +425,15 @@ Golden disposition examples:
 class WeeklyReviewResult(_StrictModel):
     model_config = ConfigDict(extra="forbid", json_schema_extra={"description": WEEKLY_REVIEW_RESULT_PROMPT})
 
-    schema_version: Literal["kamdar-weekly-review-result@1.1.0"]
+    schema_version: Literal["kamdar-weekly-review-result@2.0.0"]
     context_id: StableId
     week: Week
     feature_outcomes: Annotated[list[FeatureOutcome], Field(min_length=3, max_length=3)]
     report_results: Annotated[list[ReportResult], Field(min_length=1)]
     promotion_dispositions: list[PromotionDisposition]
-    next_week_project_replacements: list[NextWeekProjectReplacement]
+    employee_memory_updates: list[EmployeeMemoryUpdate]
+    sop_updates: list[SopUpdate]
+    carry_forward_updates: list[CarryForwardUpdate]
     configuration_gaps: list[ConfigurationGap]
     run_notes: str
 
@@ -402,12 +469,12 @@ class WeeklyReviewResult(_StrictModel):
             output_roots={
                 "FEAT-0005": "report_results",
                 "FEAT-0006": "promotion_dispositions",
-                "FEAT-0007": "next_week_project_replacements",
+                "FEAT-0007": "carry_forward_updates",
             },
             output_counts={
                 "FEAT-0005": len(self.report_results),
                 "FEAT-0006": len(self.promotion_dispositions),
-                "FEAT-0007": len(self.next_week_project_replacements),
+                "FEAT-0007": len(self.carry_forward_updates),
             },
         )
         return self
@@ -417,11 +484,13 @@ __all__ = [
     "CompanyExecutiveContext",
     "ConfigurationGap",
     "DecisionOption",
-    "NextWeekProjectReplacement",
+    "CarryForwardUpdate",
+    "EmployeeMemoryUpdate",
     "PromotedDecisionPreservationProof",
     "PromotedProblemBaselineProof",
     "PromotionDisposition",
     "ReportResult",
+    "SopUpdate",
     "WEEKLY_REVIEW_RESULT_PROMPT",
     "WeeklyReviewResult",
 ]

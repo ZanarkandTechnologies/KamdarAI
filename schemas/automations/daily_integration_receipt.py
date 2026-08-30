@@ -41,9 +41,9 @@ def _synthetic_url(value: str) -> str:
     if not parsed.scheme or not parsed.hostname:
         raise ValueError("must be a URL")
     hostname = parsed.hostname.lower()
-    if hostname != "example.test" and not hostname.endswith(".example.test"):
+    if parsed.scheme != "workspace" and hostname != "example.test" and not hostname.endswith(".example.test"):
         raise ValueError(
-            "Tracked receipts may contain only source-safe synthetic example.test URLs."
+            "Tracked receipts may contain only private workspace locators or source-safe synthetic example.test URLs."
         )
     return value
 
@@ -187,7 +187,7 @@ class IntegrationEffect(StrictModel):
     result_pointer: Annotated[
         StrictStr,
         StringConstraints(
-            pattern=r"^/(project_updates|documentation_reviews|weekly_progress_chases|knowledge_updates)(?:/\d+(?:/.*)?)?$"
+            pattern=r"^/(project_note_updates|documentation_reviews|weekly_progress_chases)(?:/\d+(?:/.*)?)?$"
         ),
         Field(
             description="JSON Pointer into the exact Daily Review result row, or its whole output array for a verified no-finding."
@@ -207,12 +207,11 @@ class IntegrationEffect(StrictModel):
             description="Seeded Work records whose processed state depends on this effect.",
         ),
     ]
-    integration: Literal["notion", "email", "telegram", "whatsapp", "none"]
+    integration: Literal["private_workspace", "notion", "email", "telegram", "whatsapp", "none"]
     operation: Literal[
-        "replace_project_sections",
+        "append_project_notes",
         "add_work_comment",
         "send_owner_chase",
-        "replace_weekly_report_draft",
         "record_no_finding",
     ]
     target: IntegrationTarget
@@ -374,7 +373,7 @@ def _processing_safety_errors(receipt: "DailyIntegrationReceipt") -> list[str]:
 class DailyIntegrationReceipt(StrictModel):
     """Receipt for deterministic application of one Daily Review result. Business Status remains Done. AI review becomes Processed only when documentation is sufficient and every required linked effect safely settles; a posted question leaves AI review as Needs information."""
 
-    schema_version: Literal["kamdar-daily-integration-receipt@1.1.0"]
+    schema_version: Literal["kamdar-daily-integration-receipt@2.0.0"]
     receipt_id: StableId
     source_context_id: Annotated[
         StableId, Field(description="context_id from the exact Daily context artifact.")
