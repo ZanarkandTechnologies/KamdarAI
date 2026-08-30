@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +20,12 @@ SUITES = {
             "weekly_progress_chases",
             "knowledge_updates",
         },
+        "contracts": (
+            ("schemas.automations.daily_context_diff", "DailyContextDiff", "evals/daily/expected/context.json", None),
+            ("schemas.automations.daily_review_result", "DailyReviewResult", "evals/daily/expected/result.json", None),
+            ("schemas.automations.daily_integration_receipt", "DailyIntegrationReceipt", "evals/daily/expected/integration-receipt.json", "assert_daily_processing_safety"),
+            ("schemas.automations.daily_idempotency_rerun_receipt", "DailyIdempotencyRerunReceipt", "evals/daily/expected/idempotency-receipt.json", None),
+        ),
     },
     "weekly": {
         "features": {"FEAT-0005", "FEAT-0006", "FEAT-0007"},
@@ -26,10 +34,17 @@ SUITES = {
             "promotion_dispositions",
             "next_week_project_replacements",
         },
+        "contracts": (
+            ("schemas.automations.weekly_context", "WeeklyContext", "evals/weekly/expected/context.json", None),
+            ("schemas.automations.weekly_review_result", "WeeklyReviewResult", "evals/weekly/expected/result.json", None),
+        ),
     },
     "meeting-intake": {
         "features": {"FEAT-0010"},
         "result_keys": {"task_creations", "blocked_commitments"},
+        "contracts": (
+            ("schemas.automations.meeting_commitment_intake_result", "MeetingCommitmentIntakeResult", "evals/meeting-intake/expected/result.json", None),
+        ),
     },
 }
 
@@ -56,6 +71,26 @@ def feature_ids(suite: dict[str, Any]) -> set[str]:
         kamdar = extensions.get("kamdar") if isinstance(extensions.get("kamdar"), dict) else {}
         discovered.update(str(item) for item in kamdar.get("feature_ids", []))
     return discovered
+
+
+def validate_contracts(root: Path, contracts: tuple[tuple[str, str, str, str | None], ...]) -> list[str]:
+    """Execute the same Pydantic contracts shipped to the client runtime."""
+    root_text = str(root)
+    if root_text not in sys.path:
+        sys.path.insert(0, root_text)
+    errors: list[str] = []
+    for module_name, model_name, relative, safety_check in contracts:
+        try:
+            module = importlib.import_module(module_name)
+            model = getattr(module, model_name)
+            validated = model.model_validate_json(
+                (root / relative).read_bytes(), strict=True
+            )
+            if safety_check:
+                getattr(module, safety_check)(validated)
+        except Exception as error:  # Report provider/runtime validation failures uniformly.
+            errors.append(f"contract_invalid:{relative}:{type(error).__name__}")
+    return errors
 
 
 def evaluate(root: Path) -> dict[str, Any]:
@@ -86,6 +121,7 @@ def evaluate(root: Path) -> dict[str, Any]:
                 errors.append("suite_schema_version_missing")
             if not str(expected.get("schema_version") or "").startswith("kamdar-"):
                 errors.append("result_schema_version_missing")
+            errors.extend(validate_contracts(root, contract["contracts"]))
         except (OSError, ValueError, json.JSONDecodeError) as error:
             errors.append(f"unreadable:{type(error).__name__}")
         results.append(

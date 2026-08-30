@@ -25,8 +25,11 @@ authorized production source. Run `ntn --help`, `ntn pages --help`, and
 ## Todo List
 
 - [ ] Load the complete triggering Meeting and its linked Project and People.
-- [ ] Read `schemas/automations/meeting-commitment-intake-result.zod.mjs` and
-  extract only explicit commitments from the Meeting's Commitments section.
+- [ ] Read `schemas/automations/meeting_commitment_intake_result.py`, run
+  `python -m schemas.automations.validate schema meeting-commitment-intake`,
+  and extract only explicit commitments from the Meeting's Commitments section.
+- [ ] Validate the result with `python -m schemas.automations.validate
+  validate meeting-commitment-intake <result-path>` before any write.
 - [ ] Require a stable commitment key, action, linked Project, accountable
   Person, and due date. Put incomplete rows in `blocked_commitments`; never
   invent missing values.

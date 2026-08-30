@@ -53,13 +53,16 @@ the automation must not invent another organizational layer.
 
 - [ ] **B — Produce and validate one complete Weekly result.**
 
-  - Read `schemas/automations/weekly-review-result.zod.mjs` completely.
-  - Give the schema instructions, golden examples, frozen context, and every
+  - Read `schemas/automations/weekly_review_result.py` completely and run
+    `python -m schemas.automations.validate schema weekly-review`.
+  - Give the emitted JSON Schema, schema instructions, golden examples, frozen context, and every
     destination template to one structured extraction call.
   - Produce and validate one complete Weekly result before any workspace or
     provider mutation.
   - Write the exact result bytes to
     `weekly/review/weekly-review-result-YYYY-Www.json`.
+  - Validate that file with `python -m schemas.automations.validate
+    validate weekly-review <result-path>`.
   - Stop before integrations if validation fails.
 
 - [ ] **C — Pass the end-user artifact quality gate.**
@@ -68,7 +71,9 @@ the automation must not invent another organizational layer.
     `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
     reviewer.
   - Validate its response with
-    `schemas/automations/artifact-quality-review.zod.mjs`.
+    `schemas/automations/artifact_quality_review.py` using `python -m
+    schemas.automations.validate validate artifact-quality-review
+    <review-path>`.
   - Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`.
   - Require exact coverage of every report, disposition, Project replacement,
     and gap.

@@ -5,7 +5,7 @@
     "automation": "automations/weekly-operating-review.md",
     "evaluator": "evals/automations/evaluate-weekly-review.md",
     "runner": "evals/filesystem/scripts/unified-weekly-review-eval.mjs",
-    "schema": "schemas/automations/weekly-review-result.zod.mjs",
+    "schema": "schemas/automations/weekly_review_result.py",
     "seed": "seed/manifest.json",
     "templates": [
       "templates/weekly-report.md",

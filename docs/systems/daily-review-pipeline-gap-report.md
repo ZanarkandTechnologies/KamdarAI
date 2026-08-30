@@ -16,10 +16,10 @@ feature_refs:
 refs:
   - ../../automations/daily-operating-update.md
   - ../../automations/weekly-operating-review.md
-  - ../../schemas/automations/daily-context-diff.zod.mjs
-  - ../../schemas/automations/daily-review-result.zod.mjs
-  - ../../schemas/automations/daily-integration-receipt.zod.mjs
-  - ../../schemas/automations/weekly-review-result.zod.mjs
+  - ../../schemas/automations/daily_context_diff.py
+  - ../../schemas/automations/daily_review_result.py
+  - ../../schemas/automations/daily_integration_receipt.py
+  - ../../schemas/automations/weekly_review_result.py
   - ../../evals/rubrics/end-user-artifact-quality.md
   - company-os-operator-manual.md
 ---
@@ -292,6 +292,6 @@ or mark the item `Processed`.
 7. Extend the eval suite with the sad path, partial-memory path, reply path, and
    duplicate-question suppression.
 
-Grounding: current local automation contracts, Zod schemas, templates, feature
+Grounding: current local automation contracts, Pydantic schemas, templates, feature
 specs, workspace authority, receipts, and evaluation rubric. No external source
 was needed for this repository-internal decision.

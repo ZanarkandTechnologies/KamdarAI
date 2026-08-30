@@ -3,7 +3,7 @@
   "suite": "kamdar-unified-daily-review",
   "target": {
     "automation": "automations/daily-operating-update.md",
-    "schema": "schemas/automations/daily-review-result.zod.mjs",
+    "schema": "schemas/automations/daily_review_result.py",
     "seed": "seed/manifest.json",
     "expected_result": "evals/daily/expected/result.json"
   },

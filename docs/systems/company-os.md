@@ -129,7 +129,7 @@ open state.**
                                   │
                                   ▼
  ┌──────────────────────────── DAILY · ONE BOUNDED SCAN ──────────────────────┐
- │ Stage 1                         → one validated Zod result                  │
+ │ Stage 1                         → one Pydantic-validated result             │
  │ FEAT-0001 Project memory        → private Project report fields            │
  │ FEAT-0002 Documentation quality → report evidence + outbound request       │
  │ FEAT-0003 Project control       → PM/risk/cost fields + outbound chase      │
@@ -156,7 +156,7 @@ open state.**
        records/reports        documents/reports     outbound delivery
 ```
 
-Stage 1 never decides provider placement. Stage 2 owns an explicit map from Zod
+Stage 1 never decides provider placement. Stage 2 owns an explicit map from validated
 fields to report frontmatter, report sections, outbound content, or provider
 properties. `workspace.hermes.md` binds each optional provider effect to an
 authorized destination URL or route. Notion and Drive own visibility and

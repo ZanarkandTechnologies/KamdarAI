@@ -15,8 +15,10 @@ class AutomationContractTests(unittest.TestCase):
             self.assertIn("workspace.hermes.md", automation)
             self.assertIn("ntn --help", automation)
             self.assertNotIn("skills/kamdar-company-os", automation)
-        self.assertIn("DailyReviewResultSchema", daily)
-        self.assertIn("weekly-review-result.zod.mjs", weekly)
+        self.assertIn("validate daily-review", daily)
+        self.assertIn("weekly_review_result.py", weekly)
+        self.assertNotIn(".zod.mjs", daily)
+        self.assertNotIn(".zod.mjs", weekly)
 
     def test_runtime_setup_does_not_depend_on_agent_skills(self) -> None:
         skills = ROOT / "skills"

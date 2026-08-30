@@ -19,7 +19,7 @@ the tester files exist.
 
 Load `evals/weekly/suite.json`,
 `seed/manifest.json`,
-`schemas/automations/weekly-review-result.zod.mjs`,
+`schemas/automations/weekly_review_result.py`,
 `automations/weekly-operating-review.md`, and the report and destination
 templates named by the suite.
 
@@ -120,7 +120,7 @@ other providers.
   promotion disposition, Project replacement, and configuration gap for
   referential clarity, end-user value, readability, template fidelity, and
   groundedness. The parent validates the response with
-  `schemas/automations/artifact-quality-review.zod.mjs` and writes
+  `schemas/automations/artifact_quality_review.py` and writes
   `<run_root>/eval/artifact-quality-review.json`. Only tier A proceeds. Route
   B/C prose findings through `unslop` and regeneration; the reviewer remains
   read-only.

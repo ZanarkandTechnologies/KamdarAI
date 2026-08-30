@@ -38,13 +38,14 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
 
   Load `evals/daily/suite.json`,
   `seed/manifest.json`,
-  `schemas/automations/daily-review-result.zod.mjs`, and
-  `schemas/automations/daily-integration-receipt.zod.mjs`. Treat the three base
+  `schemas/automations/daily_review_result.py`, and
+  `schemas/automations/daily_integration_receipt.py`. Treat the three base
   run artifacts declared by the suite as immutable. Stop before subagents when
   a required input is missing or changed.
 
   Run deterministic checks first: parse every JSON file; validate the extracted
-  result against `DailyReviewResultSchema`; verify its date and source IDs exist
+  result with `python -m schemas.automations.validate validate
+  daily-review <result-path>`; verify its date and source IDs exist
   in the context and seed; require the four feature arrays; reject undeclared
   intermediate files under `<run_root>/daily`; and verify every declared receipt
   and embedded read-back target can be traced to one extracted result. Write the complete
@@ -54,7 +55,7 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
 
   Spawn four native read-only tester subagents. Give each tester only its feature
   case from the eval suite, relevant seed evidence, corresponding extraction
-  slice, and that slice's Zod `.describe()` text and golden examples:
+  slice, and that slice's Pydantic field descriptions and golden examples:
 
   | Tester | Extraction slice | Judge for |
   | --- | --- | --- |
@@ -119,7 +120,7 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
   four result arrays for referential clarity, end-user value, readability,
   template fidelity, groundedness, workflow reconstructability, and baseline
   integrity. The parent validates the response with
-  `schemas/automations/artifact-quality-review.zod.mjs` and writes
+  `schemas/automations/artifact_quality_review.py` and writes
   `<run_root>/eval/artifact-quality-review.json`. Only tier A proceeds. Route
   B/C prose findings through an `unslop` repair and regeneration; the reviewer
   never edits its candidate.

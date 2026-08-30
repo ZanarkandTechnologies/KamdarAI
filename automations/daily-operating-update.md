@@ -49,16 +49,18 @@ destination or substitute another route.
   A missing relation, full page, or processing field is a `configuration_gap`,
   not permission to scan every historical Work item.
 
-- [ ] **2 — Extract one Zod-shaped Daily Review.**
+- [ ] **2 — Extract one Pydantic-shaped Daily Review.**
 
-  - Read `schemas/automations/daily-review-result.zod.mjs` completely.
-  - Give `DailyReviewResultSchema`, its `.describe()` instructions, golden
+  - Read `schemas/automations/daily_review_result.py` completely and run
+    `python -m schemas.automations.validate schema daily-review`.
+  - Give the emitted JSON Schema, its field descriptions, golden
     examples, and the context JSON to one structured extraction call.
   - Treat the call as schema-driven form completion. Do not add fields or
     requirements outside the schema.
-  - Validate the returned object against `DailyReviewResultSchema`.
   - Write the exact validated bytes to
     `daily/review/daily-review-result-YYYY-MM-DD.json`.
+  - Validate that file with `python -m schemas.automations.validate
+    validate daily-review <result-path>`.
   - Stop before integrations if validation fails.
 
   Daily observation does not require an already-approved SOP. Capture the
@@ -72,7 +74,9 @@ destination or substitute another route.
   Give the exact result bytes, frozen context, destination templates, and
   `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
   reviewer. Validate its response with
-  `schemas/automations/artifact-quality-review.zod.mjs` and write
+  `schemas/automations/artifact_quality_review.py`, validate it with `python -m
+  schemas.automations.validate validate artifact-quality-review
+  <review-path>`, and write
   `daily/review/daily-artifact-quality-review-YYYY-MM-DD.json`. Require exact
   coverage of every output row. Only tier A may proceed to integration calls.
   Route B/C readability findings through `unslop`, regenerate the result, and
@@ -149,6 +153,8 @@ destination or substitute another route.
 - `daily/review/daily-review-result-YYYY-MM-DD.json`
 - `daily/review/daily-artifact-quality-review-YYYY-MM-DD.json`
 - `daily/receipts/daily-integration-receipt-YYYY-MM-DD.json`, validated against
-  `schemas/automations/daily-integration-receipt.zod.mjs`, recording Notion
+  `schemas/automations/daily_integration_receipt.py` with `python -m
+  schemas.automations.validate validate daily-integration-receipt
+  <receipt-path> --processing-safety`, recording Notion
   effects, processing outcomes, and each blocked or provider-confirmed message
   route

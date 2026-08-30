@@ -84,7 +84,7 @@ Human logs Work in Notion
 Daily agent reads active Projects + selected Work
           |
           v
-one validated platform-neutral Zod result
+one platform-neutral, Pydantic-validated result
           |
           v
 deterministic field mapping into the private week

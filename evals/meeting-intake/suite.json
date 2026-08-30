@@ -3,7 +3,7 @@
   "suite": "kamdar-meeting-commitment-intake",
   "target": {
     "automation": "automations/meeting-commitment-intake.md",
-    "schema": "schemas/automations/meeting-commitment-intake-result.zod.mjs",
+    "schema": "schemas/automations/meeting_commitment_intake_result.py",
     "seed": "seed/manifest.json",
     "template": "templates/task.md",
     "expected_result": "evals/meeting-intake/expected/result.json"
