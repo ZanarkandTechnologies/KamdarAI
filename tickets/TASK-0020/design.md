@@ -72,7 +72,7 @@ not affect the doctor status.
 - **Customer benefit:** know in under ten seconds whether the manager works and
   whether its output is worth trusting.
 - **Core action:** inspect the first non-green feature or open a passing preview.
-- **Remove or defer:** raw test IDs, Zod names, hashes, tier letters, integration
+- **Remove or defer:** raw test IDs, Pydantic names, hashes, tier letters, integration
   gates, artifact inventories, and provider traces from the first screen.
 - **Deliberate no:** no single green “all tests passed” when outputs are empty or
   low-value; no numeric health score that hides why a feature failed.
@@ -228,7 +228,7 @@ question            one precise question for the responsible person
 ```
 
 Each cadence result contains `feature_outcomes`, exactly once per selected
-feature. Zod `superRefine` cross-checks output references and domain arrays:
+feature. Pydantic `superRefine` cross-checks output references and domain arrays:
 
 - `produced` must point to existing non-empty output rows.
 - `no_change_needed` must have complete source coverage and no output row.
@@ -267,7 +267,7 @@ not success.
 ## Lean eval-authoring contract
 
 Replace duplicated prose fields with one compact feature definition. Prompts
-and extraction instructions remain owned by the Zod schema; integration proof
+and extraction instructions remain owned by the Pydantic schema; integration proof
 remains in the separate delivery-contract suite.
 
 ```yaml
@@ -276,23 +276,26 @@ label: Weekly operating report
 output_path: report_results
 value_checks: [grounded, complete, useful, clear, safe]
 scenarios:
-  - fixture: enough-information.json
+  - static_validator_sample: enough-information.json
     expected_outcome: produced
     reference_points:
       - Every Company claim resolves through the expected Area and Project source chain.
       - A blocking Area gap prevents Company Final status.
-  - fixture: no-change.json
+  - static_validator_sample: no-change.json
     expected_outcome: no_change_needed
     reference_points:
       - Every eligible current report was checked.
-  - fixture: missing-information.json
+  - static_validator_sample: missing-information.json
     expected_outcome: insufficient_information
     expected_gap_codes: [missing-current-area-report]
     reference_points:
       - The missing Area and affected Company finalization are named exactly.
 ```
 
-`reference_points` are fixture-owned observable assertions, not generic rubric
+These samples test static validators only and make no end-to-end claim; Doctor
+acceptance always uses real configured sources and a live model.
+
+`reference_points` are sample-owned observable assertions, not generic rubric
 labels. Existing feature claims, assertions, and falsifiers migrate into the
 smallest relevant scenario reference points or shared runner invariants; they
 must not be deleted during compaction. For example, Daily preserves specific
@@ -348,6 +351,41 @@ open preview      show exact gaps       show failed stage   save partial receipt
 
 Delivery remains outside this flow.
 ```
+
+## Accepted Stage 2 run UX
+
+The run choice applies to the complete configured downstream plan, not only
+Telegram. Telegram is one adapter beside Notion, Drive, messaging, and the
+private workspace.
+
+```text
+Run Company OS evaluation
+
+● Prepare and evaluate only
+  Generate and check outputs; change no downstream system
+
+○ Prepare, evaluate, and apply Stage 2
+  Review every configured downstream action before applying it
+```
+
+```text
+Review downstream actions
+
+Private workspace   3 updates
+Notion              2 updates
+Google Drive        1 publication
+Telegram            1 owner report
+
+Environment: Isolated evaluation
+Production systems: Not authorized
+
+[Back]                              [Apply 7 actions]
+```
+
+The apply action consumes the exact hash-bound prepare handoff without
+regeneration. Disabled policy, a changed handoff, missing destination,
+non-passing quality result, or production target blocks before any provider
+call. Results list every provider separately and link to redacted receipts.
 
 ## Implementation handoff
 

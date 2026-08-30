@@ -32,7 +32,7 @@ status: in_progress
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 # 97 passed
 
-node --test evals/filesystem/tests/*.test.mjs
+python3 -m unittest discover -s tests -p 'test_*.py' -v
 # 100 passed, 2 skipped, 0 failed
 
 python3 scripts/validate_company_context.py --context workspace.hermes.md

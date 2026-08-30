@@ -1,11 +1,87 @@
 ---
 ticket_id: TASK-0019
 artifact: progress
-updated_at: 2026-08-29T00:00:00+08:00
-state: implementation_in_progress
+updated_at: 2026-08-31T00:00:00+08:00
+state: offline_complete
 ---
 
 # TASK-0019 progress
+
+## 2026-08-31 — Python/Pydantic consolidation complete
+
+- Removed the JavaScript schemas, evaluators, test harness, package manifests,
+  and dependency directories. No JavaScript source or package metadata remains.
+- Ported Project Notes, cross-Project reducers, template sync, report models,
+  seed validation/private compilers, feature-outcome evaluation, run validation,
+  and the evidence viewer to Python.
+- Added Pydantic contracts for automation results, report extraction, seed and
+  realism review, feature judges, evidence review, and integration gates.
+- Added a repository guard that fails if the retired toolchain or a
+  non-importable generated report contract returns.
+
+## 2026-08-31 — Complete offline QA passed
+
+- Full Python boundary: 219 tests passed, 2 provider-backed tests skipped, 0 failed.
+- Report-template sync, company-context validation, packaged installed evals,
+  and whitespace/error checks passed.
+- QA receipt: `artifacts/qa/20260831-project-notes-projection/result.json`.
+- Residual deployment gate: authenticated Notion, Drive, and messaging writes
+  still require configured private destinations and explicit authority.
+
+## 2026-08-31 — Test ownership consolidated
+
+- Merged the automation-contract and feature-outcome checks into their existing
+  owner suites, reducing the test layout from 33 modules to 31.
+- Removed redundant source-layout and archived-prototype assertions.
+- Removed the unreferenced Daily documentation runner, its runner-only tests,
+  and its obsolete hard-coded Notion data-source ID.
+- Preserved the automation, Pydantic validation, setup-boundary, and reference
+  feature-outcome behavior checks in the consolidated suites.
+
+## 2026-08-31 — Project Notes and Weekly projections implemented locally
+
+- Replaced the shared mutable Draft with one guided Project Notes template and
+  standard-library writer. Daily appends per Project; exact reruns preserve
+  bytes; key conflicts do not write; a frozen week rejects new notes.
+- Added all-Project coverage validation, exclusive week locking, immutable
+  freeze manifests, consolidation receipts, and unresolved carry-forward.
+- Added an all-or-nothing legacy converter. It preserves source-key identity,
+  publishes every Project directory in one rename, and records a repair receipt
+  instead of exposing a partial migration.
+- Migrated Daily and Weekly Pydantic contracts, fixtures, receipts,
+  automation prompts, reference automation, and eval packets to Project Notes.
+  Weekly raw Work/Meeting input remains forbidden.
+- Added cross-Project Employee Memory and workflow/SOP reducers. Employee
+  observations merge by Person + Work; SOP samples merge by workflow key.
+  Baseline proposals require three comparable samples across two Projects and
+  remain owner-approval gated.
+- Added guarded Person and SOP Markdown application. Person persistent memory
+  and latest-week evidence update with version/hash checks; SOP weekly samples
+  update without changing the approved baseline version.
+- Removed the old Draft template, writer, and test. Runtime distribution now
+  includes the dependency-free Project Notes writer.
+
+### Focused proof
+
+```text
+python3 -m unittest tests.test_project_week_notes -v
+# 4 pass
+
+python3 -m unittest tests.test_project_note_reducers -v
+# 4 pass
+
+python3 -m unittest tests.test_pydantic_weekly_meeting_contracts tests.test_validate_eval_run -v
+# 23 pass
+
+python3 -m unittest tests.test_validate_automation_contract -v
+# 5 pass
+
+python3 -m unittest tests.test_pydantic_weekly_meeting_contracts -v
+# 14 pass
+```
+
+External Notion/Drive/message writes remain separately gated by client
+destination bindings, authentication, permissions, and explicit authority.
 
 ## 2026-08-29 — Hermes profile invocation and reproducible generated contracts
 
@@ -14,18 +90,18 @@ state: implementation_in_progress
   `hermes -p vishan-kamdar-ai` directly and supports
   `KAMDAR_HERMES_PROFILE` when the maintained source profile has a different
   ID. Customer setup still runs Hermes inside Docker and installs no host CLI.
-- Narrowed the root report-output ignore rule so `schemas/reports/*.zod.mjs`
+- Narrowed the root report-output ignore rule so `schemas/reports/*.py`
   are committed derived contracts. A clean clone can therefore run the
-  model-free `npm run report:sync -- --check` without first reconstructing
+  model-free `python3 scripts/sync_report_templates.py --check` without first reconstructing
   missing generated state.
 - Added a unit assertion that the interpreter uses the raw Hermes profile
   command and never depends on a `kamdar` alias.
 
 ## 2026-08-29 — Interactive report-template synchronization
 
-- Added `npm run report:sync`: it scans every report template, compares the
+- Added `python3 scripts/sync_report_templates.py`: it scans every report template, compares the
   Markdown SHA-256 with its generated module, interprets only changed files,
-  displays the structured contract delta, and writes `schemas/reports/*.zod.mjs`.
+  displays the structured contract delta, and writes `schemas/reports/*.py`.
 - Preview generation is not implicit. An interactive run asks
   `Generate synthetic test report preview? [y/N]`; non-interactive runs default
   to no, while `--preview` is the explicit override.
@@ -36,10 +112,9 @@ state: implementation_in_progress
   Company reports roll up only items that need that management level's
   visibility. The instruction explicitly prohibits inferred personality,
   intent, or performance ratings.
-- Kept the implementation in Node/Zod. Python already owns setup orchestration,
-  but that code is standard-library based and Pydantic is not installed. The
-  report compiler, generated schemas, and filesystem eval harness are already
-  JavaScript/Zod, so adding Pydantic would create a second schema runtime.
+- Consolidated the implementation on Python/Pydantic, matching setup orchestration,
+  automation contracts, generated report contracts, and the eval harness. Hermes
+  supplies Pydantic, so the repository no longer carries a second schema runtime.
 - Independent review found and the implementation now rejects incomplete or
   malformed AI interpretations, duplicate table keys, unsafe template IDs,
   output-path escapes, unresolved placeholders, and malformed table cells. A
@@ -50,32 +125,32 @@ state: implementation_in_progress
 ### Proof
 
 ```text
-node --test evals/filesystem/tests/report-template-sync.test.mjs \
-  evals/filesystem/tests/markdown-report-contract.test.mjs
-# 11 tests, 11 pass, 0 fail
+python3 -m unittest tests.test_markdown_report_contract -v
+# 4 tests, 4 pass, 0 fail
 
-npm run report:sync -- --check
+python3 scripts/sync_report_templates.py --check
 # All report templates are synchronized; no model call or write
 
-node --test evals/filesystem/tests/*.test.mjs
+python3 -m unittest discover -s tests -p 'test_*.py' -v
 # 109 tests, 107 pass, 0 fail, 2 skip
 
 python3 scripts/validate_company_context.py --context workspace.hermes.md
 # context_valid=true
 ```
 
-The full Python suite currently has seven pre-existing `test_setup_launch`
-failures caused by local-variable shadowing of `profile_home` in
-`scripts/setup_cli/flows/lifecycle.py`. TASK-0019 does not touch that owner.
+At the 2026-08-29 checkpoint, seven `test_setup_launch` failures exposed local-
+variable shadowing of `profile_home` in `scripts/setup_cli/flows/lifecycle.py`.
+That separate defect was resolved before the 2026-08-31 consolidation; the
+current full-suite result is recorded above.
 
-## 2026-08-29 — Markdown-to-Zod synchronization prototype
+## 2026-08-29 — Markdown-to-Pydantic synchronization prototype
 
 ### Prototype Note
 
 - **Hypothesis:** a maintainer can keep plain Markdown as the report tuning
   surface while an AI interpretation copies section instructions nearly
   verbatim and proposes headings, tables, bullets, examples, cardinality,
-  optionality, and nested row structure for deterministic compilation to Zod.
+  optionality, and nested row structure for deterministic compilation to Pydantic.
 - **Scale risk:** automatically interpreting every template would create a
   lossy second contract and could silently drift production schemas, prompts,
   examples, and renderers.
@@ -87,9 +162,9 @@ failures caused by local-variable shadowing of `profile_home` in
 - **Manual / non-scalable move:** reviewed JSON fixtures stand in for the AI
   response. The prototype deliberately has no model call, auto-apply path, YAML
   schema contract, schema editor, database, publish queue, or provider write.
-- **Evidence observed:** `scripts/markdown_report_contract.mjs` treats the AI
+- **Evidence observed:** `scripts/markdown_report_contract.py` treats the AI
   response as untrusted input, validates it against Markdown observations,
-  builds a strict runtime Zod schema and JSON Schema, validates a structured
+  builds a strict runtime Pydantic schema and JSON Schema, validates a structured
   Project extraction, rejects fact-changing prose cleanup, and renders the
   same frontmatter/heading/table shape. Focused tests cover compatible compile,
   exact instruction descriptions, golden-example observation, nested table
@@ -102,7 +177,7 @@ failures caused by local-variable shadowing of `profile_home` in
 - **Revise / stop criteria:** stop automatic compilation if real templates need
   hidden semantics that cannot be stated in Markdown instructions or a minimal
   reviewed annotation, if cleanup invariants cannot preserve citations and
-  quantitative facts, or if generated Zod becomes less inspectable than the
+  quantitative facts, or if generated Pydantic becomes less inspectable than the
   current authored schema.
 - **Next scale step:** bind the compiled exemplar to the Stage 1/Stage 2 seam
   only after the week-first private-report writer stabilizes; do not replace
@@ -111,16 +186,16 @@ failures caused by local-variable shadowing of `profile_home` in
 ### Proof
 
 ```text
-node --test evals/filesystem/tests/markdown-report-contract.test.mjs
+python3 -m unittest tests.test_markdown_report_contract -v
 # 4 tests, 4 pass, 0 fail
 
-node scripts/markdown_report_contract.mjs \
+python3 scripts/markdown_report_contract.py \
   templates/weekly-report.md \
   tickets/TASK-0019/artifacts/template-drift-cases/weekly-report.interpretation.json \
   tickets/TASK-0019/artifacts/template-drift-cases/weekly-report.extraction.json
 # compatible: true; extraction_valid: true
 
-node --test evals/filesystem/tests/*.test.mjs
+python3 -m unittest discover -s tests -p 'test_*.py' -v
 # 102 tests, 100 pass, 0 fail, 2 skip
 ```
 
@@ -131,4 +206,4 @@ node --test evals/filesystem/tests/*.test.mjs
 - Sentence counting and protected-token detection are representative safety
   checks, not a complete natural-language verifier.
 - The compiler is pure and read-only. It returns a diff or compiled in-memory
-  contract and never rewrites templates or production Zod files.
+  contract and never rewrites templates or production Pydantic files.

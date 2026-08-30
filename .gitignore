@@ -20,6 +20,7 @@ proposals/
 project-memory/
 tasks/
 decisions/
+tickets/**/artifacts/
 
 # A live workspace context never belongs at the source root
 /.hermes.md
@@ -27,6 +28,14 @@ decisions/
 # Tooling output
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
 .DS_Store
 node_modules/
 .reports-preview/

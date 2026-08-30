@@ -1,6 +1,6 @@
 ---
 ticket_id: TASK-0017
-updated_at: 2026-08-29T00:00:00Z
+updated_at: 2026-08-31T00:00:00Z
 state: in_progress
 ---
 
@@ -47,6 +47,26 @@ state: in_progress
 - Fixed the refactored certification recovery callback so a failed integration
   test displays Retry/Defer instead of shadowing the UI selector and raising a
   `TypeError`; the real callback boundary now has a regression assertion.
+- Added a Pydantic workspace messaging contract with only four customer-owned
+  fields: message job, app, named recipient, and drafts/automatic behavior.
+  Runtime and recipient policies are derived; `connection test` is not a
+  reusable message type, and employee follow-up is disabled until a People
+  route exists.
+- Added the copy-complete Messages, Owner messages, Hermes connection, explicit
+  one-message test, recipient confirmation, and review states. The setup flow
+  delegates credentials to `hermes gateway setup` and never treats a running
+  gateway or empty target listing as delivery proof.
+- Added an owner-only exact-target receipt bound to configuration, recipient,
+  and target hashes. `messaging_configured` and `messaging_delivery` are
+  separate from gateway health.
+- Added `scripts/authorized_message.py` as the typed downstream send boundary.
+  Draft-first never invokes Hermes. Automatic sending requires the exact target
+  from a current recipient-confirmed receipt; stale or absent proof fails
+  closed.
+- Updated the canonical workspace, customer setup guide, UX baseline, and Daily
+  and Weekly automation contracts. Drafts live under the existing private
+  `weeks/<week>/outbound/` path, and normal automations may not call raw Hermes
+  delivery directly.
 
 ## Accepted ingress contract
 
@@ -61,12 +81,33 @@ state: in_progress
 
 ## Local proof
 
+- Live Telegram proof on the explicitly authorized `vishan-kamdar-ai` profile:
+  one test message was accepted by Telegram as message `27`; the exact target
+  remained redacted. The result stays `not_provable` until the named owner
+  confirms receipt. Global Python discovery now includes the live test behind
+  explicit profile and side-effect gates.
+
+- 41 focused messaging, workspace, setup-init, launch, architecture, and
+  distribution tests pass, including
+  exact-target extraction, owner-only receipt permissions, stale-config
+  invalidation, draft no-send, automatic exact-target routing, and independent
+  messaging health.
+- `python3 scripts/validate_company_context.py --context workspace.hermes.md`
+  reports `context_valid=true`; Python compilation and `git diff --check` pass.
+- The full Python suite currently reports 171 passes, 1 skip, 3 failures, and 9
+  errors in the separate active Pydantic consolidation migration. Its Weekly golden
+  context no longer has the `reports` and `draft_candidate_refs` shape expected
+  by the current parity tests, and several strict-format assertions are mid-
+  migration. Messaging files do not own those models, goldens, or parity tests.
+- No provider-backed message was sent during offline QA. The first real route
+  proof remains an explicit setup confirmation using an owner-controlled app.
+
 - 107 repository unit tests pass, including architecture boundaries and exact regressions for blank input,
   early setup failure, and end-of-input cancellation.
-- The filesystem/eval suite currently has 105 passes, 2 intentional
-  private-fixture skips, and 1 failure in the separate in-progress report
-  template contract: the new `EMPLOYEE_ACTION_ROWS` placeholder has no matching
-  interpreted field. The setup refactor does not touch that contract.
+- The filesystem/eval suite currently has 74 passes, 2 intentional skips, and
+  43 failures cascading from the separate in-progress Person-template/seed
+  migration (`PERSON-AISHA` headings no longer match `person.md`). The messaging
+  implementation does not own the template or seed bundle.
 - Compose configuration, Python compilation, distribution contract evals,
   company-context validation, and `git diff --check` pass.
 - A disposable non-interactive profile install completed with a redacted
@@ -77,6 +118,25 @@ state: in_progress
   through disposable profiles.
 
 ## Review
+
+- Initial messaging plan review returned `TAS-C` and identified four material
+  gaps: display name was not an executable target, automatic send was not
+  blocked after skipped proof, Pydantic was absent at the send boundary, and
+  employee follow-up was a dead-end choice. The implementation now resolves an
+  exact target from the test result, requires named-recipient confirmation,
+  gates every normal send, and disables employee follow-up.
+- Post-implementation review found three additional integration gaps. The
+  installed guard now bootstraps the profile package and has a real
+  cron-working-directory test; setup now shows the post-test result, offers
+  retry or atomic draft-only downgrade, and asks before apply; draft-first now
+  writes one idempotent action-keyed artifact and supports explicit approval of
+  that exact file through the same typed guard.
+- Final narrow review: `TAS-A — pass-ready` for TASK-0017 messaging. The exact
+  installed approval command is consistent across the parser, customer guide,
+  canonical workspace, and automation working directory.
+- The `farplane ticket check` mechanical gate is unavailable in this project
+  because `rules/validation.toml` is absent; focused tests, context validation,
+  diff checks, and independent review are the substitute evidence.
 
 - Documentation quality: `TAS-A` for the in-progress contract. The reader,
   human gates, value destinations, stable/temporary tunnel distinction,
