@@ -7,26 +7,26 @@
     {
       "path": "weekly/context/weekly-context-2026-W34.json",
       "kind": "weekly-context",
-      "bytes": 33967,
-      "sha256": "ba78bfb84786c50ab19e08afac5c8e6b45693dd9e42a440e867c94fd7ca78146"
+      "bytes": 20379,
+      "sha256": "035e6c257338a8ec68fc46c74d3249d7fc0bd80066cdad92c659672ea7e0929c"
     },
     {
       "path": "weekly/read-back/weekly-integration-read-back-2026-W34.json",
       "kind": "mock-provider-read-back",
-      "bytes": 22946,
-      "sha256": "21aac83a44bb03bae5078201fc02a258d27c8422bf3cfca67464cac4dd9a604c"
+      "bytes": 22316,
+      "sha256": "66acd5ed81afd7a3977f1941044dda9dec1dce141ebe4c92775d3253b23d30e5"
     },
     {
       "path": "weekly/receipts/weekly-integration-receipt-2026-W34.json",
       "kind": "mock-integration-receipt",
-      "bytes": 6474,
-      "sha256": "b3c3487051a4179c8d3b44ebbc005313d9e40ad9235ebc42a88baee7c98a5939"
+      "bytes": 6441,
+      "sha256": "6e0926a1840216450a7a4a89be11fd85e92879849671f1e46465b8bf45e2b8a3"
     },
     {
       "path": "weekly/review/weekly-review-result-2026-W34.json",
       "kind": "weekly-review-result",
-      "bytes": 45696,
-      "sha256": "837108bee6280f5105e2df60f452c222ec0da5e718459a7d1f8b83682ca60cff"
+      "bytes": 45415,
+      "sha256": "18ea2f6e04982c31553d5c4f33bcaa85aa89af730120e01b757b1fe2f51d1a96"
     }
   ]
 }

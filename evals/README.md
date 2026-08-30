@@ -12,22 +12,21 @@ at the repository root under `seed/`; product templates live under `templates/`.
 - `automations/`: evaluator procedures for the seed, Daily, and Weekly runs.
 - `rubrics/`: independent review criteria.
 - `schemas/`: evaluation-only structured review contracts.
-- `filesystem/`: executable evaluators and their deterministic tests.
+- `scripts/` and `tests/` at the repository root: Python evaluators and their deterministic tests.
 - `viewer/`: a minimal static feature dossier. It renders source values from
   the canonical seed, verdicts from selected feature judges, and final links
   from operated evidence. Database seeding is setup and is never scored as an
   automation feature.
 
 The `expected/` directories are deterministic test inputs and outputs, not
-runtime state. Generated `filesystem/runs/` and `filesystem/node_modules/` are
-ignored local state.
+runtime state. Generated evidence-viewer output is ignored local state.
 
 ```bash
-node --test evals/filesystem/tests/*.test.mjs
-cd evals/filesystem && npm run eval:feature-outcomes
-node evals/viewer/build.mjs --out evals/viewer/dist \
-  --evidence tickets/archive/TASK-0006/artifacts/qa/deployments/operated-w34-2026-08-26/operated-evidence.json
-node evals/viewer/serve.mjs
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+python3 scripts/evaluate_feature_outcomes.py
+python3 -m evals.viewer.build --out evals/viewer/dist \
+  --doctor-run /absolute/private/path/to/doctor-run
+python3 -m evals.viewer.serve
 ```
 
 The active evals never authorize live Notion, Gmail, Drive, messaging, or

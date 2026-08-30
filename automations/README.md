@@ -22,6 +22,23 @@ Runtime receipts, proposals, and runs belong in ignored runtime directories.
 They are generated state, not automation configuration, and must not be
 committed here.
 
+## Two-stage execution
+
+Stage 1 generates and judges an immutable cadence result, then writes
+`delivery-plan.json` and `handoff.json`. It never applies provider effects.
+Stage 2 is a separate invocation that verifies the result, plan, workspace,
+quality state, exact destinations, and `automation_delivery.<cadence>` policy
+before applying anything:
+
+```bash
+python3 setup.py deliver --handoff /absolute/private/run/daily/handoff.json
+python3 setup.py deliver --handoff /absolute/private/run/daily/handoff.json --apply
+```
+
+The review lists every configured downstream provider. `--apply` consumes the
+same hashes without regenerating content. Receipts are stored beside the
+private handoff and idempotency state remains in the private Hermes profile.
+
 This layout cleanup changes repository source only. The workspace setup process
 copies an allowlist and never deletes runtime files. Removing stale files from a
 live Hermes workspace requires separately approved cleanup.

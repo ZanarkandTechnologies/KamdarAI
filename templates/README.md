@@ -23,17 +23,26 @@ duplicated page title in the body. The tracked 39-name scrape remains
 capture provenance; only Projects with an explicit feature or control role are
 instantiated in the evaluation workspace.
 
+## Inventory and lifecycle
+
+| Lifecycle | Templates | Current consumer |
+| --- | --- | --- |
+| Active records | `project.md`, `person.md`, `task.md`, `feature.md`, `issue.md`, `meeting.md`, `decision.md`, `skill.md`, `sop.md` | Notion record creation, review, and Weekly promotion. |
+| Active private memory | `project-week-notes.md` | Daily append and Weekly all-Project freeze. |
+| Active reports | `weekly-report.md`, `area-operating-rollup.md`, `company-operating-rollup.md` | Weekly projections; these three use Markdown-to-Pydantic synchronization. |
+| Active outbound | `executive-distribution.md` | Weekly owner distribution renders this template directly. |
+| Feature-declared safety format | `automation-receipt.md` | FEAT-0009 retains this reviewed format, while current Daily/Weekly execution receipts are primarily Pydantic-validated JSON. |
+| Retained optional outbound | `employee-followups.md` | Available for a future rendered employee-chase artifact; current Daily chases are schema-rendered directly. |
+| Inactive compatibility/showcase | `daily-operating-evidence.md`, `documentation-request.md`, `knowledge-candidates.md` | No active automation consumer. Keep only until a separate compatibility cleanup confirms no external installer depends on their template IDs. |
+
 `task.md`, `feature.md`, `issue.md`, and `meeting.md` share one Work data model
 but deliberately guide different thought: ordinary work, a bounded value
 opportunity, a problem to diagnose, and a discussion whose commitments must be
 captured. `person.md` is the machine-readable directory contract: routing and
 expertise remain frontmatter so an agent can select the right person before it
-reads freeform notes. `area-operating-rollup.md`,
-`company-operating-rollup.md`, and the Daily output templates are Kamdar-owned
-derived templates. `documentation-request.md`, `knowledge-candidates.md`, and
-`executive-distribution.md` remain legacy/showcase artifacts only. The active
-Daily automation writes documentation requests and current-week report content
-directly through its schema-validated result.
+reads freeform notes. The active Daily automation writes documentation requests
+and progress chases directly through its schema-validated result; it does not
+need separate intermediary Markdown files for those effects.
 `skill.md` is a thin registry card for promoted Farplane software capabilities;
 the full executable workflow, golden nodes, and evals belong with the source
 `SKILL.md`, not in the Notion record. `sop.md` is the canonical employee workflow
@@ -45,11 +54,13 @@ is intentionally no separate Problems database.
 
 Record and message templates do not begin with generic `Outcome` and `Why`
 callouts. A Project holds its durable memory, proprietary project knowledge,
-and linked Work, Decisions, Reports, and relevant Skills views; a Daily run
-does not create a second Project-memory file. A separate Docs/Research record
-type is deliberately deferred until cross-project reuse proves it needs an
-independent lifecycle. Automation specifications may retain `Outcome` and
-`Why` where those headings explain a workflow rather than a record.
+and linked Work, Decisions, Reports, and relevant Skills views. The private
+`project-week-notes.md` file is short-term operating memory: Daily appends
+source-linked observations to one file per Project and week; Weekly freezes the
+complete all-Project set before producing official reports, Employee Memory,
+and SOP updates. It is not a second public Project record or employee
+scorecard. A separate Docs/Research record type remains deferred until
+cross-project reuse proves it needs an independent lifecycle.
 
 The setup skill installs this whole directory into the Hermes workspace as
 `workspace/templates/`. `workspace.hermes.md` routes real Notion sources and

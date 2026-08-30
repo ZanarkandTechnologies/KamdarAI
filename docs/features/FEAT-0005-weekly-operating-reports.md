@@ -1,102 +1,84 @@
 ---
-title: Turn the current Weekly Draft into an operating review
+title: Project frozen notes into the weekly operating review
 status: active
-execution_modes: [source-contract, isolated-task0007-seed]
+execution_modes: [source-contract, private-local]
 production_mode: proposal-only
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 tags: [company-os, feature, weekly, reporting]
 feature_id: FEAT-0005
 feature_key: weekly.report-finalization
 system_id: SYS-0001
 category: reporting
 public: true
-surfaces:
-  - automations/weekly-operating-review.md
-  - templates/current-weekly-draft.md
-  - templates/weekly-report.md
-  - templates/area-operating-rollup.md
-  - templates/company-operating-rollup.md
-source_refs:
-  - workspace.hermes.md
-  - tickets/archive/TASK-0007/ticket.md
-evidence_refs:
-  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
-  - evals/filesystem/scripts/operate-task0007-notion-seed.mjs
-known_limits: "Production report publication and executive delivery remain proposal-only."
+surfaces: [automations/weekly-operating-review.md, templates/project-week-notes.md, templates/weekly-report.md, templates/area-operating-rollup.md, templates/company-operating-rollup.md]
+source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
+evidence_refs: [tests/test_pydantic_weekly_meeting_contracts.py, tests/test_validate_eval_run.py]
+known_limits: "Authenticated publication and executive delivery remain separately gated."
 ---
 
-# Turn the current Weekly Draft into an operating review
-
-The Company OS turns the one current Weekly Draft into Project, Department, and Company
-reports. The Draft is accumulated by Daily pipelines during the week; Weekly
-reads it once and never re-synthesizes or edits its five anchors.
+# Project frozen notes into the weekly operating review
 
 ## Why it exists
 
-Leadership needs a concise source-linked view of outcomes, open attention, and
-problems worth solving. The hierarchy separates Project evidence from
-Department and Company attention without copying raw Work into every report.
+Produce one complete, reproducible weekly view from private accumulated notes
+without rescanning raw Work or exposing intermediate management state.
 
 ## Trigger and inputs
 
-Weekly receives the current Draft and a canonical Project snapshot used only to
-route known Project and Department relations. Missing routing remains a visible
-gap; it does not trigger a Daily rescan or inferred relation.
+Weekly receives the expected active Project index, every current-week Project
+Notes file, prior reports, and targeted Person/SOP records.
 
 ## Pipeline signature
 
-    WeeklyReviewResult + current Project Report Drafts
-      -> finalized Project, Department, and Company reports
-         | no_finding | configuration_gap | blocked
-
-The [Weekly automation](../../automations/weekly-operating-review.md) owns report
-rendering, promotion review, authorized publication, and delivery.
+`all Project Notes -> freeze -> validate -> project/entity/area/company outputs`
 
 ## Flow
 
-    Daily owns source-keyed Draft entries
-      Decisions / SOPs / PM / risks / cost
-                       ↓
-         current Weekly Draft, read only
-                       ↓
-    Project reports → Department reports → Company report
-                       ↓
-       reviewed promotion and delivery plans
+Weekly locks the week, requires exactly one valid notes file for every active
+Project, hashes the complete set, and writes one immutable freeze manifest.
+Raw Work and Meetings are forbidden at this stage.
+
+```text
+all active Project Notes --freeze--> immutable weekly context
+                                      |
+                 +--------------------+------------------+
+                 |                    |                  |
+                 v                    v                  v
+          Project reports      Employee / SOP      Issue / Decision
+                 |
+                 v
+Area reports -> Company report -> approved outbound
+```
 
 ## State changes and artifacts
 
-- Renders a finalization plan and the Project to Department to Company Markdown
-  hierarchy under the caller-owned output root.
-- Every report item traces to a Draft source key. Department and Company
-  rollups aggregate report references rather than raw Work or Meeting text.
-- Proposed Decisions and SOPs remain Proposed until authority, recurrence,
-  owner, proof, and destination review pass.
-- The input Draft remains unchanged; final reports are immutable for that week.
+The freeze manifest fixes the input set. Validated outputs include reports,
+targeted entity updates, carry-forward instructions, and a consolidation
+receipt after required read-back.
 
 ## Downstream application
 
-The source contract stops after local report rendering. The isolated TASK-0007
-Notion seed can prove report-page publication with receipts, but it does not
-publish the Draft itself and it does not authorize production writes.
+Project reports cite source note keys; Area and Company reports cite downstream
+reports rather than rescanning raw sources. Missing Project coverage blocks a
+complete Company finalization. Prior Final reports remain immutable. Failed
+projection leaves the frozen set retryable and persistent records unchanged.
 
 ## Failure modes
 
-Missing or malformed Draft, absent Project routing, unresolved reporting
-destination, or a Final target selected for mutation becomes a named gap.
-Finalization never searches raw Daily sources to paper over missing input.
+Missing coverage, hash drift, tied divergent snapshots, invalid entity keys, or
+version conflicts block the affected consolidation path.
 
 ## Proof contract
 
-The feature evals cover normal Draft finalization, unapproved Decision/SOP
-candidates, and a missing Draft. The deterministic runner proves a direct
-Draft rerun is zero-write and then produces the hierarchy. The isolated operator
-proves guarded Project-memory application and four finalized report pages only.
+The reference automation and Weekly suites prove frozen input, report hierarchy,
+cross-Project reducers, idempotent retry, and guarded application offline.
 
 ## Example
 
-Two Projects share the same current Draft. Weekly renders two Project reports,
-one unassigned Department rollup when routing is missing, and one Company
-report. The missing Department relation remains a source gap instead of an
-invented assignment.
+Project A and Project B notes for the same employee produce two Project reports
+and one deduplicated Employee Memory update.
+
+After guarded outputs validate and read back, Weekly writes the consolidation
+receipt and initializes next week's unresolved items.

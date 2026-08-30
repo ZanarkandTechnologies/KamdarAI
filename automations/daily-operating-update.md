@@ -37,10 +37,9 @@ destination or substitute another route.
     `AI review != Processed`. Do not reload unchanged Done Work whose
     `AI review = Processed`.
   - Include embedded Meetings from the selected Work pages.
-  - Load each exact current-week private Project report from
-    `weeks/<week>/reports/`. If this is the first Daily run of the week, initialize
-    it through the private report writer from the bounded live Work context;
-    never copy the prior finalized report wholesale.
+  - Load or initialize one Project Notes file for every selected Project at
+    `weeks/<week>/project-notes/project--<project-id>.md`. Do not load prior
+    Daily source records, Employee Memory, SOP records, or final reports.
   - Write `daily/context/daily-context-diff-YYYY-MM-DD.json`.
 
   Never infer an `ntn` resource or argument shape.
@@ -81,46 +80,45 @@ destination or substitute another route.
   coverage of every output row. Only tier A may proceed to integration calls.
   Route B/C readability findings through `unslop`, regenerate the result, and
   rerun the review against the new hash; the reviewer never edits the result.
+  Keep opaque UUIDs and hashes in structured evidence fields only. Comments,
+  messages, reasoning, and rendered Markdown use readable entity names or
+  natural descriptions; human references such as `TASK-101` may remain.
 
 - [ ] **4 — Apply each JSON section and verify its effects.**
 
   Resolve the exact tables, URLs, write authority, and message routes from
   `workspace.hermes.md`. Then apply each result through its integration:
 
-  - `project_updates[].section_replacements[]`: use the `notion` skill via
-    configured provider on `projects`. Replace the named section only when
-    `expected_current_text` still matches.
+  - `project_note_updates[]`: pass `progress_notes[]` and `knowledge_notes[]`
+    unchanged to `scripts/project_week_notes.py`. The applier derives stable
+    note keys and appends each Project batch to that Project's current-week
+    file under the week lock.
   - `documentation_reviews[]` with `verdict = needs_information`: use the
     configured provider on `tasks`. Add the rendered
     comment to the exact Work item using `question_key` for deduplication.
-  - `knowledge_updates[].draft_entries[]` and `weekly_progress_chases[]`: map
-    them through the private report writer into the exact current-week Project
-    report. Build the complete replacement report using the procedure below.
+  - `documentation_reviews[]` with an open question must also have a matching
+    `documentation_question` note in the owning Project batch. The provider
+    comment and private note are separate effects with the same Work ID.
   - `weekly_progress_chases[]`: load the exact Person, resolve its
     `Contact endpoint` through the active environment binding, and send through
     that approved route only.
 
   Never infer a table, report path, person, route alias, or fallback channel.
-  The current private report path must resolve under `weeks/<week>/reports/`.
+  The Project Notes path must resolve under `weeks/<week>/project-notes/`.
   If a required provider integration or approved route is unavailable, keep the
   private report update, report the external effect as `blocked`, and retain the
   JSON result.
 
-  For the current Weekly Draft:
+  For each Project Notes batch:
 
-  1. Load or initialize the exact current-week private Project report.
-  2. Reconcile its open-work view against canonical Work by stable Work ID:
-     update still-open rows, add newly created Meeting-commitment Work, and
-     omit completed or cancelled rows only after their disposition is
-     evidenced in the current week's outcomes. Never delete the source Work.
-  3. Preserve unresolved documentation requests, blockers, unaccepted expected
-     artifacts, and other content that is still current.
-  4. Render the structured workflow and problem payloads without dropping any
-     baseline fields.
-  5. Apply the findings to the required sections.
-  6. Increment `draft_version` by one.
-  7. Set `last_updated` to the run timestamp.
-  8. Write one complete replacement Draft.
+  1. Validate every note's Project, section, source revision, timestamps, Work
+     and Person IDs, workflow key, payload, and Markdown.
+  2. Acquire the week lock, reject a frozen week, and preflight every note key.
+  3. Append new notes by section. Exact duplicates make no write; a conflicting
+     key leaves that Project file unchanged.
+  4. Record the per-Project append outcome. Other Project batches may settle
+     independently, but Work processing advances only when its owning Project
+     append and all other required effects settle safely.
 
   **Message delivery**
 
@@ -128,7 +126,11 @@ destination or substitute another route.
   - Before the first Gmail send, run
     `gws gmail users getProfile --params '{"userId":"me"}'` and
     `gws schema gmail.users.messages.send`.
-  - Before the first Telegram send, run `kamdar send --help`.
+  - Before any configured owner message, pipe the message body from the runtime
+    workspace into `python ../scripts/authorized_message.py --workspace
+    .hermes.md --profile-home .. --message "owner alert" --action-key
+    <stable-action-key>`. Never call `hermes send` directly from a normal
+    automation.
   - If the intended route is missing or unauthorized, record
     `channel_unavailable`. Do not select another channel, recipient, or fallback.
   - For every provider attempt, record the action key, intended Person, intended
@@ -156,5 +158,5 @@ destination or substitute another route.
   `schemas/automations/daily_integration_receipt.py` with `python -m
   schemas.automations.validate validate daily-integration-receipt
   <receipt-path> --processing-safety`, recording Notion
-  effects, processing outcomes, and each blocked or provider-confirmed message
+  Project Notes append effects, processing outcomes, and each blocked or provider-confirmed message
   route

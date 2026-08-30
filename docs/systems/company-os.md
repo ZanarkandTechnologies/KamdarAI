@@ -3,7 +3,7 @@ title: Company OS
 status: designed
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 system_id: SYS-0001
 primary_feature_ref: FEAT-0001
 feature_refs:
@@ -25,143 +25,96 @@ refs:
 
 # Company OS
 
-The Company OS turns one bounded Daily source scan into private,
-week-scoped Project reports and outbound requests. Daily first validates one
-platform-neutral structured result, then deterministically maps its fields into
-those workspace artifacts. Weekly finalizes the Project reports, rolls them into
-Department and Company reports, and prepares reviewed knowledge promotion,
-next-week planning, and executive delivery without re-extracting Daily evidence.
+The Company OS turns one bounded Daily source scan into private Project Notes.
+Weekly freezes every active Project's notes together, then produces official
+reports and persistent entity updates without rescanning raw Work or Meetings.
 
 ```text
 company_os(source_window, templates, destination_bindings)
-  -> weeks/<week>/reports[] + weeks/<week>/outbound[] + source_gaps[]
+  -> Project Notes -> reports + Employee Memory + SOP/Decision/Issue updates
 ```
 
 ## At a glance
 
 - System ID: `SYS-0001`
 - Primary feature: `FEAT-0001`
-- Source scan: once per Daily automation run; Weekly reads the accumulated
-  Project reports and routing snapshot rather than rescanning raw sources
-- Private operating state: week-scoped Project reports accumulated in the
-  Hermes workspace; intermediary management state is not published to Notion
-- Durable summaries: private Project reports → Department rollups → Company
-  rollup
+- Daily owner: append complete source-linked observations to one private file
+  per Project/week.
+- Weekly owner: freeze the all-Project set; project reports and persistent
+  Person/SOP memory; carry unresolved items forward.
+- Durable summaries: Project reports → Department reports → Company report.
 - Promotion authority: Weekly only, after type-specific gates
 - External writes: Stage 2 mappings to explicitly configured destination URLs;
   destination platforms own access control
-- Operator-visible artifact classes: `reports` and `outbound` only; delivery
-  dedupe and provider status remain hidden run metadata
+- Public boundary: Project Notes and intermediate management state stay private.
 
 ## Private workspace contract
 
 ```text
 weeks/
 `-- YYYY-Www/
+    |-- project-notes/
+    |   `-- project--<stable-project-id>.md
     |-- reports/
-    |   |-- project--<stable-project-id>.md
-    |   |-- department--<stable-department-id>.md
-    |   `-- company.md
+    |   |-- projects/
+    |   |-- departments/
+    |   `-- company/
+    |-- projections/
+    |   |-- employee-memory-updates.json
+    |   `-- sop-updates.json
     `-- outbound/
-        |-- employee--<stable-action-key>.md
-        |-- documentation--<stable-action-key>.md
-        `-- executive-report.md
+        `-- <approved message or publication>.md
 ```
 
-Week-first storage matches the dominant access pattern: Daily updates the
-current reporting window, Weekly enumerates every Project report in that window,
-and retention can archive a complete week. Reports carry their own
-`accumulating` or `final` state; there is no separate drafts directory. Outbound
-artifacts carry material intended to leave the private workspace; there is no
-publish queue or separate follow-up directory.
-
-## Continuous Project draft contract
-
-A weekly Project draft is a current-week view over canonical Work, not the
-owner of the task list. Crossing a week boundary finalizes the report snapshot
-but does not clear continuing work:
-
-```text
-canonical Work + new Meeting commitments + prior unresolved state
-                              |
-                              v
-                  current Project weekly draft
-                              |
-                +-------------+-------------+
-                |                           |
-          Work remains open           Work completes
-                |                           |
-     keep and update one row      record the evidenced result
-                |                 in the finalized week
-                |                           |
-                +-----------> next week <---+
-                     carry open only
-```
-
-- Open Work keeps the same stable Work ID and appears in the next week's
-  accumulating Project report with its latest owner, state, due/review
-  condition, expected artifact, and evidence.
-- Completed or cancelled Work is omitted from the next week's open-work view;
-  it remains in the finalized report for the week in which its disposition was
-  evidenced. This is removal from a view, never deletion of canonical Work.
-- Meeting intake creates source-linked canonical Work for new commitments and
-  deduplicates unchanged commitments. The next Daily reconciliation updates a
-  matching open-work row by stable Work ID or adds the newly created Work; it
-  never creates a second report-local todo list.
-- A human response received after finalization updates the still-live Work or
-  documentation-review state and appears in the next accumulating report. It
-  does not rewrite the finalized Project, Department, or Company reports.
-- On the first Daily run of a new week, the private writer initializes that
-  week's Project report. It resets bounded narrative such as Summary, weekly
-  outcomes, and completed-this-week evidence, while carrying the open Work,
-  unresolved documentation requests, active blockers, and unaccepted expected
-  artifacts present in the live bounded Daily context.
-
-The practical invariant is: **final reports are immutable weekly snapshots;
-canonical Work supplies continuity; the next Project draft carries only live
-open state.**
+Week-first storage matches the dominant access pattern. Project Notes are
+append-only observation blocks; Weekly report files are projections, not the
+Daily cache. There is no publish queue or separate Daily Person/SOP memory.
 
 ## System flow
 
 ```text
- CONFIGURED COMPANY SOURCES
- Notion Projects + Tasks + Meetings + Directory + Drive
-                                  │
-                                  ▼
- ┌──────────────────────────── DAILY · ONE BOUNDED SCAN ──────────────────────┐
- │ Stage 1                         → one Pydantic-validated result             │
- │ FEAT-0001 Project memory        → private Project report fields            │
- │ FEAT-0002 Documentation quality → report evidence + outbound request       │
- │ FEAT-0003 Project control       → PM/risk/cost fields + outbound chase      │
- │ FEAT-0004 Knowledge capture     → Decision/SOP report fields                │
- └─────────────────────────────────────┬───────────────────────────────────────┘
-                                       │ Stage 2 deterministic field mapping
-                                       ▼
- ┌────────────────────── PRIVATE WEEKLY WORKSPACE ─────────────────────────────┐
- │ weeks/YYYY-Www/reports/  → accumulating Project reports                    │
- │ weeks/YYYY-Www/outbound/ → employee and documentation requests             │
- └─────────────────────────────────────┬───────────────────────────────────────┘
-                                       │
-                                       ▼
- ┌──────────────────────────── WEEKLY · ONE REVIEW PASS ──────────────────────┐
- │ Project weekly reports, read only → source-keyed accumulated review         │
- │ FEAT-0005 Operating reports    → Project → Department → Company            │
- │ FEAT-0006 Knowledge promotion  → Work Items / Decisions / SOPs             │
- │ FEAT-0007 Next-week planning   → Project context + carried commitments     │
- └───────────────┬──────────────────┬──────────────────┬───────────────────────┘
-                 │                  │                  │
-                 ▼                  ▼                  ▼
-       NOTION / WIKI           GOOGLE DRIVE          EMAIL / TELEGRAM
-       configured URLs        configured URLs       approved routes
-       records/reports        documents/reports     outbound delivery
+Projects + Work + Meetings + artifacts
+                  |
+       Daily Pydantic extraction
+                  |
+       project_note_updates[]
+                  |
+       Project-scoped append writer
+                  v
+       all Project Notes for week
+                  |
+         lock + coverage + freeze
+                  |
+       +----------+-----------+----------------+
+       |          |           |                |
+    Reports   Employee     SOP samples     Issue/Decision
+       |       Memory      + baseline       promotion
+       v                     proposal
+Department -> Company -> approved outbound/publication
 ```
 
-Stage 1 never decides provider placement. Stage 2 owns an explicit map from validated
-fields to report frontmatter, report sections, outbound content, or provider
-properties. `workspace.hermes.md` binds each optional provider effect to an
-authorized destination URL or route. Notion and Drive own visibility and
-permissions at those destinations; Hermes does not reproduce their access
-control model.
+Daily selects latest Work state by source revision and time. Weekly selects the
+greatest `source_updated_at` per Work and question type; materially divergent
+ties block consolidation. Accepted completed outcomes update Employee Memory by
+`person_id + work_id`. Comparable workflow samples group by explicit
+`workflow_key`; three samples across two Projects may propose, but never apply,
+a timing baseline without owner approval.
+
+After every required projection validates and reads back, Weekly writes a
+consolidation receipt. It then initializes next week's Project Notes with only
+unresolved Work, open documentation questions, and unaccepted artifacts. Frozen
+notes and Final reports remain immutable.
+
+Stage 1 never decides provider placement. Stage 2 maps validated fields to
+explicit workspace paths, destination URLs, or routes. `workspace.hermes.md`
+holds those bindings; Notion and Drive own destination permissions.
+
+```text
+validated projection
+  |-- NOTION / WIKI     approved records and reports at configured URLs
+  |-- GOOGLE DRIVE      approved documents under the configured company root
+  `-- EMAIL / TELEGRAM  approved outbound only, with delivery receipts
+```
 
 ## Integration routing
 
@@ -203,8 +156,8 @@ actions with a lower setup burden.
 | Observed employee workflow | Observe daily; promote only after authority/reuse review | Existing SOPs database / `templates/sop.md`; `skill.md` remains software-only |
 
 Daily never promotes canonical knowledge. Proprietary Project-specific facts
-accumulate in the private Project weekly report, linked to their Work or Meeting
-source and review condition. Weekly may apply only a Problem, Decision, or SOP
+accumulate in private Project Notes and then immutable Project report history,
+linked to their Work or Meeting source and review condition. Weekly may apply only a Problem, Decision, or SOP
 candidate whose source quality, destination mapping, dedupe result, authority,
 privacy, and write policy all pass. Otherwise it remains in the report with a
 named gap.

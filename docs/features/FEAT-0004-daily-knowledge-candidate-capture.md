@@ -1,108 +1,83 @@
 ---
-title: Accumulate workflow and problem baselines in the Weekly Draft
+title: Append grounded operating knowledge to Project Notes
 status: active
-execution_modes: [source-contract]
-production_mode: proposal-only
+execution_modes: [source-contract, private-local]
+production_mode: private-local
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 tags: [company-os, feature, daily, knowledge]
 feature_id: FEAT-0004
 feature_key: daily.knowledge-capture
 system_id: SYS-0001
 category: knowledge
 public: true
-surfaces:
-  - automations/daily-operating-update.md
-  - templates/current-weekly-draft.md
-  - automations/weekly-operating-review.md
-source_refs:
-  - workspace.hermes.md
-  - tickets/archive/TASK-0007/ticket.md
-evidence_refs:
-  - evals/filesystem/scripts/run-task0007-reference-automation.mjs
-known_limits: "Daily writes only its local Markdown anchors. It does not promote knowledge or call a provider."
+surfaces: [automations/daily-operating-update.md, templates/project-week-notes.md, automations/weekly-operating-review.md]
+source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
+evidence_refs: [tests/test_project_note_reducers.py]
+known_limits: "Daily observes; Weekly alone promotes or changes persistent entities."
 ---
 
-# Accumulate grounded knowledge in the Weekly Draft
-
-The Company OS extracts source-backed Decisions, current employee workflow observations,
-and measurable problem baselines from Daily Work and Meeting context. It writes
-them into the supplied current Weekly Draft. A workflow may be observed before
-it is approved or reusable; Weekly owns promotion into canonical SOP and Issue
-records.
+# Append grounded operating knowledge to Project Notes
 
 ## Why it exists
 
-Important choices and repeatable methods otherwise disappear inside Work items.
-The Draft is a small, source-keyed weekly accumulation record, not a second
-wiki or a review queue.
+Capture useful operating signals once, near their source, while reserving
+persistent entity changes for the complete Weekly evidence set.
 
 ## Trigger and inputs
 
-The one Daily collector supplies complete Work and embedded Meeting snapshots.
-The pipeline receives the already-created current Draft for that week. It does
-not scan for another Draft or call a provider.
+Daily receives complete Work and Meeting evidence, artifact links, measured
+timing when available, and explicit workflow identities.
 
 ## Pipeline signature
 
-    DailyReviewResult.knowledge_updates
-      -> current Report Draft | applied | duplicate | conflict |
-         no_finding | configuration_gap
-
-The [Daily automation](../../automations/daily-operating-update.md) owns
-Decisions and SOP observations and writes them to the current Report Draft.
+`Daily evidence -> knowledge_notes[] -> Project Notes -> Weekly disposition`
 
 ## Flow
 
-    complete Daily Work + Meeting snapshots
-                     ↓
-    Daily context → schema-validated knowledge updates
-                     ↓
-    current Weekly Draft, same file
-      Decisions + SOPs source-keyed entries
-                     ↓
-    Weekly finalization reads it; promotion remains review-gated
+Daily extracts source-backed Problems, inefficiencies, Decisions, and workflow
+samples once, then appends them to the owning Project Notes file.
+
+```text
+complete Work + Meeting evidence
+              |
+              v
+project_note_updates[].knowledge_notes[]
+       | problem / decision / workflow_key
+       v
+private Project Notes
+       |
+       v Weekly only
+Issue / Decision / SOP disposition
+```
 
 ## State changes and artifacts
 
-- Writes only the supplied local current Weekly Draft Markdown file.
-- A Decision needs a concrete choice plus an alternative or tradeoff. A workflow
-  observation needs trigger, actors, ordered steps, systems/handoffs, timing and
-  volume or explicit measurement gaps, output, evidence window, and confidence.
-  Reuse and authority are Weekly promotion gates, not Daily observation gates.
-- A problem baseline names the affected workflow step, measurement window,
-  recurrence/volume, time or wait loss, direct-cost formula when grounded,
-  confidence, measurement owner, and any missing measurements.
-- Entries use decision:source_id or sop:source_id. Equal content is a
-  duplicate; changed content under the same key is a conflict with no partial
-  file update.
-- Missing authority, owner, recurrence, or proof stays visible as a Proposed
-  review gap.
+Daily creates immutable candidate notes. It does not update an Issue, Decision,
+SOP, or approved baseline.
 
 ## Downstream application
 
-Weekly finalization reads the completed Draft and builds the Project to
-Department to Company hierarchy. It never re-extracts Daily evidence or writes
-these anchors again. Promotion is a separate reviewed step.
+A problem names the affected workflow step, dated measurement window, observed
+time/wait/volume, sourced cost formula or explicit gap, confidence, and next
+proof. A workflow sample needs an explicit stable `workflow_key`; one sample
+never becomes a baseline. A Decision preserves choice, tradeoff, authority, and
+review trigger. Weak or incomplete evidence remains a visible gap and is not
+promoted automatically.
 
 ## Failure modes
 
-A generic suggestion, weak recurrence, absent complete evidence, wrong-week
-Draft, missing Draft, or material source-key conflict becomes no_finding,
-configuration_gap, or conflict. No generic Docs/Research record, provider
-receipt, message, or promotion is created.
+Exact source revisions deduplicate; conflicting note identity leaves the
+Project file unchanged.
 
 ## Proof contract
 
-Normal, hard, and boundary evals cover a grounded Decision/SOP pair, a weak
-idea that must not pollute the Draft, and a missing Draft. The deterministic
-fixture proves a source-keyed zero-write rerun before Weekly reads the same
-file.
+Reducer tests cover cross-Project workflow grouping, insufficient samples,
+approval-gated baseline proposals, and conflict-safe updates.
 
 ## Example
 
-A Meeting says not to approve a rollout until supplier counts are normalised,
-and two Work items show the same comparison failure. Daily writes one Proposed
-Decision and one Proposed SOP into the current Draft. Their authority and proof
-gaps remain explicit until Weekly review.
+Accepted catalogue exports in two Projects can share
+`workflow_key: catalogue-export`; their sourced durations remain separate SOP
+samples until Weekly evaluates them together.

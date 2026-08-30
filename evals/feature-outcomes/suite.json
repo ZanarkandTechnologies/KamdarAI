@@ -16,7 +16,7 @@
         ],
         "reasoning_summary": "The dated approval is a meaningful project change and supports one traceable update.",
         "output_refs": [
-          "/project_updates/0"
+          "/project_note_updates/0"
         ],
         "information_gaps": []
       },
@@ -27,7 +27,7 @@
           "TASK-101"
         ],
         "output_refs": [
-          "/project_updates/0"
+          "/project_note_updates/0"
         ],
         "information_gap_codes": [],
         "reasoning_must_include": [
@@ -52,11 +52,11 @@
         "outcome": "no_change_needed",
         "evidence": [
           {
-            "source_id": "RPT-DRAFT-CMT-W34",
-            "observation": "The finalized Project Draft contains no approved next-week checklist changes."
+            "source_id": "PROJ-CMT-CMT_PIPELINE",
+            "observation": "The frozen Project Notes contain no unresolved Work or documentation question to carry forward."
           }
         ],
-        "reasoning_summary": "The required draft was checked successfully and contains no eligible replacement, so no output is needed.",
+        "reasoning_summary": "The required Project Notes were checked successfully and contain no eligible carry-forward, so no output is needed.",
         "output_refs": [],
         "information_gaps": []
       },
@@ -64,7 +64,7 @@
         "feature_id": "FEAT-0007",
         "outcome": "no_change_needed",
         "evidence_source_ids": [
-          "RPT-DRAFT-CMT-W34"
+          "PROJ-CMT-CMT_PIPELINE"
         ],
         "output_refs": [],
         "information_gap_codes": [],
@@ -73,8 +73,8 @@
           "no output"
         ],
         "evidence_observations_must_include": [
-          "Project Draft",
-          "no approved"
+          "Project Notes",
+          "no unresolved"
         ]
       },
       "reference_points": [

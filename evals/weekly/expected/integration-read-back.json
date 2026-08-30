@@ -1,7 +1,7 @@
 {
   "schema_version": "kamdar-weekly-integration-read-back@1.0.0",
   "receipt_id": "WEEKLY-INTEGRATION-2026-W34-V4",
-  "weekly_result_sha256": "837108bee6280f5105e2df60f452c222ec0da5e718459a7d1f8b83682ca60cff",
+  "weekly_result_sha256": "18ea2f6e04982c31553d5c4f33bcaa85aa89af730120e01b757b1fe2f51d1a96",
   "checked_at": "2026-08-24T18:16:00+08:00",
   "live_provider_calls": false,
   "observations": [
@@ -291,23 +291,26 @@
     },
     {
       "feature_id": "FEAT-0007",
-      "result_pointer": "/next_week_project_replacements/0",
+      "result_pointer": "/carry_forward_updates/0",
       "target_id": "PROJ-CMT-CMT_PIPELINE",
-      "provider_id_or_url": "https://notion.example.test/next_week_project_replacements/PROJ-CMT-CMT_PIPELINE",
+      "provider_id_or_url": "https://workspace.example.test/carry-forward/PROJ-CMT-CMT_PIPELINE",
       "observed_payload": {
         "project_id": "PROJ-CMT-CMT_PIPELINE",
-        "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
-        "section": "This week's attention",
-        "expected_current_text": "**Planning window:** 2026-W34\n\n- [x] Complete the signed pre-production sample check [TASK-105]\n- [ ] **P0 · Blocked · due 2026-08-22** — Confirm the corrected collar tolerance and approver [TASK-101]\n- [ ] Correct and recheck the baju kurung sample against the signed pack [TASK-104]\n- [ ] Reserve the appropriate sewing line after sample approval [TASK-110]\n\n### Daily history\n\n- 2026-08-19: pre-production sample check completed.\n- 2026-08-21: capacity confirmed; tech-pack authority remains missing.\n\n- **Next action:** Aisha records the approved measurement in TASK-101, then Nur completes TASK-104.\n- **Last meaningful update:** 2026-08-21",
-        "replacement_text": "**Planning window:** 2026-W35\n\n- [ ] **P0 · Blocked · overdue** — Sign the corrected collar measurement, approver, and affected sizes. **Owner:** Aisha. **Why now:** bulk cutting cannot start from conflicting measurements. [TASK-101]\n- [ ] **P0 · due one working day after approval** — Recheck the corrected sample against the signed pack. **Owner:** Nur. **Success:** the sample matches the approved measurement. [TASK-104] [TASK-105]\n- [ ] **P1 · after sample acceptance** — Confirm Line 3 for 1,200 pieces and the production handoff. **Owner:** Aisha. [TASK-110]\n\n### Daily history\n\n- 2026-08-24: W34 closed with the sample check complete and the tech-pack authority unresolved.\n\n- **Next action:** Aisha closes TASK-101; Nur completes TASK-104 within one working day; Aisha then confirms TASK-110.\n- **Last meaningful update:** 2026-08-24",
-        "source_ids": [
-          "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+        "from_week": "2026-W34",
+        "to_week": "2026-W35",
+        "source_note_keys": [
+          "f7d7c793993e9640093973f87a74fefb86e9acd7a7088007c8005f0bfce7f8fe"
+        ],
+        "work_ids": [
           "TASK-101",
           "TASK-104",
           "TASK-110"
-        ]
+        ],
+        "notes_markdown": "**Planning window:** 2026-W35\n\n- [ ] **P0 · Blocked · overdue** — Sign the corrected collar measurement, approver, and affected sizes. **Owner:** Aisha. **Why now:** bulk cutting cannot start from conflicting measurements. [TASK-101]\n- [ ] **P0 · due one working day after approval** — Recheck the corrected sample against the signed pack. **Owner:** Nur. **Success:** the sample matches the approved measurement. [TASK-104] [TASK-105]\n- [ ] **P1 · after sample acceptance** — Confirm Line 3 for 1,200 pieces and the production handoff. **Owner:** Aisha. [TASK-110]\n\n### Daily history\n\n- 2026-08-24: W34 closed with the sample check complete and the tech-pack authority unresolved.\n\n- **Next action:** Aisha closes TASK-101; Nur completes TASK-104 within one working day; Aisha then confirms TASK-110.\n- **Last meaningful update:** 2026-08-24",
+        "disposition": "carried_forward",
+        "gaps": []
       },
-      "observed_sha256": "f60341dd4689e6843f5671a93deed4506c3d810add076daaf99f013ad124a7aa",
+      "observed_sha256": "6ccd5c9dfe3151adaff497827a6c94711575037d9754daacd3fa958939d52144",
       "matched": true,
       "created": true
     }
@@ -315,7 +318,7 @@
   "source_invariants": [
     {
       "id": "RPT-PROJ-CMT-CMT_PIPELINE-W33",
-      "observed_sha256": "7d9bf835fd0073173f0c5c44aa5f81d8f0c04196182fe4f97558f4b018a4fbd3",
+      "observed_sha256": "01c0fbffa5ec3c91022f477dc2d4189153b9b2ff9997e7c52b315cd77cb81f7f",
       "changed": false
     }
   ],

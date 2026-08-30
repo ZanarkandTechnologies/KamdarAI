@@ -4,7 +4,7 @@
   "target": {
     "automation": "automations/weekly-operating-review.md",
     "evaluator": "evals/automations/evaluate-weekly-review.md",
-    "runner": "evals/filesystem/scripts/unified-weekly-review-eval.mjs",
+    "runner": "scripts/validate_eval_run.py",
     "schema": "schemas/automations/weekly_review_result.py",
     "seed": "seed/manifest.json",
     "templates": [
@@ -137,7 +137,7 @@
         "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
         "RPT-PROJ-ECOM-ECOM_FIXES-W34"
       ],
-      "claim": "Every candidate already recorded in the three current Project Drafts receives an evidence-backed disposition. Promoted problems preserve their workflow baseline, promoted workflows become employee SOP records, and only reusable or materially consequential decisions become canonical Decisions with advise-style options and rationale. Weekly never rescans raw Work or Meetings.",
+      "claim": "Every candidate already recorded in the three current frozen Project Notes receives an evidence-backed disposition. Promoted problems preserve their workflow baseline, promoted workflows become employee SOP records, and only reusable or materially consequential decisions become canonical Decisions with advise-style options and rationale. Weekly never rescans raw Work or Meetings.",
       "assertions": [
         "CMT promotes the production problem as an Issue preserving the workflow step, four-hour and MYR 360 Before baseline, formula, confidence, measurement gap, intervention, and empty After state.",
         "The CMT sample-baseline choice is promoted only because it establishes a reusable production standard; it records 2–3 real options, selected option, rationale, authority, accepted tradeoff, consequences, and review trigger.",
@@ -151,7 +151,7 @@
     },
     {
       "feature_id": "FEAT-0007",
-      "result_path": "$.next_week_project_replacements[*]",
+      "result_path": "$.carry_forward_updates[*]",
       "entity_ids": [
         "PROJ-CMT-CMT_PIPELINE",
         "TASK-101",
@@ -159,13 +159,12 @@
         "TASK-110",
         "RPT-PROJ-CMT-CMT_PIPELINE-W34"
       ],
-      "claim": "Next-week priorities become one guarded complete replacement of the canonical Project checklist, carrying unresolved commitments forward without creating a parallel plan or altering source Work.",
+      "claim": "Unresolved Work and documentation questions become source-linked next-week Project Notes without rewriting frozen history or canonical Work.",
       "assertions": [
-        "One replacement targets PROJ-CMT-CMT_PIPELINE.",
-        "Expected text matches the grounded checklist and read-back matches replacement.",
-        "Tech-pack and collar gates carry forward with line confirmation.",
-        "Final report is cited and source Work remains unchanged.",
-        "No parallel plan or duplicate checklist is created."
+        "Exactly one carry-forward update targets the owning Project.",
+        "It preserves stable Work IDs and frozen source note keys.",
+        "Accepted completed Work is absent from the next open view.",
+        "The effect initializes private Project Notes and targets no canonical Work record."
       ],
       "falsifier": "A lost unresolved item, an unsourced new priority, a partial append instead of complete guarded replacement, changed source Work, or any parallel plan artifact."
     }
@@ -269,7 +268,7 @@
       "expected_output": "Every candidate receives one evidence-backed disposition, and only qualified knowledge creates a correctly templated canonical record.",
       "files": [],
       "assertions": [
-        "The result represents promoted, duplicate, project-only, monitor, dismissed, and blocked branches using candidates already present in the three Project Drafts.",
+        "The result represents promoted, duplicate, project-only, monitor, dismissed, and blocked branches using candidates already present in the three frozen Project Notes.",
         "Each promotion route uses the matching canonical template and carries its source and Project relation.",
         "A duplicate or blocked disposition produces no new destination row in mocked provider read-back."
       ],
@@ -336,7 +335,7 @@
               "RPT-PROJ-CMT-CMT_PIPELINE-W34"
             ],
             "result_paths": [
-              "$.next_week_project_replacements[*]"
+              "$.carry_forward_updates[*]"
             ]
           }
         }

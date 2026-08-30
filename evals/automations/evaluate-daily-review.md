@@ -59,10 +59,10 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
 
   | Tester | Extraction slice | Judge for |
   | --- | --- | --- |
-  | FEAT-0001 | `project_updates[]` | Complete, evidence-grounded Project section replacements that preserve current facts and update weekly work, progress, and blockers |
+  | FEAT-0001 | `project_note_updates[].progress_notes[]` | Complete, evidence-grounded Work, outcome, and documentation snapshots appended to the owning Project Notes file |
   | FEAT-0002 | `documentation_reviews[]` | One explicit sufficiency verdict per selected Done Work item; precise questions for missing rationale or evidence |
   | FEAT-0003 | `weekly_progress_chases[]` | Accountable, evidence-led chases only when weekly targets are stale, blocked, or unlikely to finish |
-  | FEAT-0004 | `knowledge_updates[]` | Structured current-workflow observations, problem baselines linked to affected steps, decisions, and precise measurement requests for missing time/volume/cost evidence |
+  | FEAT-0004 | `project_note_updates[].knowledge_notes[]` | Structured workflow observations, problem baselines linked to affected steps, and source-linked Decisions appended to Project Notes |
 
   Each tester must return exactly this machine shape (the parent supplies the
   absolute `verdict_path` in the judge packet):
@@ -83,10 +83,10 @@ live Notion, Telegram, email, WhatsApp, or other provider writes in this eval.
       {
         "assertion": "exact authored assertion",
         "met": true,
-        "evidence_refs": ["TASK-201 at project_updates[0].source_ids"]
+        "evidence_refs": ["TASK-201 at project_note_updates[0].knowledge_notes[0].source_ids"]
       }
     ],
-    "evidence_refs": ["TASK-201 at project_updates[0].source_ids"],
+    "evidence_refs": ["TASK-201 at project_note_updates[0].knowledge_notes[0].source_ids"],
     "failures": [],
     "verdict_path": "/absolute/run/root/eval/judges/FEAT-0001.json"
   }

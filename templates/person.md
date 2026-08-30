@@ -1,6 +1,6 @@
 ---
 template_id: company-os-person
-template_version: "0.1.0"
+template_version: "0.2.0"
 name: "{{PERSON_NAME}}"
 person_id: "{{PERSON_ID}}"
 department: "{{DEPARTMENT}}"
@@ -43,3 +43,19 @@ Lead.
 END GOLDEN EXAMPLE -->
 
 {{OPERATING_NOTES}}
+
+## Persistent operating memory
+
+<!-- Weekly-only. Preserve factual, source-linked accepted outcomes that remain
+useful across weeks. Merge by Person ID + Work ID. Do not infer personality,
+intent, effort, or a performance rating. -->
+
+No accepted cross-week observation yet.
+
+## Latest weekly evidence
+
+<!-- Weekly replaces this complete section with the person's current cross-
+Project delivery, open attention, documentation state, and source Work IDs.
+Daily must not edit this section. -->
+
+No consolidated weekly evidence yet.

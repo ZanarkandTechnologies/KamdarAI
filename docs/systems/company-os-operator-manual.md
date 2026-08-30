@@ -3,7 +3,7 @@ title: Company OS operator manual
 status: active
 owner: Company OS
 created_at: 2026-08-27
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 system_id: SYS-0001
 refs:
   - company-os.md
@@ -20,10 +20,10 @@ refs:
 
 Use the Company OS to keep work, private management state, follow-up, weekly
 reporting, Decisions, and SOPs connected to the same source evidence. People
-work in Notion tickets and comments. The Daily agent reconciles current work
-into private, week-scoped Project reports and outbound requests. The Weekly
-agent finalizes and rolls up those reports and promotes only knowledge that has
-earned a durable home.
+work in Notion tickets and comments. The Daily agent appends current evidence
+to private, week-scoped Project Notes and prepares bounded outbound requests.
+The Weekly agent freezes all Project Notes, produces the report hierarchy, and
+promotes only knowledge that has earned a durable home.
 
 The current repository is configured for frozen or isolated evaluation.
 Production Notion writes and employee messages remain proposal-only until the
@@ -39,7 +39,7 @@ production routes and authority are approved.
 | **Reports** | An optional destination, configured by URL, for approved finalized Project, Department, or Company reports. Notion owns its permissions. | Intermediary management state or the agent's accumulating private report files. |
 | **Decisions** | Provenance database for choices worth remembering: context, options, selected option, authority, rationale, accepted tradeoff, consequences, review trigger, and sources. | Routine next actions or every choice made during execution. |
 | **SOPs** | Reusable employee operating procedures: trigger, owner, inputs, ordered workflow, handoffs, baseline, exceptions, controls, and verification. | Software-agent skills or a one-off personal trick with no reuse proof. |
-| **Hermes weekly workspace** | Private accumulating Project reports, finalized report hierarchy, and outbound artifacts under `weeks/<week>/`. | Provider permissions or an employee-facing database. |
+| **Hermes weekly workspace** | Private Project Notes, finalized report hierarchy, entity projections, and outbound artifacts under `weeks/<week>/`. | Provider permissions or an employee-facing database. |
 
 Problems do not need a separate database. A material problem becomes an
 `Issue` in Work, linked to the affected workflow or SOP step. Its page preserves
@@ -66,8 +66,9 @@ After measurement.
      v
 +----+--------------------------------+
 | Private weeks/<week>/              |
+| project-notes/ Daily evidence      |
 | reports/ Project -> Dept -> Company|
-| outbound/ approved requests        |
+| projections/ Employee + SOP        |
 +------------------+-----------------+
                    |
                    v
@@ -87,16 +88,17 @@ Daily agent reads active Projects + selected Work
 one platform-neutral, Pydantic-validated result
           |
           v
-deterministic field mapping into the private week
+deterministic append into the private week
           |
-          +--> accumulates one report per Project
+          +--> appends one notes file per Project
           +--> prepares precise documentation requests
           +--> prepares threatened-target chases
-          `--> stages Problem / Decision / SOP report entries
+          `--> appends Problem / Decision / workflow observations
                                       |
                                       v
-Weekly agent finalizes Project reports
+Weekly freezes every Project Notes file
           |
+          +--> creates and rolls up Project reports
           +--> rolls them into Department and Company reports
           +--> promotes qualified Decisions, Issues, and SOPs
           `--> carries accepted priorities into next week
@@ -261,7 +263,7 @@ Agent reads authorized canonical records
        |
        +--> answer or proposal in Telegram
        |
-       `--> derived management state -> private weekly report
+       `--> derived management state -> private Project Notes
 ```
 
 Do not paste credentials, personal contact details, or private files into
@@ -278,7 +280,7 @@ ACTIVE PROJECTS
       +
 linked open or changed Work + Done Work where AI review != Processed
       +
-embedded Meetings + People route facts + current private Project reports
+embedded Meetings + People route facts
       |
       v
 one immutable Daily context
@@ -290,7 +292,7 @@ one validated Daily result
 independent artifact-quality review
           |
           v
-deterministic report/outbound mapping
+deterministic Project Notes/outbound mapping
           |
           v
 optional guarded writes to configured URLs/routes + hidden run metadata
@@ -298,19 +300,17 @@ optional guarded writes to configured URLs/routes + hidden run metadata
 
 Daily responsibilities:
 
-1. Reconcile current Work against each Project's weekly attention.
-2. Accumulate only grounded changes in that Project's private weekly report.
+1. Reconcile current Work against each active Project.
+2. Append only changed, grounded observations to that Project's notes file.
 3. Map precise completion questions for Done Work into `outbound`.
 4. Map one factual owner chase for each threatened weekly target into `outbound`.
-5. Stage grounded Problem, Decision, and SOP observations in the Project report.
+5. Append grounded Problem, Decision, and workflow observations to Project Notes.
 6. Keep effect, conflict, blocked-route, duplicate, and read-back metadata in
    hidden run state rather than adding operator-facing artifact classes.
 
-Daily also reconciles the Project report's open-work view against canonical
-Work by stable ID. It updates still-open rows in place, adds Work created from
-new Meeting commitments, and removes a row from the open view only after the
-Work's completed or cancelled disposition is evidenced. Removed rows remain in
-the appropriate finalized weekly history; Daily never deletes the source Work.
+Daily appends a new complete snapshot only when a source revision changes. It
+does not edit earlier observation blocks. Work created from Meeting commitments
+joins the same flow on the next Daily run.
 
 Daily must not:
 
@@ -322,16 +322,19 @@ Daily must not:
 
 ## 6. Weekly agent task
 
-Weekly reads all accumulating Project reports for the current week; it does not
+Weekly reads all Project Notes files for the current week; it does not
 rescan raw Work or Meeting pages.
 
 ```text
-weeks/<week>/reports/project--*.md
+weeks/<week>/project-notes/project--*.md
         |
-        +--> finalize Project reports
+        +--> lock, validate coverage, and freeze hashes
+        +--> create Project reports
+        +--> update Employee Memory by person_id + work_id
+        +--> update SOP samples by workflow_key
         +--> disposition every Problem / Decision / SOP candidate
         +--> promote only qualified canonical records
-        `--> prepare next-week Project attention
+        `--> initialize next-week unresolved notes
                           |
                           v
                Department reports
@@ -343,15 +346,11 @@ weeks/<week>/reports/project--*.md
              approved executive delivery
 ```
 
-Weekly writes the accepted carry-forward checklist to the canonical Project
-attention surface; it does not mutate canonical Work or create another
-accumulating report. On the first
-Daily run of the new week, the private writer creates that week's Project report
-from the bounded live Work context and those carry-forward decisions. Its
-weekly narrative starts empty, while open Work, unresolved documentation
-requests, blockers, and expected artifacts remain live. A late human response
-settles the canonical Work or documentation state and is reflected by the next
-Daily run in the new week's report; finalized rollups are not reopened.
+Weekly initializes the next week's private Project Notes from the newest open
+Work and documentation-question snapshots; it does not mutate canonical Work or
+public Project narrative. Accepted completed outcomes do not carry. A late
+human response is appended by the next Daily run under the original Work ID;
+frozen notes and finalized rollups are not reopened.
 
 Promotion rules:
 

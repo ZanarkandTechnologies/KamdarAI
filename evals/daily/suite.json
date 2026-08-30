@@ -83,7 +83,7 @@
   "features": [
     {
       "feature_id": "FEAT-0001",
-      "result_path": "project_updates",
+      "result_path": "project_note_updates",
       "entity_ids": [
         "PROJ-CMT-CMT_PIPELINE",
         "TASK-101",
@@ -91,12 +91,12 @@
         "TASK-105",
         "TASK-110"
       ],
-      "claim": "CMT Pipeline receives conflict-safe section replacements that reconcile sample and capacity checks and preserve production blockers.",
+      "claim": "Daily emits source-linked Project progress notes instead of mutating Project narrative.",
       "assertions": [
-        "Exactly one Project update targets PROJ-CMT-CMT_PIPELINE.",
-        "All three complete sections have expected-current and replacement text.",
-        "The checklist checks sample and capacity evidence and retains tech-pack and collar gates.",
-        "Every construction and production fact is source-linked."
+        "Every progress note targets an exact Project and Work ID.",
+        "Complete snapshots retain current state, owner, timing, blocker, documentation state, and evidence.",
+        "The output contains no direct Project section replacement.",
+        "The deterministic applier can route each batch to one private Project Notes file."
       ]
     },
     {
@@ -139,20 +139,19 @@
     },
     {
       "feature_id": "FEAT-0004",
-      "result_path": "knowledge_updates",
+      "result_path": "project_note_updates",
       "entity_ids": [
         "TASK-201",
         "TASK-203",
         "TASK-102",
         "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
       ],
-      "claim": "Complete Done work yields source-linked workflow observations, measurable problem baselines, decisions, and promotion candidates; missing time or cost evidence becomes a source-record measurement question instead of an invented estimate.",
+      "claim": "Complete Done work yields source-linked Problem, Decision, and workflow notes inside the owning Project batch.",
       "assertions": [
-        "TASK-201 yields a structured current campaign workflow, a problem linked to its affected step, a two-day wait baseline, and precise questions for missing volume, active minutes, and hourly cost.",
-        "TASK-203 yields the approved repeated listing workflow with actors, ordered steps, systems, handoff, evidence window, confidence, and explicit timing gaps.",
-        "TASK-102 yields no knowledge and one precise defect-evidence question.",
-        "Every entry has a routable anchor and source ID; SOP candidates carry workflow_observation and problem/inefficiency candidates carry problem_baseline.",
-        "No direct cost is present without a visible formula and sourced inputs."
+        "Problem observations preserve structured baselines or explicit measurement gaps.",
+        "Workflow observations retain actors, ordered steps, systems, output, confidence, and timing gaps.",
+        "Every knowledge note has a routable section, stable source revision, and source IDs.",
+        "No direct cost or duration is invented."
       ]
     }
   ],
@@ -189,7 +188,7 @@
               "TASK-110"
             ],
             "result_paths": [
-              "project_updates"
+              "project_note_updates"
             ]
           }
         }
@@ -300,7 +299,7 @@
               "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
             ],
             "result_paths": [
-              "knowledge_updates"
+              "project_note_updates"
             ]
           }
         }
@@ -342,10 +341,9 @@
               "TASK-203"
             ],
             "result_paths": [
-              "project_updates",
+              "project_note_updates",
               "documentation_reviews",
-              "weekly_progress_chases",
-              "knowledge_updates"
+              "weekly_progress_chases"
             ],
             "integration_gate_ids": [
               "effects-match-receipt",
@@ -383,7 +381,7 @@
               "TASK-203"
             ],
             "result_paths": [
-              "knowledge_updates"
+              "project_note_updates"
             ],
             "integration_gate_ids": [
               "processing-safety"

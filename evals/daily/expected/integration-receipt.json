@@ -1,108 +1,82 @@
 {
-  "schema_version": "kamdar-daily-integration-receipt@1.1.0",
+  "schema_version": "kamdar-daily-integration-receipt@2.0.0",
   "receipt_id": "DAILY-INTEGRATION-2026-08-25-V4",
   "source_context_id": "daily-context-2026-08-25",
   "daily_result_id": "daily-review-result-2026-08-25",
-  "daily_result_sha256": "951238c92593ad7b6bda7eedca61438b1af320b2682a6b459ddd2e4c46f29f21",
+  "daily_result_sha256": "3a82ffb10459e0e6ed543f6f6bf83ea2894dc3054f51b058cfd36d374aaa066c",
   "recorded_at": "2026-08-25T17:12:00+08:00",
   "effects": [
     {
-      "effect_id": "E-CMT",
-      "required": false,
-      "feature_id": "FEAT-0001",
-      "result_pointer": "/project_updates/0",
-      "source_record_ids": [
-        "PROJ-CMT-CMT_PIPELINE",
-        "TASK-101",
-        "TASK-104",
-        "TASK-105",
-        "TASK-110"
-      ],
-      "work_item_ids": [
-        "TASK-110"
-      ],
-      "integration": "notion",
-      "operation": "replace_project_sections",
-      "target": {
-        "target_id": "PROJ-CMT-CMT_PIPELINE",
-        "target_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE"
-      },
-      "payload_hash": "3a73704aaf8aef21fd2cd1803c0dc9135548261aa5e85a236bf35c227b20dc2f",
-      "outcome": {
-        "state": "applied",
-        "reason": null,
-        "provider_response": {
-          "response_id": "RESP-PROJ-CMT-CMT_PIPELINE",
-          "response_url": "https://notion.example.test/receipts/PROJ-CMT-CMT_PIPELINE",
-          "recorded_at": "2026-08-25T17:10:00+08:00"
-        },
-        "read_back": {
-          "target_id": "PROJ-CMT-CMT_PIPELINE",
-          "target_url": "https://notion.example.test/projects/PROJ-CMT-CMT_PIPELINE",
-          "provider_response_id": "RESP-PROJ-CMT-CMT_PIPELINE",
-          "checked_at": "2026-08-25T17:10:04+08:00",
-          "payload_hash": "3a73704aaf8aef21fd2cd1803c0dc9135548261aa5e85a236bf35c227b20dc2f",
-          "matched": true
-        }
-      }
-    },
-    {
-      "effect_id": "E-META-Q",
+      "effect_id": "E-201-DOC",
       "required": true,
       "feature_id": "FEAT-0002",
-      "result_pointer": "/documentation_reviews/0",
+      "result_pointer": "/documentation_reviews/2",
       "source_record_ids": [
-        "TASK-115"
+        "TASK-201"
       ],
       "work_item_ids": [
-        "TASK-115"
-      ],
-      "integration": "notion",
-      "operation": "add_work_comment",
-      "target": {
-        "target_id": "TASK-115",
-        "target_url": "https://notion.example.test/work/TASK-115"
-      },
-      "payload_hash": "45b24586be60fd0a5f7bb67b0371ecafea3c0d341152cfe51946fe4ba500cae3",
-      "outcome": {
-        "state": "applied",
-        "reason": null,
-        "provider_response": {
-          "response_id": "RESP-TASK-115",
-          "response_url": "https://notion.example.test/receipts/TASK-115",
-          "recorded_at": "2026-08-25T17:10:00+08:00"
-        },
-        "read_back": {
-          "target_id": "TASK-115",
-          "target_url": "https://notion.example.test/work/TASK-115",
-          "provider_response_id": "RESP-TASK-115",
-          "checked_at": "2026-08-25T17:10:04+08:00",
-          "payload_hash": "45b24586be60fd0a5f7bb67b0371ecafea3c0d341152cfe51946fe4ba500cae3",
-          "matched": true
-        }
-      }
-    },
-    {
-      "effect_id": "E-META-OK",
-      "required": true,
-      "feature_id": "FEAT-0002",
-      "result_pointer": "/documentation_reviews/1",
-      "source_record_ids": [
-        "TASK-116"
-      ],
-      "work_item_ids": [
-        "TASK-116"
+        "TASK-201"
       ],
       "integration": "none",
       "operation": "record_no_finding",
       "target": {
-        "target_id": "TASK-116",
-        "target_url": "https://notion.example.test/work/TASK-116"
+        "target_id": "TASK-201",
+        "target_url": "https://notion.example.test/work/TASK-201"
       },
-      "payload_hash": "feb2c60eef3f511471a89d9ac191c1197003b88e1b44124282d49cab20368e35",
+      "payload_hash": "6298a63f906101af206f88f93c2d737e89ff3e8b6a30646cb091fb92496c4989",
       "outcome": {
         "state": "no_finding",
-        "reason": "The control contains a complete measurement basis and approval.",
+        "reason": "The completed Meeting record contains sufficient documentation.",
+        "provider_response": null,
+        "read_back": null
+      }
+    },
+    {
+      "effect_id": "E-202-DOC",
+      "required": true,
+      "feature_id": "FEAT-0002",
+      "result_pointer": "/documentation_reviews/3",
+      "source_record_ids": [
+        "TASK-202"
+      ],
+      "work_item_ids": [
+        "TASK-202"
+      ],
+      "integration": "none",
+      "operation": "record_no_finding",
+      "target": {
+        "target_id": "TASK-202",
+        "target_url": "https://notion.example.test/work/TASK-202"
+      },
+      "payload_hash": "356631cac72b00be0205c669480be043fd106ed84045e132cb7fa18f1ab29183",
+      "outcome": {
+        "state": "no_finding",
+        "reason": "The completed Meeting record contains sufficient documentation.",
+        "provider_response": null,
+        "read_back": null
+      }
+    },
+    {
+      "effect_id": "E-203-DOC",
+      "required": true,
+      "feature_id": "FEAT-0002",
+      "result_pointer": "/documentation_reviews/4",
+      "source_record_ids": [
+        "TASK-203"
+      ],
+      "work_item_ids": [
+        "TASK-203"
+      ],
+      "integration": "none",
+      "operation": "record_no_finding",
+      "target": {
+        "target_id": "TASK-203",
+        "target_url": "https://notion.example.test/work/TASK-203"
+      },
+      "payload_hash": "419395f5a63113fe576ae3fd71324eaedb6e603c993ec99bdebfb62a48d693f0",
+      "outcome": {
+        "state": "no_finding",
+        "reason": "The completed Meeting record contains sufficient documentation.",
         "provider_response": null,
         "read_back": null
       }
@@ -153,129 +127,64 @@
       }
     },
     {
-      "effect_id": "E-201-DOC",
+      "effect_id": "E-META-OK",
       "required": true,
       "feature_id": "FEAT-0002",
-      "result_pointer": "/documentation_reviews/2",
-      "source_record_ids": ["TASK-201"],
-      "work_item_ids": ["TASK-201"],
-      "integration": "none",
-      "operation": "record_no_finding",
-      "target": {
-        "target_id": "TASK-201",
-        "target_url": "https://notion.example.test/work/TASK-201"
-      },
-      "payload_hash": "6298a63f906101af206f88f93c2d737e89ff3e8b6a30646cb091fb92496c4989",
-      "outcome": {
-        "state": "no_finding",
-        "reason": "The completed Meeting record contains sufficient documentation.",
-        "provider_response": null,
-        "read_back": null
-      }
-    },
-    {
-      "effect_id": "E-202-DOC",
-      "required": true,
-      "feature_id": "FEAT-0002",
-      "result_pointer": "/documentation_reviews/3",
-      "source_record_ids": ["TASK-202"],
-      "work_item_ids": ["TASK-202"],
-      "integration": "none",
-      "operation": "record_no_finding",
-      "target": {
-        "target_id": "TASK-202",
-        "target_url": "https://notion.example.test/work/TASK-202"
-      },
-      "payload_hash": "356631cac72b00be0205c669480be043fd106ed84045e132cb7fa18f1ab29183",
-      "outcome": {
-        "state": "no_finding",
-        "reason": "The completed Meeting record contains sufficient documentation.",
-        "provider_response": null,
-        "read_back": null
-      }
-    },
-    {
-      "effect_id": "E-203-DOC",
-      "required": true,
-      "feature_id": "FEAT-0002",
-      "result_pointer": "/documentation_reviews/4",
-      "source_record_ids": ["TASK-203"],
-      "work_item_ids": ["TASK-203"],
-      "integration": "none",
-      "operation": "record_no_finding",
-      "target": {
-        "target_id": "TASK-203",
-        "target_url": "https://notion.example.test/work/TASK-203"
-      },
-      "payload_hash": "419395f5a63113fe576ae3fd71324eaedb6e603c993ec99bdebfb62a48d693f0",
-      "outcome": {
-        "state": "no_finding",
-        "reason": "The completed Meeting record contains sufficient documentation.",
-        "provider_response": null,
-        "read_back": null
-      }
-    },
-    {
-      "effect_id": "E-DEEP-DRAFT",
-      "required": true,
-      "feature_id": "FEAT-0004",
-      "result_pointer": "/knowledge_updates/0",
+      "result_pointer": "/documentation_reviews/1",
       "source_record_ids": [
-        "TASK-201",
-        "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+        "TASK-116"
       ],
       "work_item_ids": [
-        "TASK-201"
+        "TASK-116"
+      ],
+      "integration": "none",
+      "operation": "record_no_finding",
+      "target": {
+        "target_id": "TASK-116",
+        "target_url": "https://notion.example.test/work/TASK-116"
+      },
+      "payload_hash": "feb2c60eef3f511471a89d9ac191c1197003b88e1b44124282d49cab20368e35",
+      "outcome": {
+        "state": "no_finding",
+        "reason": "The control contains a complete measurement basis and approval.",
+        "provider_response": null,
+        "read_back": null
+      }
+    },
+    {
+      "effect_id": "E-META-Q",
+      "required": true,
+      "feature_id": "FEAT-0002",
+      "result_pointer": "/documentation_reviews/0",
+      "source_record_ids": [
+        "TASK-115"
+      ],
+      "work_item_ids": [
+        "TASK-115"
       ],
       "integration": "notion",
-      "operation": "replace_weekly_report_draft",
+      "operation": "add_work_comment",
       "target": {
-        "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-        "target_url": "https://notion.example.test/reports/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34"
+        "target_id": "TASK-115",
+        "target_url": "https://notion.example.test/work/TASK-115"
       },
-      "payload_hash": "fda2d24028771df86ff7e464c0d0876bff80f7b9de016397902799117194d8f4",
+      "payload_hash": "45b24586be60fd0a5f7bb67b0371ecafea3c0d341152cfe51946fe4ba500cae3",
       "outcome": {
         "state": "applied",
         "reason": null,
         "provider_response": {
-          "response_id": "RESP-RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-          "response_url": "https://notion.example.test/receipts/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "response_id": "RESP-TASK-115",
+          "response_url": "https://notion.example.test/receipts/TASK-115",
           "recorded_at": "2026-08-25T17:10:00+08:00"
         },
         "read_back": {
-          "target_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-          "target_url": "https://notion.example.test/reports/RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
-          "provider_response_id": "RESP-RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "target_id": "TASK-115",
+          "target_url": "https://notion.example.test/work/TASK-115",
+          "provider_response_id": "RESP-TASK-115",
           "checked_at": "2026-08-25T17:10:04+08:00",
-          "payload_hash": "fda2d24028771df86ff7e464c0d0876bff80f7b9de016397902799117194d8f4",
+          "payload_hash": "45b24586be60fd0a5f7bb67b0371ecafea3c0d341152cfe51946fe4ba500cae3",
           "matched": true
         }
-      }
-    },
-    {
-      "effect_id": "E-LISTING-DRAFT",
-      "required": true,
-      "feature_id": "FEAT-0004",
-      "result_pointer": "/knowledge_updates/1",
-      "source_record_ids": [
-        "TASK-203",
-        "PROJ-ECOM-LISTING_PIPELINE"
-      ],
-      "work_item_ids": [
-        "TASK-203"
-      ],
-      "integration": "notion",
-      "operation": "replace_weekly_report_draft",
-      "target": {
-        "target_id": "PROJ-ECOM-LISTING_PIPELINE",
-        "target_url": "https://notion.example.test/projects/PROJ-ECOM-LISTING_PIPELINE"
-      },
-      "payload_hash": "3aab5444a138b54c70e810672adf2b9c18beaa14b3ba6fe526c4bf5f30a326a6",
-      "outcome": {
-        "state": "blocked",
-        "reason": "The required provider confirmation is unavailable in this branch.",
-        "provider_response": null,
-        "read_back": null
       }
     },
     {
@@ -302,6 +211,190 @@
         "provider_response": null,
         "read_back": null
       }
+    },
+    {
+      "effect_id": "E-PROJECT-NOTES-0",
+      "required": false,
+      "feature_id": "FEAT-0001",
+      "result_pointer": "/project_note_updates/0",
+      "source_record_ids": [
+        "PROJ-CMT-CMT_PIPELINE",
+        "TASK-101",
+        "TASK-104",
+        "TASK-105",
+        "TASK-110"
+      ],
+      "work_item_ids": [
+        "TASK-101"
+      ],
+      "integration": "private_workspace",
+      "operation": "append_project_notes",
+      "target": {
+        "target_id": "PROJ-CMT-CMT_PIPELINE",
+        "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-CMT-CMT_PIPELINE.md"
+      },
+      "payload_hash": "9619a1bb1078d64f03a51d5c7b3938797d46a8b0c42daec2b0e314cf9bc6e05c",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJECT-NOTES-0",
+          "response_url": "workspace://receipts/RESP-PROJECT-NOTES-0",
+          "recorded_at": "2026-08-25T17:05:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-CMT-CMT_PIPELINE",
+          "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-CMT-CMT_PIPELINE.md",
+          "provider_response_id": "RESP-PROJECT-NOTES-0",
+          "checked_at": "2026-08-25T17:05:10+08:00",
+          "payload_hash": "9619a1bb1078d64f03a51d5c7b3938797d46a8b0c42daec2b0e314cf9bc6e05c",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-PROJECT-NOTES-1",
+      "required": true,
+      "feature_id": "FEAT-0001",
+      "result_pointer": "/project_note_updates/1",
+      "source_record_ids": [
+        "TASK-102"
+      ],
+      "work_item_ids": [
+        "TASK-102"
+      ],
+      "integration": "private_workspace",
+      "operation": "append_project_notes",
+      "target": {
+        "target_id": "PROJ-ECOM-ECOM_FIXES",
+        "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-ECOM-ECOM_FIXES.md"
+      },
+      "payload_hash": "936c7a434ec5e7848f666af1a201e7108b1aedbebba070cfdf41f6c12747ea0f",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJECT-NOTES-1",
+          "response_url": "workspace://receipts/RESP-PROJECT-NOTES-1",
+          "recorded_at": "2026-08-25T17:05:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-ECOM-ECOM_FIXES",
+          "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-ECOM-ECOM_FIXES.md",
+          "provider_response_id": "RESP-PROJECT-NOTES-1",
+          "checked_at": "2026-08-25T17:05:10+08:00",
+          "payload_hash": "936c7a434ec5e7848f666af1a201e7108b1aedbebba070cfdf41f6c12747ea0f",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-PROJECT-NOTES-2",
+      "required": true,
+      "feature_id": "FEAT-0004",
+      "result_pointer": "/project_note_updates/2",
+      "source_record_ids": [
+        "TASK-203"
+      ],
+      "work_item_ids": [
+        "TASK-203"
+      ],
+      "integration": "private_workspace",
+      "operation": "append_project_notes",
+      "target": {
+        "target_id": "PROJ-ECOM-LISTING_PIPELINE",
+        "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-ECOM-LISTING_PIPELINE.md"
+      },
+      "payload_hash": "031a2437930a5a080acadd2e264ecb3f2d723d601bba79d68286f94c0ad432fd",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJECT-NOTES-2",
+          "response_url": "workspace://receipts/RESP-PROJECT-NOTES-2",
+          "recorded_at": "2026-08-25T17:05:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-ECOM-LISTING_PIPELINE",
+          "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-ECOM-LISTING_PIPELINE.md",
+          "provider_response_id": "RESP-PROJECT-NOTES-2",
+          "checked_at": "2026-08-25T17:05:10+08:00",
+          "payload_hash": "031a2437930a5a080acadd2e264ecb3f2d723d601bba79d68286f94c0ad432fd",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-PROJECT-NOTES-3",
+      "required": true,
+      "feature_id": "FEAT-0004",
+      "result_pointer": "/project_note_updates/3",
+      "source_record_ids": [
+        "TASK-201"
+      ],
+      "work_item_ids": [
+        "TASK-201"
+      ],
+      "integration": "private_workspace",
+      "operation": "append_project_notes",
+      "target": {
+        "target_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+        "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-MKT-DEEPAVALI_MARKETING.md"
+      },
+      "payload_hash": "67cc4bc09c3ec6dab8e633aac98cfeb7e75e556819dfb3f58250ef0917a8722b",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJECT-NOTES-3",
+          "response_url": "workspace://receipts/RESP-PROJECT-NOTES-3",
+          "recorded_at": "2026-08-25T17:05:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-MKT-DEEPAVALI_MARKETING",
+          "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-MKT-DEEPAVALI_MARKETING.md",
+          "provider_response_id": "RESP-PROJECT-NOTES-3",
+          "checked_at": "2026-08-25T17:05:10+08:00",
+          "payload_hash": "67cc4bc09c3ec6dab8e633aac98cfeb7e75e556819dfb3f58250ef0917a8722b",
+          "matched": true
+        }
+      }
+    },
+    {
+      "effect_id": "E-PROJECT-NOTES-4",
+      "required": true,
+      "feature_id": "FEAT-0001",
+      "result_pointer": "/project_note_updates/4",
+      "source_record_ids": [
+        "TASK-115"
+      ],
+      "work_item_ids": [
+        "TASK-115"
+      ],
+      "integration": "private_workspace",
+      "operation": "append_project_notes",
+      "target": {
+        "target_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+        "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-MKT-WEEKLY_META_ADS_UPDATES.md"
+      },
+      "payload_hash": "a8255dd4adb53b224f7547be91eeb4e69882cced6b8b6bb25956050c5e7025be",
+      "outcome": {
+        "state": "applied",
+        "reason": null,
+        "provider_response": {
+          "response_id": "RESP-PROJECT-NOTES-4",
+          "response_url": "workspace://receipts/RESP-PROJECT-NOTES-4",
+          "recorded_at": "2026-08-25T17:05:00+08:00"
+        },
+        "read_back": {
+          "target_id": "PROJ-MKT-WEEKLY_META_ADS_UPDATES",
+          "target_url": "workspace://weeks/2026-W35/project-notes/project--PROJ-MKT-WEEKLY_META_ADS_UPDATES.md",
+          "provider_response_id": "RESP-PROJECT-NOTES-4",
+          "checked_at": "2026-08-25T17:05:10+08:00",
+          "payload_hash": "a8255dd4adb53b224f7547be91eeb4e69882cced6b8b6bb25956050c5e7025be",
+          "matched": true
+        }
+      }
     }
   ],
   "work_processing": [
@@ -310,14 +403,15 @@
       "documentation_review_pointer": "/documentation_reviews/0",
       "documentation_verdict": "needs_information",
       "required_effect_ids": [
-        "E-META-Q"
+        "E-META-Q",
+        "E-PROJECT-NOTES-4"
       ],
       "state": "needs_information",
       "processed_at": null,
       "status_after": "Done",
       "ai_review_after": "Needs information",
       "daily_review_version_after": null,
-      "reason": "The documentation question was posted, but the missing evidence remains unresolved."
+      "reason": "The documentation question and Project Notes append settled; Work remains Done pending an answer."
     },
     {
       "work_item_id": "TASK-116",
@@ -327,7 +421,7 @@
         "E-META-OK"
       ],
       "state": "processed",
-      "processed_at": "2026-08-25T17:12:00+08:00",
+      "processed_at": "2026-08-25T17:10:00+08:00",
       "status_after": "Done",
       "ai_review_after": "Processed",
       "daily_review_version_after": "daily-review-v2",
@@ -339,10 +433,10 @@
       "documentation_verdict": "sufficient",
       "required_effect_ids": [
         "E-201-DOC",
-        "E-DEEP-DRAFT"
+        "E-PROJECT-NOTES-3"
       ],
       "state": "processed",
-      "processed_at": "2026-08-25T17:12:00+08:00",
+      "processed_at": "2026-08-25T17:10:00+08:00",
       "status_after": "Done",
       "ai_review_after": "Processed",
       "daily_review_version_after": "daily-review-v2",
@@ -356,7 +450,7 @@
         "E-202-DOC"
       ],
       "state": "processed",
-      "processed_at": "2026-08-25T17:12:00+08:00",
+      "processed_at": "2026-08-25T17:10:00+08:00",
       "status_after": "Done",
       "ai_review_after": "Processed",
       "daily_review_version_after": "daily-review-v2",
@@ -368,28 +462,29 @@
       "documentation_verdict": "sufficient",
       "required_effect_ids": [
         "E-203-DOC",
-        "E-LISTING-DRAFT"
+        "E-PROJECT-NOTES-2"
       ],
-      "state": "blocked",
-      "processed_at": null,
+      "state": "processed",
+      "processed_at": "2026-08-25T17:10:00+08:00",
       "status_after": "Done",
-      "ai_review_after": "Blocked",
-      "daily_review_version_after": null,
-      "reason": "At least one required effect lacks provider confirmation."
+      "ai_review_after": "Processed",
+      "daily_review_version_after": "daily-review-v2",
+      "reason": "Documentation is sufficient and every required effect settled safely."
     },
     {
       "work_item_id": "TASK-102",
       "documentation_review_pointer": "/documentation_reviews/5",
       "documentation_verdict": "needs_information",
       "required_effect_ids": [
-        "E-ORDER-Q"
+        "E-ORDER-Q",
+        "E-PROJECT-NOTES-1"
       ],
       "state": "blocked",
       "processed_at": null,
       "status_after": "Done",
       "ai_review_after": "Blocked",
       "daily_review_version_after": null,
-      "reason": "At least one required effect lacks provider confirmation."
+      "reason": "At least one required effect remains unsafe."
     }
   ],
   "run_notes": "Provider-safe synthetic receipt for the exact source-complete Daily result. TASK-201 receives its Weekly Draft update but no unrelated completion-quality comment."

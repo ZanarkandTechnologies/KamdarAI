@@ -11,8 +11,9 @@ feature_refs: [FEAT-0005, FEAT-0006, FEAT-0007]
 
 ## Context
 
-Run one bounded sequence from private workspace reports. First, finalize every
-current-week Project report and promote its reviewed knowledge. Second, roll finalized
+Run one bounded sequence from one frozen all-Project Notes set. First, project
+each Project's notes into its official report and targeted persistent entity
+updates. Second, roll finalized
 Project reports into Department reports, then roll finalized Department reports
 into one Company report. Read the private report root, Projects, and optional
 destination URLs from `workspace.hermes.md`; never rescan raw Work or Meeting
@@ -42,12 +43,15 @@ the automation must not invent another organizational layer.
   - Before the first provider call, run `ntn --help`,
     `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
     syntax confirmed by the installed CLI.
-  - Load every current-week private Project report with
-    `report_status = Draft`, its related Project, prior reports, and the
-    destination records needed for dedupe.
-  - Read each full private report and the complete Project, Issue, Decision, and
-    Skill/SOP templates. Do not read raw Work or Meeting pages.
-  - Freeze the input as `weekly/context/weekly-context-YYYY-Www.json`.
+  - Enumerate one Project Notes file for every expected active Project under
+    `weeks/<week>/project-notes/`.
+  - Acquire the week lock, validate complete Project coverage, hash every file,
+    and atomically create `.project-notes-freeze.json`.
+  - Load prior final reports, lightweight Person/SOP indexes, and full Person or
+    SOP records only for IDs/keys referenced by the frozen notes. Do not read
+    raw Work or Meeting pages.
+  - Materialize the immutable set as
+    `weekly/context/weekly-context-YYYY-Www.json`.
 
   Never infer an `ntn` resource or argument shape.
 
@@ -75,26 +79,31 @@ the automation must not invent another organizational layer.
     schemas.automations.validate validate artifact-quality-review
     <review-path>`.
   - Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`.
-  - Require exact coverage of every report, disposition, Project replacement,
-    and gap.
+  - Require exact coverage of every report, promotion disposition, Employee
+    Memory update, SOP update, carry-forward update, and gap.
   - Proceed to workspace or provider writes only for tier A.
   - For B/C readability findings, run `unslop`, regenerate the result, and
     review the new hash.
+  - Keep opaque UUIDs and hashes in structured evidence fields only. Rendered
+    reports use readable entity names or natural descriptions; human references
+    such as `TASK-101` may remain.
 
-- [ ] **1 — Finalize Project Weekly Drafts and promote reviewed knowledge.**
+- [ ] **1 — Project frozen Project Notes and promote reviewed knowledge.**
 
   | Source | Action | Destination |
   | --- | --- | --- |
-  | Complete private Project report | Finalize the exact report using the rules below | Exact `weeks/<week>/reports/project--<id>.md` path |
+  | Frozen Project Notes | Render and finalize the exact report using the rules below | Exact `weeks/<week>/reports/projects/project--<id>.md` path |
+  | Completed outcomes and current Work | Group by Person ID across Projects | Existing People / Employee Memory records |
   | `Problems and inefficiencies` | Promote each qualifying problem or record its disposition | `notion` skill via `ntn` on the existing Work/Issue database |
   | `Decisions` | Promote each qualifying reusable Decision or record its disposition | `notion` skill via `ntn` on the Decisions database |
   | `SOPs` | Promote each qualifying approved employee workflow or record its disposition | `notion` skill via `ntn` on the existing SOPs database |
-  | `Next-week priorities` + evidenced open-Work rows | Replace the related Project's complete `This week's attention` section with one merged open-work checklist for the new week | Configured provider on `projects` |
+  | Unresolved Work and documentation questions | Initialize the next Project Notes file with source-linked carry-forward notes | `weeks/<next-week>/project-notes/project--<id>.md` |
 
   Apply these rules in order:
 
-  1. Validate the shared Project Report structure. Set `report_status = Final`,
-     increment `report_version`, set `finalized_at`, and preserve source links.
+  1. Validate each frozen Project Notes file, then render one Project Report.
+     Set `report_status = Final`, increment `report_version`, set
+     `finalized_at`, and preserve source note keys.
   2. Promote a recurring or materially costly problem only when the Issue
      preserves the affected workflow or step, dated Before baseline, cost
      calculation or explicit measurement gap, confidence, measurement owner,
@@ -111,19 +120,20 @@ the automation must not invent another organizational layer.
      its trigger, actors, ordered steps, systems, handoffs, timing or volume
      baseline, exceptions, output, owner, reuse proof, Project relation, and
      source provenance. Never use the Farplane `skill.md` registry card.
-  5. Build the related Project's new-week `This week's attention` from accepted
-     `Next-week priorities` plus open-Work rows already evidenced in the
-     finalized Project report. Preserve stable Work IDs and current owners,
-     states, due/review conditions, expected artifacts, and evidence. Do not
-     rescan raw Work. Do not copy completed or cancelled Work into the new open
-     view, and never delete it from canonical Work or finalized report history.
-  6. Do not create the next accumulating report during Weekly. The first Daily
-     run of the new week initializes it from the bounded live Work context and
-     the canonical carry-forward checklist. New Meeting-created Work joins the
-     same view through Daily reconciliation.
+  5. Group accepted completed outcomes by Person ID across all Projects. Append
+     deduplicated durable observations and replace only `Latest weekly evidence`.
+     Keep open/stale/question-pending Work in the weekly section; never rate a
+     person or infer effort, intent, or personality.
+  6. Group accepted workflow samples by explicit `workflow_key`. Replace only
+     `Latest weekly samples`; preserve the approved baseline. Three comparable
+     samples across two Projects may produce an owner-approval candidate, never
+     an automatic baseline change.
+  7. Initialize next-week Project Notes from the newest unresolved Work and
+     documentation-question snapshots. Do not carry accepted completed Work,
+     rescan raw Work, or edit the frozen source week.
 
   A human response that arrives after finalization updates live Work or
-  documentation-review state and appears in the next accumulating report. Do
+  documentation-review state and appears in the next Project Notes file. Do
   not reopen or rewrite finalized Project, Department, or Company reports.
 
   Record one disposition for every candidate: `promoted`, `duplicate`,
@@ -184,7 +194,11 @@ the automation must not invent another organizational layer.
 
   - Load the owner Person record and resolve its approved Telegram route through
     the active environment binding.
-  - Run `kamdar send --help`.
+  - From the runtime workspace, pipe the rendered document to `python
+    ../scripts/authorized_message.py --workspace .hermes.md --profile-home ..
+    --message "owner report" --action-key company-report-<YYYY-Www>`. The guard
+    writes the review draft or resolves the current exact Hermes target; it
+    blocks delivery unless the binding and confirmed setup receipt match.
   - Render `templates/executive-distribution.md` with the complete Company
   report Markdown, unchanged and not summarized; the title and private locator
   of every source Department report; and the final Company report locator and

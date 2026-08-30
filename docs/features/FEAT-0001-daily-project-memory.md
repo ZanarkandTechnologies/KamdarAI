@@ -1,109 +1,81 @@
 ---
-title: Keep Project pages current
+title: Append current Work to private Project Notes
 status: active
-execution_modes: [source-contract]
-production_mode: proposal-only
+execution_modes: [source-contract, private-local]
+production_mode: private-local
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 tags: [company-os, feature, daily, memory]
 feature_id: FEAT-0001
 feature_key: daily.project-memory
 system_id: SYS-0001
 category: memory
 public: true
-surfaces:
-  - automations/daily-operating-update.md
-  - templates/project.md
-source_refs:
-  - workspace.hermes.md
-  - tickets/archive/TASK-0007/ticket.md
-evidence_refs:
-known_limits: "No Project adapter is shipped. Production Project updates remain proposal-only."
+surfaces: [automations/daily-operating-update.md, templates/project-week-notes.md]
+source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
+evidence_refs: [tests/test_project_week_notes.py]
+known_limits: "Provider publication is separate; Project Notes remain private workspace state."
 ---
 
-# Keep Project pages current
-
-The Company OS turns one collector snapshot into minimal, source-linked Project changes.
-Project-specific facts remain in `Project knowledge`; current-week operational
-work remains in `This week's attention`. It does not create a copied task list,
-child memory page, generic Docs record, or Project summary from memory.
+# Append current Work to private Project Notes
 
 ## Why it exists
 
-Project owners need concise durable facts and a live weekly attention checklist
-in the Project they already use—not a second Daily page that drifts from it.
+Keep one private, source-linked operating memory per Project without rewriting
+public records or maintaining separate Daily entity files.
 
 ## Trigger and inputs
 
-The Daily collector provides a bounded `daily-context-diff-YYYY-MM-DD.json`
-with complete selected Work/Meeting evidence, embedded Project snapshots, source
-IDs, time window, and source gaps. The automation makes no compensating fetch
-when a Project snapshot is absent.
+Daily receives active Projects plus bounded changed, open, and Done-unreviewed
+Work with owners, dates, evidence, and source revisions.
 
 ## Pipeline signature
 
-```text
-daily Project update rows + exact Project preflight
-  -> applied receipt | duplicate | conflict | blocked | no_finding
-```
-
-The [Daily automation](../../automations/daily-operating-update.md) owns the
-semantic judgment and guarded application. It validates identity, expected
-current value, source IDs, and idempotency before applying a replacement.
+`DailyContextDiff -> project_note_updates[] -> append results by project_id`
 
 ## Flow
 
+Daily turns one bounded context into complete Work, completion, and
+documentation snapshots grouped by Project. The deterministic writer derives
+each note key and appends it to that Project's current-week file.
+
 ```text
-collector context diff → classify evidence
-                           │             │
-                           ▼             ▼
-                 Project knowledge   This week's attention
-                           \             /
-                            ▼           ▼
-                       project-diffs.json
-                              │
-                              ▼
-               guarded Project integration → receipt / conflict
+Projects + changed/open/Done-unreviewed Work
+                    |
+                    v
+          project_note_updates[]
+                    |
+          group by exact project_id
+                    |
+                    v
+weeks/<week>/project-notes/project--<id>.md
 ```
 
 ## State changes and artifacts
 
-- Creates a `kamdar-project-diff-plan` JSON proposal (a temporary compatibility
-  identifier) with source IDs, explicit
-  gaps, expected current value, and append/replace intent.
-- May target only `Project knowledge` and `This week's attention`.
-- Creates zero `daily/projects/*.md` files and zero Project-memory child pages.
-- A knowledge item captures a decision-changing proprietary fact, impact,
-  evidence, and review condition; an attention item is one actionable,
-  accountable, dated/statused checklist entry.
-- Default `prepare` mode performs no Project or Work mutation. Explicit `apply`
-  can claim only the child integration's observed receipt.
+An exact source revision is a no-op. Different content under the same note key
+is a conflict and leaves that Project file unchanged. Other Projects in the
+same Daily result may still succeed. A frozen week rejects new appends.
 
 ## Downstream application
 
-The nested integration rejects a target mismatch as `conflict` and preserves
-the provider's current text. It applies only one named Project section with an
-observed adapter response. Weekly reporting reads the resulting current draft
-surfaces; it does not receive a second Project-memory file.
+Notes keep sourced status, timestamps, staleness basis, owner, blocker, next
+action, documentation state, and artifact evidence. They never infer employee
+effort, intent, personality, or a performance rating. Daily does not edit the
+public Project narrative, Employee Memory, SOPs, Decisions, Issues, or reports.
 
 ## Failure modes
 
-Missing embedded Project evidence, unread Work/Meeting material, duplicate
-source IDs, a contradiction, or an unconfirmed cause is a named gap or
-`no_finding`. No provider read, inferred Project identity, or “better” rewrite
-repairs that gap.
+Missing Project identity, invalid payloads, key conflicts, or a frozen week
+block that Project append without rolling back successful unrelated Projects.
 
 ## Proof contract
 
-The local evals cover source-linked knowledge plus weekly reset, uncertain or
-duplicate evidence, and a missing Project snapshot. Readiness also requires a
-candidate-versus-baseline run and judge verdict against the shared collector
-golden; the old v4 filesystem showcase is not proof of this split pipeline.
+Proof covers per-Project files, zero-write reruns, conflicts, missing coverage,
+freeze, consolidation, and carry-forward.
 
 ## Example
 
-A Meeting says rollout needs a normalised comparison and names the next review.
-The plan appends that constraint—with its impact and evidence—to `Project
-knowledge`, then adds a scoped checklist action for the comparison owner. It
-does not rewrite the Project goal or copy the meeting transcript.
+Two source revisions for Aisha's `TASK-101` append two snapshots to CMT notes;
+the same revision rerun writes nothing.

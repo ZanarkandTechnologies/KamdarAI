@@ -1,5 +1,5 @@
 {
-  "schema_version": "kamdar-weekly-review-result@1.1.0",
+  "schema_version": "kamdar-weekly-review-result@2.0.0",
   "context_id": "weekly-context-2026-W34",
   "week": "2026-W34",
   "feature_outcomes": [
@@ -7,11 +7,25 @@
       "feature_id": "FEAT-0005",
       "outcome": "insufficient_information",
       "evidence": [
-        { "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34", "observation": "The current CMT Project Draft contains grounded outcomes, blockers, and next-week attention." },
-        { "source_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34", "observation": "The current Marketing Project Draft contains campaign outcomes and unresolved measurement needs." }
+        {
+          "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+          "observation": "The current CMT Project Draft contains grounded outcomes, blockers, and next-week attention."
+        },
+        {
+          "source_id": "RPT-PROJ-MKT-DEEPAVALI_MARKETING-W34",
+          "observation": "The current Marketing Project Draft contains campaign outcomes and unresolved measurement needs."
+        }
       ],
       "reasoning_summary": "Current Project Drafts support useful Project, Area, and blocked Company preview reports, but the missing Content Area report prevents a complete Company answer.",
-      "output_refs": ["/report_results/0", "/report_results/1", "/report_results/2", "/report_results/3", "/report_results/4", "/report_results/5", "/report_results/6"],
+      "output_refs": [
+        "/report_results/0",
+        "/report_results/1",
+        "/report_results/2",
+        "/report_results/3",
+        "/report_results/4",
+        "/report_results/5",
+        "/report_results/6"
+      ],
       "information_gaps": [
         {
           "code": "missing-area-report",
@@ -30,22 +44,42 @@
       "feature_id": "FEAT-0006",
       "outcome": "produced",
       "evidence": [
-        { "source_id": "TASK-101", "observation": "The repeated production blocker includes a measurable Before baseline and intervention owner." },
-        { "source_id": "TASK-203", "observation": "The listing handoff workflow has repeated-use evidence with explicit measurement gaps." }
+        {
+          "source_id": "TASK-101",
+          "observation": "The repeated production blocker includes a measurable Before baseline and intervention owner."
+        },
+        {
+          "source_id": "TASK-203",
+          "observation": "The listing handoff workflow has repeated-use evidence with explicit measurement gaps."
+        }
       ],
       "reasoning_summary": "Every knowledge candidate can receive a grounded promotion, duplicate, project-only, monitor, dismissed, or blocked disposition.",
-      "output_refs": ["/promotion_dispositions/0", "/promotion_dispositions/1", "/promotion_dispositions/2", "/promotion_dispositions/3", "/promotion_dispositions/4"],
+      "output_refs": [
+        "/promotion_dispositions/0",
+        "/promotion_dispositions/1",
+        "/promotion_dispositions/2",
+        "/promotion_dispositions/3",
+        "/promotion_dispositions/4"
+      ],
       "information_gaps": []
     },
     {
       "feature_id": "FEAT-0007",
       "outcome": "produced",
       "evidence": [
-        { "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34", "observation": "The finalized CMT priorities retain unresolved work and one approved next priority." },
-        { "source_id": "TASK-104", "observation": "The sample recheck remains unresolved and must carry forward." }
+        {
+          "source_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
+          "observation": "The finalized CMT priorities retain unresolved work and one approved next priority."
+        },
+        {
+          "source_id": "TASK-104",
+          "observation": "The sample recheck remains unresolved and must carry forward."
+        }
       ],
       "reasoning_summary": "The finalized CMT report supports one complete conflict-safe Project checklist replacement for next week.",
-      "output_refs": ["/next_week_project_replacements/0"],
+      "output_refs": [
+        "/carry_forward_updates/0"
+      ],
       "information_gaps": []
     }
   ],
@@ -340,21 +374,6 @@
       ]
     }
   ],
-  "next_week_project_replacements": [
-    {
-      "project_id": "PROJ-CMT-CMT_PIPELINE",
-      "source_report_id": "RPT-PROJ-CMT-CMT_PIPELINE-W34",
-      "section": "This week's attention",
-      "expected_current_text": "**Planning window:** 2026-W34\n\n- [x] Complete the signed pre-production sample check [TASK-105]\n- [ ] **P0 · Blocked · due 2026-08-22** — Confirm the corrected collar tolerance and approver [TASK-101]\n- [ ] Correct and recheck the baju kurung sample against the signed pack [TASK-104]\n- [ ] Reserve the appropriate sewing line after sample approval [TASK-110]\n\n### Daily history\n\n- 2026-08-19: pre-production sample check completed.\n- 2026-08-21: capacity confirmed; tech-pack authority remains missing.\n\n- **Next action:** Aisha records the approved measurement in TASK-101, then Nur completes TASK-104.\n- **Last meaningful update:** 2026-08-21",
-      "replacement_text": "**Planning window:** 2026-W35\n\n- [ ] **P0 · Blocked · overdue** — Sign the corrected collar measurement, approver, and affected sizes. **Owner:** Aisha. **Why now:** bulk cutting cannot start from conflicting measurements. [TASK-101]\n- [ ] **P0 · due one working day after approval** — Recheck the corrected sample against the signed pack. **Owner:** Nur. **Success:** the sample matches the approved measurement. [TASK-104] [TASK-105]\n- [ ] **P1 · after sample acceptance** — Confirm Line 3 for 1,200 pieces and the production handoff. **Owner:** Aisha. [TASK-110]\n\n### Daily history\n\n- 2026-08-24: W34 closed with the sample check complete and the tech-pack authority unresolved.\n\n- **Next action:** Aisha closes TASK-101; Nur completes TASK-104 within one working day; Aisha then confirms TASK-110.\n- **Last meaningful update:** 2026-08-24",
-      "source_ids": [
-        "RPT-PROJ-CMT-CMT_PIPELINE-W34",
-        "TASK-101",
-        "TASK-104",
-        "TASK-110"
-      ]
-    }
-  ],
   "configuration_gaps": [
     {
       "code": "missing-area-report",
@@ -363,5 +382,25 @@
       "blocks_company_finalization": true
     }
   ],
-  "run_notes": "Three Project Drafts finalized into three Area reports. The Company rollup remains Blocked because Content has no current W34 input."
+  "run_notes": "Three Project Drafts finalized into three Area reports. The Company rollup remains Blocked because Content has no current W34 input.",
+  "employee_memory_updates": [],
+  "sop_updates": [],
+  "carry_forward_updates": [
+    {
+      "project_id": "PROJ-CMT-CMT_PIPELINE",
+      "from_week": "2026-W34",
+      "to_week": "2026-W35",
+      "source_note_keys": [
+        "f7d7c793993e9640093973f87a74fefb86e9acd7a7088007c8005f0bfce7f8fe"
+      ],
+      "work_ids": [
+        "TASK-101",
+        "TASK-104",
+        "TASK-110"
+      ],
+      "notes_markdown": "**Planning window:** 2026-W35\n\n- [ ] **P0 · Blocked · overdue** — Sign the corrected collar measurement, approver, and affected sizes. **Owner:** Aisha. **Why now:** bulk cutting cannot start from conflicting measurements. [TASK-101]\n- [ ] **P0 · due one working day after approval** — Recheck the corrected sample against the signed pack. **Owner:** Nur. **Success:** the sample matches the approved measurement. [TASK-104] [TASK-105]\n- [ ] **P1 · after sample acceptance** — Confirm Line 3 for 1,200 pieces and the production handoff. **Owner:** Aisha. [TASK-110]\n\n### Daily history\n\n- 2026-08-24: W34 closed with the sample check complete and the tech-pack authority unresolved.\n\n- **Next action:** Aisha closes TASK-101; Nur completes TASK-104 within one working day; Aisha then confirms TASK-110.\n- **Last meaningful update:** 2026-08-24",
+      "disposition": "carried_forward",
+      "gaps": []
+    }
+  ]
 }

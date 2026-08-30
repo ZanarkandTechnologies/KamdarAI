@@ -10,7 +10,11 @@ Review every generated Daily or Weekly output row before integration writes. Det
 
 ## Required checks
 
-1. **Referential clarity** — no unexplained ID, placeholder, or template token. A named entity has a link, readable label, or immediate surrounding context.
+1. **Referential clarity** — no unexplained ID, placeholder, or template token.
+   Opaque UUIDs and hashes belong only in structured machine evidence, never in
+   reader prose. Use the readable entity name or a natural description instead;
+   human-facing references such as `TASK-101` may remain. A named entity has a
+   link, readable label, or immediate surrounding context.
 2. **End-user value** — the content gives a useful conclusion, impact, next action, or evidence. It does not merely restate source data.
 3. **Readability** — concise human language; no evaluator instructions, implementation jargon, filler, or internal control metadata in user-facing prose.
 4. **Template fidelity** — the complete destination template is followed and each populated section serves its intended purpose.

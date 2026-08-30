@@ -49,16 +49,16 @@ other providers.
   Treat the Weekly context, result, integration receipt, and provider read-back
   as immutable inputs. Verify their SHA-256 values against the run manifest
   before judging them. Parse every JSON file, validate the result against
-  `WeeklyReviewResultSchema`, enforce the integration contracts, prove every
+  the `WeeklyReviewResult` Pydantic model, enforce the integration contracts, prove every
   result source ID exists in the immutable
   Weekly context, then prove every context ID exists in the seed. The seed is
-  grading evidence, not a runtime source; never fill a missing Draft candidate
+  grading evidence, not a runtime source; never fill a missing Project Notes candidate
   by reading seed-only Work facts.
 
   Inventory `<run_root>/weekly` and `<run_root>/eval`. Reject undeclared files,
   missing required paths, repeated outputs, or a manifest path with the wrong
   artifact kind. Confirm that the result contains `report_results`,
-  `promotion_dispositions`, `next_week_project_replacements`, and
+  `promotion_dispositions`, `employee_memory_updates`, `sop_updates`, `carry_forward_updates`, and
   `configuration_gaps`. Write every check and failure to
   `<run_root>/eval/deterministic.json`. Stop before subagents if an immutable
   input is missing, malformed, or changed.
@@ -66,7 +66,7 @@ other providers.
   Run the executable deterministic gate before dispatching testers:
 
   ```bash
-  node evals/filesystem/scripts/unified-weekly-review-eval.mjs <run_root>
+  python3 scripts/validate_eval_run.py weekly <run_root>
   ```
 
   The immutable W34 expected files under `evals/weekly/expected/` are the
@@ -82,7 +82,7 @@ other providers.
   | --- | --- | --- | --- |
   | FEAT-0005 | `report_results[]` and `configuration_gaps[]` | Project, Area, and Company report templates | Versioned Project finalization, source-linked report hierarchy, shared sections, immutable prior Final, and truthful Company finalization gate |
   | FEAT-0006 | `promotion_dispositions[]` | Issue, Decision, and employee SOP templates | Complete disposition matrix, correct existing database, preserved workflow/problem baseline, authority, dedupe, provenance, and blocked weak evidence |
-  | FEAT-0007 | `next_week_project_replacements[]` | Project template | One complete guarded Project checklist replacement that carries unresolved priorities forward without changing Work or creating a parallel plan |
+  | FEAT-0007 | `carry_forward_updates[]` | Project Notes template | Complete unresolved Work and documentation questions used to initialize next week's Project Notes without changing source Work |
 
   Each tester follows the suite tier rubric and returns machine-readable tester
   evidence with `lane`, `target`, `claim_under_test`, `tier`, `test_cases[]`,
@@ -152,7 +152,7 @@ other providers.
   rejects any saved verdict that does not reconcile with the immutable inputs:
 
   ```bash
-  node evals/filesystem/scripts/unified-weekly-review-eval.mjs <run_root> --judged
+  python3 scripts/validate_eval_run.py weekly <run_root> --judged
   ```
 
 ## Output

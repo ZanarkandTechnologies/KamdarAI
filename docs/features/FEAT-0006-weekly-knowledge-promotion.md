@@ -5,7 +5,7 @@ execution_modes: [frozen, operated-v4]
 production_mode: proposal-only
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 tags: [company-os, feature, weekly, knowledge, promotion]
 feature_id: FEAT-0006
 feature_key: weekly.knowledge-promotion
@@ -27,7 +27,7 @@ known_limits: "Only operated-v4 may apply a reviewed canonical record in the eva
 
 # Promote only knowledge that earned a home
 
-The Company OS reviews every Daily candidate and promotes only evidence-backed Problems,
+The Company OS reviews candidates from the frozen all-Project Notes set and promotes only evidence-backed Problems,
 Decisions, and employee workflows to the correct canonical record. Problems
 remain Issues in the existing Work database; workflows remain records in the
 existing SOPs database.
@@ -39,8 +39,9 @@ turning unverified notes or one-off observations into official policy.
 
 ## Trigger and inputs
 
-Staged Daily candidates, source links, existing destination records, owner and
-approver authority, privacy/write policy, quality checks, and Project relations.
+Frozen Project Notes, source links, targeted existing destination records,
+owner and approver authority, privacy/write policy, quality checks, and Project
+relations. Weekly never rescans raw Work or Meetings.
 
 ## Pipeline signature
 
@@ -57,7 +58,7 @@ production remains proposal-only.
 ## Flow
 
 ```text
-staged candidate + source evidence
+Project Notes candidate + source evidence
               │
               ▼
 check future value, destination, dedupe, authority, privacy, and write policy
@@ -83,9 +84,8 @@ Issue / Decision / Employee SOP record + receipt
 
 Problems become Issue records; precedents become Decisions; repeated workflows
 become employee SOP records after review. Proprietary project-specific
-facts remain in the Project knowledge section, source-linked and reviewable,
-until a later explicit wiki extraction proves cross-project reuse. Each promoted
-result links to its source Projects.
+facts remain in the immutable Project report history. Each promoted result
+links to its source Projects and note keys.
 
 A canonical Decision is deliberately rare. It must preserve future reuse value:
 recurring customer handling, a Project operating standard, monetary or material

@@ -2,7 +2,7 @@
   "schema_version": "kamdar-weekly-integration-receipt@1.0.0",
   "receipt_id": "WEEKLY-INTEGRATION-2026-W34-V4",
   "context_id": "weekly-context-2026-W34",
-  "weekly_result_sha256": "837108bee6280f5105e2df60f452c222ec0da5e718459a7d1f8b83682ca60cff",
+  "weekly_result_sha256": "18ea2f6e04982c31553d5c4f33bcaa85aa89af730120e01b757b1fe2f51d1a96",
   "recorded_at": "2026-08-24T18:15:00+08:00",
   "live_provider_calls": false,
   "effects": [
@@ -128,13 +128,13 @@
     },
     {
       "feature_id": "FEAT-0007",
-      "result_pointer": "/next_week_project_replacements/0",
-      "operation": "replace_project_attention",
+      "result_pointer": "/carry_forward_updates/0",
+      "operation": "initialize_project_notes",
       "target_id": "PROJ-CMT-CMT_PIPELINE",
-      "action_key": "weekly:v4:next_week_project_replacements:PROJ-CMT-CMT_PIPELINE:0",
-      "payload_sha256": "f60341dd4689e6843f5671a93deed4506c3d810add076daaf99f013ad124a7aa",
+      "action_key": "weekly:v5:carry_forward_updates:PROJ-CMT-CMT_PIPELINE:0",
+      "payload_sha256": "6ccd5c9dfe3151adaff497827a6c94711575037d9754daacd3fa958939d52144",
       "outcome": "applied",
-      "provider_id_or_url": "https://notion.example.test/next_week_project_replacements/PROJ-CMT-CMT_PIPELINE"
+      "provider_id_or_url": "https://workspace.example.test/carry-forward/PROJ-CMT-CMT_PIPELINE"
     }
   ]
 }

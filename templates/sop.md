@@ -1,9 +1,10 @@
 ---
 template_id: kamdar-employee-sop
-template_version: "1.0.0"
+template_version: "1.1.0"
 name: "{{SOP_NAME}}"
 sop_id: "{{SOP_ID}}"
-project: "{{PROJECT}}"
+workflow_key: "{{WORKFLOW_KEY}}"
+projects: "{{PROJECTS}}"
 department: "{{DEPARTMENT}}"
 owner: "{{OWNER}}"
 status: "{{STATUS}}"
@@ -52,6 +53,15 @@ waiting time, exception/rework rate, measurement window, evidence, and
 confidence. Unknown values remain explicit measurement gaps. -->
 
 {{TIMING_AND_VOLUME_BASELINE}}
+
+## Latest weekly samples
+
+<!-- Weekly replaces this section with accepted, source-linked samples grouped
+by workflow_key across Projects. Each sample names its Work ID, Project,
+artifact type, elapsed/active/wait hours when sourced, and acceptance evidence.
+Samples never change the approved baseline automatically. -->
+
+{{LATEST_WEEKLY_SAMPLES}}
 
 ## Exceptions and controls
 

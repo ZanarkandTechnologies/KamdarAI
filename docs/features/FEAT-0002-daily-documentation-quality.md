@@ -21,8 +21,11 @@ surfaces:
 source_refs:
   - workspace.hermes.md
   - tickets/archive/TASK-0007/ticket.md
+  - tickets/TASK-0019/ticket.md
 evidence_refs:
-known_limits: "The next Daily run guarantees re-review while AI review is not Processed; deterministic event-driven re-review from a Notion reply remains follow-up work."
+  - tests/test_pydantic_daily_contracts.py
+  - tickets/TASK-0019/artifacts/qa/20260831-project-notes-projection/result.json
+known_limits: "The next Daily run rechecks Done Work while AI review is not Processed; immediate event-driven re-review is outside the current release and is not required for closure."
 ---
 
 # Review Done Work for documentation sufficiency
@@ -83,9 +86,9 @@ settle effects   post one deduplicated question
 
 The Daily automation posts a reviewed question to the exact Work item only when
 the active environment authorizes it. A successful comment sets `AI review` to
-`Needs information`, not `Processed`. The human edits the named page section
-and can request re-review in the same Notion discussion; otherwise the next
-Daily run re-fetches the item.
+`Needs information`, not `Processed`. A human reply or page edit supplies new
+evidence but does not invoke the full review itself; the next Daily run
+re-fetches the unresolved item and evaluates that evidence.
 
 ## Failure modes
 
