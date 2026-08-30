@@ -19,4 +19,4 @@ schema sanity check records the remaining production-readiness gaps.
 
 - [Company OS](company-os.md)
 - [Company OS operator manual](company-os-operator-manual.md)
-- [Daily Review schema sanity check and v1.1 proposal](daily-review-pipeline-gap-report.md)
+- [Daily and Weekly operating-memory implementation status](daily-review-pipeline-gap-report.md)

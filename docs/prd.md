@@ -1,316 +1,333 @@
 ---
-title: Seamless Company OS deployment and tuning
-status: proposed
+title: Seamless Company OS deployment, operating memory, and tuning
+status: implemented_with_external_followups
 owner: Company OS
 created_at: 2026-08-28
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 source_feedback: first external computer deployment
-feature_refs: [FEAT-0011]
+feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004, FEAT-0005, FEAT-0006, FEAT-0007, FEAT-0010, FEAT-0011]
 ---
 
-# PRD: Seamless Company OS deployment and tuning
+# PRD: Seamless Company OS deployment, operating memory, and tuning
 
-## Problem / Context
+## Product decision
 
-The first installation on another person's computer did not deliver the product
-promise. The nominal one-click distribution still required platform-specific
-commands, separate workspace and automation setup, custom Notion adapter and CLI
-knowledge, and manual interpretation of whether the system actually worked.
-Windows and Docker ownership were unclear, chat could not reliably invoke the
-Hermes commands needed for setup, and there was no one health-and-eval receipt.
+The first external installation exposed two connected problems:
 
-The product boundary is therefore not “copy a client profile.” It is: install a
-working, updateable Company OS; ask only for unavoidable credentials and access
-consent; reconcile all declared runtime state; and prove the result.
+1. “One click” still meant platform-specific commands, separate workspace and
+   automation setup, custom Notion tooling, and manual verification.
+2. Daily and Weekly automations had no clear private memory layer between live
+   Work and the reports or records they publish.
 
-## First-Principles Basis
+The product must therefore provide:
 
-- **Objective:** A new operator can install, configure, verify, and later update
-  the Company OS through one discoverable entry point on every supported
-  topology.
-- **User or system need:** The installer needs a trustworthy working system,
-  not a successful file copy.
-- **Root cause:** The current flow splits desired state and proof across the git
-  distribution, profile files, Company OS setup scripts, Hermes chat, custom
-  Notion code, host services, and eval tooling without one lifecycle owner.
-- **Key assumptions:** Hermes profiles can own client secrets, MCP connections,
-  scheduler state, and user data while the repo owns versioned desired state;
-  unavoidable OAuth and Notion sharing remain explicit human gates.
-- **Constraints:** Preserve unknown client files and secrets; support Docker and
-  at least one practical Windows topology; do not require chat for deterministic
-  setup; do not claim that an MCP replaces inbound event delivery.
-- **First viable slice:** Prove the topology and ownership model, then ship one
-  resumable install/reconcile/verify command for a fresh profile with official
-  Notion MCP access, native schedules, workspace contracts, and frozen feature
-  evals.
-- **Proof / falsification:** A clean-machine matrix either reaches a typed
-  `ready | partial | blocked` receipt and passes the declared health/eval suite,
-  or identifies exactly one next user action. Any hidden manual repair,
-  platform-specific undocumented step, secret outside the profile, or false
-  green health result falsifies the slice.
-- **Tradeoff accepted:** “One click” means one entry command plus unavoidable
-  browser OAuth, credential, and Notion permission gates. It does not mean
-  bypassing external-service consent.
-- **Ingress decision:** Real-time Notion comments use a remotely managed named
-  Cloudflare Tunnel. The customer creates its hostname and route once in the
-  Cloudflare dashboard; setup installs no Cloudflare CLI, stores only the
-  tunnel token in the Hermes profile, runs the connector container, and rejects
-  temporary Quick Tunnel URLs.
-- **Non-goals:** Native support for every Windows shell, zero-click OAuth,
-  replacing Notion webhooks with MCP, production writes by default, or a new
-  general-purpose installer framework.
+- one resumable install, reconcile, and verify command;
+- profile-local secrets, auth, schedules, and runtime state;
+- Markdown report templates as the human tuning surface;
+- one private Project Notes file per active Project and week;
+- Weekly projections from those notes into reports, Employee Memory, and SOPs;
+- a typed `ready | partial | blocked` receipt with one exact next action.
 
-## Audience
+“One click” may still pause for credentials, browser OAuth, Notion sharing,
+deploy approval, or spend approval. It must not bypass external consent.
 
-- **Primary:** A non-developer client operator installing the Company OS on a
-  personal computer or managed Docker host.
-- **Secondary:** The Company OS maintainer publishing repo-owned configuration,
-  output-template, and eval updates across installed profiles.
+## Users and jobs
 
-## JTBD
+| User | Job |
+| --- | --- |
+| Client operator | Install, authorize, verify, update, and recover the Company OS without learning Hermes internals. |
+| Manager | See assigned, active, stale, blocked, completed, and documentation-pending Work from source evidence. |
+| Maintainer | Change a Markdown report template and keep its Pydantic contract, example, rendering, and QA in sync. |
 
-When I receive the Company OS distribution or an update, I want one guided
-command to install or reconcile it and prove every required capability, so I
-can start using the Company OS without understanding Hermes internals, adapters,
-or eval plumbing.
+## Release scope
 
-## SLC Slice (Next Release)
+The next release supports one macOS/Linux path, one proven Windows path, and a
+persistent Docker topology. One deterministic entry point owns install,
+reconcile, update, health, and eval phases. Chat may wrap that command but is
+not required to run it.
 
-Ship one supported path for macOS/Linux and one proven Windows path, plus a
-persistent Docker topology. A single deterministic entry point installs or
-updates the distribution, keeps secrets and OAuth tokens profile-local,
-configures declared MCPs and native schedules, installs the workspace, runs
-static and opted-in live health probes, and executes the frozen feature evals.
-It emits a redacted machine-readable receipt and a short human result.
+MCP is the default provider access route. Notion comments remain a separate
+inbound-event boundary: a remotely managed named Cloudflare Tunnel exposes the
+connector. The customer creates the hostname and route once; setup stores only
+the tunnel token in the Hermes profile, installs no Cloudflare CLI, and rejects
+temporary Quick Tunnel URLs.
 
-MCP is the default provider access route. Event-driven Notion comments remain a
-separate public-webhook boundary until an operated proof establishes a simpler
-supported ingress.
+## System boundaries
 
-## Project Profile
+This diagram answers: **who owns configuration, credentials, runtime state, and
+provider access?**
 
-- **Profile:** Distribution and onboarding infrastructure.
-- **Component matrix:** Hermes owns profile lifecycle, secrets, MCP auth/config,
-  tool access, scheduler, and doctor; the Company OS source owns desired
-  distribution state, workspace/templates, Company OS automation contracts, product-specific
-  reconciliation, health policy, and feature evals; the operator owns
-  credentials, OAuth consent, Notion sharing, and deploy topology; the runtime
-  owns generated state and receipts.
-- **Advice axes explored:** chat-led vs deterministic setup; native host vs
-  container; custom adapter vs hosted MCP; repo distribution vs profile export;
-  handwritten schemas vs template-derived contracts.
-- **Selected complete directions:** deterministic setup with optional chat
-  wrapper; versioned distribution for updates rather than export snapshots;
-  profile-local secrets and OAuth; MCP-first provider access; webhook retained
-  only for inbound events; output templates as the primary tuning surface.
-- **Pipeline handoff:** FEAT-0011 and TASK-0016 through TASK-0021.
+```mermaid
+flowchart LR
+  maintainer[Maintainer] -->|versioned desired state| repo[Company OS source]
+  operator[Client operator] -->|credentials + consent| profile[(Hermes profile)]
+  repo -->|install / reconcile| setup[Setup entry point]
+  setup -->|declared config only| profile
+  profile --> runtime[Hermes runtime]
+  runtime -->|read / write| mcp[Official Notion MCP]
+  notion[Notion events] --> tunnel[Named Cloudflare Tunnel]
+  tunnel --> connector[Webhook connector]
+  connector --> runtime
+  runtime --> workspace[(Private workspace state)]
+  setup -->|redacted result| receipt[ready / partial / blocked]
+```
 
-## Prototype / PoC Gates
+| Owner | Owns | Must not own |
+| --- | --- | --- |
+| Company OS source | Distribution, workspace/templates, automation contracts, reconciliation policy, health checks, feature evals | Client credentials, sessions, generated reports, private memory |
+| Hermes profile | Secrets, OAuth, MCP configuration, scheduler, plugins, local databases | Repo-authored desired state |
+| Runtime workspace | Generated reports, Project Notes, Employee Memory, proposals, receipts | Source templates treated as co-equal edited copies |
+| Operator | Credentials, OAuth consent, Notion sharing, deploy topology, external-write approval | Hidden manual repair steps |
+| Notion/Drive | Destination permissions and document visibility | Private intermediate management state unless explicitly published |
 
-- **Highest-risk assumption:** One ownership model and entry point can behave
-  consistently across Windows and a persistent Docker profile while preserving
-  Hermes credential and scheduler semantics.
-- **Prototype artifact:** TASK-0016 topology matrix with real install/update,
-  process, persistence, chat-command, MCP-auth, and cron observations.
-- **Pass signal:** At least one Windows path and one Docker path complete a
-  clean install and idempotent rerun without an undocumented repair step.
-- **Ticket before full production build:** yes.
+Unknown client files must survive install and update. Distribution updates may
+change only the declared allowlist. `hermes profile export` remains a snapshot
+or backup, not the update channel.
 
-## Goals
+## Operating memory
 
-- Reduce the documented new-machine path to one entry command and only named
-  human authorization gates.
-- Make install, update, health, and eval results deterministic, resumable, and
-  safe to share after redaction.
-- Make the repo the source of desired configuration while preserving
-  profile-owned secrets, auth, memories, sessions, and generated state.
-- Let a maintainer tune report behavior through the output template and derive
-  the corresponding structured contract, example, and QA checks together.
+This diagram answers: **how does live Work become short-term memory, reports,
+and persistent entity memory?**
 
-## Metric Candidates
+```mermaid
+flowchart TD
+  sources[Projects + Work + Meetings + artifact links]
+  daily[Daily bounded reconciliation]
+  cache[(Project Notes)]
+  freeze[Frozen weekly evidence]
+  project[Official Project report]
+  employee[(Employee Memory)]
+  sop[(Canonical SOP)]
+  rollups[Area + Company rollups]
+  outbound[Approved outbound / publication]
 
-- **Primary candidate:** Clean-install journey pass rate across the supported
-  topology matrix.
-- **Direction:** pass/fail.
-- **Verification idea:** Disposable clean profile per topology must finish with
-  `ready`, pass a second idempotent reconcile, and pass the required frozen eval.
-- **Guard idea:** Tests fail if credentials enter repo-owned files, an update
-  overwrites user-owned state, or a skipped live dependency is reported healthy.
+  sources --> daily --> cache
+  cache -->|Weekly freeze| freeze
+  freeze --> project --> rollups --> outbound
+  freeze -->|delivery observations| employee
+  freeze -->|workflow samples| sop
+```
 
-## Non-Goals
+Project Notes are private working memory, not a public report or employee
+scorecard. Daily appends source-linked snapshots and findings under fixed
+Markdown sections. The first implementation keeps one notes file per Project
+and week—not separate Daily employee or workflow files.
 
-- Shipping or modifying Hermes itself inside this repository.
-- Treating `hermes profile export` as the update channel; it remains a snapshot
-  handoff/backup while `profile install/update` owns versioned distribution.
-- Supporting unmaintained local Notion MCP as the default.
-- Making hosted Notion MCP a headless bearer-token service when it requires
-  user OAuth.
-- Automating external write authority, Notion workspace sharing, webhook
-  verification, spend, or production deployment without a human gate.
-- Rewriting every record template or every feature eval in the first slice.
+### Daily reconciliation
 
-## User Stories
+Daily reads active Projects and this union of Work:
 
-### US-001: Install from one entry point
+```text
+all open Work
++ changed since last successful watermark
++ Done Work pending documentation review
++ Work with unresolved documentation questions
+```
 
-**Description:** As a client operator, I want one command that installs and
-configures the supported topology so that I do not assemble Hermes manually.
+Full page content is fetched only for changed, stale, blocked, Done, or
+unresolved records. Daily appends a complete Work snapshot only when its source
+revision changes. Weekly groups snapshots by stable Work ID and selects the
+greatest source update time. Materially different snapshots tied at that time
+block consolidation; source revisions identify snapshots but are not sorted.
 
-**Acceptance Criteria:**
+Staleness comes from the last meaningful status, comment, artifact, acceptance,
+or human update. An automation touch does not reset it. Elapsed time comes from
+sourced timestamps and remains `unknown` when a timestamp is missing. It is not
+presented as employee effort or a performance rating.
 
-- [ ] The command works from a clean supported host/profile and resumes safely.
-- [ ] It reports one exact user action for any credential, OAuth, sharing, or
-      process gate instead of a stack trace or generic failure.
-- [ ] An unchanged rerun performs no duplicate schedule, workspace, or MCP work.
+When Work becomes Done:
 
-### US-002: Update from repo-owned configuration
+```text
+Done Work
+   |
+   v
+Documentation review
+   | sufficient                    | missing information
+   v                               v
+extract outcome + artifacts       record one precise question
+   |                               |
+   v                               v
+Completed outcomes section        keep Work open in weekly notes
+```
 
-**Description:** As a maintainer, I want installed clients to reconcile a new
-distribution version without editing live profile configuration by hand.
+### Weekly lifecycle and recovery
 
-**Acceptance Criteria:**
+This diagram answers: **what resets, what persists, and what happens after a
+failed rollup or late answer?**
 
-- [ ] The installed source and version are inspectable.
-- [ ] Update overwrites only declared distribution-owned desired state.
-- [ ] Profile secrets, auth, memories, sessions, and generated workspace state
-      remain intact.
+```mermaid
+stateDiagram-v2
+  [*] --> Active: first Daily run
+  Active --> Active: append changed source snapshots
+  Active --> Frozen: Weekly boundary
+  Frozen --> Frozen: projection fails / retry
+  Frozen --> Consolidated: all projections validate
+  Consolidated --> Active: retain frozen week; seed next week
+```
 
-### US-003: Use Notion without a local adapter stack
+Weekly validates every candidate projection before persistent memory changes.
+On success it:
 
-**Description:** As an operator, I want official MCP access where it is viable
-so that I do not install a Notion CLI and custom read/write adapter.
+1. writes the official Project report;
+2. merges factual delivery observations into Employee Memory by employee and
+   source Work ID;
+3. proposes source-linked workflow samples to the canonical SOP;
+4. produces Area and Company rollups, then approved outbound material;
+5. retains the consolidated week's frozen notes immutably and seeds next week
+   with unresolved Work and documentation questions.
 
-**Acceptance Criteria:**
+Closed Work stops carrying forward after its accepted outcome is retained in
+the official report and Employee Memory. A late answer stays linked to its
+original Work ID and is consumed by the next Daily run. An immutable report is
+corrected only when reporting policy requires it. If projection validation
+fails, persistent memory stays unchanged and the frozen notes remain retryable.
 
-- [ ] The supported interactive mode uses the official hosted Notion MCP and a
-      bounded tool set.
-- [ ] The receipt distinguishes MCP read/write health from webhook event health.
-- [ ] Headless Docker and event-trigger requirements have an explicit supported
-      route or an honest blocked verdict.
+### Template-to-Pydantic contract
 
-### US-004: Tune behavior through output templates
+The Markdown template supplies the section instructions, field vocabulary,
+enum values, and golden examples. Template sync must show the generated Pydantic
+diff before changing the schema. Daily performs one structured extraction; a
+deterministic mapper routes the result back into Markdown and Weekly sinks.
 
-**Description:** As a maintainer, I want the report template to be the primary
-tuning surface so that prompt, schema, example, and QA cannot silently diverge.
+| Template section | Structured concepts | Weekly destination |
+| --- | --- | --- |
+| Work and employee updates | Work ID, owner, state, timestamps, staleness, blocker, next action, documentation state, expected/observed artifact, evidence | Project report; Employee latest-week evidence; unresolved items carry forward |
+| Completed outcomes and artifacts | Outcome, accepted artifacts, completion/acceptance time, elapsed duration, documentation result, optional workflow key, evidence | Project report; Employee Memory |
+| Documentation questions | Work/question ID, open state, exact missing fact, update location, evidence checked | Project report; Employee latest-week evidence; open questions carry forward |
+| Problems and inefficiencies | Workflow step, condition, impact, recurrence/volume, time/wait loss, sourced cost, confidence/gaps, next proof | Reports; Issue candidates |
+| Decisions | Choice, rationale/tradeoff, authority, evidence, review trigger | Project report; approved decision destination |
+| Workflow and SOP signals | Explicit workflow key, trigger, actors, method, systems/handoffs, output artifact type, exceptions, controls, timing samples, confidence, promotion state | Canonical SOP candidate/update |
+| Carry-forward items | Original Work ID, source note keys, unresolved state/question, owner, next action, source week | Next week's Project Notes only |
 
-**Acceptance Criteria:**
+One Daily sample may not establish or silently replace an SOP baseline. Weekly
+must preserve the sample count, evidence window, prior value, approval state,
+and rollback evidence.
 
-- [ ] One representative report template deterministically yields or validates
-      its structured contract and realistic example.
-- [ ] Schema and eval drift fails a local check with an actionable diff.
+## User stories
 
-### US-005: Verify the whole installation
+| ID | User story | Acceptance |
+| --- | --- | --- |
+| US-001 | Install from one entry point. | Clean supported host/profile works and resumes; a blocked step gives one exact action; unchanged rerun creates no duplicates. |
+| US-002 | Update from repo-owned configuration. | Installed source/version is visible; only distribution-owned state changes; profile secrets, auth, memory, sessions, and generated state survive. |
+| US-003 | Use Notion without a local adapter stack. | Interactive mode uses official hosted MCP and bounded tools; receipts separate MCP health from webhook health; headless/event routes are explicit. |
+| US-004 | Tune behavior through output templates. | One representative template yields or validates its structured contract and realistic example; schema/eval drift fails with an actionable diff. |
+| US-005 | Verify the whole installation. | Static health, live probes, scheduler readiness, and feature evals remain separate; skipped probes never pass; receipts contain no secrets or private records. |
+| US-006 | Learn and recover without tribal knowledge. | A new operator follows the tested path without reading source or legacy pages; docs QA runs every documented command and receipt. |
+| US-007 | Track weekly delivery without employee self-scoring. | Daily appends changed Work snapshots with stable IDs; Weekly selects the greatest sourced update time per Work while using source revision only for identity and deduplication; Done Work passes documentation review; elapsed duration is not called effort or performance. |
+| US-008 | Consolidate weekly evidence into persistent entity memory. | Weekly freezes and validates before promotion; Employee Memory merges by person and Work ID; SOP updates retain sample history; failed projections leave memory unchanged. |
 
-**Description:** As an operator, I want one health-and-eval command so that I
-know what works before relying on automations.
+## Functional requirements
 
-**Acceptance Criteria:**
+### Setup and deployment
 
-- [ ] Static health, opted-in live provider probes, scheduler readiness, and
-      feature evals are separate named lanes.
-- [ ] The final exit state is `ready`, `partial`, or `blocked` and never turns a
-      skipped or unauthorized probe into a pass.
-- [ ] The receipt contains no secret values or private record content.
-
-### US-006: Learn and recover without tribal knowledge
-
-**Description:** As a client operator, I want short task-based documentation so
-that I can install, authorize, verify, update, and repair the system myself.
-
-**Acceptance Criteria:**
-
-- [ ] A new operator can follow the tested happy path without opening source
-      code or legacy setup pages.
-- [ ] Every command and expected receipt in the guide is exercised by docs QA.
-
-## Functional Requirements
-
-- **FR-1:** Define and test the supported native, Windows, and Docker topology
-  matrix before locking the installer implementation.
-- **FR-2:** Provide one cross-platform, non-chat-dependent entry point for
-  install, reconcile, update, health, and eval subcommands or phases.
-- **FR-3:** Store secrets and OAuth material only in Hermes-owned profile state;
-  repo files may declare names, endpoints, tool allowlists, and desired state.
-- **FR-4:** Use Hermes native profile install/update, MCP, cron, plugin, config,
-  and doctor capabilities where they satisfy the contract.
-- **FR-5:** Make every phase idempotent and write a redacted resumable receipt
+- **FR-1:** Prove the native, Windows, and Docker topology matrix before locking
+  the installer.
+- **FR-2:** Provide one cross-platform, non-chat entry point for install,
+  reconcile, update, health, and eval.
+- **FR-3:** Keep secrets and OAuth material in Hermes-owned profile state. Repo
+  files may declare names, endpoints, tool allowlists, and desired state.
+- **FR-4:** Reuse Hermes profile install/update, MCP, cron, plugin, config, and
+  doctor capabilities where they meet this contract.
+- **FR-5:** Make each phase idempotent and produce a redacted resumable receipt
   with observed state and `next_action`.
-- **FR-6:** Default Notion read/write to the official hosted MCP; model webhook
-  event ingress and unattended access as distinct capabilities.
-- **FR-7:** Treat report templates as versioned source contracts and bind each
-  tuned template to a compatible Zod/JSON schema, realistic example, and QA.
-- **FR-8:** Package the health policy and frozen feature eval entry points in the
-  installed distribution, not only in the development repository.
-- **FR-9:** Consolidate installation, authorization, operation, update,
-  verification, and troubleshooting documentation around the new lifecycle.
+- **FR-6:** Default Notion read/write to official hosted MCP. Treat webhook
+  ingress and unattended access as separate capabilities.
+- **FR-7:** Bind each versioned report template to a compatible Pydantic/JSON schema,
+  realistic example, renderer, and QA.
+- **FR-8:** Install the health policy and frozen feature eval entry points with
+  the distribution.
+- **FR-9:** Organize setup docs around installation, authorization, operation,
+  update, verification, and recovery.
 
-## Constraints
+### Operating memory
 
-- **Security/privacy:** Never print or copy token values into receipts, logs,
-  docs, git, or chat. Provider live probes are bounded and explicit.
-- **Performance:** A repeat static health/reconcile should complete quickly and
-  avoid network calls unless the operator selects live verification.
-- **Platform:** No POSIX-shell-only contract. Windows support may be WSL2 or
-  Docker if the PoC proves that topology and the docs name it honestly.
-- **Budget/time:** Reuse Hermes primitives before adding product-specific code. First prove
-  one Windows route and one container route rather than three partial routes.
+- **FR-10:** Maintain one private append-only Project Notes file per active
+  Project and week from bounded Daily reads.
+- **FR-11:** Extend the Daily Pydantic result and mapper with Work timing/state,
+  documentation questions, accepted outcomes/artifacts, and workflow samples.
+- **FR-12:** Freeze the complete Project Notes set before creating Project, Area, Company,
+  Employee Memory, SOP, or outbound projections.
+- **FR-13:** Store only factual, source-linked Employee Memory observations. Do
+  not infer personality, unsourced effort, or automatic performance ratings.
+- **FR-14:** Update SOP timing only through a versioned, auditable sample policy
+  with approval and rollback evidence.
+- **FR-15:** Carry unresolved Work and questions into the next week's notes. Remove
+  closed Work only after retaining its accepted outcome evidence.
 
-## Autonomy Readiness
+## Success and proof
 
-- **Human inputs/assets needed:** profile name, deploy topology, company
-  timezone, report template, approved Notion workspace/root, and optional
-  webhook public endpoint.
-- **Credentials / external services:** model provider; official Notion MCP
-  OAuth for interactive access; separate Notion connection/token and public
-  HTTPS endpoint only when event webhooks are enabled.
-- **Compute or runtime needs:** supported Hermes version, persistent profile and
-  workspace storage, long-running scheduler/gateway for automations.
-- **Tooling or testability gaps:** clean Windows and Docker runners; deterministic
-  live MCP probe; packaged eval fixtures; secret-safe receipt validator.
-- **Hard-to-QA surfaces:** browser OAuth callback from a container, host/container
-  path translation, scheduler persistence, public webhook verification.
-- **Human gates:**
-  - **Plan approval:** accept this PRD/ticket split before implementation.
-  - **QA approval:** review the real clean-machine evidence bundle.
-  - **Deploy/publish:** explicit owner approval.
-  - **Spend/billing:** explicit owner approval for hosted infrastructure.
-  - **Destructive/migration actions:** never implicit; setup preserves unknown
-    files and update follows the distribution allowlist.
-- **Agent decision boundaries:** The setup command may inspect, reconcile
-  declared repo-owned state, and run bounded tests. It may not grant Notion
-  access, complete OAuth consent, enable production writes, expose a public
-  endpoint, or delete user-owned state without the operator.
+| Claim | Required proof |
+| --- | --- |
+| Supported topology | Fresh install and idempotent rerun on one Windows path and one persistent Docker path, with no undocumented repair. |
+| Honest health | `ready | partial | blocked` receipt; skipped or unauthorized probes cannot appear healthy. |
+| Safe update | Tests prove secrets stay profile-local, unknown files survive, and only allowlisted desired state changes. |
+| Template tuning | Template-contract drift test covers schema, example, renderer, and eval output. |
+| Operating memory | Daily/Weekly evals prove stable-ID reconciliation, documentation branches, frozen projection input, carry-forward, and failed-promotion recovery. |
+| Provider access | One official Notion MCP OAuth/read probe; webhook health tested separately. |
 
-## Risks / Unknowns
+Record cold-install and warm static-verify durations. Do not set a performance
+target until the topology PoC produces a representative baseline.
 
-- Hosted Notion MCP requires user OAuth and is not suitable by itself for a
-  fully unattended headless container.
-- MCP supplies read/write tools but not Notion's inbound webhook event stream;
-  comment-triggered behavior still needs public ingress or an accepted polling
-  design.
-- Hermes chat tool permissions may intentionally prevent shell/CLI access; the
-  deterministic setup path must not depend on changing that security boundary.
-- Distribution update preserves `config.yaml` by default, so the desired-state
-  contract must name which settings are repo-owned and which remain local.
-- A free-form Markdown template cannot safely generate every semantic schema
-  rule without explicit machine-readable annotations or a compatibility check.
+## Constraints and human gates
 
-## Backpressure / Evidence to Ship
+- Never put token values in receipts, logs, docs, git, or chat.
+- Static reconcile must avoid network calls unless live verification is chosen.
+- The supported contract cannot require a POSIX-only shell. Windows may use
+  WSL2 or Docker if the PoC proves and documents that route.
+- Reuse Hermes primitives before adding product-specific code.
+- The setup command may inspect and reconcile declared source-owned state and
+  run bounded tests. It may not grant Notion access, complete OAuth consent,
+  enable production writes, expose a public endpoint, spend money, or delete
+  user-owned state.
+- Plan, real-machine QA, deploy/publish, spend, and destructive migration each
+  require their named human approval.
 
-- **Tests:** topology smoke tests, allowlist and secret-boundary tests,
-  idempotent reconcile/update tests, template-contract drift tests, receipt
-  schema tests, and existing repository suites.
-- **QA:** real fresh install and rerun on the selected Windows topology and a
-  persistent Docker topology, plus one official Notion MCP OAuth/read probe.
-- **Perf checks:** record cold install and warm static verify duration; no hard
-  target until the PoC establishes a representative baseline.
+## Non-goals
+
+- Modify or ship Hermes itself from this repository.
+- Support every Windows shell or make OAuth zero-click.
+- Replace Notion webhooks with MCP.
+- Use hosted Notion MCP as a headless bearer-token service.
+- Enable production writes or external publication by default.
+- Build a general-purpose installer framework.
+- Rewrite every record template or feature eval in the first slice.
+
+## Risks and open proof
+
+- Hosted Notion MCP requires user OAuth and does not by itself serve an
+  unattended headless container.
+- MCP provides read/write tools, not Notion's inbound webhook event stream.
+- Hermes chat permissions may block shell/CLI access; setup cannot depend on
+  weakening that boundary.
+- Distribution update preserves `config.yaml` by default. The desired-state
+  contract must distinguish repo-owned and local settings.
+- Free-form Markdown cannot safely define every semantic schema rule without a
+  compatibility check.
+- Clean Windows and Docker runners, a deterministic live MCP probe, packaged
+  eval fixtures, and a secret-safe receipt validator are still required.
+
+## Implementation status
+
+The local operating-memory slice is implemented. Daily reconciles bounded Work
+into source-linked Project Notes, including completed outcome/artifact rows and
+documentation questions. Weekly freezes the complete all-Project set, then
+produces report, Employee Memory, SOP sample, promotion, and carry-forward
+projections. Employee observations merge by Person and Work; workflow samples
+merge by explicit workflow key without automatically changing an approved
+baseline.
+
+The remaining gates are external: bind authenticated client destinations and
+operate separately authorized Notion, Drive, messaging, Windows, and persistent
+Docker proof. The next Daily run is the accepted re-review path for unanswered
+documentation questions; event-driven re-review is not required for this
+release. FEAT-0011 and TASK-0016 through TASK-0021 own setup and deployment
+proof.
 
 ## Grounding
 
 - **User evidence:** first external-computer deployment feedback in this task.
-- **Local product evidence:** `distribution.yaml`, TASK-0015, current setup
-  scripts, schemas, templates, evals, and installed Hermes CLI/help/docs.
-- **Current provider evidence:** official Notion hosted MCP documentation states
-  that it is OAuth-based and infrastructure-free for read/write, while official
-  webhook documentation requires a separate public HTTPS endpoint for
-  `comment.created` delivery.
+- **Local evidence:** `distribution.yaml`, TASK-0015, setup scripts, schemas,
+  templates, evals, and installed Hermes CLI/help/docs.
+- **Provider evidence:** official Notion hosted MCP documentation describes
+  OAuth-based read/write access; official webhook documentation requires a
+  separate public HTTPS endpoint for `comment.created` delivery.

@@ -18,7 +18,7 @@ setup workflow and product-facing contracts remain company-neutral here.
 ## Install on Windows
 
 You need Windows, Docker Desktop, and the WSL2 backend. The client runtime does
-not require a host Python, Node.js, or npm installation.
+not require a host Python installation; Hermes supplies Python/Pydantic inside Docker.
 
 1. Clone or download this repository.
 2. Start Docker Desktop.
@@ -105,7 +105,7 @@ private runtime data into Git.
 Report maintainers edit the Markdown files in `templates/`, then run:
 
 ```bash
-npm run report:sync
+python3 scripts/sync_report_templates.py
 ```
 
 The maintainer command uses the installed Hermes CLI directly with profile
@@ -116,9 +116,9 @@ inside Docker, so customers do not install Hermes on Windows.
 
 The command detects changed report templates by content hash, asks Hermes to
 interpret only those templates, shows the contract diff, and updates the
-committed generated Zod modules in `schemas/reports/`. It then asks before
+committed generated Pydantic modules in `schemas/reports/`. It then asks before
 creating each synthetic preview in the private, ignored `.reports-preview/`
-directory. Use `npm run report:sync -- --check` for a model-free, non-writing
+directory. Use `python3 scripts/sync_report_templates.py --check` for a model-free, non-writing
 drift check or `--preview` when an explicit non-interactive run should generate
 previews.
 
@@ -126,15 +126,33 @@ Then run:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-node --test evals/filesystem/tests/*.test.mjs
 python3 scripts/validate_company_context.py --context workspace.hermes.md
 python3 scripts/run_installed_evals.py --root .
 ```
 
 Local evals use packaged fixtures and make no provider calls. Private Notion
 captures and generated private seeds must remain outside the repository.
+
+The operated evaluation has two explicit stages. `setup.py doctor` reads the
+configured sources, runs and judges the AI, writes one immutable handoff per
+cadence, and stops without downstream changes. If setup enabled **Reviewed
+Stage 2**, review and apply one exact handoff without regeneration:
+
+```bash
+python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json
+python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json --apply
+```
+
+The first command is review-only. The second applies the complete configured
+plan—private workspace, Notion or Linear, Drive, knowledge destinations, task
+creation, and configured messages—and writes a redacted per-action receipt.
+Production remains unauthorized; disabled policy, failed quality, a changed
+workspace or handoff, and missing exact destinations block before provider
+calls.
 The [autonomous testing runbook](docs/autonomous-testing.md) defines the safe
 default loop, targeted setup checks, live-test gates, and required evidence.
+The global Python discovery includes the real Telegram test as a skipped-by-
+default case; use the runbook's explicit profile and side-effect gate to run it.
 
 For the detailed setup screens and recovery paths, see
 [`docs/features/FEAT-0011-setup-ux-ascii.md`](docs/features/FEAT-0011-setup-ux-ascii.md).

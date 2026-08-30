@@ -70,7 +70,6 @@ copies and treat them as co-equal sources.
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-node --test evals/filesystem/tests/*.test.mjs
 python3 scripts/validate_company_context.py --context workspace.hermes.md
 python3 scripts/run_installed_evals.py --root .
 hermes config get terminal.cwd
