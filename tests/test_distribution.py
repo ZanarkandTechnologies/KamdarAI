@@ -28,8 +28,12 @@ class DistributionTests(unittest.TestCase):
             "scripts/composio_session.py",
             "scripts/run_connection_evals.py",
             "scripts/run_installed_evals.py",
+            "scripts/validate_eval_run.py",
+            "scripts/project_week_notes.py",
+            "scripts/project_note_reducers.py",
             "catalog/data-sources",
             "workspace.hermes.template.md",
+            "schemas/evals.py",
             "automations",
             "templates",
             "plugins/platforms/notion/plugin.yaml",
@@ -37,9 +41,11 @@ class DistributionTests(unittest.TestCase):
         self.assertTrue(required.issubset(set(self.owned)))
         self.assertNotIn("workspace.hermes.md", self.owned)
         self.assertNotIn("schemas/automations", self.owned)
-        self.assertFalse(any(path.endswith(".zod.mjs") for path in self.owned))
+        self.assertFalse(any(path.endswith((".js", ".mjs")) for path in self.owned))
         self.assertIn("schemas/automations/daily_review_result.py", self.owned)
         self.assertIn("schemas/automations/validate.py", self.owned)
+        self.assertIn("evals/viewer/build.py", self.owned)
+        self.assertIn("evals/viewer/model.py", self.owned)
         for excluded in ("docs", "tickets", "tests", "seed", "evals/filesystem"):
             self.assertFalse(any(path == excluded or path.startswith(f"{excluded}/") for path in self.owned))
         self.assertFalse(any("company-os-onboard" in path for path in self.owned))
@@ -60,14 +66,14 @@ class DistributionTests(unittest.TestCase):
                 files.update(item for item in path.rglob("*") if item.is_file() and ".pyc" not in item.suffix)
         payload_bytes = sum(path.stat().st_size for path in files)
         self.assertLess(payload_bytes, 1_000_000, payload_bytes)
-        self.assertFalse(any(path.name.endswith(".zod.mjs") for path in files))
+        self.assertFalse(any(path.suffix in {".js", ".mjs"} for path in files))
         self.assertFalse(any(path.name in {"package.json", "package-lock.json"} for path in files))
         text_payload = "\n".join(
             path.read_text(encoding="utf-8")
             for path in files
             if path.suffix in {".md", ".py", ".json", ".yaml", ".yml"}
         )
-        self.assertNotIn('from "zod"', text_payload)
+        self.assertNotIn("javascript", text_payload.lower())
 
 
 if __name__ == "__main__":

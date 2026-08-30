@@ -12,6 +12,7 @@ def _ensure_ui_runtime() -> None:
     """Restart with Hermes' bundled Python when local UI dependencies are absent."""
     try:
         import prompt_toolkit  # noqa: F401
+        import pydantic  # noqa: F401
         import rich  # noqa: F401
         return
     except ModuleNotFoundError:
@@ -38,7 +39,7 @@ def _ensure_ui_runtime() -> None:
         ):
             os.execv(str(candidate), [str(candidate), str(script), *sys.argv[1:]])
     raise SystemExit(
-        "Rich and prompt_toolkit are bundled with Hermes, but its Python runtime "
+        "Rich, prompt_toolkit, and Pydantic are bundled with Hermes, but its Python runtime "
         "could not be found."
     )
 

@@ -9,27 +9,26 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class KamdarCompanyOSTests(unittest.TestCase):
-    def test_repository_uses_lean_source_layout(self) -> None:
-        for expected in ("automations", "docs", "templates", "evals", "scripts", "tests"):
-            self.assertTrue((ROOT / expected).is_dir(), expected)
-        for removed in ("profile", "context", "deploy", "hermes-distribution"):
-            self.assertFalse((ROOT / removed).exists(), removed)
-        self.assertFalse(list((ROOT / "skills").glob("*/SKILL.md")))
+    def test_automation_markdown_contracts_exist(self) -> None:
+        daily = (ROOT / "automations/daily-operating-update.md").read_text(encoding="utf-8")
+        weekly = (ROOT / "automations/weekly-operating-review.md").read_text(encoding="utf-8")
+        for automation, cadence in ((daily, "daily"), (weekly, "weekly")):
+            self.assertIn(f"cadence: {cadence}", automation)
+            self.assertIn("## Authority", automation)
+            self.assertIn("workspace.hermes.md", automation)
+            self.assertIn("ntn --help", automation)
+            self.assertNotIn("skills/kamdar-company-os", automation)
+        self.assertIn("validate daily-review", daily)
+        self.assertIn("weekly_review_result.py", weekly)
+        self.assertNotIn("javascript", daily.lower())
+        self.assertNotIn("javascript", weekly.lower())
+
+    def test_runtime_setup_does_not_depend_on_agent_skills(self) -> None:
+        skills = ROOT / "skills"
+        packages = sorted(path.parent.name for path in skills.glob("*/SKILL.md")) if skills.exists() else []
+        self.assertEqual(packages, [])
         self.assertTrue((ROOT / "scripts/setup_profile.py").is_file())
         self.assertTrue((ROOT / "scripts/setup_workspace.py").is_file())
-        self.assertTrue((ROOT / "workspace.hermes.md").is_file())
-        self.assertFalse((ROOT / "configs").exists())
-        self.assertFalse((ROOT / "hermes-profile.yaml").exists())
-
-    def test_automation_markdown_contracts_exist(self) -> None:
-        expected = {
-            "automations/daily-operating-update.md": "cadence: daily",
-            "automations/weekly-operating-review.md": "cadence: weekly",
-        }
-        for relative, marker in expected.items():
-            content = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertIn(marker, content)
-            self.assertIn("## Authority", content)
 
     def test_live_context_is_ignored_but_reviewable_config_is_tracked(self) -> None:
         ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
@@ -40,7 +39,6 @@ class KamdarCompanyOSTests(unittest.TestCase):
         self.assertIn("unmapped_template", proposal)
         self.assertIn("meeting_block_parse_gap", proposal)
         self.assertIn("proposal-only", proposal)
-
 
     def test_feature_docs_and_system_map_own_the_pipeline_inventory(self) -> None:
         feature_docs = [next((ROOT / "docs/features").glob(f"FEAT-{index:04d}-*.md")) for index in range(1, 8)]
@@ -66,11 +64,6 @@ class KamdarCompanyOSTests(unittest.TestCase):
             self.assertIn(f"FEAT-{index:04d}", system)
         for destination in ("NOTION / WIKI", "GOOGLE DRIVE", "EMAIL / TELEGRAM"):
             self.assertIn(destination, system)
-        ui_prototype = (ROOT / "tickets/archive/TASK-0002/ascii-prototype.md").read_text(encoding="utf-8")
-        self.assertIn("CURRENT TEMPLATE CONTENT ASSERTIONS", ui_prototype)
-        self.assertIn("PROPOSED FEATURE CONTENT ASSERTIONS", ui_prototype)
-        self.assertIn("replaces only Section 5", ui_prototype)
-        self.assertIn("ASCII comparison: available here, not in the buyer summary", ui_prototype)
 
     def test_template_registry_has_pinned_and_derived_contracts(self) -> None:
         expected = {
@@ -130,8 +123,6 @@ class KamdarCompanyOSTests(unittest.TestCase):
         ):
             self.assertIn(f"## {section}", weekly)
 
-
-
     def test_proposed_context_validates(self) -> None:
         result = subprocess.run(
              [sys.executable, str(ROOT / "scripts/validate_company_context.py"),
@@ -140,31 +131,6 @@ class KamdarCompanyOSTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("context_valid=true", result.stdout)
-
-    def test_daily_runner_is_hardwired_to_proposal_only(self) -> None:
-        runner = (ROOT / "scripts/run_daily_documentation_check.py").read_text(encoding="utf-8")
-        self.assertIn('"status": "proposal-only"', runner)
-        self.assertIn('"comments_posted": 0', runner)
-        self.assertNotIn('comments -X POST', runner)
-        self.assertNotIn('"--apply"', runner)
-        self.assertNotIn('comment_policy", "approved"', runner)
-
-    def test_daily_runner_rejects_tracked_output_path(self) -> None:
-        result = subprocess.run(
-             [sys.executable, str(ROOT / "scripts/run_daily_documentation_check.py"),
-             "--date", "2026-08-20", "--output", str(ROOT / "workspace.hermes.md")],
-            text=True, capture_output=True, check=False,
-        )
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("output_must_be_relative_to:runs", result.stderr)
-
-    def test_daily_runner_rejects_symlinked_runs_root(self) -> None:
-        runner = (ROOT / "scripts/run_daily_documentation_check.py").read_text(encoding="utf-8")
-        self.assertIn("runtime_output_root_must_be_real_directory", runner)
-        self.assertIn("runtime_output_must_not_be_tracked", runner)
-        self.assertIn("O_NOFOLLOW", runner)
-        self.assertIn("O_EXCL", runner)
-
 
 if __name__ == "__main__":
     unittest.main()

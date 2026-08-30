@@ -174,6 +174,38 @@ test.
 
 ## S7 — Full health verification
 
+### Owner messaging setup
+
+```text
+Messages
+[x] Send completed reports to the company owner
+[x] Alert the owner when something needs attention
+[ ] Follow up with employees — Needs People routes
+
+Owner messages
+Recipient: Vishan Kamdar
+App: Telegram
+Behavior: Prepare drafts in the private workspace (recommended)
+          or Send automatically
+
+Connect Telegram
+-> opens Hermes' native messaging setup; no token enters the workspace
+
+Check the connection
+-> explicit one-message approval
+-> Hermes returns an exact target
+-> the named owner confirms receipt
+-> private configuration-bound receipt
+```
+
+Draft-first writes an idempotent stable-action-key draft to
+`weeks/<week>/outbound/` and never calls Hermes delivery. The owner reviews and
+explicitly approves that exact file through the same typed guard.
+Automatic delivery remains blocked by the typed send guard until the exact
+target receipt matches the current message, app, recipient, and behavior.
+Gateway process state, messaging configuration, and tested delivery are
+separate lanes.
+
 When optional Notion comments are enabled, the health action guides the browser
 verification and shows bounded waits:
 

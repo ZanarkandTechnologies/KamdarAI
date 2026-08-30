@@ -1,5 +1,5 @@
 name: kamdar-ai
-version: 1.7.0
+version: 1.8.0
 description: "Kamdar Company OS workspace, provider catalog, automations, onboarding, and connectors"
 hermes_requires: ">=0.20.4"
 author: "Zanarkand Technologies"
@@ -21,15 +21,31 @@ distribution_owned:
   - scripts/setup_runtime.py
   - scripts/setup_cli
   - scripts/setup_workspace.py
+  - scripts/authorized_message.py
   - scripts/setup_profile.py
   - scripts/provider_catalog.py
   - scripts/composio_session.py
   - scripts/run_connection_evals.py
   - scripts/run_installed_evals.py
+  - scripts/validate_eval_run.py
+  - scripts/run_company_doctor.py
+  - scripts/automation_prepare.py
+  - scripts/automation_delivery.py
+  - scripts/run_automation.py
+  - scripts/dashboard_bridge.py
+  - scripts/project_week_notes.py
+  - scripts/project_note_reducers.py
+  - schemas/__init__.py
+  - schemas/workspace.py
+  - schemas/evals.py
   - catalog/data-sources
   - evals/daily
   - evals/weekly
   - evals/meeting-intake
+  - evals/__init__.py
+  - evals/viewer/__init__.py
+  - evals/viewer/build.py
+  - evals/viewer/model.py
   - workspace.hermes.template.md
   - automations
   - schemas/automations/__init__.py
@@ -38,6 +54,7 @@ distribution_owned:
   - schemas/automations/daily_idempotency_rerun_receipt.py
   - schemas/automations/daily_integration_receipt.py
   - schemas/automations/daily_review_result.py
+  - schemas/automations/delivery.py
   - schemas/automations/feature_outcome.py
   - schemas/automations/meeting_commitment_intake_result.py
   - schemas/automations/weekly_context.py
@@ -51,4 +68,3 @@ distribution_owned:
   - plugins/platforms/notion/cli.py
   - plugins/platforms/notion/plugin.yaml
   - plugins/platforms/notion/protocol.py
-  - schemas/__init__.py

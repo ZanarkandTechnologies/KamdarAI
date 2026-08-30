@@ -17,6 +17,7 @@ class ProviderCatalogTests(unittest.TestCase):
         self.assertEqual(
             set(catalog),
             {
+                "decisions",
                 "projects",
                 "tasks",
                 "people",
@@ -24,6 +25,7 @@ class ProviderCatalogTests(unittest.TestCase):
                 "reports",
                 "meetings",
                 "operator_email",
+                "sops",
             },
         )
         self.assertEqual(
@@ -73,7 +75,10 @@ class ProviderCatalogTests(unittest.TestCase):
         )
         self.assertEqual(
             {binding["data_source"] for binding in bindings},
-            {"projects", "tasks", "meetings", "people", "operator_email", "knowledge"},
+            {
+                "projects", "tasks", "meetings", "people", "operator_email",
+                "knowledge", "reports", "decisions", "sops",
+            },
         )
         self.assertEqual(
             {provider_catalog.connection_key(binding["provider"]) for binding in bindings},

@@ -10,6 +10,15 @@ from pathlib import Path
 from rich.panel import Panel
 from rich.table import Table
 
+from schemas.workspace import (
+    CommunicationBinding,
+    DeliveryBehavior,
+    MessageType,
+    MessagingApp,
+    MANAGED_COMMUNICATIONS,
+    parse_workspace_communications,
+    render_workspace_communications,
+)
 from scripts import provider_catalog
 from scripts.setup_cli.ui import (
     CONSOLE,
@@ -37,6 +46,10 @@ MANAGED = re.compile(
     r"(?P<body>.*?)"
     r"(?P<close><!-- /hermes:managed (?P=name) -->)",
     re.DOTALL,
+)
+AUTOMATION_DELIVERY = re.compile(
+    r"^automation_delivery:\s*$\n(?P<body>(?:^[ \t]+[^\n]+\n?)*)",
+    re.MULTILINE,
 )
 
 
@@ -90,6 +103,8 @@ def replace_rows(content: str) -> str:
     def update_block(match: re.Match[str]) -> str:
         nonlocal row_count
         name = match.group("name")
+        if name == "communications":
+            return match.group(0)
         rows = list(ROW.finditer(match.group("body")))
         if name == "data-sources":
             selected_roles = select_roles(rows)
@@ -107,12 +122,16 @@ def replace_rows(content: str) -> str:
             provider = current_value(row.group("provider"))
             source = current_value(row.group("source"))
             if role in selected_roles:
-                provider = (
-                    select_provider(role, provider)
-                    if name == "data-sources"
-                    else ask(f"Provider for {role}", provider)
-                )
-                source = ask(f"Source URL or identifier for {role}", source)
+                if name == "data-sources":
+                    provider = select_provider(role, provider)
+                    source = ask(
+                        f"Source URL or identifier for {role.replace('_', ' ').title()}",
+                        source,
+                    )
+                else:
+                    message = role.replace("_", " ").title()
+                    provider = ask(f"Messaging app for {message}", provider)
+                    source = ask(f"Send {message} to", source)
             return (
                 f'{row.group("prefix")}{provider or "—"}{row.group("middle")}'
                 f'{source or "—"}{row.group("suffix")}'
@@ -126,6 +145,182 @@ def replace_rows(content: str) -> str:
     if block_count == 0 or row_count == 0:
         raise SystemExit("No configurable role rows found.")
     return updated
+
+
+MESSAGE_CHOICES = (
+    (MessageType.OWNER_REPORT, "Send completed reports to the company owner"),
+    (MessageType.OWNER_ALERT, "Alert the owner when something needs attention"),
+)
+
+
+def _message_selection(
+    current: list[CommunicationBinding],
+) -> tuple[set[MessageType], bool]:
+    """Return selected jobs and whether the customer requested route changes."""
+    selected_now = {binding.message for binding in current}
+    CONSOLE.rule("[bold cyan]Messages[/bold cyan]")
+    CONSOLE.print("What should Hermes help with?")
+    for index, (_, label) in enumerate(MESSAGE_CHOICES, start=1):
+        marker = "x" if MESSAGE_CHOICES[index - 1][0] in selected_now else " "
+        CONSOLE.print(f"  [cyan]{index}.[/cyan] [{marker}] {label}")
+    CONSOLE.print(
+        "  [dim]Employee follow-up — not enabled until approved People-directory "
+        "routes are available.[/dim]"
+    )
+    hint = "Enter keeps the current choices." if current else "Enter skips messages."
+    CONSOLE.print(f"[dim]{hint} Use comma-separated numbers or 'all'.[/dim]")
+    while True:
+        raw = _prompt_text(
+            "Selection",
+            default="",
+            show_default=False,
+            console=CONSOLE,
+        ).lower()
+        if not raw:
+            return selected_now, False
+        if raw == "all":
+            return {choice[0] for choice in MESSAGE_CHOICES}, True
+        try:
+            indices = sorted({int(value.strip()) - 1 for value in raw.split(",")})
+        except ValueError:
+            indices = []
+        if indices and all(0 <= index < len(MESSAGE_CHOICES) for index in indices):
+            return {MESSAGE_CHOICES[index][0] for index in indices}, True
+        CONSOLE.print("[yellow]Enter 1, 2, all, or press Enter.[/yellow]")
+
+
+def replace_communications(content: str) -> str:
+    """Configure the friendly customer choices and derive the internal boundary."""
+    try:
+        current = parse_workspace_communications(content).communications
+    except ValueError as error:
+        raise SystemExit(f"Invalid communications configuration: {error}") from error
+    selected, change_details = _message_selection(current)
+    if not selected:
+        bindings: list[CommunicationBinding] = []
+    elif current and not change_details and {item.message for item in current} == selected:
+        bindings = current
+    else:
+        owner = next(
+            (
+                item
+                for item in current
+                if item.message in {MessageType.OWNER_REPORT, MessageType.OWNER_ALERT}
+            ),
+            None,
+        )
+        CONSOLE.rule("[bold cyan]Owner messages[/bold cyan]")
+        send_to = ask("Who should receive these messages?", owner.send_to if owner else "")
+        app = choose(
+            "Which app should Hermes use?",
+            choices=[item.value for item in MessagingApp],
+            default=owner.app.value if owner else MessagingApp.TELEGRAM.value,
+        )
+        behavior_choice = choose(
+            "What should Hermes do? [drafts = prepare drafts for approval; automatic = send automatically]",
+            choices=["drafts", "automatic"],
+            default=(
+                "automatic"
+                if owner and owner.behavior is DeliveryBehavior.SEND_AUTOMATICALLY
+                else "drafts"
+            ),
+        )
+        behavior = (
+            DeliveryBehavior.SEND_AUTOMATICALLY
+            if behavior_choice == "automatic"
+            else DeliveryBehavior.PREPARE_DRAFTS
+        )
+        bindings = [
+            CommunicationBinding(
+                message=message,
+                app=MessagingApp(app),
+                send_to=send_to,
+                behavior=behavior,
+            )
+            for message in selected
+        ]
+
+    table = render_workspace_communications(bindings)
+    return MANAGED_COMMUNICATIONS.sub(
+        "<!-- hermes:managed communications -->\n"
+        + table
+        + "\n<!-- /hermes:managed communications -->",
+        content,
+        count=1,
+    )
+
+
+def replace_automation_delivery(content: str) -> str:
+    """Choose whether reviewed Stage 2 runs may start for any cadence."""
+    block = AUTOMATION_DELIVERY.search(content)
+    if not block:
+        marker = "production_write_mode: proposal-only\n"
+        if marker not in content:
+            raise SystemExit("Workspace frontmatter is missing production_write_mode.")
+        content = content.replace(
+            marker,
+            marker
+            + "automation_delivery:\n"
+            + "  daily: disabled\n"
+            + "  weekly: disabled\n"
+            + "  meeting-intake: disabled\n",
+            1,
+        )
+        block = AUTOMATION_DELIVERY.search(content)
+    assert block is not None
+    current = {
+        match.group(1): match.group(2)
+        for match in re.finditer(
+            r"^[ \t]+(daily|weekly|meeting-intake):\s*(disabled|enabled)\s*$",
+            block.group("body"),
+            re.MULTILINE,
+        )
+    }
+    default = (
+        "reviewed stage 2"
+        if any(value == "enabled" for value in current.values())
+        else "prepare only"
+    )
+    CONSOLE.rule("[bold cyan]Evaluation delivery[/bold cyan]")
+    CONSOLE.print(
+        "Prepare only changes no downstream system. Reviewed Stage 2 shows the "
+        "complete downstream plan and still requires an explicit Apply action."
+    )
+    choice = choose(
+        "How should evaluation runs behave?",
+        choices=["prepare only", "reviewed stage 2"],
+        default=default,
+    )
+    value = "enabled" if choice == "reviewed stage 2" else "disabled"
+    replacement = (
+        "automation_delivery:\n"
+        f"  daily: {value}\n"
+        f"  weekly: {value}\n"
+        f"  meeting-intake: {value}\n"
+    )
+    return AUTOMATION_DELIVERY.sub(replacement, content, count=1)
+
+
+def migrate_managed_communications(content: str, template: str) -> str:
+    """Add the reviewed managed block to pre-messaging workspaces, preserving prose."""
+    if MANAGED_COMMUNICATIONS.search(content):
+        return content
+    template_block = MANAGED_COMMUNICATIONS.search(template)
+    if not template_block:
+        raise SystemExit("Workspace template is missing its communications block.")
+    block = (
+        "<!-- hermes:managed communications -->"
+        + template_block.group(1)
+        + "<!-- /hermes:managed communications -->"
+    )
+    heading = "## Communications\n"
+    if heading in content:
+        return content.replace(heading, heading + "\n" + block + "\n", 1)
+    anchor = "## Operating guidance\n"
+    section = "## Communications\n\n" + block + "\n\n"
+    if anchor in content:
+        return content.replace(anchor, section + anchor, 1)
+    return content.rstrip() + "\n\n" + section
 
 
 def select_provider(role: str, current: str = "") -> str:
@@ -145,7 +340,7 @@ def select_provider(role: str, current: str = "") -> str:
             f"Supported providers: {', '.join(provider_ids)}"
         )
     return choose(
-        f"Provider for {role} [{labels}]",
+        f"Provider for {role.replace('_', ' ').title()} [{labels}]",
         choices=provider_ids,
         default=current_id or provider_ids[0],
     )
@@ -154,9 +349,15 @@ def select_provider(role: str, current: str = "") -> str:
 def configure(content: str) -> str:
     content = replace_frontmatter(content)
     content = replace_rows(content)
+    content = replace_communications(content)
+    content = replace_automation_delivery(content)
     unresolved = sorted(set(re.findall(r"\{\{[^}]+\}\}|REPLACE_ME", content)))
     if unresolved:
         raise SystemExit("Unresolved template values: " + ", ".join(unresolved))
+    try:
+        parse_workspace_communications(content)
+    except ValueError as error:
+        raise SystemExit(f"Invalid communications configuration: {error}") from error
     return content
 
 
@@ -167,6 +368,8 @@ def show_review(content: str, workspace: Path) -> None:
     table.add_column("Provider")
     table.add_column("Source", overflow="fold")
     for block in MANAGED.finditer(content):
+        if block.group("name") == "communications":
+            continue
         for row in ROW.finditer(block.group("body")):
             table.add_row(
                 row.group("role"),
@@ -174,6 +377,37 @@ def show_review(content: str, workspace: Path) -> None:
                 current_value(row.group("source")),
             )
     CONSOLE.print(table)
+    messaging = Table(title="Review messaging setup", show_header=True)
+    messaging.add_column("Message")
+    messaging.add_column("App")
+    messaging.add_column("Recipient")
+    messaging.add_column("Behavior")
+    communication_config = parse_workspace_communications(content)
+    for binding in communication_config.communications:
+        messaging.add_row(
+            binding.message.value,
+            binding.app.value.title(),
+            binding.send_to,
+            (
+                "Drafts first"
+                if binding.behavior is DeliveryBehavior.PREPARE_DRAFTS
+                else "Send automatically after a confirmed test"
+            ),
+        )
+    if not communication_config.communications:
+        messaging.add_row("No owner messages", "—", "—", "Not enabled")
+    messaging.add_row("Employee follow-up", "—", "—", "Not enabled")
+    CONSOLE.print(messaging)
+    delivery = AUTOMATION_DELIVERY.search(content)
+    enabled = bool(delivery and "enabled" in delivery.group("body"))
+    CONSOLE.print(
+        "Evaluation delivery: "
+        + (
+            "Review the complete Stage 2 plan before an explicit Apply"
+            if enabled
+            else "Prepare and evaluate only; no downstream changes"
+        )
+    )
     CONSOLE.print(f"[dim]Output:[/dim] {workspace}")
 
 
@@ -200,6 +434,9 @@ def configure_workspace(command: str, workspace: Path, template: Path) -> int:
                 f"[cyan]Using existing {workspace}.[/cyan] Current values are defaults."
             )
         content = workspace.read_text(encoding="utf-8")
+
+    template_content = template.read_text(encoding="utf-8") if template.is_file() else ""
+    content = migrate_managed_communications(content, template_content)
 
     configured = configure(content)
     show_review(configured, workspace)

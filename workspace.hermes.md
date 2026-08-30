@@ -10,6 +10,10 @@ execution_modes:
   - frozen
   - isolated-eval
 production_write_mode: proposal-only
+automation_delivery:
+  daily: disabled
+  weekly: disabled
+  meeting-intake: disabled
 ---
 
 # Kamdar AI Workspace
@@ -37,6 +41,9 @@ and gap in `daily-context-diff.json`.
 | `people` | notion | [People](https://app.notion.com/p/8f796be4a629420f9148105da2cb8221) | read | Only seeded people referenced by selected Projects or Work; sending remains proposal-only unless explicitly authorized. |
 | `operator_email` | gmail | `kenji@znrknd.com` | read-write | Operator-owned isolated-eval inbox; never use it for recipient discovery. |
 | `knowledge` | google-drive | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | read | Disabled unless a run explicitly enables a bounded retrieval query; no creation or publishing. |
+| `reports` | notion | [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) | isolated-eval | Approved Final operating reports only. |
+| `decisions` | notion | [Eval Decisions](https://app.notion.com/p/f4f78dbab22b423fab1e4d0fc8bd5787) | isolated-eval | Source-backed promoted decisions only. |
+| `sops` | notion | [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | isolated-eval | Approved employee workflow baselines only. |
 <!-- /hermes:managed data-sources -->
 
 ## Output destination bindings
@@ -78,17 +85,36 @@ hierarchy or infer another destination.
 
 ## Communications
 
+These choices authorize a message job, not credentials. Hermes owns the private
+app connection and exact destination. Automatic delivery additionally requires
+a current setup receipt proving the exact destination was received by the named
+owner.
+
+<!-- hermes:managed communications -->
+| Message | App | Send to | Behavior |
+| --- | --- | --- | --- |
+| `owner report` | telegram | Kenji | prepare drafts for approval |
+| `owner alert` | telegram | Kenji | prepare drafts for approval |
+<!-- /hermes:managed communications -->
+
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Telegram eval sink | `kamdar send --to telegram --json` | Hermes-configured operator-owned home target | Operated eval messages include the intended Person and are receipted as `delivered_to_eval_sink`—never as employee delivery. |
-| Gmail eval sink | `gws gmail users messages send` | `kenji@znrknd.com` | `operator_primary_email` and `operator_secondary_email` resolve only to this operator-owned inbox. Capture the returned Gmail message/thread identifier in the run receipt. |
+| Telegram | Hermes native messaging plus `scripts/authorized_message.py` | Profile-private exact target from a confirmed setup test | The workspace stores the named owner and behavior; the private profile owns credentials, target IDs, and current delivery proof. |
+
+Drafts are written to the current private `weeks/<week>/outbound/` directory.
+They stay unsent until the owner reviews the exact file and invokes
+`python ../scripts/authorized_message.py --workspace .hermes.md --profile-home
+.. --message "owner report" --approve-draft <draft-path>` from the runtime
+workspace. That approval still requires a matching confirmed route. Employee
+follow-up remains disabled until the People directory supplies a per-person
+approved contact.
 
 ## Isolated-eval delivery map
 
 | Person `Contact endpoint` | Direct command | Actual destination |
 | --- | --- | --- |
 | `operator_primary_email` or `operator_secondary_email` | `gws gmail users messages send` | `kenji@znrknd.com` only |
-| `telegram` | `kamdar send --to telegram --json` | Hermes-configured operator-owned Telegram target only |
+| `telegram` | `hermes send --to telegram --json` during an explicit connection test only | Hermes-configured operator-owned Telegram target only |
 
 The Daily and Weekly automations use this map directly. They do not call a
 generic message dispatcher or fallback channel. Every test delivery must retain

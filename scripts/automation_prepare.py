@@ -46,6 +46,34 @@ USER_FACING_PROSE_FIELDS = {
     "title",
     "workflow_and_output",
 }
+INTERNAL_PROSE_REPLACEMENTS = (
+    ("ProjectNoteUpdate.ProjectNote objects", "project notes"),
+    ("ProjectNoteUpdate rows", "project updates"),
+    ("ProjectNote rows", "project notes"),
+    ("ProjectNote", "project note"),
+    ("DocumentationReview outputs", "documentation reviews"),
+    ("DocumentationReview rows", "documentation reviews"),
+    ("DocumentationReview", "documentation review"),
+    ("WeeklyProgressChase messages", "progress follow-up messages"),
+    ("WeeklyProgressChase", "progress follow-up"),
+    ("Pydantic schema", "report contract"),
+    ("owner_person_id", "owner record"),
+    ("employee person_ids", "team member records"),
+    ("employee_ids", "team member records"),
+    ("employee IDs", "team member records"),
+    ("machine-readable employee identifiers", "linked team member records"),
+    ("person_ids", "person records"),
+    ("person IDs", "person records"),
+    ("question_key", "duplicate-check reference"),
+    ("workflow_key", "workflow reference"),
+    ("workflow keys", "workflow references"),
+    ("last_edited_time", "last updated"),
+    ("message_text", "message"),
+    ("knowledge_notes", "knowledge notes"),
+)
+INTERNAL_PROSE = re.compile(
+    r"\b(?:owner_person_id|employee_ids|person_ids|question_key|workflow_key|message_text|knowledge_notes|DocumentationReview|ProjectNote(?:Update)?|WeeklyProgressChase|Pydantic schema)\b"
+)
 
 CADENCE_CONFIG = {
     "daily": {
@@ -203,6 +231,14 @@ def validate_user_facing_prose(result: dict[str, Any]) -> list[dict[str, str]]:
                         "structured identifier/evidence field"
                     ),
                 })
+            if INTERNAL_PROSE.search(value):
+                issues.append({
+                    "path": path,
+                    "message": (
+                        "user-facing prose contains an internal schema term; use ordinary "
+                        "reader language and retain the canonical field name only in structured data"
+                    ),
+                })
 
     visit(result, "")
     return issues
@@ -213,6 +249,8 @@ def normalize_user_facing_prose(result: dict[str, Any], snapshot: dict[str, Any]
     labels = _source_labels(snapshot)
 
     def replace(text: str) -> str:
+        for internal, readable in INTERNAL_PROSE_REPLACEMENTS:
+            text = text.replace(internal, readable)
         return OPAQUE_ID.sub(
             lambda match: labels.get(match.group(0), "the referenced record"),
             text,
@@ -366,6 +404,7 @@ def _generation_prompt(cadence: str, schema: dict[str, Any], snapshot: dict[str,
                 "A connected record with readable content remains a healthy source when it omits entity-template properties or sections. Describe those omissions as documentation-quality evidence and ask one focused question; never relabel them as source-unconfigured, a binding failure, or a setup failure.",
                 "Before returning, unslop every user-facing prose field: remove filler and implementation jargon, use short specific sentences, and preserve every supported fact and qualification.",
                 "Keep opaque UUIDs, hashes, source IDs, and schema keys in their structured machine fields for traceability. In report Markdown, comments, messages, evidence observations, questions, and reasoning summaries, use the entity's readable name or a natural description instead of printing the raw identifier. Human-readable references such as TASK-101 may remain.",
+                "Do not expose internal schema terms such as owner_person_id, employee_ids, question_key, ProjectNote, DocumentationReview, or WeeklyProgressChase in reader prose. Say owner, team member, duplicate check, project note, documentation review, or progress follow-up instead.",
                 *cadence_invariants,
             ],
             "automation_contract": automation,

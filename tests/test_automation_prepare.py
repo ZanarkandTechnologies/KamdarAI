@@ -159,6 +159,28 @@ class AutomationPrepareTests(unittest.TestCase):
         self.assertIn("Kamdar AI", report["report_markdown"])
         self.assertEqual(validate_user_facing_prose(normalized), [])
 
+    def test_internal_schema_terms_are_unslopped_in_reader_prose(self) -> None:
+        result = {
+            "feature_outcomes": [{
+                "reasoning_summary": (
+                    "The Pydantic schema requires owner_person_id and employee_ids "
+                    "before WeeklyProgressChase messages can be produced."
+                ),
+                "information_gaps": [{
+                    "question": "Please add owner_person_id and question_key.",
+                }],
+            }]
+        }
+        normalized = normalize_user_facing_prose(result, {"sources": {}})
+        prose = normalized["feature_outcomes"][0]["reasoning_summary"]
+        question = normalized["feature_outcomes"][0]["information_gaps"][0]["question"]
+        self.assertEqual(
+            prose,
+            "The report contract requires owner record and team member records before progress follow-up messages can be produced.",
+        )
+        self.assertEqual(question, "Please add owner record and duplicate-check reference.")
+        self.assertEqual(validate_user_facing_prose(normalized), [])
+
     def test_preview_shows_readable_source_names_and_report_text(self) -> None:
         opaque_id = "3b7d43a2-3942-80e6-ae73-fcadf3c5c748"
         result = {

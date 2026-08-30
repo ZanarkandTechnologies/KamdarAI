@@ -21,7 +21,10 @@ ANSWERS = "\n".join(
         "notion", "https://notion.so/acme/knowledge",
         "notion", "https://notion.so/acme/reports",
         "gmail", "ops@example.invalid",
-        "telegram", "company-operators",
+        "notion", "https://notion.so/acme/decisions",
+        "notion", "https://notion.so/acme/sops",
+        "all", "company-operators", "telegram", "drafts",
+        "prepare only",
         "y",
     )
 )
@@ -32,6 +35,11 @@ class SetupInitTests(unittest.TestCase):
     def copy_setup(target: Path) -> None:
         for name in ("setup.py", "workspace.hermes.template.md"):
             (target / name).write_bytes((ROOT / name).read_bytes())
+        (target / "schemas").mkdir()
+        for name in ("__init__.py", "workspace.py"):
+            (target / "schemas" / name).write_bytes(
+                (ROOT / "schemas" / name).read_bytes()
+            )
         (target / "scripts").mkdir()
         (target / "scripts" / "provider_catalog.py").write_bytes(
             (ROOT / "scripts" / "provider_catalog.py").read_bytes()
@@ -72,6 +80,13 @@ class SetupInitTests(unittest.TestCase):
             content = workspace.read_text(encoding="utf-8")
             self.assertIn('company_name: "Acme"', content)
             self.assertIn("| `projects` | linear | https://linear.app/acme/projects |", content)
+            self.assertIn(
+                "| `owner report` | telegram | company-operators | "
+                "prepare drafts for approval |",
+                content,
+            )
+            self.assertNotIn("operator_review", content)
+            self.assertNotIn("setup_test_sink", content)
             self.assertNotIn("REPLACE_ME", content)
             self.assertIn("status: draft", content)
 
@@ -157,6 +172,27 @@ class SetupInitTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("# Owner-edited Workspace", workspace.read_text(encoding="utf-8"))
 
+    def test_existing_workspace_gets_managed_messaging_block_without_losing_prose(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            first = self.run_setup(target, "init")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            workspace = target / "workspace.hermes.md"
+            content = workspace.read_text(encoding="utf-8")
+            start = content.index("<!-- hermes:managed communications -->")
+            end = content.index("<!-- /hermes:managed communications -->")
+            end += len("<!-- /hermes:managed communications -->")
+            workspace.write_text(
+                content[:start] + "Legacy owner messaging notes.\n" + content[end:],
+                encoding="utf-8",
+            )
+            result = self.run_setup(target, "configure", "\n" * 8)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            migrated = workspace.read_text(encoding="utf-8")
+            self.assertIn("Legacy owner messaging notes.", migrated)
+            self.assertIn("<!-- hermes:managed communications -->", migrated)
+
     def test_init_reuses_existing_workspace_values(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)
@@ -204,8 +240,8 @@ class SetupInitTests(unittest.TestCase):
                 "1,5",
                 "linear", "https://linear.app/acme/projects",
                 "notion", "https://notion.so/acme/reports",
-                "gmail", "ops@example.invalid",
-                "telegram", "company-operators", "y",
+                "all", "company-operators", "telegram", "drafts",
+                "prepare only", "y",
             ))
             result = self.run_setup(target, "init", answers)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -222,8 +258,8 @@ class SetupInitTests(unittest.TestCase):
             answers = "\n".join((
                 "Acme", "Operations workspace", "Asia/Kuala_Lumpur",
                 "",
-                "gmail", "ops@example.invalid",
-                "telegram", "company-operators", "y",
+                "all", "company-operators", "telegram", "drafts",
+                "prepare only", "y",
             ))
             result = self.run_setup(target, "init", answers)
             self.assertEqual(result.returncode, 0, result.stderr)

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "sops",
+  "label": "SOPs",
+  "providers": [
+    {
+      "id": "notion",
+      "label": "Notion",
+      "mcp": {"source": "hermes_catalog", "name": "notion"},
+      "test": {
+        "risk": "read_only",
+        "requires_confirmation": false,
+        "prompt": "Use only the configured Notion MCP tools. Fetch the configured SOPs destination at {{source}}, report its identity, URL, and visible structure, and make no changes.",
+        "expected_output": "The configured SOP destination is fetched and described without a write.",
+        "assertions": [
+          "The configured SOP destination is fetched successfully.",
+          "The response reports its identity, URL, and visible structure.",
+          "The trace contains no write operation."
+        ]
+      }
+    }
+  ]
+}

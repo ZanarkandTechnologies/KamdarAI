@@ -7,6 +7,7 @@ the operations deterministic and independently testable.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import importlib.util
 import ipaddress
@@ -30,6 +31,7 @@ WEBHOOK_PATH = "/notion/webhook"
 WEBHOOK_HEALTH_PATH = "/notion/health"
 TUNNEL_TOKEN_RELATIVE = Path("secrets/cloudflare-tunnel-token")
 RECEIPT_DIRECTORY = Path("receipts")
+MESSAGING_TEST_RECEIPT = Path("state/messaging-setup/latest.json")
 EXPECTED_CRON_NAMES = {
     "Company OS Daily Operating Update",
     "Company OS Weekly Operating Review",
@@ -432,6 +434,62 @@ def _read_json(path: Path) -> Any:
         return None
 
 
+def write_private_json(profile_home: Path, relative: Path, payload: dict[str, Any]) -> Path:
+    """Atomically write owner-only profile state without exposing it in logs."""
+    destination = profile_home / relative
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(prefix=f".{destination.name}-", dir=destination.parent)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(payload, stream, indent=2, sort_keys=True)
+            stream.write("\n")
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, destination)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return destination
+
+
+def write_messaging_test_receipt(profile_home: Path, payload: dict[str, Any]) -> Path:
+    from schemas.workspace import MessagingTestReceipt
+
+    receipt = MessagingTestReceipt.model_validate(payload)
+    return write_private_json(
+        profile_home, MESSAGING_TEST_RECEIPT, receipt.model_dump(mode="json")
+    )
+
+
+def current_messaging_target(profile_home: Path, bindings: list[Any]) -> str | None:
+    """Return the exact confirmed target only while its typed binding is current."""
+    from pydantic import ValidationError
+    from schemas.workspace import MessagingTestReceipt, configuration_hash
+
+    try:
+        receipt = MessagingTestReceipt.model_validate(
+            _read_json(profile_home / MESSAGING_TEST_RECEIPT)
+        )
+    except ValidationError:
+        return None
+    recipient_hashes = {
+        hashlib.sha256(binding.send_to.casefold().encode()).hexdigest()
+        for binding in bindings
+    }
+    if (
+        receipt.status != "passed"
+        or not receipt.recipient_confirmed
+        or receipt.configuration_sha256 != configuration_hash(bindings)
+        or receipt.recipient_sha256 not in recipient_hashes
+        or not receipt.exact_target
+    ):
+        return None
+    return receipt.exact_target
+
+
+def messaging_test_current(profile_home: Path, bindings: list[Any]) -> bool:
+    return current_messaging_target(profile_home, bindings) is not None
+
+
 def _http_json(url: str, timeout: float = 3.0) -> tuple[bool, dict[str, Any]]:
     try:
         with urllib.request.urlopen(url, timeout=timeout) as response:
@@ -624,6 +682,85 @@ def _gateway_lane(
         "pass" if ready else "fail",
         "gateway running" if ready else "gateway not yet observed",
     )
+
+
+def _messaging_lanes(profile_home: Path) -> list[dict[str, Any]]:
+    """Separate a running gateway from an exact, user-confirmed owner route."""
+    from schemas.workspace import DeliveryBehavior, parse_workspace_communications
+
+    workspace = profile_home / "workspace.hermes.md"
+    try:
+        config = parse_workspace_communications(workspace.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return [
+            _lane(
+                "messaging_configured",
+                "skip",
+                "no managed messaging choices are installed",
+                required=False,
+            ),
+            _lane(
+                "messaging_delivery",
+                "skip",
+                "no owner message route is enabled",
+                required=False,
+            ),
+        ]
+    bindings = config.communications
+    if not bindings:
+        return [
+            _lane("messaging_configured", "skip", "owner messages not configured", required=False),
+            _lane("messaging_delivery", "skip", "owner messages not enabled", required=False),
+        ]
+    automatic = any(
+        binding.behavior is DeliveryBehavior.SEND_AUTOMATICALLY
+        for binding in bindings
+    )
+    confirmed = messaging_test_current(profile_home, bindings)
+    if confirmed:
+        return [
+            _lane(
+                "messaging_configured",
+                "pass",
+                "exact owner route confirmed by a current setup test",
+                required=False,
+            ),
+            _lane(
+                "messaging_delivery",
+                "pass",
+                "confirmed setup test matches the current messaging choices",
+                required=False,
+            ),
+        ]
+    if automatic:
+        return [
+            _lane(
+                "messaging_configured",
+                "fail",
+                "automatic sending is blocked until the exact owner route is confirmed",
+                required=False,
+            ),
+            _lane(
+                "messaging_delivery",
+                "fail",
+                "no current confirmed connection test",
+                required=False,
+            ),
+        ]
+    return [
+        _lane(
+            "messaging_configured",
+            "skip",
+            "draft preparation does not require a connected messaging route",
+            required=False,
+        ),
+        _lane(
+            "messaging_delivery",
+            "skip",
+            "drafts require approval and are not sent automatically",
+            required=False,
+        ),
+    ]
 
 
 def _webhook_lanes(profile_home: Path, *, live: bool) -> list[dict[str, Any]]:
@@ -829,6 +966,7 @@ def verify_profile(
     )
     lanes.append(_connection_eval_lane(profile_home, live=live))
     lanes.append(_gateway_lane(profile_home, command_runner))
+    lanes.extend(_messaging_lanes(profile_home))
     lanes.extend(_webhook_lanes(profile_home, live=live))
     lanes.append(
         _comment_eval_lane(

@@ -14,6 +14,7 @@ from rich.table import Table
 
 from scripts import provider_catalog as catalog_api
 from scripts import setup_runtime as runtime
+from schemas.workspace import parse_workspace_communications
 from scripts.provider_catalog import CatalogError
 from scripts.setup_cli.flows.connections import (
     _certify_with_recovery,
@@ -23,6 +24,7 @@ from scripts.setup_cli.flows.connections import (
     _selected_bindings,
 )
 from scripts.setup_cli.flows.webhook import _configure_webhook
+from scripts.setup_cli.flows.messaging import configure_messaging
 from scripts.setup_cli.flows.workspace import configure_workspace
 from scripts.setup_cli.paths import ROOT, profile_home as resolve_profile_home, receipt_reference
 from scripts.setup_cli.process import run_visible
@@ -104,6 +106,18 @@ def _workspace_update(profile_home: Path) -> int:
         if configure_workspace("configure", workspace, template):
             CONSOLE.print("[yellow]Workspace configuration was not changed.[/yellow]")
             return 1
+        message_bindings = parse_workspace_communications(
+            workspace.read_text(encoding="utf-8")
+        ).communications
+        messaging_result = configure_messaging(
+            profile_home,
+            message_bindings,
+            workspace=workspace,
+            non_interactive=False,
+        )
+        if not messaging_result.apply:
+            return 1
+        message_bindings = messaging_result.bindings
         runtime.approve_workspace_context(workspace)
         receipt = _run_profile_setup(
             profile_home,
@@ -115,7 +129,8 @@ def _workspace_update(profile_home: Path) -> int:
         CONSOLE.print(
             Panel.fit(
                 "[bold green]Workspace configuration applied[/bold green]\n"
-                "Model and provider authorization were not changed.\n"
+                "Existing model and provider authorization was preserved.\n"
+                f"Messaging connection test: {messaging_result.status}.\n"
                 f"Support receipt: {receipt_reference(profile_home, receipt_path)}",
                 border_style="green",
             )
@@ -272,6 +287,7 @@ def _confirm_install_plan(
     profile_home: Path,
     *,
     bindings: list[dict],
+    message_bindings: list,
     webhook: bool,
     non_interactive: bool,
 ) -> bool:
@@ -291,6 +307,14 @@ def _confirm_install_plan(
         {catalog_api.connection_key(binding["provider"]) for binding in bindings}
     )
     review.add_row("Provider MCPs", ", ".join(connections) if connections else "None")
+    messaging = sorted(
+        {
+            f"{binding.message.value}: {binding.app.value} → {binding.send_to} "
+            f"({binding.behavior.value})"
+            for binding in message_bindings
+        }
+    )
+    review.add_row("Owner messages", "\n".join(messaging) if messaging else "Not enabled")
     review.add_row("Real-time comments", "Configure" if webhook else "Set up later")
     review.add_row("Automations", "Daily + Weekly")
     review.add_row("Report template", "Reviewed repository template")
@@ -358,6 +382,9 @@ def install_command(args: argparse.Namespace) -> int:
             non_interactive=args.non_interactive
         )
         bindings = _selected_bindings(workspace_config)
+        message_bindings = parse_workspace_communications(
+            workspace_config.read_text(encoding="utf-8")
+        ).communications
         notion_selected = any(
             binding["provider"]["id"] == "notion" for binding in bindings
         )
@@ -369,6 +396,7 @@ def install_command(args: argparse.Namespace) -> int:
         if not _confirm_install_plan(
             profile_home,
             bindings=bindings,
+            message_bindings=message_bindings,
             webhook=webhook,
             non_interactive=args.non_interactive,
         ):
@@ -378,7 +406,6 @@ def install_command(args: argparse.Namespace) -> int:
             )
             return 1
 
-        runtime.approve_workspace_context(workspace_config)
         _configure_model(profile_home, non_interactive=args.non_interactive)
         _configure_connections(
             profile_home,
@@ -387,6 +414,17 @@ def install_command(args: argparse.Namespace) -> int:
         )
         if webhook and not runtime.webhook_enabled(profile_home):
             _configure_webhook(profile_home)
+
+        messaging_result = configure_messaging(
+            profile_home,
+            message_bindings,
+            workspace=workspace_config,
+            non_interactive=args.non_interactive,
+        )
+        if not messaging_result.apply:
+            return 1
+        message_bindings = messaging_result.bindings
+        runtime.approve_workspace_context(workspace_config)
 
         receipt_path = _install_profile(
             profile_home,
@@ -413,6 +451,7 @@ def install_command(args: argparse.Namespace) -> int:
                 "[bold green]Configuration installed[/bold green]\n"
                 f"Support receipt: {receipt_reference(profile_home, receipt_path)}\n"
                 f"Integration certification: {connection_status}\n"
+                f"Messaging connection test: {messaging_result.status}\n"
                 "The launcher will now start Hermes and run verification.",
                 border_style="green",
             )

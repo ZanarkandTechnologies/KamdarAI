@@ -12,7 +12,7 @@ feature_refs: [FEAT-0011]
 This is the customer runbook for the supported Windows deployment. The target
 is Docker Desktop using Linux containers on its WSL2 backend. Hermes,
 `cloudflared`, Python, and the Company OS runtime run inside containers; the
-customer does not install those CLIs, Node.js, or npm on Windows or open a WSL
+customer does not install those CLIs or Python on Windows or open a WSL
 terminal. The installed extraction contracts execute with Hermes' bundled
 Python and Pydantic.
 
@@ -53,6 +53,7 @@ Download or clone the Company OS source
                 +--Hermes profile and model setup
                 +--official Notion MCP authorization
                 +--optional Gmail/Drive Composio MCP authorization
+                +--optional owner-message app + confirmed route test
                 +--optional tunnel token + stable hostname
                 +--workspace, schedules, and templates
                 +--start containers
@@ -123,11 +124,39 @@ failed prerequisite:
 | `Docker Desktop is running Windows containers.` | Switch Docker Desktop to Linux containers, then rerun setup. |
 | `Docker Compose is unavailable. Update Docker Desktop, then try again.` | Update Docker Desktop, then rerun setup. |
 
-On a new profile, the interactive wizard asks for company details and shows a
-selectable **Data Sources** list. Use the arrow keys to move, Space to select,
-and Enter to continue. Before setup changes runtime services or credentials, it
-shows a **Review setup plan** table. An incomplete profile offers Resume. An
+On a new profile, the interactive wizard asks for company details, data sources,
+and optional owner messages. Messaging asks ordinary questions only: completed
+reports and/or owner alerts, the owner's name, Telegram/Slack/WhatsApp, and
+**Prepare drafts in the private workspace** or **Send automatically**. Employee
+follow-up is visibly unavailable until approved People-directory routes exist.
+Setup also asks one plain-language evaluation question: **Prepare only** or
+**Reviewed Stage 2**. Prepare only is the default and changes no downstream
+system. Reviewed Stage 2 permits a later Apply action, but does not apply
+anything during setup and never authorizes production.
+Before setup changes runtime services or credentials, it shows a **Review setup
+plan** table. An incomplete profile offers Resume. An
 existing profile instead shows the maintenance menu documented below.
+
+If owner messages are selected, setup opens Hermes' own messaging setup; tokens
+remain in the private Hermes profile. A connection test is always a separate
+opt-in send. Automatic delivery remains blocked until Hermes returns an exact
+destination and the named owner confirms receiving that test. The private
+receipt is tied to the current message choices, recipient, app, and exact
+target, so changing any of them requires a new test.
+
+Draft-first does not send. The typed guard writes one idempotent Markdown draft
+per stable action key under the private `weeks/<week>/outbound/` directory; a
+different body with the same key fails as a conflict. After reviewing a draft,
+the owner can explicitly approve that exact file through the same guard's
+`--approve-draft` action. The guard still requires the current confirmed owner
+route and never exposes its target ID. Normal automation delivery cannot bypass
+this approval or reuse an old route.
+
+From the runtime workspace, the explicit approval command is:
+
+```text
+python ../scripts/authorized_message.py --workspace .hermes.md --profile-home .. --message "owner report" --approve-draft weeks/<YYYY-Www>/outbound/<action-key>.md
+```
 
 > **What you should see:** Your chosen company values and data sources appear
 > in the review table. If Notion is selected, setup offers browser
@@ -215,6 +244,8 @@ The capability boundary is documented in
 Setup returns `ready`, `partial`, or `blocked` and writes a redacted receipt in
 the persistent Hermes profile. `ready` requires core profile, workspace,
 model, schedules, official Notion MCP, gateway, and packaged feature evals.
+Messaging adds separate `messaging_configured` and `messaging_delivery` lanes;
+a running gateway alone is not accepted as proof that the owner route works.
 When comments are selected, the optional webhook lanes additionally check:
 
 - local webhook health and captured verification state;
@@ -237,6 +268,35 @@ The final panel should show one of these states:
 > **What you should see:** An **Installation verification** table followed by
 > the final state and a profile-relative support receipt. A successful launcher also prints
 > `Company OS is ready` with the dashboard address.
+
+The dashboard is still local-only in Docker. Current Hermes releases no longer
+permit `--insecure` to bypass authentication on a container-wide bind, so the
+Company OS starts Hermes on container loopback and uses its packaged bridge to
+publish only `127.0.0.1:9119` on the host. If logs mention a refused
+`0.0.0.0` dashboard bind, update the repository and rerun **Update Company OS
+software**; do not add an unauthenticated public bind.
+
+## Review and apply an evaluation
+
+`setup.py doctor` creates the real-data previews and one private handoff for
+Daily, Weekly, and Meeting Intake. It always stops after Stage 1. Review a
+cadence's complete downstream plan with:
+
+```text
+python setup.py deliver --handoff <private-run>/<cadence>/handoff.json
+```
+
+After checking the provider/action counts, explicitly apply that unchanged
+handoff with:
+
+```text
+python setup.py deliver --handoff <private-run>/<cadence>/handoff.json --apply
+```
+
+Stage 2 covers every applicable configured destination, not only Telegram. A
+disabled policy returns `not_requested`; a missing binding is shown as blocked;
+successful provider actions require read-back or provider acceptance and write
+a redacted `delivery-receipt.json` beside the handoff.
 
 ## 5. Restart and update
 

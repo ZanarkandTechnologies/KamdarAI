@@ -57,6 +57,17 @@ def parser() -> argparse.ArgumentParser:
     certify.add_argument("--profile-home", type=Path)
     certify.add_argument("--allow-side-effects", action="store_true")
 
+    doctor = subcommands.add_parser("doctor")
+    doctor.add_argument("--profile-home", type=Path)
+    doctor.add_argument("--bindings", type=Path)
+    doctor.add_argument("--run-id")
+
+    deliver = subcommands.add_parser("deliver")
+    deliver.add_argument("--handoff", type=Path, required=True)
+    deliver.add_argument("--profile-home", type=Path)
+    deliver.add_argument("--workspace", type=Path)
+    deliver.add_argument("--apply", action="store_true")
+
     subcommands.add_parser("webhook-enabled").add_argument("--profile-home", type=Path)
     return command
 
@@ -82,6 +93,16 @@ def main(arguments: list[str] | None = None) -> int:
             return verify_command(args)
         if selected == "certify":
             return certify_command(args)
+        if selected == "doctor":
+            from scripts.run_company_doctor import operate
+
+            args.profile_home = profile_home(args.profile_home)
+            return operate(args)
+        if selected == "deliver":
+            from scripts.run_automation import operate
+
+            args.profile_home = profile_home(args.profile_home)
+            return operate(args)
         if selected == "webhook-enabled":
             return 0 if runtime.webhook_enabled(profile_home(args.profile_home)) else 1
         return 2

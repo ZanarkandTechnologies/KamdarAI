@@ -7,6 +7,10 @@ company_description: REPLACE_ME
 company_timezone: REPLACE_ME
 status: draft
 production_write_mode: proposal-only
+automation_delivery:
+  daily: disabled
+  weekly: disabled
+  meeting-intake: disabled
 ---
 
 # Company Workspace
@@ -29,6 +33,8 @@ refer to the role instead of repeating the URL.
 | `knowledge` | REPLACE_ME | REPLACE_ME | read | Canonical company files |
 | `reports` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination URL for approved Final operating reports; accumulating reports remain private |
 | `operator_email` | REPLACE_ME | REPLACE_ME | isolated-eval | Operator-owned inbox used only for bounded connection certification |
+| `decisions` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination for source-backed promoted decisions |
+| `sops` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination for approved employee workflow baselines |
 <!-- /hermes:managed data-sources -->
 
 Fill each provider independently. Roles may share one provider or use different
@@ -70,10 +76,18 @@ state.
 
 ## Communications
 
+Choose what kind of message Hermes may prepare or send. Setup asks only for
+the message, app, recipient, and whether Hermes should draft or send it:
+
+- `owner report` is a completed company report for the owner or boss.
+- `owner alert` is a short message about something that needs their attention.
+- `employee follow-up` uses contact details already approved for that employee.
+
+One message type never substitutes for another.
+
 <!-- hermes:managed communications -->
-| Role | Provider | Destination | Authority |
+| Message | App | Send to | Behavior |
 | --- | --- | --- | --- |
-| `operator_review` | REPLACE_ME | REPLACE_ME | proposal-only |
 <!-- /hermes:managed communications -->
 
 ## Operating guidance
