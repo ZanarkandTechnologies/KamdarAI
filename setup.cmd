@@ -102,8 +102,32 @@ exit /b %ERRORLEVEL%
 docker compose --profile setup run --rm setup python /distribution/setup.py webhook-enabled >nul 2>nul
 if errorlevel 1 exit /b 0
 echo Starting secure webhook ingress...
-docker compose --profile webhook up -d cloudflared
-exit /b %ERRORLEVEL%
+docker compose --profile webhook up -d --force-recreate ngrok
+if errorlevel 1 goto webhook_rollback
+docker compose --profile setup run --rm setup python /distribution/setup.py webhook-ingress-ready --wait 30
+if errorlevel 1 (
+  echo ngrok rejected its credentials or the assigned endpoint did not become reachable.
+  docker compose --profile webhook logs --no-color --tail 20 ngrok
+  goto webhook_rollback
+)
+docker compose --profile webhook ps --status running --services ngrok | findstr /x /c:"ngrok" >nul
+if errorlevel 1 (
+  echo The assigned endpoint responded, but this ngrok agent is not running.
+  goto webhook_rollback
+)
+docker compose --profile setup run --rm setup python /distribution/setup.py webhook-commit
+if errorlevel 1 goto webhook_rollback
+exit /b 0
+
+:webhook_rollback
+docker compose --profile setup run --rm setup python /distribution/setup.py webhook-rollback
+docker compose --profile setup run --rm setup python /distribution/setup.py webhook-enabled >nul 2>nul
+if errorlevel 1 (
+  docker compose --profile webhook stop ngrok >nul 2>nul
+) else (
+  docker compose --profile webhook up -d --force-recreate ngrok >nul 2>nul
+)
+exit /b 1
 
 :docker_missing
 echo.

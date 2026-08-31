@@ -46,7 +46,7 @@ def _ensure_ui_runtime() -> None:
 
 def main() -> int:
     _ensure_ui_runtime()
-    from scripts.setup_cli.app import main as run
+    from apps.installer.cli.app import main as run
 
     return run()
 

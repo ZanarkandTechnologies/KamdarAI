@@ -25,7 +25,7 @@ services:
       HERMES_GID: "10000"
     ports:
       - "127.0.0.1:9119:9119"
-    command: ["python", "/opt/data/profiles/kamdar-ai/scripts/dashboard_bridge.py"]
+    command: ["python", "/opt/data/profiles/kamdar-ai/apps/installer/dashboard.py"]
     networks: [runtime]
 
   setup:
@@ -40,23 +40,25 @@ services:
       HERMES_HOME: /opt/data
       KAMDAR_PROFILE_HOME: /opt/data/profiles/kamdar-ai
       KAMDAR_GATEWAY_ORIGIN: http://gateway:8645
-      KAMDAR_TUNNEL_METRICS: http://cloudflared:2000
       HERMES_UID: "10000"
       HERMES_GID: "10000"
     working_dir: /distribution
     command: ["python", "/distribution/setup.py"]
     networks: [runtime]
 
-  cloudflared:
-    image: cloudflare/cloudflared:2026.8.0
+  ngrok:
+    image: ngrok/ngrok:latest@sha256:14d80d083e5b53145f416bbbd36238336c9de4016c43fd950eb2eb845670583b
+    user: "10000:10000"
     profiles: [webhook]
     restart: unless-stopped
     depends_on: [gateway]
     volumes:
       - kamdar_hermes_data:/opt/data:ro
-    environment:
-      TUNNEL_TOKEN_FILE: /opt/data/profiles/kamdar-ai/secrets/cloudflare-tunnel-token
-    command: ["tunnel", "--no-autoupdate", "--metrics", "0.0.0.0:2000", "run"]
+    command:
+      - start
+      - --all
+      - --config
+      - /opt/data/profiles/kamdar-ai/secrets/ngrok.yml
     networks: [runtime]
 
 volumes:
