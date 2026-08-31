@@ -104,7 +104,7 @@ endpoints, missing feature cases, template/body drift, and checklist or report
 citations pointing to another Project.
 
 ```bash
-python3 -m unittest tests.test_seed_contracts -v
+python3 -m unittest tests.unit.schemas.test_seed_bundle -v
 python3 scripts/run_installed_evals.py --root .
 ```
 

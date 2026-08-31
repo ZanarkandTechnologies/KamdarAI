@@ -40,13 +40,6 @@ SUITES = {
             ("schemas.automations.weekly_review_result", "WeeklyReviewResult", "evals/weekly/expected/result.json", None),
         ),
     },
-    "meeting-intake": {
-        "features": {"FEAT-0010"},
-        "result_keys": {"task_creations", "blocked_commitments"},
-        "contracts": (
-            ("schemas.automations.meeting_commitment_intake_result", "MeetingCommitmentIntakeResult", "evals/meeting-intake/expected/result.json", None),
-        ),
-    },
 }
 
 

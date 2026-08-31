@@ -13,7 +13,6 @@ production_write_mode: proposal-only
 automation_delivery:
   daily: disabled
   weekly: disabled
-  meeting-intake: disabled
 ---
 
 # Kamdar AI Workspace
@@ -46,22 +45,27 @@ and gap in `daily-context-diff.json`.
 | `sops` | notion | [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | isolated-eval | Approved employee workflow baselines only. |
 <!-- /hermes:managed data-sources -->
 
-## Output destination bindings
+## Optional artifact sync
 
-Hermes creates intermediary management state under the private weekly workspace
-first. A provider receives only fields selected by the Stage 2 mapper and only
-when this document binds the exact destination URL or route. Notion and Drive
-own permissions at those destinations; Hermes records authority but does not
-mirror their access-control model.
+Hermes always writes canonical artifacts inside its private runtime workspace:
+Project Notes are short-term memory, weekly entity records are long-term
+memory, and Final reports have immutable local versions. The table below lists
+only optional one-way provider copies. An absent artifact row means local-only;
+there is no enabled/default column. Provider and destination must both be
+present, and provider edits never flow back into local memory.
 
-| Role | Provider | Destination | Authority | Structure and scope |
-| --- | --- | --- | --- | --- |
-| `reports` | notion | [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) | isolated-eval only | Optional destination for approved Final Project, Department, and Company reports. Do not publish accumulating reports or intermediary performance state. |
-| `documents` | google-drive | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | read; production write proposal-only | Optional destination for approved final documents. The folder URL is routing, not permission discovery. |
+<!-- hermes:managed artifact-sync -->
+| Artifact | Provider | Destination |
+| --- | --- | --- |
+<!-- /hermes:managed artifact-sync -->
 
-Production destination URLs remain unbound. A future production setup replaces
-the destination cell for the selected role; it does not add a Hermes permission
-hierarchy or infer another destination.
+To mirror memory, add `short-term memory` or `long-term memory` with an exact
+operator-approved private destination. Reports may target a management
+dashboard. Notion and Drive own destination permissions; configuring a URL does
+not prove that the destination is private or writable. Production destinations
+remain unbound until setup and operated provider proof confirm them.
+The `long-term memory` destination must not equal the configured People source;
+Stage 2 rejects that public-directory collision before planning a provider action.
 
 ## Isolated eval proof environment
 
@@ -80,7 +84,7 @@ hierarchy or infer another destination.
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
 | Google Drive | profile-scoped `google-workspace` skill | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Canonical root for Kamdar files. Keep retrieval and new company files inside this folder unless explicitly approved otherwise. |
-| Notion | Daily and Weekly automations via `ntn` | [Eval Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) · [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | During evaluation, Projects and Work are bounded sources, Reports are an optional Final-report destination, SOPs hold canonical employee workflow baselines, and material Problems remain Issue records in Work linked to the affected SOP step. Do not publish intermediary management state or read/write the production Kamdar root. |
+| Notion | Daily and Weekly automations via `ntn` | [Eval Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) · [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | During evaluation, Projects and Work are bounded sources and Reports are an optional Final-report copy. Local Employee/SOP/Decision/Issue Memory is canonical; no intermediary memory is written to the eval databases unless a private artifact-sync destination is explicitly configured. Do not read/write the production Kamdar root. |
 | Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. `skill.md` is software-only; employee workflow baselines use `sop.md`. The skill resolves template ID/version here; it never relies on a profile-local copy. |
 
 ## Communications
@@ -93,21 +97,21 @@ owner.
 <!-- hermes:managed communications -->
 | Message | App | Send to | Behavior |
 | --- | --- | --- | --- |
-| `owner report` | telegram | Kenji | prepare drafts for approval |
-| `owner alert` | telegram | Kenji | prepare drafts for approval |
 <!-- /hermes:managed communications -->
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
 | Telegram | Hermes native messaging plus `scripts/authorized_message.py` | Profile-private exact target from a confirmed setup test | The workspace stores the named owner and behavior; the private profile owns credentials, target IDs, and current delivery proof. |
 
-Drafts are written to the current private `weeks/<week>/outbound/` directory.
-They stay unsent until the owner reviews the exact file and invokes
+No owner messages are enabled by default. If configured, drafts are written to
+the current private `weeks/<week>/outbound/` directory. They stay unsent until
+the owner reviews the exact file and invokes
 `python ../scripts/authorized_message.py --workspace .hermes.md --profile-home
 .. --message "owner report" --approve-draft <draft-path>` from the runtime
 workspace. That approval still requires a matching confirmed route. Employee
-follow-up remains disabled until the People directory supplies a per-person
-approved contact.
+progress and documentation questions default to comments on the exact linked
+Work item. A separately configured employee-follow-up route overrides that
+default; Hermes never infers a recipient or falls back to a generic channel.
 
 ## Isolated-eval delivery map
 
@@ -124,7 +128,7 @@ the fictional intended Person in its subject or first line.
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Notion | Daily and Weekly automations via `ntn` | [Eval Decisions](https://app.notion.com/p/f4f78dbab22b423fab1e4d0fc8bd5787) | Promote source-backed decisions from the current private Project reports into this isolated database. Preserve the source Work or Report link and never invent rationale. |
+| Local workspace | Weekly automation | `memory/decisions/` | Canonical source-backed Decision Memory. Preserve source Work/Report links and never invent rationale. A configured private long-term-memory destination may receive a one-way copy after local read-back. |
 
 ## Notion mention and comment policy
 
@@ -146,16 +150,16 @@ The manager's reviewed target hierarchy is:
 canonical Projects + Work Items + People
   -> one validated platform-neutral Daily result
   -> Stage 2 field mapping
-  -> private weeks/<week>/reports/project--<project-id>.md accumulation
-  -> private weeks/<week>/outbound/ requests
-  -> finalized Weekly Project reports
+  -> private weeks/<week>/project-notes/ short-term memory
+  -> frozen all-Project weekly input
+  -> finalized local Project reports
   -> Area rollup (derived template)
   -> Company rollup (derived template)
-  -> selective Decisions / Problems / SOPs promotion
-  -> optional approved publication to configured URLs and routes
+  -> local Employee / Decision / Issue / SOP long-term memory
+  -> optional one-way copies to configured private destinations
 ```
 
-Each private Project weekly report preserves exact progress, blocker,
+Each Project Notes file preserves exact progress, blocker,
 documentation quality, next action, owner, dates, native source URLs, and any
 relevant embedded Meeting evidence. When a plan exists it also preserves planned
 versus actual hours, schedule variance, estimated versus actual cost in MYR, the
@@ -163,18 +167,16 @@ calculation basis, and a source-backed explanation of the problem. Unknown cause
 stay explicitly `unconfirmed`; the manager must not convert a hypothesis into a
 fact.
 
-A stale or overdue Work Item produces one deduplicated progress-comment proposal
-in `weeks/<week>/outbound/` before any approved provider action. The request asks
+A stale or overdue Work Item produces one deduplicated progress-comment action
+on the exact Work item when that route is authorized. The request asks
 for the current state, blocker owner, root-cause evidence, revised commitment,
 and effort variance. Reports summarize and link; they do not replace canonical
 Project or Work source records. The isolated evaluation databases remain proof
 fixtures; they are not the target private-state architecture.
 
-The active Daily and Weekly automation specifications still use in-place Project
-patches and a Notion Report Draft. `TASK-0019` owns their migration to this
-private weekly model. Until that ticket is implemented and verified, production
-writes remain proposal-only and the designed target must not be represented as
-an operated capability.
+The offline local lifecycle is implemented and verified. Production provider
+writes remain gated by private destination configuration, authentication,
+permissions, and explicit authority.
 
 ## Template and meeting-block routing
 

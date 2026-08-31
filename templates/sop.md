@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-employee-sop
-template_version: "1.1.0"
+template_version: "1.2.0"
 name: "{{SOP_NAME}}"
 sop_id: "{{SOP_ID}}"
 workflow_key: "{{WORKFLOW_KEY}}"
@@ -9,6 +9,7 @@ department: "{{DEPARTMENT}}"
 owner: "{{OWNER}}"
 status: "{{STATUS}}"
 baseline_version: "{{BASELINE_VERSION}}"
+record_version: "{{RECORD_VERSION}}"
 effective_date: "{{EFFECTIVE_DATE}}"
 last_reviewed: "{{LAST_REVIEWED}}"
 next_review: "{{NEXT_REVIEW}}"

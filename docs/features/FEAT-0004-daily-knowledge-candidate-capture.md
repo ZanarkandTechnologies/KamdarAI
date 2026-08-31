@@ -13,8 +13,8 @@ system_id: SYS-0001
 category: knowledge
 public: true
 surfaces: [automations/daily-operating-update.md, templates/project-week-notes.md, automations/weekly-operating-review.md]
-source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
-evidence_refs: [tests/test_project_note_reducers.py]
+source_refs: [workspace.hermes.md, tickets/archive/TASK-0019/ticket.md]
+evidence_refs: [tests/unit/scripts/test_project_note_reducers.py]
 known_limits: "Daily observes; Weekly alone promotes or changes persistent entities."
 ---
 

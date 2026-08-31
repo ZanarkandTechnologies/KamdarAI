@@ -13,8 +13,8 @@ system_id: SYS-0001
 category: planning
 public: true
 surfaces: [automations/weekly-operating-review.md, templates/project-week-notes.md]
-source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
-evidence_refs: [tests/test_project_week_notes.py]
+source_refs: [workspace.hermes.md, tickets/archive/TASK-0019/ticket.md]
+evidence_refs: [tests/unit/scripts/test_project_week_notes.py]
 known_limits: "Weekly initializes private notes and never mutates source Work."
 ---
 

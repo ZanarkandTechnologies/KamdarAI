@@ -71,7 +71,7 @@ artifact, draft, or frozen receipt is not external delivery proof.
 | `FEAT-0005` | [Build weekly reports from frozen Project Notes](FEAT-0005-weekly-operating-reports.md) | Weekly | Project → Department → Company reports |
 | `FEAT-0006` | [Promote qualified knowledge to long-term memory](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated local Employee/SOP/Decision/Issue Memory with optional private provider copies |
 | `FEAT-0007` | [Carry unresolved Project Notes into next week](FEAT-0007-weekly-next-week-planning.md) | Weekly | Consolidation-gated next-week initialization without Work mutation |
-| `FEAT-0010` | [Turn Meeting commitments into accountable Work](FEAT-0010-meeting-commitment-intake.md) | Event workflow | Explicit Meeting commitments become canonical, deduplicated Task records |
+| `FEAT-0010` | [Turn Meeting commitments into accountable Work](FEAT-0010-meeting-commitment-intake.md) | Manual workflow | Explicit Meeting commitments become canonical, deduplicated Task records after user invocation |
 | `FEAT-0011` | [Install and verify the Company OS from one entry point](FEAT-0011-seamless-deployment-and-verification.md) | Install / update | Implemented local contract; clean Windows/Notion/Cloudflare operation pending |
 
 ## Update rule

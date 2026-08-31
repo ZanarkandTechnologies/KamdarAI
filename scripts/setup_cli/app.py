@@ -12,7 +12,7 @@ from scripts.setup_cli.flows.lifecycle import install_command, launch_command, u
 from scripts.setup_cli.flows.verification import verify_command
 from scripts.setup_cli.flows.workspace import configure_workspace
 from scripts.setup_cli.paths import DEFAULT_TEMPLATE, DEFAULT_WORKSPACE, profile_home
-from scripts.setup_cli.ui import CONSOLE
+from scripts.setup_cli.ui import CONSOLE, choose
 
 
 DESCRIPTION = (
@@ -61,6 +61,16 @@ def parser() -> argparse.ArgumentParser:
     doctor.add_argument("--profile-home", type=Path)
     doctor.add_argument("--bindings", type=Path)
     doctor.add_argument("--run-id")
+    doctor.add_argument(
+        "--cadence",
+        dest="cadences",
+        action="append",
+        choices=("daily", "weekly"),
+    )
+    doctor_sync = doctor.add_mutually_exclusive_group()
+    doctor_sync.add_argument("--prepare-sync-plan", dest="sync_to_provider", action="store_true")
+    doctor_sync.add_argument("--no-sync", dest="sync_to_provider", action="store_false")
+    doctor.set_defaults(sync_to_provider=None)
 
     deliver = subcommands.add_parser("deliver")
     deliver.add_argument("--handoff", type=Path, required=True)
@@ -97,6 +107,25 @@ def main(arguments: list[str] | None = None) -> int:
             from scripts.run_company_doctor import operate
 
             args.profile_home = profile_home(args.profile_home)
+            if args.sync_to_provider is None:
+                cadence = choose(
+                    "Which automation should Doctor run?",
+                    choices=["Daily", "Weekly", "Daily and Weekly"],
+                    default="Daily and Weekly",
+                )
+                args.cadences = {
+                    "Daily": ["daily"],
+                    "Weekly": ["weekly"],
+                    "Daily and Weekly": ["daily", "weekly"],
+                }[cadence]
+                mode = choose(
+                    "Which Doctor run should start?",
+                    choices=["Analyze only", "Analyze and prepare sync plan"],
+                    default="Analyze only",
+                )
+                args.sync_to_provider = mode == "Analyze and prepare sync plan"
+            elif args.cadences is None:
+                args.cadences = ["daily", "weekly"]
             return operate(args)
         if selected == "deliver":
             from scripts.run_automation import operate

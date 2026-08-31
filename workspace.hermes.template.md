@@ -1,6 +1,6 @@
 ---
 template_id: hermes-company-workspace
-template_version: "1.0.0"
+template_version: "1.1.0"
 kind: hermes-project-context
 company_name: REPLACE_ME
 company_description: REPLACE_ME
@@ -10,7 +10,6 @@ production_write_mode: proposal-only
 automation_delivery:
   daily: disabled
   weekly: disabled
-  meeting-intake: disabled
 ---
 
 # Company Workspace
@@ -27,14 +26,11 @@ refer to the role instead of repeating the URL.
 <!-- hermes:managed data-sources -->
 | Role | Provider | Source | Access | Structure and scope |
 | --- | --- | --- | --- | --- |
-| `projects` | REPLACE_ME | REPLACE_ME | read | Human-operated project source records; private derived management state stays in the Hermes weekly workspace |
+| `projects` | REPLACE_ME | REPLACE_ME | read-write | Human-operated project source records; private derived management state stays in the Hermes weekly workspace |
 | `tasks` | REPLACE_ME | REPLACE_ME | read-write | Current work items linked to projects |
 | `people` | REPLACE_ME | REPLACE_ME | read | People referenced by configured work only |
 | `knowledge` | REPLACE_ME | REPLACE_ME | read | Canonical company files |
-| `reports` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination URL for approved Final operating reports; accumulating reports remain private |
 | `operator_email` | REPLACE_ME | REPLACE_ME | isolated-eval | Operator-owned inbox used only for bounded connection certification |
-| `decisions` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination for source-backed promoted decisions |
-| `sops` | REPLACE_ME | REPLACE_ME | proposal-only | Optional destination for approved employee workflow baselines |
 <!-- /hermes:managed data-sources -->
 
 Fill each provider independently. Roles may share one provider or use different
@@ -43,36 +39,59 @@ for later configuration; automations must only use configured roles. Notion or
 Drive owns permissions at a configured URL. Hermes records only its bounded
 authority and never infers another destination.
 
-The setup wizard currently configures all provider roles in this one managed
-table. Semantically, `projects`, `tasks`, `people`, and `knowledge` are Stage 1
-sources, while `reports` is an optional Stage 2 destination binding. Its location
-in the setup table does not make accumulating reports a provider source or
-authorize a write.
+The lean setup needs only Projects and Work. Add People as a read-only directory
+when employee rollups are wanted; Knowledge and operator email are optional.
+Reports and Employee/SOP/Decision/Issue Memory are local artifacts, not data
+sources.
+
+## Optional artifact sync
+
+Hermes always writes canonical Project Notes, long-term entity memory, and
+Final reports inside its private runtime workspace. Add a row only when an
+operator wants a one-way secondary copy after local read-back. An empty table
+means local-only; provider edits never flow back into memory.
+
+<!-- hermes:managed artifact-sync -->
+| Artifact | Provider | Destination |
+| --- | --- | --- |
+<!-- /hermes:managed artifact-sync -->
+
+Supported artifacts are `short-term memory`, `long-term memory`, and `reports`.
+Each row needs an exact HTTPS destination. Memory destinations must be private;
+the long-term-memory destination must never be the public People directory.
 
 ## Private weekly workspace
 
 ```text
 weeks/
 `-- YYYY-Www/
-    |-- reports/
-    |   |-- project--<stable-project-id>.md
-    |   |-- department--<stable-department-id>.md
-    |   `-- company.md
-    `-- outbound/
-        `-- <stable-action-key>.md
+    |-- project-notes/
+    |   `-- project--<stable-project-id>.md
+    `-- reports/
+        |-- projects/
+        |-- areas/
+        `-- company/
+memory/
+|-- employees/
+|-- sops/
+|-- decisions/
+`-- issues/
 ```
 
-Daily validates one platform-neutral structured result before mapping its fields
-into this workspace. Weekly finalizes the Project reports and rolls them upward.
-Do not add user-facing drafts, follow-ups, publish queues, or receipt directories;
-report state stays on reports and minimal delivery metadata stays in hidden run
-state.
+Daily validates one platform-neutral structured result before appending to
+Project Notes. Weekly freezes all Project Notes, writes versioned Project/Area/
+Company reports, and updates the referenced long-term entity records. Optional
+message drafts live under the week only when owner messaging is configured;
+minimal delivery metadata stays in hidden run state.
 
 ## Outputs
 
-| Output | Template | Destination role |
+| Output | Template | Local owner |
 | --- | --- | --- |
-| Approved Final operating report | templates/weekly-report.md | reports |
+| Project Notes | templates/project-week-notes.md | weeks/&lt;week&gt;/project-notes |
+| Employee Memory | templates/employee-memory.md | memory/employees |
+| SOP Memory | templates/sop.md | memory/sops |
+| Approved Final operating report | templates/weekly-report.md | weeks/&lt;week&gt;/reports |
 
 ## Communications
 
@@ -81,7 +100,10 @@ the message, app, recipient, and whether Hermes should draft or send it:
 
 - `owner report` is a completed company report for the owner or boss.
 - `owner alert` is a short message about something that needs their attention.
-- `employee follow-up` uses contact details already approved for that employee.
+- Task-specific documentation and progress questions use comments on the exact
+  linked Work item by default.
+- `employee follow-up` is an optional direct route that replaces progress
+  comments only when explicitly configured.
 
 One message type never substitutes for another.
 

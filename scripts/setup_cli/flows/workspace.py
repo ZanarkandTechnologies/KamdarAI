@@ -15,7 +15,9 @@ from schemas.workspace import (
     DeliveryBehavior,
     MessageType,
     MessagingApp,
+    MANAGED_ARTIFACT_SYNC,
     MANAGED_COMMUNICATIONS,
+    parse_workspace_artifact_sync,
     parse_workspace_communications,
     render_workspace_communications,
 )
@@ -62,6 +64,10 @@ def _role_label(row: re.Match[str]) -> str:
 def select_roles(rows: list[re.Match[str]]) -> set[str]:
     """Ask which managed role rows should be configured in this run."""
     labels = [_role_label(row) for row in rows]
+    CONSOLE.print(
+        "[dim]Lean setup: select Projects and Tasks; add People for employee "
+        "rollups. Knowledge and operator email are optional.[/dim]"
+    )
     selected = (
         _interactive_checklist("Data Sources", labels)
         if sys.stdin.isatty()
@@ -103,7 +109,7 @@ def replace_rows(content: str) -> str:
     def update_block(match: re.Match[str]) -> str:
         nonlocal row_count
         name = match.group("name")
-        if name == "communications":
+        if name in {"communications", "artifact-sync"}:
             return match.group(0)
         rows = list(ROW.finditer(match.group("body")))
         if name == "data-sources":
@@ -164,8 +170,8 @@ def _message_selection(
         marker = "x" if MESSAGE_CHOICES[index - 1][0] in selected_now else " "
         CONSOLE.print(f"  [cyan]{index}.[/cyan] [{marker}] {label}")
     CONSOLE.print(
-        "  [dim]Employee follow-up — not enabled until approved People-directory "
-        "routes are available.[/dim]"
+        "  [dim]Task-specific documentation and progress questions use comments "
+        "on the exact linked Work item by default.[/dim]"
     )
     hint = "Enter keeps the current choices." if current else "Enter skips messages."
     CONSOLE.print(f"[dim]{hint} Use comma-separated numbers or 'all'.[/dim]")
@@ -262,8 +268,7 @@ def replace_automation_delivery(content: str) -> str:
             marker
             + "automation_delivery:\n"
             + "  daily: disabled\n"
-            + "  weekly: disabled\n"
-            + "  meeting-intake: disabled\n",
+            + "  weekly: disabled\n",
             1,
         )
         block = AUTOMATION_DELIVERY.search(content)
@@ -271,7 +276,7 @@ def replace_automation_delivery(content: str) -> str:
     current = {
         match.group(1): match.group(2)
         for match in re.finditer(
-            r"^[ \t]+(daily|weekly|meeting-intake):\s*(disabled|enabled)\s*$",
+            r"^[ \t]+(daily|weekly):\s*(disabled|enabled)\s*$",
             block.group("body"),
             re.MULTILINE,
         )
@@ -296,7 +301,6 @@ def replace_automation_delivery(content: str) -> str:
         "automation_delivery:\n"
         f"  daily: {value}\n"
         f"  weekly: {value}\n"
-        f"  meeting-intake: {value}\n"
     )
     return AUTOMATION_DELIVERY.sub(replacement, content, count=1)
 
@@ -318,6 +322,28 @@ def migrate_managed_communications(content: str, template: str) -> str:
         return content.replace(heading, heading + "\n" + block + "\n", 1)
     anchor = "## Operating guidance\n"
     section = "## Communications\n\n" + block + "\n\n"
+    if anchor in content:
+        return content.replace(anchor, section + anchor, 1)
+    return content.rstrip() + "\n\n" + section
+
+
+def migrate_managed_artifact_sync(content: str, template: str) -> str:
+    """Add the explicit local-only sync block to older workspaces."""
+    if MANAGED_ARTIFACT_SYNC.search(content):
+        return content
+    template_block = MANAGED_ARTIFACT_SYNC.search(template)
+    if not template_block:
+        raise SystemExit("Workspace template is missing its artifact-sync block.")
+    block = (
+        "<!-- hermes:managed artifact-sync -->"
+        + template_block.group(1)
+        + "<!-- /hermes:managed artifact-sync -->"
+    )
+    heading = "## Optional artifact sync\n"
+    if heading in content:
+        return content.replace(heading, heading + "\n" + block + "\n", 1)
+    anchor = "## Private weekly workspace\n"
+    section = "## Optional artifact sync\n\n" + block + "\n\n"
     if anchor in content:
         return content.replace(anchor, section + anchor, 1)
     return content.rstrip() + "\n\n" + section
@@ -356,8 +382,9 @@ def configure(content: str) -> str:
         raise SystemExit("Unresolved template values: " + ", ".join(unresolved))
     try:
         parse_workspace_communications(content)
+        parse_workspace_artifact_sync(content)
     except ValueError as error:
-        raise SystemExit(f"Invalid communications configuration: {error}") from error
+        raise SystemExit(f"Invalid workspace configuration: {error}") from error
     return content
 
 
@@ -368,7 +395,7 @@ def show_review(content: str, workspace: Path) -> None:
     table.add_column("Provider")
     table.add_column("Source", overflow="fold")
     for block in MANAGED.finditer(content):
-        if block.group("name") == "communications":
+        if block.group("name") in {"communications", "artifact-sync"}:
             continue
         for row in ROW.finditer(block.group("body")):
             table.add_row(
@@ -396,8 +423,25 @@ def show_review(content: str, workspace: Path) -> None:
         )
     if not communication_config.communications:
         messaging.add_row("No owner messages", "—", "—", "Not enabled")
-    messaging.add_row("Employee follow-up", "—", "—", "Not enabled")
+    messaging.add_row(
+        "Work-item questions", "Ticket system", "Exact linked Work",
+        "Default when reviewed Stage 2 is enabled",
+    )
     CONSOLE.print(messaging)
+    artifact_sync = Table(title="Optional artifact copies", show_header=True)
+    artifact_sync.add_column("Artifact")
+    artifact_sync.add_column("Provider")
+    artifact_sync.add_column("Destination", overflow="fold")
+    configured_sync = parse_workspace_artifact_sync(content).artifact_sync
+    for binding in configured_sync:
+        artifact_sync.add_row(
+            binding.artifact.value,
+            binding.provider.value,
+            binding.destination,
+        )
+    if not configured_sync:
+        artifact_sync.add_row("Local only", "—", "—")
+    CONSOLE.print(artifact_sync)
     delivery = AUTOMATION_DELIVERY.search(content)
     enabled = bool(delivery and "enabled" in delivery.group("body"))
     CONSOLE.print(
@@ -437,6 +481,7 @@ def configure_workspace(command: str, workspace: Path, template: Path) -> int:
 
     template_content = template.read_text(encoding="utf-8") if template.is_file() else ""
     content = migrate_managed_communications(content, template_content)
+    content = migrate_managed_artifact_sync(content, template_content)
 
     configured = configure(content)
     show_review(configured, workspace)

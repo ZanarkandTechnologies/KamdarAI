@@ -21,10 +21,10 @@ surfaces:
 source_refs:
   - workspace.hermes.md
   - tickets/archive/TASK-0007/ticket.md
-  - tickets/TASK-0019/ticket.md
+  - tickets/archive/TASK-0019/ticket.md
 evidence_refs:
-  - tests/test_pydantic_daily_contracts.py
-  - tickets/TASK-0019/artifacts/qa/20260831-project-notes-projection/result.json
+  - tests/unit/schemas/test_daily_review_result.py
+  - tickets/archive/TASK-0019/artifacts/qa/20260831-project-notes-projection/result.json
 known_limits: "The next Daily run rechecks Done Work while AI review is not Processed; immediate event-driven re-review is outside the current release and is not required for closure."
 ---
 

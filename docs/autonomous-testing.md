@@ -27,25 +27,32 @@ The lane passes only when every command exits zero, context validation prints
 `context_valid=true`, and the installed-eval receipt reports `"status":
 "pass"`. Do not update expected files merely to turn a failure green.
 
+Tests are grouped by proof boundary. `tests/unit/` is organized around canonical
+source owners, `tests/integration/` covers cross-module workflows, `tests/contracts/`
+holds repository and architecture invariants, `tests/harness/` covers eval
+tooling, and `tests/e2e/` and `tests/live/` remain explicit gated lanes. A
+source module may appear in integration proof in addition to its canonical unit
+suite; that is workflow coverage, not duplicate ownership.
+
 ## Targeted setup lane
 
 Use this smaller loop while changing setup, distribution, or webhook code:
 
 ```bash
 python3 -m unittest \
-  tests.test_setup_architecture \
-  tests.test_setup_init \
-  tests.test_setup_launch \
-  tests.test_setup_runtime \
-  tests.test_setup_profile \
-  tests.test_setup_workspace \
-  tests.test_setup_certify_ux \
-  tests.test_provider_catalog \
-  tests.test_connection_evals \
-  tests.test_composio_session \
-  tests.test_distribution \
-  tests.test_notion_comment_adapter \
-  tests.test_notion_webhook_protocol -v
+  tests.contracts.test_setup_architecture \
+  tests.integration.test_setup_init \
+  tests.integration.test_setup_launch \
+  tests.integration.test_connection_certification_workflow \
+  tests.unit.scripts.test_setup_runtime \
+  tests.unit.scripts.test_setup_profile \
+  tests.unit.scripts.test_setup_workspace \
+  tests.unit.scripts.test_provider_catalog \
+  tests.unit.scripts.test_run_connection_evals \
+  tests.unit.scripts.test_composio_session \
+  tests.contracts.test_distribution \
+  tests.integration.test_notion_comment_adapter \
+  tests.integration.test_notion_webhook_protocol -v
 python3 -m py_compile \
   setup.py scripts/setup_cli/*.py scripts/setup_cli/flows/*.py \
   scripts/setup_runtime.py scripts/setup_profile.py scripts/setup_workspace.py
@@ -136,7 +143,7 @@ configured owner route, run:
 ```bash
 COMPANY_OS_RUN_TELEGRAM_LIVE=1 \
 COMPANY_OS_PROFILE=/absolute/path/to/the/named/profile \
-python3 -m unittest tests.test_setup_messaging_live -v
+python3 -m unittest tests.live.test_messaging_telegram_live -v
 ```
 
 This sends exactly one labeled connection-test message. It asserts provider
@@ -152,7 +159,7 @@ read-back, private-workspace application, messaging-guard routing, and
 idempotent reruns:
 
 ```bash
-python3 -m unittest tests.test_automation_delivery -v
+python3 -m unittest tests.unit.scripts.test_automation_delivery -v
 ```
 
 These tests use a command recorder and make no provider calls. Do not run

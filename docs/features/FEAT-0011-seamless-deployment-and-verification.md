@@ -22,7 +22,7 @@ surfaces:
 source_refs:
   - ../prd.md
   - ../customer-setup.md
-  - ../../tickets/TASK-0016/ticket.md
+  - ../../tickets/archive/TASK-0016/ticket.md
   - https://developers.cloudflare.com/tunnel/setup/
   - https://developers.notion.com/reference/webhooks
 evidence_refs: []

@@ -196,6 +196,8 @@ def normalize_project_note(
         _fail(f"note project {project_id} does not equal {expected_project_id}.")
     source_ids = _unique_strings(note.get("source_ids"), "source_ids", 1)
     employee_ids = _unique_strings(note.get("employee_ids", []), "employee_ids")
+    for employee_id in employee_ids:
+        _assert_id(employee_id, "employee_id")
     work_id = note.get("work_id")
     workflow_key = note.get("workflow_key")
     if work_id is not None:
@@ -394,6 +396,15 @@ def freeze_project_week_notes(
         path = root / FREEZE_FILE
         if path.exists():
             manifest = json.loads(path.read_text(encoding="utf-8"))
+            observed = sorted(str(row.get("project_id")) for row in manifest.get("files", []))
+            if observed != expected:
+                return {
+                    "state": "configuration_gap",
+                    "path": str(path),
+                    "reason": "project_coverage_mismatch",
+                    "expected": expected,
+                    "observed": observed,
+                }
             for row in manifest.get("files", []):
                 target = root / row["path"]
                 if not target.is_file() or _sha256(target.read_bytes()) != row["sha256"]:

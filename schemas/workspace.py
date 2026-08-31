@@ -1,4 +1,4 @@
-"""Typed contracts for customer-owned workspace messaging choices."""
+"""Typed contracts for customer-owned workspace routing choices."""
 
 from __future__ import annotations
 
@@ -15,6 +15,16 @@ MANAGED_COMMUNICATIONS = re.compile(
     r"<!-- hermes:managed communications -->(.*?)"
     r"<!-- /hermes:managed communications -->",
     re.DOTALL,
+)
+MANAGED_ARTIFACT_SYNC = re.compile(
+    r"<!-- hermes:managed artifact-sync -->(.*?)"
+    r"<!-- /hermes:managed artifact-sync -->",
+    re.DOTALL,
+)
+ARTIFACT_SYNC_ROW = re.compile(
+    r"^\| `(?P<artifact>[^`]+)` \| (?P<provider>[^|]+?) "
+    r"\| (?P<destination>[^|]+?) \|$",
+    re.MULTILINE,
 )
 COMMUNICATION_ROW = re.compile(
     r"^\| `(?P<message>[^`]+)` \| (?P<app>[^|]+?) "
@@ -38,6 +48,17 @@ class MessagingApp(StrEnum):
     TELEGRAM = "telegram"
     SLACK = "slack"
     WHATSAPP = "whatsapp"
+
+
+class ArtifactType(StrEnum):
+    SHORT_TERM_MEMORY = "short-term memory"
+    LONG_TERM_MEMORY = "long-term memory"
+    REPORTS = "reports"
+
+
+class ArtifactSyncProvider(StrEnum):
+    NOTION = "notion"
+    GOOGLE_DRIVE = "google-drive"
 
 
 class RunMode(StrEnum):
@@ -113,6 +134,35 @@ class WorkspaceCommunicationConfig(BaseModel):
         return self
 
 
+class ArtifactSyncBinding(BaseModel):
+    """One optional one-way copy of a locally canonical artifact."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    artifact: ArtifactType
+    provider: ArtifactSyncProvider
+    destination: NonEmptyString
+
+    @model_validator(mode="after")
+    def require_exact_https_destination(self) -> "ArtifactSyncBinding":
+        if not re.fullmatch(r"https://[^\s]+", self.destination):
+            raise ValueError("artifact sync destination must be one exact HTTPS URL")
+        return self
+
+
+class WorkspaceArtifactSyncConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    artifact_sync: list[ArtifactSyncBinding] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def require_unique_artifacts(self) -> "WorkspaceArtifactSyncConfig":
+        artifacts = [binding.artifact for binding in self.artifact_sync]
+        if len(artifacts) != len(set(artifacts)):
+            raise ValueError("each artifact may have only one sync destination")
+        return self
+
+
 class MessagingTestReceipt(BaseModel):
     """Redacted proof of one explicitly approved setup test."""
 
@@ -181,5 +231,57 @@ def render_workspace_communications(bindings: list[CommunicationBinding]) -> str
         lines.append(
             f"| `{binding.message.value}` | {binding.app.value} | "
             f"{binding.send_to} | {binding.behavior.value} |"
+        )
+    return "\n".join(lines)
+
+
+def parse_workspace_artifact_sync(content: str) -> WorkspaceArtifactSyncConfig:
+    """Parse optional local-to-provider artifact copies from Markdown."""
+
+    block = MANAGED_ARTIFACT_SYNC.search(content)
+    if not block:
+        return WorkspaceArtifactSyncConfig()
+    table_lines = [
+        line.strip()
+        for line in block.group(1).splitlines()
+        if line.strip().startswith("|")
+    ]
+    data_lines = [
+        line
+        for line in table_lines
+        if line != "| Artifact | Provider | Destination |"
+        and not re.fullmatch(r"\|\s*:?-+\s*\|\s*:?-+\s*\|\s*:?-+\s*\|", line)
+    ]
+    rows: list[ArtifactSyncBinding] = []
+    for line in data_lines:
+        match = ARTIFACT_SYNC_ROW.fullmatch(line)
+        if not match:
+            raise ValueError(
+                "artifact sync rows must contain exactly Artifact, Provider, and Destination"
+            )
+        values = {key: value.strip() for key, value in match.groupdict().items()}
+        missing = [
+            key for key in ("provider", "destination")
+            if values[key].lower() in {"", "—", "replace_me"}
+        ]
+        if missing:
+            raise ValueError(
+                f"artifact sync binding is incomplete: {values['artifact']}"
+            )
+        rows.append(ArtifactSyncBinding.model_validate(values))
+    return WorkspaceArtifactSyncConfig(artifact_sync=rows)
+
+
+def render_workspace_artifact_sync(bindings: list[ArtifactSyncBinding]) -> str:
+    """Render only enabled secondary destinations; local storage is implicit."""
+
+    lines = [
+        "| Artifact | Provider | Destination |",
+        "| --- | --- | --- |",
+    ]
+    for binding in sorted(bindings, key=lambda item: item.artifact.value):
+        lines.append(
+            f"| `{binding.artifact.value}` | {binding.provider.value} | "
+            f"{binding.destination} |"
         )
     return "\n".join(lines)

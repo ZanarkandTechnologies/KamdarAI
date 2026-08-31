@@ -41,7 +41,6 @@ distribution_owned:
   - catalog/data-sources
   - evals/daily
   - evals/weekly
-  - evals/meeting-intake
   - evals/__init__.py
   - evals/viewer/__init__.py
   - evals/viewer/build.py
@@ -57,6 +56,7 @@ distribution_owned:
   - schemas/automations/delivery.py
   - schemas/automations/feature_outcome.py
   - schemas/automations/meeting_commitment_intake_result.py
+  - schemas/automations/template_catalog.py
   - schemas/automations/weekly_context.py
   - schemas/automations/weekly_review_result.py
   - schemas/automations/validate.py

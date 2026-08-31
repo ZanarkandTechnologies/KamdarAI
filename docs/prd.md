@@ -272,6 +272,9 @@ and rollback evidence.
 - **FR-16:** Always write short-term memory, long-term memory, and Final reports
   locally. Add a one-way provider copy only for a complete configured
   artifact/provider/destination binding and only after local read-back.
+- **FR-17:** Default to empty artifact-sync and communications configuration.
+  Send documentation and stale-work questions to each exact linked Work item;
+  use a direct employee channel only when it is explicitly configured.
 
 ## Success and proof
 

@@ -92,18 +92,22 @@ destination or substitute another route.
   - `project_note_updates[]`: pass `progress_notes[]` and `knowledge_notes[]`
     unchanged to `scripts/project_week_notes.py`. The applier derives stable
     note keys and appends each Project batch to that Project's current-week
-    file under the week lock.
+    file under the week lock. After filesystem read-back, create a one-way copy
+    only when a complete `short-term memory` provider/destination row exists.
+    No row means local-only; never import provider edits.
   - `documentation_reviews[]` with `verdict = needs_information`: use the
     configured provider on `tasks`. Add the rendered
     comment to the exact Work item using `question_key` for deduplication.
   - `documentation_reviews[]` with an open question must also have a matching
     `documentation_question` note in the owning Project batch. The provider
     comment and private note are separate effects with the same Work ID.
-  - `weekly_progress_chases[]`: load the exact Person, resolve its
-    `Contact endpoint` through the active environment binding, and send through
-    that approved route only.
+  - `weekly_progress_chases[]`: add the question to every exact linked Work item
+    through the configured `tasks` provider. If an explicit employee-follow-up
+    communication binding exists, use that approved route instead.
 
-  Never infer a table, report path, person, route alias, or fallback channel.
+  Never infer a table, report path, person, route alias, or generic fallback
+  channel. A Work comment is allowed only when its exact record URL was present
+  in the bounded Daily snapshot.
   The Project Notes path must resolve under `weeks/<week>/project-notes/`.
   If a required provider integration or approved route is unavailable, keep the
   private report update, report the external effect as `blocked`, and retain the

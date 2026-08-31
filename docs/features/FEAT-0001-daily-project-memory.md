@@ -13,8 +13,8 @@ system_id: SYS-0001
 category: memory
 public: true
 surfaces: [automations/daily-operating-update.md, templates/project-week-notes.md]
-source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
-evidence_refs: [tests/test_project_week_notes.py]
+source_refs: [workspace.hermes.md, tickets/archive/TASK-0019/ticket.md]
+evidence_refs: [tests/unit/scripts/test_project_week_notes.py]
 known_limits: "Project Notes remain locally canonical; an optional configured provider copy must target an operator-approved private destination."
 ---
 

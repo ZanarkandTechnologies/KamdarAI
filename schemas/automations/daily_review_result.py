@@ -17,12 +17,13 @@ from pydantic import (
 )
 
 from .feature_outcome import FeatureOutcome
+from .template_catalog import template_body
 
 
 NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
 StableId = Annotated[
     str,
-    StringConstraints(min_length=1),
+    StringConstraints(pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$"),
     Field(
         description=(
             "Use the exact stable ID supplied by the Daily context. "
@@ -99,75 +100,8 @@ Golden example — replacement_this_weeks_attention:
 - [ ] P1 Complete the final two store comparisons — Nur — due 2026-08-28. [TASK-104]
 """
 
-FEAT0002_COMPLETION_COMMENT_PROMPT = """
-Write one concise comment for a completed Work item that is missing important
-context. The comment must show what is already understood, identify exactly what
-is missing, explain why it matters, and name where the owner should add it.
-
-Writing rules:
-- Ask only questions that affect understanding, reuse, accountability, or proof.
-- Do not ask for cosmetic labels or generic "more detail".
-- Do not repeat facts already present in the ticket.
-- Ask in a direct, helpful tone.
-- Refer to the exact ticket section to update.
-
-Comment template:
-I understand that <known outcome or decision>.
-
-What is still missing: <important missing context>.
-
-Please add this under <exact section>:
-1. <precise question>
-
-Why this matters: <operational reason>.
-
-Golden example:
-I understand that the reconciliation sheet became the release gate.
-
-What is still missing: the ticket does not explain why this option was chosen.
-
-Please add this under Notes > Decision:
-1. Why was the reconciliation sheet selected over the other options considered?
-
-Why this matters: we cannot safely reuse the release rule without its rationale.
-"""
-
-FEAT0003_PROGRESS_CHASE_PROMPT = """
-Write one short owner message about a threatened weekly Project target.
-
-Writing rules:
-- Begin with the Project target and due date, not a vague "checking in".
-- State the observed progress and why the target appears at risk.
-- Ask what changed, the current blocker, the recovery plan, and the date the
-  owner can now commit to.
-- Do not ask documentation-quality questions already handled on the ticket.
-- Do not exaggerate unknown causes, progress, or dates.
-
-Message template:
-<Owner>, the Project target "<target>" is due <date>.
-
-Current evidence: <progress and risk basis>.
-
-Please reply with:
-1. What changed since the last update?
-2. What is blocking the remaining work?
-3. What is the recovery plan and revised commitment date?
-
-Update the linked Work item here: <source reference>.
-
-Golden example:
-Jun, the Project target "Complete all three supplier comparisons" is due Friday.
-
-Current evidence: only one comparison is complete, and the remaining two have
-not changed since 21 August. The supplier normalisation rule is still unresolved.
-
-Please reply with:
-1. What changed since the last update?
-2. What is blocking the remaining comparisons?
-3. What is the recovery plan and revised commitment date?
-
-Update the linked Work items here: TASK-103 and TASK-104.
-"""
+FEAT0002_COMPLETION_COMMENT_PROMPT = template_body("kamdar-documentation-request")
+FEAT0003_PROGRESS_CHASE_PROMPT = template_body("kamdar-employee-followups")
 
 FEAT0004_KNOWLEDGE_UPDATE_PROMPT = """
 Extract only learning that another person or future review could use. Write one
@@ -313,11 +247,6 @@ class ProjectPageUpdate(_Model):
 
 
 class DocumentationReview(_StrictModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        json_schema_extra={"description": FEAT0002_COMPLETION_COMMENT_PROMPT},
-    )
-
     work_item_id: StableId
     owner_person_id: StableId
     source_ids: SourceIds
@@ -328,9 +257,7 @@ class DocumentationReview(_StrictModel):
         description="Stable deduplication key for the open documentation question."
     )
     comment_text: NonEmptyString | None = Field(
-        description=(
-            "The complete comment to add, or null when documentation is sufficient."
-        )
+        description=FEAT0002_COMPLETION_COMMENT_PROMPT
     )
 
     @model_validator(mode="after")
@@ -363,10 +290,7 @@ class DocumentationReview(_StrictModel):
 class WeeklyProgressChase(_Model):
     model_config = ConfigDict(
         extra="ignore",
-        json_schema_extra={
-            "additionalProperties": False,
-            "description": FEAT0003_PROGRESS_CHASE_PROMPT,
-        },
+        json_schema_extra={"additionalProperties": False},
     )
 
     project_id: StableId
@@ -374,7 +298,7 @@ class WeeklyProgressChase(_Model):
     related_work_item_ids: Annotated[list[StableId], Field(min_length=1)]
     source_ids: SourceIds
     message_text: NonEmptyString = Field(
-        description="The complete owner message to prepare for dispatch."
+        description=FEAT0003_PROGRESS_CHASE_PROMPT
     )
 
 

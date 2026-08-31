@@ -9,226 +9,211 @@ feature_refs: [FEAT-0005, FEAT-0006, FEAT-0007]
 
 # Weekly operating review
 
-## Context
+## At a glance
 
-Run one bounded sequence from one frozen all-Project Notes set. First, project
-each Project's notes into its official report and targeted persistent entity
-updates. Second, roll finalized
-Project reports into Department reports, then roll finalized Department reports
-into one Company report. Read the private report root, Projects, and optional
-destination URLs from `workspace.hermes.md`; never rescan raw Work or Meeting
-pages.
+Run one bounded Weekly sequence from one frozen set of Project Notes:
 
-## Authority
+```text
+active Projects
+      |
+      v
+freeze every Project Notes file ----coverage/hash failure----> stop
+      |
+      v
+one validated Weekly result --------quality below Tier A------> revise + review
+      |
+      v
+Project reports + targeted memory updates + next-week carry-forward
+      |
+      v
+Department reports --> Company report --> optional provider copies --> owner
+```
 
-`workspace.hermes.md` is the active environment binding. It supplies the exact
-Notion sources, write authority, and message routes for this run. Use only those
-resources and stop when a required action is not authorized. Never infer a
-destination or substitute another route.
+The frozen Project Notes are the only Weekly operational source. Read Projects
+for relations and prior Final reports for continuity, but never rescan raw Work
+or Meeting pages.
 
-All three report levels use the same core sections: `Summary`, `Outcomes and
-open attention`, `Problems and inefficiencies`, `Decisions`, `SOPs`, and
-`Next-week priorities`. Each higher level summarizes and links its source
-reports instead of copying their evidence verbatim.
+## Authority and report shape
 
-In the current report schema and templates, the stored `Area` report level is
-the Department rollup. Its `area` value must equal a seeded Project Department;
-the automation must not invent another organizational layer.
+`workspace.hermes.md` binds the exact sources, write authority, optional sync
+destinations, and message routes. Never infer or substitute a route. Stop only
+the unauthorized effect when the rest of the run remains valid.
+
+All report levels use: `Summary`, `Outcomes and open attention`, `Problems and
+inefficiencies`, `Decisions`, `SOPs`, and `Next-week priorities`. Higher levels
+summarize and link lower reports; they do not copy source evidence verbatim.
+
+`Area` means Department. Its `area` value must match a seeded Project
+Department; do not invent another organizational layer.
+
+## Execution gates
+
+| Gate | Required proof | Failure |
+| --- | --- | --- |
+| A. Freeze context | Every active Project has one hashed note in `.project-notes-freeze.json` | Stop before extraction |
+| B. Validate result | One schema-valid `weekly-review-result-YYYY-Www.json` | Stop before any mutation |
+| C. Review quality | Independent review covers every artifact and returns Tier A | For B/C readability, run `unslop`, regenerate, and review the new hash |
+| 1. Project | Every frozen note has a Final Project report and candidate dispositions | Record gaps; block only invalid promotions unless report finalization is invalid |
+| 2. Department | Every expected active Project has a Final report | Block its Department and Company report |
+| 3. Company | Every expected Department report is Final | Record the gap; do not finalize Company |
+| 4. Deliver | Local Final files read back; each external target is authorized | Block only the failed or unauthorized external effect |
 
 ## Todo List
 
-- [ ] **A — Load the contracts and bounded Weekly context.**
+- [ ] **A — Freeze the complete Weekly context.**
 
-  - Read `workspace.hermes.md` completely for source routing and authority.
-  - Before the first provider call, run `ntn --help`,
-    `ntn datasources --help`, `ntn pages --help`, and `ntn api --help`. Use only
-    syntax confirmed by the installed CLI.
-  - Enumerate one Project Notes file for every expected active Project under
-    `weeks/<week>/project-notes/`.
-  - Acquire the week lock, validate complete Project coverage, hash every file,
-    and atomically create `.project-notes-freeze.json`.
-  - Load prior final reports, lightweight Person/SOP indexes, and full Person or
-    SOP records only for IDs/keys referenced by the frozen notes. Do not read
-    raw Work or Meeting pages.
-  - Materialize the immutable set as
-    `weekly/context/weekly-context-YYYY-Www.json`.
+  1. Read `workspace.hermes.md` completely.
+  2. Before the first provider call, run `ntn --help`, `ntn datasources
+     --help`, `ntn pages --help`, and `ntn api --help`. Use only confirmed CLI
+     syntax; never infer an `ntn` resource or argument shape.
+  3. Under `weeks/<week>/project-notes/`, enumerate exactly one Project Notes
+     file for every expected active Project.
+  4. Acquire the week lock, validate exact coverage, hash every file, and
+     atomically create `.project-notes-freeze.json`.
+  5. Load prior Final reports and lightweight local Employee/SOP Memory indexes.
+     Load full memory files only for IDs or keys referenced by frozen notes.
+     People remains a directory source.
+  6. Materialize the immutable input as
+     `weekly/context/weekly-context-YYYY-Www.json`.
 
-  Never infer an `ntn` resource or argument shape.
+- [ ] **B — Produce one validated Weekly result.**
 
-- [ ] **B — Produce and validate one complete Weekly result.**
+  1. Read `schemas/automations/weekly_review_result.py` completely.
+  2. Run `python -m schemas.automations.validate schema weekly-review`.
+  3. Give the emitted JSON Schema, schema instructions, golden examples,
+     frozen context, and every destination template to one structured
+     extraction call.
+  4. Validate the complete result before any workspace or provider mutation.
+  5. Write its exact bytes to
+     `weekly/review/weekly-review-result-YYYY-Www.json`, then run:
 
-  - Read `schemas/automations/weekly_review_result.py` completely and run
-    `python -m schemas.automations.validate schema weekly-review`.
-  - Give the emitted JSON Schema, schema instructions, golden examples, frozen context, and every
-    destination template to one structured extraction call.
-  - Produce and validate one complete Weekly result before any workspace or
-    provider mutation.
-  - Write the exact result bytes to
-    `weekly/review/weekly-review-result-YYYY-Www.json`.
-  - Validate that file with `python -m schemas.automations.validate
-    validate weekly-review <result-path>`.
-  - Stop before integrations if validation fails.
+     ```bash
+     python -m schemas.automations.validate validate weekly-review <result-path>
+     ```
 
 - [ ] **C — Pass the end-user artifact quality gate.**
 
-  - Give the exact result bytes, frozen context, destination templates, and
-    `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
-    reviewer.
-  - Validate its response with
-    `schemas/automations/artifact_quality_review.py` using `python -m
-    schemas.automations.validate validate artifact-quality-review
-    <review-path>`.
-  - Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`.
-  - Require exact coverage of every report, promotion disposition, Employee
-    Memory update, SOP update, carry-forward update, and gap.
-  - Proceed to workspace or provider writes only for tier A.
-  - For B/C readability findings, run `unslop`, regenerate the result, and
-    review the new hash.
-  - Keep opaque UUIDs and hashes in structured evidence fields only. Rendered
-    reports use readable entity names or natural descriptions; human references
-    such as `TASK-101` may remain.
+  Give the exact result bytes, frozen context, destination templates, and
+  `evals/rubrics/end-user-artifact-quality.md` to an independent read-only
+  reviewer. Validate the response with
+  `schemas/automations/artifact_quality_review.py`:
+
+  ```bash
+  python -m schemas.automations.validate validate artifact-quality-review <review-path>
+  ```
+
+  Write `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`. Require
+  exact coverage of every report, promotion disposition, Employee Memory
+  update, SOP update, carry-forward update, and gap. Proceed only for Tier A.
+  Keep opaque UUIDs and hashes in structured evidence; rendered reports use
+  readable names or natural descriptions. Human references such as `TASK-101`
+  may remain.
 
 - [ ] **1 — Project frozen Project Notes and promote reviewed knowledge.**
 
-  | Source | Action | Destination |
+  | Frozen section or evidence | Weekly action | Owned destination |
   | --- | --- | --- |
-  | Frozen Project Notes | Render and finalize the exact report using the rules below | Exact `weeks/<week>/reports/projects/project--<id>.md` path |
-  | Completed outcomes and current Work | Group by Person ID across Projects | Existing People / Employee Memory records |
-  | `Problems and inefficiencies` | Promote each qualifying problem or record its disposition | `notion` skill via `ntn` on the existing Work/Issue database |
-  | `Decisions` | Promote each qualifying reusable Decision or record its disposition | `notion` skill via `ntn` on the Decisions database |
-  | `SOPs` | Promote each qualifying approved employee workflow or record its disposition | `notion` skill via `ntn` on the existing SOPs database |
-  | Unresolved Work and documentation questions | Initialize the next Project Notes file with source-linked carry-forward notes | `weeks/<next-week>/project-notes/project--<id>.md` |
+  | Complete Project Notes | Render one Final report; preserve source note keys | `weeks/<week>/reports/projects/project--<id>.md` |
+  | Accepted completed outcomes | Group by Person ID across Projects | `memory/employees/<person-id>.md` |
+  | Problems and inefficiencies | Promote qualifying problems or record disposition | `memory/issues/<issue-id>.md` |
+  | Decisions | Promote qualifying reusable decisions or record disposition | `memory/decisions/<decision-id>.md` |
+  | Approved employee workflows | Group by explicit `workflow_key` | `memory/sops/<workflow-key>.md` |
+  | Unresolved Work and questions | Carry forward the newest source-linked snapshot | `weeks/<next-week>/project-notes/project--<id>.md` |
 
-  Apply these rules in order:
+  Apply these rules:
 
-  1. Validate each frozen Project Notes file, then render one Project Report.
-     Set `report_status = Final`, increment `report_version`, set
-     `finalized_at`, and preserve source note keys.
-  2. Promote a recurring or materially costly problem only when the Issue
-     preserves the affected workflow or step, dated Before baseline, cost
-     calculation or explicit measurement gap, confidence, measurement owner,
-     and next test. Keep weaker findings in report history with their
-     disposition.
-  3. Keep routine execution choices in the Project report. Promote only a
-     reusable customer-handling precedent, Project operating standard, monetary
-     commitment, material risk or compliance choice, recurring cross-team
-     tradeoff, or costly-to-reverse choice. Compare 2–3 real options in the
-     style of `advise`; preserve the selected option, rationale, authority,
-     accepted tradeoff, consequences, review trigger, Project relation, and
-     provenance.
-  4. Promote an approved employee workflow with `templates/sop.md`. Preserve
-     its trigger, actors, ordered steps, systems, handoffs, timing or volume
-     baseline, exceptions, output, owner, reuse proof, Project relation, and
-     source provenance. Never use the Farplane `skill.md` registry card.
-  5. Group accepted completed outcomes by Person ID across all Projects. Append
-     deduplicated durable observations and replace only `Latest weekly evidence`.
-     Keep open/stale/question-pending Work in the weekly section; never rate a
-     person or infer effort, intent, or personality.
-  6. Group accepted workflow samples by explicit `workflow_key`. Replace only
-     `Latest weekly samples`; preserve the approved baseline. Three comparable
-     samples across two Projects may produce an owner-approval candidate, never
-     an automatic baseline change.
-  7. Initialize next-week Project Notes from the newest unresolved Work and
-     documentation-question snapshots. Do not carry accepted completed Work,
-     rescan raw Work, or edit the frozen source week.
-
-  A human response that arrives after finalization updates live Work or
-  documentation-review state and appears in the next Project Notes file. Do
-  not reopen or rewrite finalized Project, Department, or Company reports.
+  | Candidate | Promote only when | Update rule |
+  | --- | --- | --- |
+  | Project report | Its frozen note validates | Set `report_status = Final`; increment `report_version`; set `finalized_at` |
+  | Issue | Recurring or materially costly, with workflow step, dated Before baseline, cost or measurement gap, confidence, owner, and next test | Otherwise keep it in report history with a disposition |
+  | Decision | Reusable precedent, operating standard, monetary commitment, material risk/compliance choice, cross-team tradeoff, or costly-to-reverse choice | Compare 2–3 real options in the style of `advise`; preserve selection, rationale, authority, tradeoff, consequences, review trigger, Project relation, and provenance |
+  | SOP | Approved employee workflow with trigger, actors, steps, systems, handoffs, baseline, exceptions, output, owner, reuse proof, Project relation, and provenance | Use `templates/sop.md`, never the Farplane `skill.md` registry card |
+  | Employee Memory | Accepted completed outcomes grouped by Person ID across all Projects | Append deduplicated durable observations; replace only `Latest weekly evidence`; keep open/stale/question-pending Work weekly; never rate a person or infer effort, intent, or personality |
+  | SOP baseline | Comparable samples share an explicit `workflow_key` | Replace only `Latest weekly samples`; preserve the approved baseline; three samples across two Projects may create an owner-approval candidate, never an automatic baseline change |
+  | Next-week notes | Work or a documentation question remains unresolved | Carry only the newest snapshot; never carry accepted completed Work, rescan raw Work, or edit the frozen week |
 
   Record one disposition for every candidate: `promoted`, `duplicate`,
   `project_only`, `monitor`, `dismissed`, or `blocked`. Missing authority,
-  relation, destination URL, template, or dedupe evidence blocks promotion but
-  does not block finalizing an otherwise valid Project report.
+  relation, template, or dedupe evidence blocks that promotion, not an otherwise
+  valid Project report.
 
-  A report sentence is not automatically a Decision candidate. First ask what
-  future manager, customer-service owner, or Project lead would reuse. If the
-  answer is only “what this team will do next,” mark it `project_only`. Monetary
-  materiality may be an amount, exposure, budget boundary, or an explicit
-  measurement gap with an owner; never invent a value.
+  A report sentence is not automatically a Decision. Ask what a future manager,
+  customer-service owner, or Project lead would reuse. If it only states what
+  the team will do next, mark it `project_only`. Monetary materiality may be an
+  amount, exposure, budget boundary, or an explicit measurement gap with an
+  owner; never invent a value.
 
-  Reports hold weekly findings and provide the management view. The SOP record
-  is the canonical employee-workflow baseline. The Issue is the canonical
-  problem and economics baseline linked to the affected workflow step. Do not
-  create a separate Problems database.
+  Reports own weekly findings. Local Employee, SOP, Issue, and Decision Memory
+  own durable knowledge. Public People pages never receive Employee Memory.
+  Responses arriving after finalization update live Work or review state and
+  enter next week's Project Notes; never reopen a Final report.
 
-- [ ] **2 — Roll finalized Project reports into finalized Department reports.**
+- [ ] **2 — Roll Final Project reports into Final Department reports.**
 
-  For each Department:
+  For each Department, group only this week's Final Project reports by the
+  Project's seeded Department. Read those reports and the previous Department
+  report. Create or replace one private report from
+  `templates/area-operating-rollup.md`, preserve the shared sections, summarize
+  cross-Project patterns, link every source Project report, and record its
+  private locator and version. Record missing relations as `configuration_gap`.
 
-  - Group only this week's Final Project reports by their Project's Department.
-  - Read the previous Department report and the complete current source reports.
-  - Create or replace one Report using
-    `templates/area-operating-rollup.md` in the private weekly workspace.
-  - Preserve the shared section structure, summarize cross-Project patterns,
-    and link every source Project report.
-  - Record missing Project or Department relations as `configuration_gap`.
-  - Write the finalized rollup under the exact private weekly report root;
-    optional publication remains a separately authorized mapped effect.
+- [ ] **3 — Roll Final Department reports into the Company report.**
 
-  Record the private report locator and finalized version for every Department
-  report, plus an optional provider URL only when publication succeeds. A
-  Department with expected active Projects but no Final Project report blocks
-  the Company report; do not hide it by omitting the Department.
+  Read every Final Department report and the previous Company report. Create or
+  replace one private report from `templates/company-operating-rollup.md`.
+  Include only company-material patterns, preserve the shared sections, and
+  link every Department report. Set `report_status = Final`, increment
+  `report_version`, set `finalized_at`, and write it under the exact private
+  weekly report root.
 
-- [ ] **3 — Roll finalized Department reports into the Company report.**
+- [ ] **4 — Sync to provider and deliver the Company report.**
 
-  - Read all Final Department reports for the week and the previous Company
-    report.
-  - Create or replace one Company Report using
-    `templates/company-operating-rollup.md` in the private weekly workspace.
-  - Preserve the shared section structure.
-  - Include only company-material patterns and link every Department report.
-  - Set `report_status = Final`, increment `report_version`, and set
-    `finalized_at`.
-  - Write the finalized Company report under the exact private weekly report
-    root; optional publication remains a separately authorized mapped effect.
+  Begin only after every expected local Project, Department, and Company file
+  reads back as Final.
 
-  Do not finalize the Company report when an expected Department report is
-  missing or non-Final. Report the gap instead.
+  1. For each Final local artifact, create a one-way provider copy only when
+     `workspace.hermes.md` has a complete matching `short-term memory`,
+     `long-term memory`, or `reports` provider/destination row. Missing means
+     local-only. Incomplete or failed copy blocks only that copy. Never import
+     provider edits into local memory. Record a provider URL only after exact
+     destination read-back.
+  2. Resolve the owner Person's approved Telegram route from the active binding.
+  3. From the runtime workspace, pipe the rendered document to:
 
-- [ ] **4 — Deliver the actual Company report.**
+     ```bash
+     python ../scripts/authorized_message.py --workspace .hermes.md --profile-home .. --message "owner report" --action-key company-report-<YYYY-Www>
+     ```
 
-  After all expected Project, Department, and Company files have been read back
-  from the private weekly workspace as Final:
+  4. Render `templates/executive-distribution.md` with the complete Company
+     report Markdown, unchanged and unsummarized; every source Department title
+     and private locator; and the Final Company locator and version. Include
+     only provider URLs whose copies succeeded, then send through the approved
+     route.
 
-  - Load the owner Person record and resolve its approved Telegram route through
-    the active environment binding.
-  - From the runtime workspace, pipe the rendered document to `python
-    ../scripts/authorized_message.py --workspace .hermes.md --profile-home ..
-    --message "owner report" --action-key company-report-<YYYY-Www>`. The guard
-    writes the review draft or resolves the current exact Hermes target; it
-    blocks delivery unless the binding and confirmed setup receipt match.
-  - Render `templates/executive-distribution.md` with the complete Company
-  report Markdown, unchanged and not summarized; the title and private locator
-  of every source Department report; and the final Company report locator and
-  version. Include provider URLs only for reports that were separately
-  published successfully.
-  - Send the rendered document through the approved route.
-
-  If the provider requires multiple messages, split only at Markdown section
-  boundaries, preserve order, and include `part N/M` in each envelope. Do not
-  replace the report with a deployment status, test summary, or link-only
-  notification. A provider-confirmed receipt for every part is required before
-  delivery is `delivered`; otherwise record `partial` or `blocked` truthfully.
-  A missing or unauthorized Telegram route blocks delivery; it does not permit
-  email or another fallback.
+  If multiple messages are required, split only at Markdown section boundaries,
+  preserve order, and label each envelope `part N/M`. Every part needs a
+  provider-confirmed receipt for `delivered`; otherwise record `partial` or
+  `blocked`. A missing or unauthorized Telegram route blocks delivery and does
+  not authorize a fallback channel.
 
 ## Output
 
-- Final Project, Department, and Company private report locators, plus optional
-  provider URLs for successful publication effects
-- Promotion dispositions and destination record URLs
-- `weekly/context/weekly-context-YYYY-Www.json`
-- `weekly/review/weekly-review-result-YYYY-Www.json`
-- `weekly/review/weekly-artifact-quality-review-YYYY-Www.json`
-- `weekly/receipts/weekly-integration-receipt-YYYY-Www.json`, containing source
-  report versions, integration outcomes, gaps, the final Company report
-  locator and optional provider URL, approved Telegram route, and provider
-  delivery receipts
+```text
+weekly/context/weekly-context-YYYY-Www.json
+weekly/review/weekly-review-result-YYYY-Www.json
+weekly/review/weekly-artifact-quality-review-YYYY-Www.json
+weeks/<week>/reports/projects/project--<id>.md
+weeks/<week>/reports/departments/department--<id>.md
+weeks/<week>/reports/company.md
+memory/{employees,issues,decisions,sops}/<entity>.md
+weeks/<next-week>/project-notes/project--<id>.md
+weekly/receipts/weekly-integration-receipt-YYYY-Www.json
+```
 
-Write the validated Weekly result before any workspace or provider mutation.
-Record each integration outcome in the receipt as it settles. Before any
-provider write,
-prove that the active environment binding authorizes the exact target and
-action. Otherwise record `blocked` and stop that effect.
+The receipt records source report versions, promotion dispositions, local
+memory locators, integration outcomes, gaps, the Final Company locator,
+approved Telegram route, delivery receipts, and provider URLs only for copies
+that succeeded. Write the validated Weekly result before any mutation. Record
+each integration outcome as it settles. Before any provider write, prove that
+the active binding authorizes the exact target and action; otherwise record
+`blocked` and stop that effect.

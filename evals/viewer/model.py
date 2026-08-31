@@ -14,8 +14,7 @@ FEATURES = {
     "FEAT-0004": ("daily", "Project knowledge notes"),
     "FEAT-0005": ("weekly", "Weekly operating report"),
     "FEAT-0006": ("weekly", "Knowledge promotion"),
-    "FEAT-0007": ("weekly", "Project Notes carry-forward"),
-    "FEAT-0010": ("meeting-intake", "Meeting commitments"),
+    "FEAT-0007": ("weekly", "Next-week carry-forward"),
 }
 
 
@@ -34,22 +33,68 @@ def _read(path: Path, label: str) -> dict[str, Any]:
 
 
 def _doctor_judge(root: Path, feature_id: str, cadence: str, outcome: dict[str, Any]) -> dict[str, Any]:
-    if feature_id == "FEAT-0010":
-        deterministic = _read(root / "meeting-intake/eval/deterministic.json", "Meeting deterministic result")
-        assertions = [{"assertion": key.replace("_", " "), "status": "pass" if value else "fail", "evidence": ["meeting-intake/result.json"]} for key, value in deterministic.get("checks", {}).items()]
-        status = "pass" if deterministic.get("pass") else "fail"
-    else:
-        path = root / cadence / "eval/judges" / f"{feature_id}.json"
-        if not path.is_file():
-            return {"status": "unjudged", "note": "No matching feature judge was supplied.", "assertions": []}
-        judge = _read(path, f"{feature_id} judge")
-        if (judge.get("target") or judge.get("feature_id")) != feature_id:
-            raise ViewerError(f"{feature_id} judge targets another feature")
-        assertions = [{"assertion": row["assertion"], "status": "pass" if row.get("met") else "fail", "evidence": row.get("evidence") or row.get("evidence_refs") or []} for row in judge.get("assertions", [])]
-        status = "pass" if judge.get("tier") == "A" and judge.get("verdict") != "fail" and all(row["status"] == "pass" for row in assertions) else "fail"
+    path = root / cadence / "eval/judges" / f"{feature_id}.json"
+    if not path.is_file():
+        return {"status": "unjudged", "note": "No matching feature judge was supplied.", "assertions": []}
+    judge = _read(path, f"{feature_id} judge")
+    if (judge.get("target") or judge.get("feature_id")) != feature_id:
+        raise ViewerError(f"{feature_id} judge targets another feature")
+    assertions = [{"assertion": row["assertion"], "status": "pass" if row.get("met") else "fail", "evidence": row.get("evidence") or row.get("evidence_refs") or []} for row in judge.get("assertions", [])]
+    status = "pass" if judge.get("tier") == "A" and judge.get("verdict") != "fail" and all(row["status"] == "pass" for row in assertions) else "fail"
     if outcome.get("outcome") == "insufficient_information":
         return {"status": "needs_information", "note": "The configured sources do not contain required information.", "assertions": assertions}
     return {"status": status, "note": "Every required assertion passed." if status == "pass" else "One or more required assertions failed.", "assertions": assertions}
+
+
+def _feature_markdown(preview: str, feature_name: str) -> str:
+    """Show the selected feature section while retaining the cadence file as the link target."""
+    marker = f"## {feature_name}"
+    start = preview.find(marker)
+    if start < 0:
+        return preview
+    end = preview.find("\n## ", start + len(marker))
+    return preview[start:end if end >= 0 else None].strip() + "\n"
+
+
+def _source_cards(snapshot: dict[str, Any], cited: set[Any]) -> list[dict[str, Any]]:
+    """Represent both cited data sources and exact records in the inspector."""
+    cards = []
+    for alias, source in snapshot.get("sources", {}).items():
+        metadata = source.get("source") if isinstance(source.get("source"), dict) else {}
+        source_id = metadata.get("id")
+        records = source.get("records", [])
+        if source_id in cited:
+            readable_records = []
+            for record in records:
+                properties = record.get("properties", {}) if isinstance(record, dict) else {}
+                readable_records.append({
+                    "name": properties.get("Name") or "Untitled record",
+                    "status": properties.get("Status") or "Observed",
+                    "last_updated": record.get("last_edited_time"),
+                })
+            cards.append({
+                "id": source_id,
+                "kind": f"{alias} source",
+                "name": metadata.get("title") or alias.title(),
+                "status": f"{len(records)} records read",
+                "record": {
+                    "source": metadata.get("title") or alias.title(),
+                    "selected_count": source.get("selected_count", len(records)),
+                    "records": readable_records,
+                },
+            })
+        for record in records:
+            if record.get("id") not in cited:
+                continue
+            properties = record.get("properties", {})
+            cards.append({
+                "id": record.get("id"),
+                "kind": alias,
+                "name": properties.get("Name") or "Untitled record",
+                "status": properties.get("Status") or "Observed",
+                "record": record,
+            })
+    return cards
 
 
 def build_evidence_model(*, project_root: Path, doctor_run_root: Path) -> dict[str, Any]:
@@ -60,6 +105,47 @@ def build_evidence_model(*, project_root: Path, doctor_run_root: Path) -> dict[s
     cached: dict[str, tuple[dict[str, Any], dict[str, Any], str]] = {}
     features = []
     for feature_id, (cadence, name) in FEATURES.items():
+        run_state = (receipt.get("automation_runs") or {}).get(cadence, {})
+        cadence_status = run_state.get("status")
+        if cadence_status in {"failed", "not_run"}:
+            preview_path = root / cadence / "preview.md"
+            preview = (
+                preview_path.read_text(encoding="utf-8")
+                if preview_path.is_file()
+                else f"# {cadence.replace('-', ' ').title()} not run\n\nThis cadence did not run because an earlier stage failed.\n"
+            )
+            failed = cadence_status == "failed"
+            features.append({
+                "id": feature_id,
+                "cadence": cadence,
+                "name": name,
+                "claim": (
+                    "The cadence failed production validation; no output was accepted."
+                    if failed else "The cadence was not run because an earlier cadence failed."
+                ),
+                "sources": [],
+                "sourceLabel": "Source input · unavailable for accepted evaluation",
+                "cases": [{
+                    "id": f"real-configured-sources-{feature_id.lower()}",
+                    "title": "Real setup-test prepare",
+                    "expectedOutput": "A schema-valid delivery-disabled prepare result.",
+                }],
+                "outputs": [{
+                    "id": f"{feature_id}-preview",
+                    "label": f"{cadence} failure preview" if failed else f"{cadence} not-run notice",
+                    "kind": "Markdown",
+                    "state": "failed" if failed else "not_run",
+                    "url": f"{cadence}/preview.md" if preview_path.is_file() else "activity.jsonl",
+                    "markdown": preview,
+                }],
+                "status": "fail" if failed else "not_run",
+                "statusNote": (
+                    "No result passed production validation."
+                    if failed else "Blocked by an earlier cadence failure."
+                ),
+                "assertions": [],
+            })
+            continue
         if cadence not in cached:
             result = _read(root / cadence / "result.json", f"{cadence} result")
             snapshot = _read(root / cadence / "source-snapshot.json", f"{cadence} source snapshot")
@@ -73,14 +159,8 @@ def build_evidence_model(*, project_root: Path, doctor_run_root: Path) -> dict[s
         if not outcome:
             raise ViewerError(f"{cadence} result omits {feature_id}")
         cited = {row.get("source_id") for row in outcome.get("evidence", [])}
-        sources = []
-        for alias, source in snapshot.get("sources", {}).items():
-            for record in source.get("records", []):
-                if cited and record.get("id") not in cited:
-                    continue
-                properties = record.get("properties", {})
-                sources.append({"id": record.get("id"), "kind": alias, "name": properties.get("Name") or record.get("id"), "status": properties.get("Status") or "Observed", "record": record})
+        sources = _source_cards(snapshot, cited)
         judge = _doctor_judge(root, feature_id, cadence, outcome)
-        features.append({"id": feature_id, "cadence": "meeting" if cadence == "meeting-intake" else cadence, "name": name, "claim": outcome.get("reasoning_summary", ""), "sources": sources, "sourceLabel": "Source input · configured PKMS read", "cases": [{"id": f"real-configured-sources-{feature_id.lower()}", "title": "Real setup-test prepare", "expectedOutput": outcome.get("reasoning_summary", "")}], "outputs": [{"id": f"{feature_id}-preview", "label": f"{cadence} intermediary preview", "kind": "Markdown", "state": "linked", "url": f"{cadence}/preview.md", "markdown": preview}], "status": judge["status"], "statusNote": judge["note"], "assertions": judge["assertions"]})
+        features.append({"id": feature_id, "cadence": cadence, "name": name, "claim": outcome.get("reasoning_summary", ""), "sources": sources, "sourceLabel": "Source input · configured PKMS read", "cases": [{"id": f"real-configured-sources-{feature_id.lower()}", "title": "Real setup-test prepare", "expectedOutput": outcome.get("reasoning_summary", "")}], "outputs": [{"id": f"{feature_id}-preview", "label": f"{name} preview", "kind": "Markdown", "state": "linked", "url": f"{cadence}/preview.md", "markdown": _feature_markdown(preview, name)}], "status": judge["status"], "statusNote": judge["note"], "assertions": judge["assertions"]})
     assertions = [row for feature in features for row in feature["assertions"]]
-    return {"schemaVersion": "kamdar-evidence-viewer@2.0.0", "runKind": "real-setup-test", "deliveryStatus": "not_requested", "rootOutputUrl": None, "metrics": {"features": {"total": len(features), "passed": sum(feature["status"] == "pass" for feature in features)}, "cases": {"total": len(features)}, "checks": {"total": len(assertions), "passed": sum(row["status"] == "pass" for row in assertions)}, "outputs": {"total": len(features)}}, "features": features}
+    return {"schemaVersion": "kamdar-evidence-viewer@2.0.0", "runKind": "real-setup-test", "runStatus": receipt.get("status", "unknown"), "deliveryStatus": "not_requested", "rootOutputUrl": None, "metrics": {"features": {"total": len(features), "passed": sum(feature["status"] == "pass" for feature in features)}, "cases": {"total": len(features)}, "checks": {"total": len(assertions), "passed": sum(row["status"] == "pass" for row in assertions)}, "outputs": {"total": len(features)}}, "features": features}

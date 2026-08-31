@@ -133,9 +133,10 @@ def reduce_employee_memory(
             f"- **{note['work_id']} · {note['project_id']}:** {note['structured_payload'].get('status') or note['observation_kind']}. [{', '.join(note['source_ids'])}]"
             for note in weekly
         ) or "No current Work snapshot this week."
-        if not person:
-            gaps.insert(0, f"{person_id}: Person record is absent from the targeted Weekly context.")
-        persistent_text = None if not person else person.get("persistent_text")
+        persistent_text = (
+            "No accepted cross-week observation yet."
+            if not person else person.get("persistent_text")
+        )
         if person and persistent_text is None and person.get("markdown") is not None:
             persistent_text = section_text(person["markdown"], "Persistent operating memory")
         row = {
@@ -144,11 +145,13 @@ def reduce_employee_memory(
             "source_project_ids": _unique([note["project_id"] for note in notes] + [project for conflict in person_conflicts for project in conflict["project_ids"]]),
             "source_work_ids": _unique([note.get("work_id") for note in notes] + [conflict["work_id"] for conflict in person_conflicts]),
             "source_note_keys": _unique([note["note_key"] for note in notes] + [key for conflict in person_conflicts for key in conflict["note_keys"]]),
-            "expected_record_version": None if not person else person.get("record_version"),
-            "expected_persistent_text_sha256": None if persistent_text is None else person.get("persistent_text_sha256", _sha256(_normalize(persistent_text))),
+            "expected_record_version": 0 if not person else person.get("record_version"),
+            "expected_persistent_text_sha256": person.get(
+                "persistent_text_sha256", _sha256(_normalize(persistent_text))
+            ) if person else _sha256(_normalize(persistent_text)),
             "persistent_observations": persistent,
             "latest_weekly_evidence_markdown": markdown,
-            "disposition": "blocked" if not person or gaps else ("update" if persistent or weekly else "no_change"),
+            "disposition": "blocked" if gaps else ("update" if persistent or weekly else "no_change"),
             "gaps": gaps,
         }
         if row["source_note_keys"]:

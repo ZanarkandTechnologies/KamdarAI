@@ -149,7 +149,10 @@ memory, long-term memory, and versioned reports into the private Hermes
 workspace first. It then makes only the optional one-way provider copies bound
 in the `artifact-sync` table in `workspace.hermes.md`, applies approved Work
 comments or messages, and writes a redacted per-action receipt. A missing
-artifact binding means local-only; provider edits never flow back into memory.
+artifact binding means local-only; the distributed Kamdar workspace has no
+artifact or owner-message bindings by default. Documentation and stale-work
+questions use the exact linked Work item unless an employee route is explicitly
+configured. Provider edits never flow back into memory.
 Production remains unauthorized; disabled policy, failed quality, a changed
 workspace or handoff, and incomplete configured destinations block before
 provider calls. Notion and Drive permissions remain the operator's privacy

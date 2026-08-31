@@ -2,7 +2,6 @@
   "schema_version": "kamdar-meeting-commitment-intake-evals@1.0.0",
   "suite": "kamdar-meeting-commitment-intake",
   "target": {
-    "automation": "automations/meeting-commitment-intake.md",
     "schema": "schemas/automations/meeting_commitment_intake_result.py",
     "seed": "seed/manifest.json",
     "template": "templates/task.md",

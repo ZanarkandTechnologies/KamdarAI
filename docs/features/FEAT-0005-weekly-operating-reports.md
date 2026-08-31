@@ -13,8 +13,8 @@ system_id: SYS-0001
 category: reporting
 public: true
 surfaces: [automations/weekly-operating-review.md, templates/project-week-notes.md, templates/weekly-report.md, templates/area-operating-rollup.md, templates/company-operating-rollup.md]
-source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
-evidence_refs: [tests/test_pydantic_weekly_meeting_contracts.py, tests/test_validate_eval_run.py]
+source_refs: [workspace.hermes.md, tickets/archive/TASK-0019/ticket.md]
+evidence_refs: [tests/unit/schemas/test_weekly_and_meeting_contracts.py, tests/harness/evals/test_validate_eval_run.py]
 known_limits: "Reports are locally canonical; authenticated provider copies and executive delivery remain separately gated."
 ---
 

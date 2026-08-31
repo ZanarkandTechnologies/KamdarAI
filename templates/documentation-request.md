@@ -1,42 +1,42 @@
 ---
 template_id: kamdar-documentation-request
-template_version: "0.3.0"
+template_version: "1.0.0"
 ---
 
-# {{WORK_ITEM_ID}} — documentation request
+# Documentation request
 
-**Responsible person:** {{RESPONSIBLE_PERSON}}
+<!-- Pydantic binding: DocumentationReview.comment_text
 
-**Requested by:** {{REQUESTED_AT}}
+Write one concise comment for a completed Work item that is missing important
+context. The comment must show what is already understood, identify exactly what
+is missing, explain why it matters, and name where the owner should add it.
 
-## Missing mapped fields
+Writing rules:
+- Ask only questions that affect understanding, reuse, accountability, or proof.
+- Do not ask for cosmetic labels or generic "more detail".
+- Do not repeat facts already present in the ticket.
+- Ask in a direct, helpful tone.
+- Refer to the exact ticket section to update.
 
-{{MISSING_FIELDS}}
+Render only the comment below. Do not include template frontmatter, instructions,
+an application receipt, or a separate private artifact. -->
 
-## Known context
+I understand that {{KNOWN_OUTCOME_OR_DECISION}}.
 
-{{KNOWN_CONTEXT}}
+What is still missing: {{IMPORTANT_MISSING_CONTEXT}}.
 
-## Required update
+Please add this under {{EXACT_SECTION}}:
+1. {{PRECISE_QUESTION}}
 
-{{REQUEST}}
+Why this matters: {{OPERATIONAL_REASON}}.
 
-## Where to update
+<!-- GOLDEN EXAMPLE — replace every fact below.
+I understand that the reconciliation sheet became the release gate.
 
-{{UPDATE_LOCATION}}
+What is still missing: the ticket does not explain why this option was chosen.
 
-## Why this is needed
+Please add this under Notes > Decision:
+1. Why was the reconciliation sheet selected over the other options considered?
 
-{{FIELD_PURPOSE}}
-
-## Source
-
-{{SOURCE_URL}}
-
-## Application receipt
-
-{{APPLICATION_STATE}}
-
-## Proposed source-record comment
-
-{{COMMENT_BODY}}
+Why this matters: we cannot safely reuse the release rule without its rationale.
+END GOLDEN EXAMPLE -->

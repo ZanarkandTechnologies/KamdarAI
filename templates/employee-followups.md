@@ -1,41 +1,49 @@
 ---
 template_id: kamdar-employee-followups
-template_version: "0.3.0"
+template_version: "1.0.0"
 ---
 
-Subject: Action requested for {{WORK_ITEM_COUNT}} work items
+# Employee progress follow-up
 
-Hello {{RECIPIENT_NAME}},
+<!-- Pydantic binding: WeeklyProgressChase.message_text
 
-Please update the source Work pages below by {{RESPONSE_DUE_AT}}. Each item
-contains the facts currently recorded and the exact response needed.
+Write one short progress question about a threatened weekly Project target.
+By default it will be posted on each exact linked Work item; an explicitly
+configured employee-follow-up channel may deliver the same text directly.
 
-## {{WORK_ITEM_ID}} — {{WORK_ITEM_NAME}}
+Writing rules:
+- Begin with the Project target and due date, not a vague "checking in".
+- State the observed progress and why the target appears at risk.
+- Ask what changed, the current blocker, the recovery plan, and the date the
+  owner can now commit to.
+- Address the owner by name when it is known from the bounded source context.
+- Do not ask documentation-quality questions already handled on the ticket.
+- Do not exaggerate unknown causes, progress, or dates.
 
-**Current record:** {{KNOWN_STATUS_AND_PROGRESS}}
+Render only the message below. Do not include template frontmatter,
+instructions, route metadata, or a delivery receipt. -->
 
-**Plan versus actual:** {{TIME_AND_COST_VARIANCE_OR_SOURCE_GAP}}
+{{OWNER}}, the Project target "{{TARGET}}" is due {{DUE_DATE}}.
 
-**Blocker / cause:** {{BLOCKER_AND_CAUSE_CONFIDENCE}}
-
-**Missing evidence:** {{MISSING_FIELDS_OR_NONE}}
+Current evidence: {{PROGRESS_AND_RISK_BASIS}}.
 
 Please reply with:
+1. What changed since the last update?
+2. What is blocking the remaining work?
+3. What is the recovery plan and revised commitment date?
 
-1. {{QUESTION_ONE}}
-2. {{QUESTION_TWO}}
-3. {{QUESTION_THREE}}
-4. {{QUESTION_FOUR}}
-5. {{QUESTION_FIVE}}
+Update the linked Work item here: {{SOURCE_REFERENCE}}.
 
-Update: {{UPDATE_LOCATION}}
+<!-- GOLDEN EXAMPLE — replace every fact below.
+Jun, the Project target "Complete all three supplier comparisons" is due Friday.
 
-Next known action: {{NEXT_ACTION}}
+Current evidence: only one comparison is complete, and the remaining two have
+not changed since 21 August. The supplier normalisation rule is still unresolved.
 
-Source: {{WORK_ITEM_URL}}
+Please reply with:
+1. What changed since the last update?
+2. What is blocking the remaining comparisons?
+3. What is the recovery plan and revised commitment date?
 
-## Delivery receipt
-
-- `recipient_person:` {{PERSON_ID}}
-- `approved_route:` {{ROUTE_OR_GAP}}
-- `write_mode:` {{proposal-only | sent}}
+Update the linked Work items here: TASK-103 and TASK-104.
+END GOLDEN EXAMPLE -->

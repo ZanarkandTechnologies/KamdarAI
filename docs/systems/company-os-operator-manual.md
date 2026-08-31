@@ -76,8 +76,16 @@ EMPLOYEE                     COMPANY OS                    MANAGER
 ```
 
 The agent keeps its working notes private. Employees continue using their
-normal Work records, while managers receive a consolidated view with links back
-to the evidence.
+normal Work records. Documentation and progress questions return to those exact
+records as comments. Managers read the private consolidated view with links
+back to the evidence.
+
+The lean Kamdar setup connects Projects and Work as read-write sources, keeps
+the People directory read-only for stable employee IDs, and leaves both the
+artifact-sync and communications tables empty. That stores Project Notes,
+Employee/SOP/Decision/Issue Memory, and Final reports only in the private Hermes
+workspace. Add a provider destination or owner message only when Kamdar wants a
+second copy or notification.
 
 ## Optional provider copies
 

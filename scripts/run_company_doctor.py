@@ -25,6 +25,11 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.automation_prepare import CADENCE_CONFIG, PrepareError, prepare_cadence
+from scripts.project_week_notes import (
+    ProjectNotesError,
+    freeze_project_week_notes,
+    load_frozen_project_week_notes,
+)
 from evals.viewer.build import build_static_evidence_viewer
 
 
@@ -45,8 +50,118 @@ CADENCE_FEATURES = {
         ("FEAT-0006", "Knowledge promotion"),
         ("FEAT-0007", "Next-week planning"),
     ),
-    "meeting-intake": (("FEAT-0010", "Meeting commitments"),),
 }
+
+
+def _frontmatter_value(markdown: str, key: str) -> str | None:
+    match = re.search(rf'^{re.escape(key)}:\s*["\']?([^\n"\']+)', markdown, re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
+def empty_private_weekly_state(profile: Path, week: str) -> dict[str, Any]:
+    report_root = profile / "workspace" / "weeks" / week / "reports"
+    reports = {
+        str(path.relative_to(report_root)): path.read_text(encoding="utf-8")
+        for path in sorted(report_root.rglob("*.md"))
+        if path.is_file()
+    } if report_root.is_dir() else {}
+    return {
+        "private_reports": reports,
+        "private_project_notes": {},
+        "project_notes_freeze_sha256": None,
+        "project_notes_freeze_manifest": None,
+        "referenced_employee_memory": {},
+        "referenced_sop_memory": {},
+    }
+
+
+def load_private_weekly_state(profile: Path, week: str) -> dict[str, Any]:
+    """Load only immutable Weekly notes plus referenced local memory."""
+
+    workspace = profile / "workspace"
+    week_root = workspace / "weeks" / week
+    empty = empty_private_weekly_state(profile, week)
+    try:
+        frozen = load_frozen_project_week_notes(week_root=week_root, week=week)
+    except (ProjectNotesError, FileNotFoundError, KeyError, json.JSONDecodeError):
+        return empty
+    notes = {
+        row["path"]: row["content"]
+        for row in frozen["projects"]
+    }
+    person_ids = {
+        person_id
+        for project in frozen["projects"]
+        for note in project["notes"]
+        for person_id in note.get("employee_ids", [])
+    }
+    workflow_keys = {
+        str(note["workflow_key"])
+        for project in frozen["projects"]
+        for note in project["notes"]
+        if note.get("workflow_key")
+    }
+    employees: dict[str, str] = {}
+    employee_root = (workspace / "memory" / "employees").resolve()
+    for person_id in sorted(person_ids):
+        path = (employee_root / f"{person_id}.md").resolve()
+        try:
+            path.relative_to(employee_root)
+        except ValueError as error:
+            raise DoctorError("Employee Memory path escaped its private root") from error
+        if path.is_file():
+            employees[person_id] = path.read_text(encoding="utf-8")
+    sops: dict[str, str] = {}
+    sop_root = workspace / "memory" / "sops"
+    for path in sorted(sop_root.glob("*.md")) if sop_root.is_dir() else []:
+        markdown = path.read_text(encoding="utf-8")
+        workflow_key = _frontmatter_value(markdown, "workflow_key")
+        if workflow_key in workflow_keys:
+            sops[str(workflow_key)] = markdown
+    return {
+        "private_reports": empty["private_reports"],
+        "private_project_notes": notes,
+        "project_notes_freeze_sha256": frozen["freeze_sha256"],
+        "project_notes_freeze_manifest": frozen["manifest"],
+        "referenced_employee_memory": employees,
+        "referenced_sop_memory": sops,
+    }
+
+
+def freeze_private_weekly_state(
+    profile: Path, week: str, project_records: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Freeze exactly the active Projects before Weekly reads private notes."""
+
+    expected_project_ids = sorted({
+        str(record["id"])
+        for record in project_records
+        if isinstance(record, dict) and record.get("id")
+    })
+    if not expected_project_ids:
+        return {
+            "state": "configuration_gap",
+            "reason": "no_active_project_ids",
+            "expected": [],
+            "observed": [],
+        }
+    result = freeze_project_week_notes(
+        week_root=profile / "workspace" / "weeks" / week,
+        week=week,
+        expected_project_ids=expected_project_ids,
+    )
+    return {**result, "expected_project_ids": expected_project_ids}
+
+
+def prepare_private_weekly_state(
+    profile: Path, week: str, project_records: list[dict[str, Any]]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Freeze current coverage and expose notes only when that exact set is valid."""
+
+    freeze_result = freeze_private_weekly_state(profile, week, project_records)
+    if freeze_result.get("state") not in {"frozen", "duplicate"}:
+        return freeze_result, empty_private_weekly_state(profile, week)
+    return freeze_result, load_private_weekly_state(profile, week)
 TERMINAL_STATUSES = {"done", "complete", "completed", "archived", "cancelled", "canceled"}
 SOURCE_EXCLUDED_STATUSES = {
     "projects": ("Done", "Dropped", "Migrated", "Info Dumped"),
@@ -83,6 +198,41 @@ class DoctorError(RuntimeError):
     pass
 
 
+def prepared_delivery_state(
+    requested_count: int,
+    prepare_runs: list[dict[str, Any]],
+    failed_cadence: str | None,
+) -> str:
+    """Summarize whether every requested handoff is genuinely apply-ready."""
+    statuses = [str(run.get("delivery_status") or "blocked") for run in prepare_runs]
+    if not statuses and failed_cadence:
+        return "blocked"
+    if failed_cadence or len(statuses) != requested_count:
+        return "partial" if "ready" in statuses else "blocked"
+    if statuses and all(status == "ready" for status in statuses):
+        return "prepared"
+    if statuses and all(status == "not_requested" for status in statuses):
+        return "not_requested"
+    return "partial" if "ready" in statuses else "blocked"
+
+
+def _log_event(run_path: Path, event: str, **fields: Any) -> None:
+    """Emit one secret-free progress event to stderr and the private run log."""
+    root = run_path.parent if run_path.name in CADENCE_CONFIG else run_path
+    root.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "event": event,
+        **fields,
+    }
+    line = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    log_path = root / "activity.jsonl"
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(line + "\n")
+    os.chmod(log_path, 0o600)
+    print(line, file=sys.stderr, flush=True)
+
+
 def load_doctor_config(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise DoctorError(f"private Doctor bindings are unavailable: {path}")
@@ -115,6 +265,26 @@ def _sha256_file(path: Path) -> str:
     return _sha256_bytes(path.read_bytes()) if path.is_file() else "absent"
 
 
+def workspace_safety_summary(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
+    """Separate the installed runtime mutation boundary from concurrent source edits."""
+    installed_unchanged = before.get("installed") == after.get("installed")
+    source_context_unchanged = before.get("source") == after.get("source")
+    if not installed_unchanged:
+        classification = "installed_workspace_changed"
+    elif not source_context_unchanged:
+        classification = "source_context_drift_no_doctor_mutation_capability"
+    else:
+        classification = "unchanged"
+    return {
+        "before": before,
+        "after": after,
+        "unchanged": installed_unchanged,
+        "installed_unchanged": installed_unchanged,
+        "source_context_unchanged": source_context_unchanged,
+        "classification": classification,
+    }
+
+
 def _stable(value: Any) -> bytes:
     return (json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":")) + "\n").encode()
 
@@ -143,6 +313,16 @@ def workspace_binding_summary(path: Path, configured_company: str, sources: dict
         "configured_source_matches": source_matches,
         "status": "consistent" if not issues else "needs_review",
         "issues": issues,
+    }
+
+
+def doctor_binding_summary(configured_company: str, sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Describe the binding that actually authorized and completed this Doctor read."""
+    return {
+        "configured_company": configured_company,
+        "configured_source_matches": {alias: True for alias in sources},
+        "status": "connected",
+        "issues": [],
     }
 
 
@@ -565,14 +745,32 @@ def _call_model(
             ensure_ascii=False,
         ),
     )
+    _log_event(run_root, "model.request.ready", label=label, max_tokens=max_tokens)
     last_error: DoctorError | None = None
     for attempt in range(1, 4):
+        started = time.monotonic()
+        _log_event(run_root, "model.call.started", label=label, transport_attempt=attempt)
         try:
             _model_subprocess(profile, request_path, response_path)
+            _log_event(
+                run_root,
+                "model.call.completed",
+                label=label,
+                transport_attempt=attempt,
+                elapsed_seconds=round(time.monotonic() - started, 3),
+            )
             last_error = None
             break
         except DoctorError as error:
             last_error = error
+            _log_event(
+                run_root,
+                "model.call.failed",
+                label=label,
+                transport_attempt=attempt,
+                elapsed_seconds=round(time.monotonic() - started, 3),
+                error_type=type(error).__name__,
+            )
             if attempt < 3:
                 time.sleep(2 ** (attempt - 1))
     if last_error is not None:
@@ -580,6 +778,7 @@ def _call_model(
     payload = json.loads(response_path.read_text(encoding="utf-8"))
     request_path.unlink(missing_ok=True)
     response_path.unlink(missing_ok=True)
+    _log_event(run_root, "model.response.loaded", label=label, model=payload.get("model"))
     return payload
 
 
@@ -623,6 +822,8 @@ No downstream destination is authorized. Reports remain profile-private intermed
 
 def operate(args: argparse.Namespace) -> int:
     profile = args.profile_home.expanduser().resolve()
+    sync_to_provider = bool(getattr(args, "sync_to_provider", False))
+    requested_cadences = tuple(getattr(args, "cadences", None) or ("daily", "weekly"))
     bindings_path = (args.bindings.expanduser().resolve() if args.bindings else profile / "company-os-doctor-bindings.json")
     doctor_config = load_doctor_config(bindings_path)
     configured_sources = doctor_config["sources"]
@@ -639,10 +840,18 @@ def operate(args: argparse.Namespace) -> int:
     if run_root.exists():
         raise DoctorError(f"run root already exists: {run_root}")
     run_root.mkdir(parents=True, mode=0o700)
+    _log_event(
+        run_root,
+        "doctor.started",
+        run_id=run_id,
+        delivery="sync_plan" if sync_to_provider else "analyze_only",
+    )
     source_workspace = ROOT / "workspace.hermes.md"
     installed_workspace = profile / "workspace" / ".hermes.md"
     before_hashes = {"source": _sha256_file(source_workspace), "installed": _sha256_file(installed_workspace)}
+    _log_event(run_root, "sources.schema.started", aliases=list(REQUIRED_SOURCE_ALIASES))
     schemas = {alias: reader.schema(alias) for alias in REQUIRED_SOURCE_ALIASES}
+    _log_event(run_root, "sources.schema.completed", source_count=len(schemas))
     proposal = workspace_proposal(schemas, configured_sources)
     _write_private(run_root / "workspace-proposal.md", proposal)
     binding_review = {
@@ -656,31 +865,61 @@ def operate(args: argparse.Namespace) -> int:
     }
     _write_private(run_root / "workspace-binding-review.json", json.dumps(binding_review, indent=2))
 
+    _log_event(run_root, "sources.read.started", aliases=list(REQUIRED_SOURCE_ALIASES))
     sources = {alias: reader.query(alias) for alias in REQUIRED_SOURCE_ALIASES}
+    _log_event(
+        run_root,
+        "sources.read.completed",
+        counts={alias: source["selected_count"] for alias, source in sources.items()},
+    )
     week = time.strftime("%G-W%V")
-    current_report_root = profile / "workspace" / "weeks" / week / "reports"
-    private_reports = {
-        path.name: path.read_text(encoding="utf-8")
-        for path in sorted(current_report_root.glob("*.md"))
-        if path.is_file()
-    } if current_report_root.is_dir() else {}
+    if "weekly" in requested_cadences:
+        freeze_result, weekly_state = prepare_private_weekly_state(
+            profile,
+            week,
+            list((sources.get("projects") or {}).get("records") or []),
+        )
+        _log_event(
+            run_root,
+            "weekly.project_notes.freeze",
+            state=freeze_result.get("state"),
+            reason=freeze_result.get("reason"),
+            expected_count=len(
+                freeze_result.get("expected_project_ids")
+                or freeze_result.get("expected")
+                or []
+            ),
+            observed_count=len(
+                (freeze_result.get("manifest") or {}).get("files")
+                or freeze_result.get("observed")
+                or []
+            ),
+        )
+    else:
+        weekly_state = load_private_weekly_state(profile, week)
+    installed_workspace_review = workspace_binding_summary(
+        installed_workspace,
+        str(doctor_config.get("company") or ""),
+        configured_sources,
+    )
     snapshot = {
         "schema_version": 1,
         "input_mode": "configured_sources",
         "captured_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "sources": sources,
-        "workspace_binding": workspace_binding_summary(
-            installed_workspace,
+        "workspace_binding": doctor_binding_summary(
             str(doctor_config.get("company") or ""),
             configured_sources,
         ),
         "current_week": week,
         "private_report_root": f"workspace/weeks/{week}/reports",
-        "private_reports": private_reports,
+        **weekly_state,
     }
     prepare_runs: list[dict[str, Any]] = []
-    try:
-        for cadence in CADENCE_CONFIG:
+    failed_cadence: str | None = None
+    failure_message: str | None = None
+    for cadence in requested_cadences:
+        try:
             prepare_runs.append(
                 prepare_cadence(
                     cadence=cadence,
@@ -690,21 +929,112 @@ def operate(args: argparse.Namespace) -> int:
                     model=doctor_model,
                     call_model=_call_model,
                     write_private=_write_private,
+                    log_event=lambda event, **fields: _log_event(run_root, event, **fields),
+                    sync_to_provider=sync_to_provider,
                 )
             )
-    except PrepareError as error:
-        raise DoctorError(str(error)) from error
+        except PrepareError as error:
+            failed_cadence = cadence
+            failure_message = str(error)
+            failure_dir = run_root / cadence
+            _write_private(
+                failure_dir / "failure.json",
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "cadence": cadence,
+                        "status": "failed",
+                        "error_type": type(error).__name__,
+                        "message": failure_message,
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                ),
+            )
+            _write_private(
+                failure_dir / "preview.md",
+                f"""---
+cadence: {cadence}
+mode: prepare
+delivery: not-requested
+status: failed
+---
+
+# {cadence.replace('-', ' ').title()} validation failed
+
+No output was accepted because the generated result did not pass the production contract after bounded repair attempts.
+
+Nothing was published and no downstream action was prepared.
+
+## Inspection
+
+- See `failure.json` for the validation failure.
+- See `../activity.jsonl` for the chronological execution log.
+""",
+            )
+            _log_event(
+                run_root,
+                "cadence.failed",
+                cadence=cadence,
+                error_type=type(error).__name__,
+                detail_path=f"{cadence}/failure.json",
+            )
+            break
+    _log_event(run_root, "sources.readback.started")
     after_sources = {alias: reader.query(alias) for alias in REQUIRED_SOURCE_ALIASES}
+    _write_private(run_root / "source-readback.json", json.dumps(after_sources, indent=2, ensure_ascii=False))
     before_source_hash = _sha256_bytes(_stable(snapshot["sources"]))
     after_source_hash = _sha256_bytes(_stable(after_sources))
     after_hashes = {"source": _sha256_file(source_workspace), "installed": _sha256_file(installed_workspace)}
     source_unchanged = before_source_hash == after_source_hash
-    workspaces_unchanged = before_hashes == after_hashes
-    technical_pass = source_unchanged and workspaces_unchanged and all(run["status"] != "failed" for run in prepare_runs)
+    _log_event(run_root, "sources.readback.completed", source_drift_detected=not source_unchanged)
+    workspace_safety = workspace_safety_summary(before_hashes, after_hashes)
+    _log_event(
+        run_root,
+        "workspace.readback.completed",
+        installed_workspace_changed=not workspace_safety["installed_unchanged"],
+        source_context_drift_detected=not workspace_safety["source_context_unchanged"],
+    )
+    technical_pass = workspace_safety["installed_unchanged"] and failed_cadence is None and all(run["status"] != "failed" for run in prepare_runs)
     needs_information = any(run["status"] == "needs_information" for run in prepare_runs)
     status = "failed" if not technical_pass else ("needs_information" if needs_information else "working")
     cadence_artifacts = [path for run in prepare_runs for path in run["artifacts"]]
+    if failed_cadence:
+        cadence_artifacts.extend([f"{failed_cadence}/failure.json", f"{failed_cadence}/preview.md"])
     feature_states = {feature_id: state for run in prepare_runs for feature_id, state in run["feature_states"].items()}
+    delivery_prepare_state = prepared_delivery_state(
+        len(requested_cadences), prepare_runs, failed_cadence
+    ) if sync_to_provider else "not_requested"
+    completed_by_cadence = {run["cadence"]: run for run in prepare_runs}
+    automation_runs: dict[str, dict[str, Any]] = {}
+    for cadence in requested_cadences:
+        completed = completed_by_cadence.get(cadence)
+        if completed:
+            automation_runs[cadence] = {
+                "label": cadence.replace("-", " ").title(),
+                "mode": "prepare",
+                "prepare_executed": True,
+                "production_schema_validated": True,
+                "preview_path": f"{cadence}/preview.md",
+                "delivery": (
+                    completed["delivery_status"] if sync_to_provider else "not_requested"
+                ),
+                "status": completed["status"],
+            }
+            continue
+        is_failure = cadence == failed_cadence
+        cadence_status = "failed" if is_failure else "not_run"
+        automation_runs[cadence] = {
+            "label": cadence.replace("-", " ").title(),
+            "mode": "prepare",
+            "prepare_executed": is_failure,
+            "production_schema_validated": False,
+            "preview_path": f"{cadence}/preview.md" if is_failure else None,
+            "delivery": "not_requested",
+            "status": cadence_status,
+        }
+        for feature_id, _ in CADENCE_FEATURES[cadence]:
+            feature_states[feature_id] = "fail" if is_failure else "not_run"
     receipt = {
         "schema_version": 1,
         "kind": "company-os-real-pkms-doctor",
@@ -713,7 +1043,9 @@ def operate(args: argparse.Namespace) -> int:
         "run_root": str(run_root),
         "input_mode": "configured_sources",
         "model_mode": "live",
-        "delivery_state": "not_requested",
+        "requested_cadences": list(requested_cadences),
+        "excluded_cadences": [cadence for cadence in CADENCE_CONFIG if cadence not in requested_cadences],
+        "delivery_state": delivery_prepare_state,
         "downstream_calls": 0,
         "provider": "notion",
         "bindings_sha256": _sha256_file(bindings_path),
@@ -721,42 +1053,41 @@ def operate(args: argparse.Namespace) -> int:
         "source_counts": {alias: source["selected_count"] for alias, source in snapshot["sources"].items()},
         "read_operation_inventory": reader.trace,
         "mutation_operations_registered": [],
-        "automation_runs": {
-            run["cadence"]: {
-                "label": run["cadence"].replace("-", " ").title(),
-                "mode": "prepare",
-                "prepare_executed": True,
-                "production_schema_validated": True,
-                "preview_path": f"{run['cadence']}/preview.md",
-                "delivery": "not_requested",
-                "status": run["status"],
-            }
-            for run in prepare_runs
-        },
+        "automation_runs": automation_runs,
         "feature_states": feature_states,
         "generation": {run["cadence"]: run["generation"] for run in prepare_runs},
         "semantic_judges": {
             run["cadence"]: {"calls": 1, "model": run["judge_model"], "tools": []}
             for run in prepare_runs
         },
-        "source_pre_post": {"before_sha256": before_source_hash, "after_sha256": after_source_hash, "unchanged": source_unchanged},
-        "workspace_pre_post": {"before": before_hashes, "after": after_hashes, "unchanged": workspaces_unchanged},
+        "source_pre_post": {
+            "before_sha256": before_source_hash,
+            "after_sha256": after_source_hash,
+            "unchanged": source_unchanged,
+            "classification": "unchanged" if source_unchanged else "observed_drift_no_mutation_capability",
+            "readback_path": "source-readback.json",
+        },
+        "workspace_pre_post": workspace_safety,
+        "installed_workspace_review": installed_workspace_review,
         "stages": {
             "setup": "pass",
             "real_integrations": "pass",
             "workspace_proposal": "pass",
             "production_prepare": "pass" if technical_pass else "failed",
             "intermediary_evaluation": "pass" if technical_pass else "failed",
-            "downstream_delivery": "not_requested",
+            "downstream_delivery": delivery_prepare_state,
         },
         "cadence_artifacts": cadence_artifacts,
-        "artifacts": ["workspace-proposal.md", "workspace-binding-review.json", *cadence_artifacts, "index.html"],
+        "failure": ({"cadence": failed_cadence, "detail_path": f"{failed_cadence}/failure.json"} if failed_cadence else None),
+        "artifacts": ["activity.jsonl", "workspace-proposal.md", "workspace-binding-review.json", "source-readback.json", *cadence_artifacts, "model.json", "index.html"],
     }
     _write_private(run_root / "doctor-receipt.json", json.dumps(receipt, indent=2, ensure_ascii=False))
+    _log_event(run_root, "receipt.written", status=status)
     try:
         build_static_evidence_viewer(out_dir=run_root, doctor_run_root=run_root)
     except Exception as error:
         raise DoctorError(f"canonical eval viewer build failed: {error}") from error
+    _log_event(run_root, "viewer.built", path="index.html")
     print(json.dumps({
         "status": receipt["status"],
         "run_id": run_id,
@@ -771,6 +1102,16 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument("--profile-home", type=Path, default=DEFAULT_PROFILE)
     command.add_argument("--bindings", type=Path)
     command.add_argument("--run-id")
+    command.add_argument(
+        "--cadence",
+        dest="cadences",
+        action="append",
+        choices=("daily", "weekly"),
+    )
+    sync = command.add_mutually_exclusive_group()
+    sync.add_argument("--prepare-sync-plan", dest="sync_to_provider", action="store_true")
+    sync.add_argument("--no-sync", dest="sync_to_provider", action="store_false")
+    command.set_defaults(sync_to_provider=False)
     return command
 
 

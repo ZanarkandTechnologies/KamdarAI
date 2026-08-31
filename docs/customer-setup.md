@@ -125,8 +125,10 @@ failed prerequisite:
 On a new profile, the interactive wizard asks for company details, data sources,
 and optional owner messages. Messaging asks ordinary questions only: completed
 reports and/or owner alerts, the owner's name, Telegram/Slack/WhatsApp, and
-**Prepare drafts in the private workspace** or **Send automatically**. Employee
-follow-up is visibly unavailable until approved People-directory routes exist.
+**Prepare drafts in the private workspace** or **Send automatically**. Leaving
+these choices empty is the lean default. Task-specific documentation and
+progress questions use comments on the exact linked Work item; they need no
+separate messaging setup.
 Setup also asks one plain-language evaluation question: **Prepare only** or
 **Reviewed Stage 2**. Prepare only is the default and changes no downstream
 system. Reviewed Stage 2 permits a later Apply action, but does not apply
@@ -293,10 +295,11 @@ python setup.py deliver --handoff <private-run>/<cadence>/handoff.json --apply
 
 Stage 2 covers local memory/report writes plus every configured external
 destination, not only Telegram. A disabled policy returns `not_requested`.
-Missing artifact-sync rows mean local-only; missing required Work or messaging
-routes remain visibly blocked. Successful actions require filesystem read-back,
-provider read-back, or provider acceptance and write a redacted
-`delivery-receipt.json` beside the handoff.
+Missing artifact-sync rows mean local-only. An unresolved exact Work target or
+an explicitly configured but unavailable message route remains visibly blocked.
+Successful actions require filesystem read-back, provider read-back, or
+provider acceptance and write a redacted `delivery-receipt.json` beside the
+handoff.
 
 ## 5. Restart and update
 

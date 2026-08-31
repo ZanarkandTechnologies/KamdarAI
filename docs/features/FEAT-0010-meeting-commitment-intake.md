@@ -10,10 +10,9 @@ tags: [company-os, feature, meeting, work]
 feature_id: FEAT-0010
 feature_key: meeting.commitment-intake
 system_id: SYS-0001
-category: workflow
+category: manual-workflow
 public: true
 surfaces:
-  - automations/meeting-commitment-intake.md
   - templates/meeting.md
   - templates/task.md
 source_refs:
@@ -31,10 +30,11 @@ Meeting commitments should enter the existing Work system with owners, dates,
 and provenance instead of remaining as prose that Project reporting cannot
 track.
 
-## Trigger and inputs
+## Invocation and inputs
 
-One newly completed Meeting, its linked Project, and the People named in its
-explicit Commitments section.
+A user manually supplies one Meeting, its linked Project, and the People named
+in its explicit Commitments section. Nothing polls for or automatically
+processes completed Meetings.
 
 ## Pipeline signature
 
