@@ -9,7 +9,7 @@ created_at: 2026-08-31T00:00:00Z
 updated_at: 2026-08-31T00:00:00Z
 depends_on: []
 ui_scope: false
-feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004, FEAT-0005, FEAT-0006, FEAT-0007, FEAT-0011]
+feature_refs: [daily-progress-chasing, daily-documentation-quality, weekly-employee-performance, weekly-sop-extraction, weekly-department-company-reporting]
 ---
 
 # TASK-0023: Deploy the managed Kamdar Company OS MVP
@@ -85,7 +85,7 @@ clean Windows host
   -> install workspace + full production automation instructions
   -> static/live health
   -> real-data Daily + Weekly preview
-  -> Doctor viewer/private artifact review
+  -> Doctor apps/eval_viewer/private artifact review
   -> restart + unchanged rerun
   -> redacted deployment receipt
 ```
@@ -94,11 +94,11 @@ clean Windows host
 
 | Area | MVP disposition | Reason |
 | --- | --- | --- |
-| Current Project Notes/template work | Ship after clean commit and green checks | Required by Daily/Weekly output |
+| Current Project Memory/template work | Ship after clean commit and green checks | Required by Daily/Weekly output |
 | Windows install/resume/health/update | Ship one operated happy path | Actual deployment target |
 | Notion authentication and bounded reads | Ship | Required source of truth |
 | Daily and Weekly real-data previews | Ship | Core customer value |
-| Doctor viewer/private artifact inspection | Ship | Operator must see the result |
+| Doctor apps/eval_viewer/private artifact inspection | Ship | Operator must see the result |
 | Restart and unchanged rerun | Ship | Minimum operational reliability |
 | Verified profile backup plus managed reinstall/restore steps | Ship | Minimum recoverability; no wizard or rehearsal needed |
 | Docker CI and adversarial failure matrix | Defer | Useful hardening, not first deployment |
@@ -131,7 +131,7 @@ clean Windows host
 
 ### M1 — Cut one clean MVP release boundary
 
-- **Files:** the current Project Notes/template-catalog changes and their owned
+- **Files:** the current Project Memory/template-catalog changes and their owned
   docs/tests/distribution entries.
 - **Change:** finish only the current coherent implementation, commit generated
   contracts required by the distribution, and remove drift.
@@ -141,8 +141,8 @@ clean Windows host
 
 ### M2 — Install the MVP without changing production automation prompts
 
-- **Files:** existing `setup.cmd`, `compose.yaml`, `scripts/setup_profile.py`,
-  `scripts/setup_runtime.py`, focused schedule/health tests, and private
+- **Files:** existing `setup.cmd`, `compose.yaml`, `apps/installer/profile.py`,
+  `apps/installer/runtime.py`, focused schedule/health tests, and private
   target-host receipts.
 - **Change:** operate fresh install or safe resume on the selected clean
   Windows/WSL2 host with the fixed Kamdar identity, Notion only, real-time
@@ -151,7 +151,7 @@ clean Windows host
   full Analyze plus Sync-to-provider instruction. The no-sync behavior belongs
   only to Doctor testing.
 - **Assertion:** distribution, workspace, model, exact bindings, Notion MCP,
-  gateway, packaged eval, and schedule rows pass. Company OS cron inventory
+  gateway, skill-package, and schedule rows pass. Company OS cron inventory
   contains the complete Daily and Weekly automation prompts. `PARTIAL` is
   acceptable only for explicitly deferred webhook, messaging, and
   optional-provider rows; no core row may be partial or failed.
@@ -161,9 +161,9 @@ clean Windows host
 
 ### M3 — Prove the core value through selected read-only Doctor previews
 
-- **Files:** `scripts/setup_cli/app.py`, `scripts/run_company_doctor.py`, Doctor
-  parser/receipt tests, private run artifacts, and a sanitized QA summary under
-  TASK-0023.
+- **Files:** `apps/installer/cli/app.py`, `apps/doctor/run.py`, Doctor
+  parser/receipt tests and owner-local docs,
+  private run artifacts, and a sanitized QA summary under TASK-0023.
 - **Change:** preflight
   `/opt/data/profiles/kamdar-ai/company-os-doctor-bindings.json`, require only
   owner-approved Kamdar roots, confirm the Notion credential remains
@@ -174,14 +174,18 @@ clean Windows host
   Doctor-only no-sync option that copies the complete selected automation
   instruction and removes only its existing numbered Sync-to-provider step
   before execution. Do not edit the source Markdown or production cron prompt,
-  and do not introduce a new orchestration or delivery design. Let setup choose
+  and do not introduce a new orchestration or delivery design. Generate one
+  second readiness registry from the user-feature docs. Run a
+  cadence only when all user features in that cadence have their required
+  sources, minimum records, required fields, and local Project Memory. Let setup choose
   Daily, Weekly, or both, and Analyze only or Analyze plus a prepared sync plan.
-  Actual provider application remains the existing separately reviewed
-  `setup.py deliver --handoff ... --apply` step.
+  Scheduled provider application remains native to the automation's configured
+  skills and MCPs; do not add a preparation, handoff, or delivery runtime.
 - **Assertion:** each preview has a private path and hash; material claims link
   to source evidence; no facts or employee ratings are invented; missing data
-  appears as an honest gap. The Doctor receipt must record
-  `downstream_calls: 0`, `mutation_operations_registered: []`, an allowlisted
+  appears as an exact readiness gap before model spend. The Doctor receipt must record
+  `downstream_calls: 0`, `mutation_operations_registered: []`, user-feature
+  readiness and eligible/blocked cadences, an allowlisted
   read-operation inventory, unchanged source hashes, and unchanged source-owned
   and installed workspace hashes.
 - **Proof:** redacted Doctor receipt plus operator acceptance against those
@@ -191,7 +195,7 @@ clean Windows host
 
 ### M4 — Prove restart, rerun, and a verified backup
 
-- **Files:** target-host state hashes and `docs/customer-setup.md`.
+- **Files:** target-host state hashes and `apps/installer/docs/customer-setup.md`.
 - **Change:** create one named-volume backup before deployment, verify that the
   archive is nonempty and hashable, stop/start Docker, rerun `setup.cmd`, and
   verify the profile and complete production schedules are preserved. Document managed
@@ -254,9 +258,7 @@ required_tas_gates: [implementation-plan, evidence-quality, integration-readines
 hard_gates: [no production mutation, no secret artifact, no fixture-as-live-proof, no unsupported provider claim, no skipped-target pass]
 checks:
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
-  - python3 scripts/sync_report_templates.py --check
-  - python3 scripts/validate_company_context.py --context workspace.hermes.md
-  - python3 scripts/run_installed_evals.py --root .
+  - python3 apps/installer/validate_context.py --context workspace.hermes.md
   - setup.cmd on the selected clean Windows/WSL2 host
   - docker compose --profile setup run --rm setup python /distribution/setup.py doctor --profile-home /opt/data/profiles/kamdar-ai --cadence daily --cadence weekly
 evidence:
@@ -268,9 +270,8 @@ evidence:
 
 ## State
 
-- **Current:** downscoped MVP plan; implementation has not started.
-- **Next:** accept this boundary, execute M1 before touching the target host,
-  and prepare M0 dispositions in parallel for application at M5.
+- **Current:** Doctor delegates analysis-only Daily/Weekly execution to native Hermes; target operation remains pending.
+- **Next:** complete repository verification, then execute M1 before touching the target host.
 - **Human gates:** target Windows access, Kamdar Notion OAuth, exact source-root
   approval, and operator preview acceptance.
 
@@ -283,5 +284,5 @@ evidence:
 - `tickets/archive/TASK-0020/ticket.md`
 - `tickets/archive/TASK-0021/ticket.md`
 - `tickets/archive/TASK-0022/ticket.md`
-- `docs/customer-setup.md`
+- `apps/installer/docs/customer-setup.md`
 - `docs/autonomous-testing.md`
