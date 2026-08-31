@@ -111,7 +111,7 @@ rubric_families: [setup-operability, eval-quality, least-privilege, truthfulness
 required_tas_gates: [implementation, qa, review]
 hard_gates: [no raw catalog commands, no secret output, no silent side effect, no false green]
 checks:
-  - python3 -m unittest tests.test_provider_catalog tests.test_connection_evals -v
+  - python3 -m unittest tests.unit.scripts.test_provider_catalog tests.unit.scripts.test_run_connection_evals -v
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
   - python3 setup.py --help
 evidence:
@@ -146,8 +146,8 @@ irreversible action remain human gates; absence of those gates is
 - `scripts/run_connection_evals.py`
 - `setup.py`
 - `scripts/setup_runtime.py`
-- `tests/test_provider_catalog.py`
-- `tests/test_connection_evals.py`
+- `tests/unit/scripts/test_provider_catalog.py`
+- `tests/unit/scripts/test_run_connection_evals.py`
 
 ## Grounding
 

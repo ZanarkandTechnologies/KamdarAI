@@ -135,6 +135,6 @@ human_gates: [Notion OAuth, isolated-root sharing, webhook verification]
 ## Links
 
 - `plugins/platforms/notion/`
-- `skills/notion-webhook-onboarding/`
+- `scripts/setup_cli/flows/webhook.py`
 - [Official Notion MCP setup](https://developers.notion.com/guides/mcp/get-started-with-mcp)
 - [Official Notion webhooks](https://developers.notion.com/reference/webhooks)

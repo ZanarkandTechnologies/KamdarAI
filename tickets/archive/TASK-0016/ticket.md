@@ -126,7 +126,7 @@ Windows self-hosted run = setup.cmd / Docker Desktop / WSL2 proof
    call `compose down -v --remove-orphans` only after matching the generated
    project and volume names for this run.
 3. **Test the runner through real Docker only (`C1`, `C3`).** Add
-   `tests/test_setup_e2e.py` as an environment-gated operated suite that invokes
+   `tests/e2e/test_run_setup_e2e.py` as an environment-gated operated suite that invokes
    the actual Docker/Compose commands for launch-code propagation, bounded
    timeout, secret redaction, partial/failed lanes, interruption cleanup, exact
    resource ownership, and refusal to touch `kamdar-hermes-data` or port `9119`.
@@ -177,7 +177,7 @@ rubric_families: [implementation-plan, integration-readiness, evidence-quality]
 required_tas_gates: [plan, implementation, qa, review]
 hard_gates: [no protected-volume access, no provider mutation, no secret artifact, no fake or fixture lane, no synthetic Windows pass]
 checks:
-  - python3 -m unittest tests.test_setup_e2e tests.test_setup_runtime -v
+  - python3 -m unittest tests.e2e.test_run_setup_e2e tests.unit.scripts.test_setup_runtime -v
   - python3 scripts/run_setup_e2e.py safe-docker --receipt <temporary-artifact-path>
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
   - python3 -m unittest discover -s tests -p 'test_*.py' -v

@@ -38,13 +38,15 @@ against the client's configured private destinations.
   notes; stable source keys; structured sections; one complete Weekly read of
   all Project Notes; Project/Department/Company reports; cross-Project Employee
   Memory; cross-Project workflow/SOP samples; Decision and Issue promotion;
-  carry-forward; archive; destination URL bindings; conflict-safe targeted
-  provider updates; template-to-Pydantic drift checks; offline eval proof.
+  carry-forward; archive; optional artifact-sync bindings; conflict-safe targeted
+  provider mirrors; local-first reports and entity memory;
+  template-to-Pydantic drift checks; offline eval proof.
 - **Out:** an event database, queue, stream processor, metrics warehouse,
   separate Daily employee/SOP files, Daily edits to People or SOP records,
   rescanning raw Work during Weekly, automatic employee ratings, personality or
   intent inference, inferred effort, automatic SOP baseline replacement,
-  public intermediate state, or a second schema runtime.
+  public intermediate state, provider-owned canonical memory, bidirectional
+  memory synchronization, or a second schema runtime.
 - **Migration:** replace the current shared Draft writer with one Project Notes
   writer. Convert an existing active Draft once when its source keys can be
   preserved; otherwise block with a repair message. Do not run dual writers or
@@ -63,6 +65,35 @@ against the client's configured private destinations.
 > **Example:** Aisha's TASK-101 note in Project A and TASK-204 note in Project B
 > both update `PERSON-AISHA` during Weekly. Workflow samples from both Projects
 > update the same SOP only when they share an explicit `workflow_key`.
+
+### Local canonical memory and optional sync
+
+Short-term memory and long-term memory are lifecycles inside the same private
+runtime workspace, not separate storage providers:
+
+```text
+Daily -> weeks/<week>/project-notes/        short-term memory
+Weekly -> memory/{employees,sops,...}/      long-term memory
+Weekly -> weeks/<week>/reports/             finalized local reports
+```
+
+Local writes always occur. A complete `artifact + provider + destination`
+binding adds a one-way provider copy after its owning local write reads back.
+An absent binding means local-only. A partial binding is invalid. Provider
+copies never become canonical and provider edits never flow back into memory.
+The provider receives the completed canonical local Markdown, not a separately
+regenerated artifact from the incremental extraction payload.
+The supported artifact roles are `short-term memory`, `long-term memory`, and
+`reports`; there is no separate enabled/default column.
+
+Memory destinations must be operator-approved private locations. Reports may
+target a management dashboard. Work-item progress and documentation comments
+remain bounded source-record actions rather than memory synchronization.
+The shipped Kamdar configuration leaves artifact sync and owner communications
+empty: local-only is the default. Documentation questions and progress chases
+map to exact linked Work comments. A configured employee-follow-up route may
+override chase comments, but the system never infers a recipient or generic
+fallback channel.
 
 ## Contract Diagram
 
@@ -149,14 +180,16 @@ accepted completed outcome does not carry forward.
 
 | Entity | Persistent section | Replaceable weekly section | Match key |
 | --- | --- | --- | --- |
-| Person | Durable operating memory | Latest weekly evidence across Projects | `person_id` |
-| SOP | Approved workflow and reviewed baseline | Latest weekly samples across Projects | `workflow_key` |
-| Decision | Accepted choice, authority, tradeoff, review trigger | None | destination dedupe key |
-| Issue | Problem, economics, intervention, evidence | None | destination dedupe key |
+| Employee Memory | Durable accepted outcomes | Latest weekly evidence across Projects | `person_id` |
+| SOP Memory | Approved workflow and reviewed baseline | Latest weekly samples across Projects | `workflow_key` |
+| Decision Memory | Accepted choice, authority, tradeoff, review trigger | None | destination dedupe key |
+| Issue Memory | Problem, economics, intervention, evidence | None | destination dedupe key |
 
-Person and SOP persistent sections are Weekly-only. Daily never loads or edits
-them. Weekly loads a lightweight ID/key index, then fetches full records only
-for employees and workflows referenced by that week's Project Notes.
+These records live under the private runtime `memory/` directory and are
+Weekly-only. Daily never loads or edits them. Weekly loads a lightweight ID/key
+index, then fetches full records only for employees and workflows referenced by
+that week's Project Notes. Public People records remain directory sources and
+never receive Employee Memory.
 
 ### Weekly freeze protocol
 
@@ -232,23 +265,22 @@ does it publish the directory. On failure the staging directory is not visible
 to the writer, the old Draft remains unchanged, no new writer starts, and
 hidden runtime state records the exact blocked block/key and repair action.
 
-## Existing reuse and gaps
+## Reused foundations
 
 - `DailyContextDiffSchema` already supplies bounded Projects, Work, Meetings,
   and People with stable relations.
-- `DailyReviewResultSchema` already performs one structured extraction, but its
-  knowledge rows do not cover the complete Project Notes contract.
+- `DailyReviewResultSchema` supplies the single structured extraction now bound
+  to the complete Project Notes contract.
 - `scripts/project_week_notes.py` already proves mode-0600 atomic writes,
   source-key idempotency, and conflicts. Reuse those mechanics while changing
   mutable upserts into append-only Project-scoped notes.
-- `WeeklyContextSchema` already forbids raw Work/Meeting input, but currently
-  accepts Project Draft reports rather than all frozen Project Notes.
-- `WeeklyReviewResultSchema` already produces report rollups and promotion
-  dispositions, but has no Employee Memory updates or cross-Project SOP sample
-  merge.
-- `templates/person.md` is only a directory card. `templates/sop.md` has a
-  durable baseline but one ambiguous `project` field and no latest-week sample
-  section.
+- `WeeklyContextSchema` forbids raw Work/Meeting input and now consumes the
+  frozen Project Notes set.
+- `WeeklyReviewResultSchema` produces report rollups, promotion dispositions,
+  cross-Project Employee Memory updates, and cross-Project SOP sample merges.
+- `templates/person.md` remains a public directory card;
+  `templates/employee-memory.md` owns private employee evidence;
+  `templates/sop.md` separates the approved baseline from Weekly samples.
 - `python3 scripts/sync_report_templates.py` and its Pydantic drift checks are implemented and remain the
   report-template authoring path; do not rebuild them.
 
@@ -261,8 +293,8 @@ rung: reuse_local
 evidence:
   - current writer already owns atomic private Markdown and source-key idempotency
   - Daily and Weekly already use Pydantic contracts and filesystem evals
-  - current People and SOP destinations already exist
-smallest_next_action: replace the mutable shared Draft contract with Project-scoped append-only notes, then extend Weekly with two grouping keys
+  - the Stage 2 planner already owns typed local actions, provider actions, idempotency, and read-back
+smallest_next_action: add one typed optional artifact-sync table and make local actions prerequisites of provider copies
 proof_preserved: conflict handling, frozen Weekly input, exact source IDs, tier-A artifact review, provider read-back, and offline evals remain required
 review_route: review:implementation-plan
 ```
@@ -318,10 +350,10 @@ review_route: review:implementation-plan
 ### 4. Add cross-Project Weekly reducers
 
 - **Files:** `schemas/automations/weekly_review_result.py`,
-  `templates/person.md`, `templates/sop.md`, generated/hand-authored schema
+  `templates/employee-memory.md`, `templates/sop.md`, generated/hand-authored schema
   contracts and fixtures.
 - **Operation:** add `employee_memory_updates[]` grouped by `person_id` and
-  `sop_updates[]` grouped by `workflow_key`. Person updates contain a durable,
+  `sop_updates[]` grouped by `workflow_key`. Employee Memory updates contain a durable,
   source-linked memory addition plus one replaceable latest-week summary. SOP
   updates retain samples from multiple Projects, preserve the prior baseline,
   and follow the schemas and no-auto-baseline policy above. Make Project
@@ -338,15 +370,20 @@ review_route: review:implementation-plan
 ### 5. Apply validated outputs in dependency order
 
 - **Files:** Weekly applier/reference automation, provider adapter calls,
-  `workspace.hermes.md` bindings, integration receipt schema.
+  `schemas/workspace.py`, `workspace.hermes.md` bindings, integration receipt
+  schema.
 - **Operation:** validate the full Weekly result and artifact-quality review
-  before writes; then apply Project reports, Employee/SOP/Decision/Issue
-  updates, Department reports, Company report, and approved outbound effects.
-  Use expected destination versions/text and source note keys for idempotency.
-  Write the consolidation receipt only after all required local projections and
-  authorized provider effects read back successfully.
+  before writes; then write short-term memory, long-term
+  Employee/SOP/Decision/Issue memory, and finalized reports locally. Parse the
+  optional `short-term memory`, `long-term memory`, and `reports` sync bindings.
+  For each configured binding, apply a one-way provider copy only after its
+  owning local action reads back. Use expected versions/text, source note keys,
+  and action dependencies for idempotency. Write the consolidation receipt only
+  after all required local projections and configured provider copies read back.
 - **Assertion:** an exact rerun creates no duplicate memory, SOP sample, report,
-  Decision, Issue, or message; a partial provider failure keeps notes frozen.
+  Decision, Issue, or message; no sync binding produces no provider action; a
+  partial binding fails validation; a provider failure preserves local output
+  and keeps notes frozen.
 - **Failure boundary:** local/private outputs survive blocked publication;
   external effects never infer a destination or permission.
 
@@ -385,7 +422,10 @@ done:
   - Weekly produces Project Department and Company reports from the frozen notes set.
   - One employee working across multiple Projects receives one deduplicated weekly memory update.
   - One workflow observed across multiple Projects receives one source-linked SOP sample update.
-  - Person and SOP records separate Weekly-owned persistent memory from replaceable latest-week evidence.
+  - Local Employee and SOP Memory separate Weekly-owned persistent memory from replaceable latest-week evidence.
+  - All short-term memory long-term memory and finalized reports write locally before any configured provider copy.
+  - Missing sync bindings mean local-only; configured provider and destination pairs create one-way copies.
+  - Public People records never receive Employee Memory.
   - Employee updates contain no inferred ratings personality intent or unsourced effort.
   - One workflow sample cannot establish or silently replace an SOP baseline.
   - A consolidation receipt exists only after required projections validate and read back.
@@ -395,11 +435,11 @@ rubric_families: [spec-contract, implementation-plan, evidence-quality, integrat
 required_tas_gates: [implementation-plan, evidence-quality, integration-readiness]
 hard_gates: [no event platform, no mixed Weekly snapshot, no Daily entity writes, no missing Project input, no duplicate projection, no inferred employee rating, no silent baseline replacement, no lossy Draft migration, no public intermediate state]
 checks:
-  - python3 -m unittest tests.test_project_week_notes -v
-  - python3 -m unittest tests.test_project_week_notes tests.test_project_note_reducers -v
-  - python3 -m unittest tests.test_validate_automation_contract -v
-  - python3 -m unittest tests.test_pydantic_daily_contracts tests.test_validate_eval_run -v
-  - python3 -m unittest tests.test_pydantic_weekly_meeting_contracts tests.test_validate_eval_run -v
+  - python3 -m unittest tests.unit.scripts.test_project_week_notes -v
+  - python3 -m unittest tests.unit.scripts.test_project_week_notes tests.unit.scripts.test_project_note_reducers -v
+  - python3 -m unittest tests.unit.schemas.test_automation_contract_validation -v
+  - python3 -m unittest tests.unit.schemas.test_daily_review_result tests.harness.evals.test_validate_eval_run -v
+  - python3 -m unittest tests.unit.schemas.test_weekly_and_meeting_contracts tests.harness.evals.test_validate_eval_run -v
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
   - python3 scripts/sync_report_templates.py --check
   - python3 scripts/validate_company_context.py --context workspace.hermes.md
@@ -465,3 +505,6 @@ human_gates: [accept Project Notes section names, authorize real provider destin
 - `tickets/TASK-0019/progress.md`
 - `tickets/TASK-0019/artifacts/qa/20260831-project-notes-projection/report.md`
 - `tickets/TASK-0019/artifacts/qa/20260831-project-notes-projection/result.json`
+- `tickets/TASK-0019/artifacts/qa/20260831-minimal-private-setup/report.md`
+- `tickets/TASK-0019/artifacts/qa/20260831-minimal-private-setup/result.json`
+- `tickets/TASK-0019/artifacts/qa/20260831-minimal-private-setup/review.md`

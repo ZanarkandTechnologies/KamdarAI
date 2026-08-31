@@ -112,7 +112,7 @@ message choices -> typed workspace binding -> Hermes gateway setup
    every shown screen and recovery branch is implemented.
 6. **Make messaging choices customer-readable (`schemas/workspace.py`,
    `workspace.hermes.template.md`, `scripts/setup_cli/flows/workspace.py`,
-   `tests/test_workspace_schema.py`, `tests/test_setup_init.py`; map `M1–M2`).**
+   `tests/unit/schemas/test_workspace_schema.py`, `tests/integration/test_setup_init.py`; map `M1–M2`).**
    Render selectable `owner report` and `owner alert` jobs and show employee
    follow-up as unavailable until People-directory routes exist. Ask for the
    owner recipient and messaging app only where required; derive runtime and
@@ -122,14 +122,14 @@ message choices -> typed workspace binding -> Hermes gateway setup
    plain-language field error; never partially rewrite the managed table.
 7. **Reuse Hermes for connection ownership (`scripts/setup_cli/flows/messaging.py`,
    `scripts/setup_cli/flows/lifecycle.py`, `scripts/setup_cli/process.py`,
-   `tests/test_setup_messaging.py`; map `M3`).** Invoke `hermes gateway setup`
+   `tests/integration/test_messaging_workflow.py`; map `M3`).** Invoke `hermes gateway setup`
    only after the reviewed plan is accepted. Do not infer readiness from
    `hermes send --list`: an empty directory can still exit successfully. Do not
    read, copy, or print bot tokens. **Failure
    boundary:** preserve the workspace draft, mark messaging incomplete, and
    continue only in draft-first mode.
 8. **Add an explicit connection-test gate (`scripts/setup_cli/flows/messaging.py`,
-   `scripts/setup_runtime.py`, `tests/test_setup_messaging.py`; map `M4`).** Ask
+   `scripts/setup_runtime.py`, `tests/integration/test_messaging_workflow.py`; map `M4`).** Ask
    before one `hermes send --to <app> --json` test message, parse only the
    provider-safe result fields, ask the named owner to confirm receipt, and
    write an owner-only `ResolvedMessagingTarget` receipt containing the exact
@@ -137,7 +137,7 @@ message choices -> typed workspace binding -> Hermes gateway setup
    messaging visibly untested. **Failure boundary:** the typed send guard blocks
    automatic delivery unless this exact receipt remains current; no fallback app.
 9. **Separate messaging health from gateway health (`scripts/setup_runtime.py`,
-   `scripts/setup_cli/flows/verification.py`, `tests/test_setup_runtime.py`;
+   `scripts/setup_cli/flows/verification.py`, `tests/unit/scripts/test_setup_runtime.py`;
    map `M5`).** Keep `gateway` as process readiness. Add
    `messaging_configured` and `messaging_delivery` only from a current,
    recipient-confirmed exact-target receipt. A draft-only binding may remain
@@ -145,7 +145,7 @@ message choices -> typed workspace binding -> Hermes gateway setup
    proof is partial. **Failure boundary:** a running gateway never promotes an
    unconfigured or untested app to pass.
 10. **Enforce every normal downstream send (`scripts/authorized_message.py`,
-    `automations/*.md`, `tests/test_setup_messaging.py`; map `M5`).** Parse the
+    `automations/*.md`, `tests/integration/test_messaging_workflow.py`; map `M5`).** Parse the
     Pydantic binding immediately before delivery, require `send automatically`,
     resolve only the matching profile-private exact target, and invoke Hermes.
     Draft-first atomically writes an idempotent action-keyed artifact under
@@ -184,8 +184,8 @@ rubric_families: [installability, idempotency, ownership-safety, error-actionabi
 required_tas_gates: [plan, implementation, qa, review]
 hard_gates: [no POSIX-shell-only contract, no secret output, no unknown-file deletion]
 checks:
-  - python3 -m unittest tests.test_setup_architecture tests.test_setup_init tests.test_setup_launch -v
-  - python3 -m unittest tests.test_workspace_schema tests.test_setup_messaging tests.test_setup_runtime -v
+  - python3 -m unittest tests.contracts.test_setup_architecture tests.integration.test_setup_init tests.integration.test_setup_launch -v
+  - python3 -m unittest tests.unit.schemas.test_workspace_schema tests.integration.test_messaging_workflow tests.unit.scripts.test_setup_runtime -v
   - python3 -m unittest discover -s tests -p 'test_*.py' -v
   - disposable clean install update and rerun smoke
 evidence:

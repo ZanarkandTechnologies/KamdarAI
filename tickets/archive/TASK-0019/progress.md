@@ -7,6 +7,82 @@ state: offline_complete
 
 # TASK-0019 progress
 
+## 2026-08-31 — Minimal private setup verified
+
+- Wired the operated Weekly Doctor path to freeze exactly the active Projects'
+  current-week Project Notes before loading Weekly context. Missing Project
+  coverage leaves the freeze absent and becomes a visible configuration gap;
+  Daily-only Doctor runs do not freeze the week. Weekly reruns also compare the
+  current active Project set with the immutable manifest, so an added or removed
+  Project blocks stale consolidation.
+- Made the distributed fresh-install template—not only the Kamdar development
+  context—default to empty artifact-sync and communications tables.
+- Removed Reports, Decisions, and SOPs from the fresh-install source table;
+  Project Notes, reports, and Employee/SOP/Decision/Issue Memory are canonical
+  private files. Older workspaces receive the explicit empty sync block without
+  losing owner content.
+- Routed both documentation questions and stale-work chases to exact linked Work
+  comments by default. Multi-ticket chases fan out to every resolved Work URL;
+  unresolved URLs block without database fallback. An explicitly configured
+  employee-follow-up route overrides only the progress comments.
+- Updated setup guidance, PRD, operator/customer docs, automation/feature
+  contracts, and the Markdown-synchronized Pydantic message description.
+- Proof: 263 Python tests passed with 2 explicitly gated live tests skipped;
+  template sync, context validation, installed offline evals, and diff checks
+  passed. Independent re-review found no remaining critical/high issue.
+- QA receipt: `artifacts/qa/20260831-minimal-private-setup/result.json`.
+
+## 2026-08-31 — Local-first memory and optional provider sync
+
+- Added a Pydantic `artifact-sync` contract with three artifact roles:
+  `short-term memory`, `long-term memory`, and `reports`. Missing rows are
+  local-only; partial rows, duplicate roles, and non-HTTPS destinations fail
+  validation. There is no enabled/default field.
+- Made Stage 2 write Project Notes, Employee/SOP/Decision/Issue Memory, and
+  immutable report versions into the private Hermes workspace before any
+  optional provider copy. Each provider action depends on the successful local
+  action; failed local version/hash guards prevent the copy.
+- Split public Person directory records from private Employee Memory. Weekly
+  can initialize and update `memory/employees/<person-id>.md` without writing
+  private evidence to the configured People database.
+- Updated the PRD, Company OS map, operator manual, Daily/Weekly contracts,
+  feature docs, workspace configuration, setup review screen, templates, and
+  synthetic seeds to use the same short-term/long-term vocabulary.
+- Wired Stage 2 to the existing Project Notes lifecycle instead of a generic
+  Markdown appender: Daily initialization/append honors locks and frozen weeks;
+  Weekly consolidation and deterministic carry-forward run only after all
+  required local projections and configured copies succeed.
+- Weekly state loading now accepts only a hash-verified freeze, reads nested
+  report versions, and loads full Employee/SOP Memory only for referenced IDs.
+  Final report versions are immutable; local action receipts persist file hashes
+  and revalidate them before a provider retry.
+- Provider copies now use the verified complete local Markdown, not an
+  extraction delta. Long-term sync cannot target the configured public People
+  source, and every employee ID plus resolved memory path is traversal-safe.
+- Proof at this checkpoint: all 253 Python tests passed (2 explicitly gated provider tests
+  skipped). Template drift, company-context validation, installed offline
+  evals, and `git diff --check` passed.
+- Independent hostile re-review passed with no remaining critical/high finding.
+
+## 2026-08-31 — Full template-to-Pydantic synchronization
+
+- Extended template sync from the three report templates to all 19 Markdown
+  templates. One generated catalog retains each stable ID, version, source
+  hash, and exact body; `--check` detects drift without a model call or write.
+- Moved documentation-request and employee-follow-up wording and golden
+  examples out of hard-coded Daily constants and into their Markdown templates.
+  The Daily Pydantic JSON Schema now resolves both descriptions from the
+  generated catalog.
+- Kept model interpretation limited to the three templates that define report
+  shapes. Their generated contract diff is displayed before replacement;
+  synthetic report preview remains an explicit prompt or `--preview` action.
+- Added the generated catalog to the client distribution and tests proving
+  complete inventory coverage, exact body synchronization, Pydantic binding,
+  and model-free drift detection for non-report templates.
+- Proof: all 225 Python tests passed (2 provider-backed tests skipped), template
+  sync reported no drift, and the distribution payload remained below its size
+  limit.
+
 ## 2026-08-31 — Python/Pydantic consolidation complete
 
 - Removed the JavaScript schemas, evaluators, test harness, package manifests,
@@ -64,19 +140,19 @@ state: offline_complete
 ### Focused proof
 
 ```text
-python3 -m unittest tests.test_project_week_notes -v
+python3 -m unittest tests.unit.scripts.test_project_week_notes -v
 # 4 pass
 
-python3 -m unittest tests.test_project_note_reducers -v
+python3 -m unittest tests.unit.scripts.test_project_note_reducers -v
 # 4 pass
 
-python3 -m unittest tests.test_pydantic_weekly_meeting_contracts tests.test_validate_eval_run -v
+python3 -m unittest tests.unit.schemas.test_weekly_and_meeting_contracts tests.harness.evals.test_validate_eval_run -v
 # 23 pass
 
-python3 -m unittest tests.test_validate_automation_contract -v
+python3 -m unittest tests.unit.schemas.test_automation_contract_validation -v
 # 5 pass
 
-python3 -m unittest tests.test_pydantic_weekly_meeting_contracts -v
+python3 -m unittest tests.unit.schemas.test_weekly_and_meeting_contracts -v
 # 14 pass
 ```
 
@@ -125,7 +201,7 @@ destination bindings, authentication, permissions, and explicit authority.
 ### Proof
 
 ```text
-python3 -m unittest tests.test_markdown_report_contract -v
+python3 -m unittest tests.integration.test_report_template_sync -v
 # 4 tests, 4 pass, 0 fail
 
 python3 scripts/sync_report_templates.py --check
@@ -186,7 +262,7 @@ current full-suite result is recorded above.
 ### Proof
 
 ```text
-python3 -m unittest tests.test_markdown_report_contract -v
+python3 -m unittest tests.integration.test_report_template_sync -v
 # 4 tests, 4 pass, 0 fail
 
 python3 scripts/markdown_report_contract.py \
