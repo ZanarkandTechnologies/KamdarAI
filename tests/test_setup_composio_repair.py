@@ -55,5 +55,8 @@ class ComposioRepairTests(unittest.TestCase):
             self.assertEqual(ensure.call_args_list[1].args[2], "good-key")
             save.assert_called_once_with(profile_home, "COMPOSIO_API_KEY", "good-key")
             configure.assert_called_once_with(
-                profile_home, "composio-google", "https://mcp.composio.dev/session/example"
+                profile_home,
+                "composio-google",
+                "https://mcp.composio.dev/session/example",
+                headers={"x-api-key": "${COMPOSIO_API_KEY}"},
             )

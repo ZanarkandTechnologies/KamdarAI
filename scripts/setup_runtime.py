@@ -255,18 +255,34 @@ def install_catalog_mcp(profile_home: Path, name: str) -> None:
     run_command(["hermes", "mcp", "install", name], profile_home)
 
 
-def configure_remote_mcp(profile_home: Path, name: str, url: str) -> None:
-    """Register one already-provisioned hosted MCP without exposing its URL."""
+def configure_remote_mcp(
+    profile_home: Path,
+    name: str,
+    url: str,
+    *,
+    headers: dict[str, str] | None = None,
+) -> None:
+    """Register one already-provisioned hosted MCP without exposing secrets."""
     if not re.fullmatch(r"[a-z][a-z0-9_-]*", name):
         raise RuntimeSetupError("invalid_remote_mcp_name")
     if not url.startswith("https://"):
         raise RuntimeSetupError("invalid_remote_mcp_url")
+    if headers is not None and (
+        not isinstance(headers, dict)
+        or not all(
+            isinstance(key, str) and key and isinstance(value, str) and value
+            for key, value in headers.items()
+        )
+    ):
+        raise RuntimeSetupError("invalid_remote_mcp_headers")
     program = (
         "import json,sys; "
         "from hermes_cli.config import set_config_value; "
         "payload=json.load(sys.stdin); "
         "set_config_value(payload['url_key'], payload['url'], force=True); "
-        "set_config_value(payload['enabled_key'], 'true', force=True)"
+        "set_config_value(payload['enabled_key'], 'true', force=True); "
+        "headers=payload.get('headers'); "
+        "headers is None or set_config_value(payload['headers_key'], headers, force=True)"
     )
     run_command(
         [str(hermes_python(profile_home)), "-c", program],
@@ -276,6 +292,8 @@ def configure_remote_mcp(profile_home: Path, name: str, url: str) -> None:
                 "url_key": f"mcp_servers.{name}.url",
                 "url": url,
                 "enabled_key": f"mcp_servers.{name}.enabled",
+                "headers_key": f"mcp_servers.{name}.headers",
+                "headers": headers,
             }
         ),
     )

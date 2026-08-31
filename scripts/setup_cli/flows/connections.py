@@ -124,6 +124,7 @@ def _configure_composio_connection(
             profile_home,
             str(providers[0]["mcp"]["name"]),
             str(state["mcp_url"]),
+            headers={"x-api-key": "${COMPOSIO_API_KEY}"},
         )
         if non_interactive:
             return

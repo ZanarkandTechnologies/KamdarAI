@@ -91,10 +91,12 @@ class SetupRuntimeTests(unittest.TestCase):
                     profile,
                     "composio-google",
                     "https://app.composio.dev/tool_router/v3/test/mcp",
+                    headers={"x-api-key": "${COMPOSIO_API_KEY}"},
                 )
         self.assertEqual(len(calls), 1)
         self.assertNotIn("app.composio.dev", " ".join(calls[0][0]))
         self.assertIn("app.composio.dev", calls[0][1] or "")
+        self.assertIn('"x-api-key": "${COMPOSIO_API_KEY}"', calls[0][1] or "")
 
     def test_webhook_url_requires_stable_public_https_hostname(self) -> None:
         self.assertEqual(
