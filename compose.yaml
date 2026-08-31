@@ -7,10 +7,10 @@ services:
     volumes:
       - kamdar_hermes_data:/opt/data
     environment:
-      HERMES_HOME: /opt/data/profiles/kamdar-ai
+      HERMES_HOME: /opt/data
       HERMES_UID: "10000"
       HERMES_GID: "10000"
-    command: ["gateway", "run"]
+    command: ["hermes", "-p", "kamdar-ai", "gateway", "run"]
     networks: [runtime]
 
   dashboard:
