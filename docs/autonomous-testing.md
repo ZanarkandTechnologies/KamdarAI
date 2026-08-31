@@ -4,7 +4,6 @@ status: active
 owner: Company OS
 created_at: 2026-08-29
 updated_at: 2026-08-31
-feature_refs: [FEAT-0011]
 ---
 
 # Autonomous testing
@@ -19,20 +18,17 @@ Run these commands from the repository root:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 scripts/validate_company_context.py --context workspace.hermes.md
-python3 scripts/run_installed_evals.py --root .
+python3 apps/installer/validate_context.py --context workspace.hermes.md
 ```
 
-The lane passes only when every command exits zero, context validation prints
-`context_valid=true`, and the installed-eval receipt reports `"status":
-"pass"`. Do not update expected files merely to turn a failure green.
+The lane passes only when every command exits zero and context validation prints
+`context_valid=true`. Do not update expected files merely to turn a failure green.
 
-Tests are grouped by proof boundary. `tests/unit/` is organized around canonical
-source owners, `tests/integration/` covers cross-module workflows, `tests/contracts/`
-holds repository and architecture invariants, `tests/harness/` covers eval
-tooling, and `tests/e2e/` and `tests/live/` remain explicit gated lanes. A
-source module may appear in integration proof in addition to its canonical unit
-suite; that is workflow coverage, not duplicate ownership.
+Tests live beside their behavioral owners in `apps/*/tests/`,
+`seed/tests/`, and plugin packages. Root `tests/contracts/`
+holds repository-wide invariants; `tests/test_owned_packages.py` provides one
+standard discovery bridge. Installer E2E and live-provider cases remain
+explicit gated lanes in `apps/installer/tests/`.
 
 ## Targeted setup lane
 
@@ -40,22 +36,22 @@ Use this smaller loop while changing setup, distribution, or webhook code:
 
 ```bash
 python3 -m unittest \
-  tests.contracts.test_setup_architecture \
-  tests.integration.test_setup_init \
-  tests.integration.test_setup_launch \
-  tests.integration.test_connection_certification_workflow \
-  tests.unit.scripts.test_setup_runtime \
-  tests.unit.scripts.test_setup_profile \
-  tests.unit.scripts.test_setup_workspace \
-  tests.unit.scripts.test_provider_catalog \
-  tests.unit.scripts.test_run_connection_evals \
-  tests.unit.scripts.test_composio_session \
+  apps.installer.tests.test_architecture \
+  apps.installer.tests.test_init \
+  apps.installer.tests.test_launch \
+  apps.installer.tests.test_connections \
+  apps.installer.tests.test_runtime \
+  apps.installer.tests.test_profile \
+  apps.installer.tests.test_workspace \
+  apps.installer.tests.test_provider_catalog \
+  apps.installer.tests.test_connection_evals \
+  apps.installer.tests.test_composio_session \
   tests.contracts.test_distribution \
-  tests.integration.test_notion_comment_adapter \
-  tests.integration.test_notion_webhook_protocol -v
+  plugins.platforms.notion.tests.test_comment_adapter \
+  plugins.platforms.notion.tests.test_webhook_protocol -v
 python3 -m py_compile \
-  setup.py scripts/setup_cli/*.py scripts/setup_cli/flows/*.py \
-  scripts/setup_runtime.py scripts/setup_profile.py scripts/setup_workspace.py
+  setup.py apps/installer/cli/*.py apps/installer/cli/flows/*.py \
+  apps/installer/runtime.py apps/installer/profile.py apps/installer/workspace.py
 ```
 
 After the targeted lane passes, run the complete safe default lane before
@@ -67,7 +63,7 @@ Setup-entrypoint, container, dashboard, and restart claims require the real
 pinned image. Run this lane on a Docker-capable macOS or Linux host:
 
 ```bash
-python3 scripts/run_setup_e2e.py safe-docker \
+python3 apps/installer/e2e.py safe-docker \
   --receipt /absolute/private-or-ticket-artifact-path/docker-receipt.json
 ```
 
@@ -95,27 +91,12 @@ profile, run:
 python3 setup.py doctor --profile-home "$COMPANY_OS_PROFILE"
 ```
 
-Doctor uses the profile's authenticated Notion connection to read only the
-selected Projects, Tasks, Goals, and Areas data sources. It reads active Tasks
-plus Done Tasks edited during the current operating week, and fetches complete
-page bodies for selected Projects and Tasks. Exact source IDs and
-the live Doctor model come from the owner-only
-`<profile>/company-os-doctor-bindings.json`; that file must never enter source
-control. Doctor filters terminal
-history at the provider, paginates every remaining row, freezes a compact
-management snapshot, calls that configured live model once per cadence, and
-judges only the intermediary files with one separate no-tools model call per
-cadence. It writes the canonical `result.json`, rendered `preview.md`, immutable
-`source-snapshot.json`, delivery-disabled `handoff.json`, and the cadence's
-existing eval artifacts. The existing eval viewer adapts those artifacts and
-lists one outcome for every selected feature. Exit `1` means the real run
-completed but required source information is missing; it is not a technical
-failure. Every trustworthy receipt must say `input_mode: configured_sources`, `model_mode: live`,
-`downstream_calls: 0`, list no mutation operations, show unchanged source and
-workspace hashes. A truthful missing-information feature is blocked rather than
-assigned a false pass grade. Reports and the workspace proposal
-remain mode-0600 below the named profile; do not copy their real contents into
-Git or CI artifacts.
+Doctor asks native Hermes to read the installed workspace and selected cadence
+contract, use its configured skills and MCP tools, and stop after producing and
+reviewing the declared local output files. Its prompt explicitly disables provider
+mutations, messaging, and artifact sync. Missing information must remain a
+named blocker rather than a guessed value. Generated private results stay below
+the named profile and must not be copied into Git or CI artifacts.
 
 ## Installed and live lanes
 
@@ -143,28 +124,13 @@ configured owner route, run:
 ```bash
 COMPANY_OS_RUN_TELEGRAM_LIVE=1 \
 COMPANY_OS_PROFILE=/absolute/path/to/the/named/profile \
-python3 -m unittest tests.live.test_messaging_telegram_live -v
+python3 -m unittest apps.installer.tests.test_messaging_live -v
 ```
 
 This sends exactly one labeled connection-test message. It asserts provider
 success, an exact target, a target hash, and a provider message ID without
 printing the destination ID. Human receipt confirmation remains a separate
 acceptance fact; provider success alone must not enable automatic messaging.
-
-### Stage 2 delivery-contract tests
-
-The global offline suite exercises complete multi-provider plan compilation,
-disabled-policy zero-call behavior, missing-destination blocking, provider
-read-back, private-workspace application, messaging-guard routing, and
-idempotent reruns:
-
-```bash
-python3 -m unittest tests.unit.scripts.test_automation_delivery -v
-```
-
-These tests use a command recorder and make no provider calls. Do not run
-`setup.py deliver ... --apply` against a real handoff unless the exact isolated
-environment, configured destinations, and resulting actions have been reviewed.
 
 ## Failure handling
 

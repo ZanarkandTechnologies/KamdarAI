@@ -3,9 +3,8 @@ title: Seamless Company OS deployment, operating memory, and tuning
 status: implemented_with_external_followups
 owner: Company OS
 created_at: 2026-08-28
-updated_at: 2026-08-31
+updated_at: 2026-09-01
 source_feedback: first external computer deployment
-feature_refs: [FEAT-0001, FEAT-0002, FEAT-0003, FEAT-0004, FEAT-0005, FEAT-0006, FEAT-0007, FEAT-0010, FEAT-0011]
 ---
 
 # PRD: Seamless Company OS deployment, operating memory, and tuning
@@ -24,7 +23,7 @@ The product must therefore provide:
 - one resumable install, reconcile, and verify command;
 - profile-local secrets, auth, schedules, and runtime state;
 - Markdown report templates as the human tuning surface;
-- one private Project Notes file per active Project and week;
+- one private Project Memory file per active Project and week;
 - Weekly projections from those notes into reports, Employee Memory, and SOPs;
 - a typed `ready | partial | blocked` receipt with one exact next action.
 
@@ -37,7 +36,7 @@ deploy approval, or spend approval. It must not bypass external consent.
 | --- | --- |
 | Client operator | Install, authorize, verify, update, and recover the Company OS without learning Hermes internals. |
 | Manager | See assigned, active, stale, blocked, completed, and documentation-pending Work from source evidence. |
-| Maintainer | Change a Markdown report template and keep its Pydantic contract, example, rendering, and QA in sync. |
+| Maintainer | Change a PM skill or Markdown artifact template and verify its owned eval cases. |
 
 ## Release scope
 
@@ -47,10 +46,10 @@ reconcile, update, health, and eval phases. Chat may wrap that command but is
 not required to run it.
 
 MCP is the default provider access route. Notion comments remain a separate
-inbound-event boundary: a remotely managed named Cloudflare Tunnel exposes the
-connector. The customer creates the hostname and route once; setup stores only
-the tunnel token in the Hermes profile, installs no Cloudflare CLI, and rejects
-temporary Quick Tunnel URLs.
+inbound-event boundary: an ngrok agent exposes the connector at the stable HTTPS
+development domain assigned to the customer's account. Setup stores an
+owner-only agent configuration in the Hermes profile, requires no host ngrok
+installation, and rejects temporary Quick Tunnel URLs.
 
 ## System boundaries
 
@@ -65,8 +64,8 @@ flowchart LR
   setup -->|declared config only| profile
   profile --> runtime[Hermes runtime]
   runtime -->|read / write| mcp[Official Notion MCP]
-  notion[Notion events] --> tunnel[Named Cloudflare Tunnel]
-  tunnel --> connector[Webhook connector]
+  notion[Notion events] --> ingress[ngrok agent endpoint]
+  ingress --> connector[Webhook connector]
   connector --> runtime
   runtime --> workspace[(Private workspace state)]
   setup -->|redacted result| receipt[ready / partial / blocked]
@@ -74,9 +73,9 @@ flowchart LR
 
 | Owner | Owns | Must not own |
 | --- | --- | --- |
-| Company OS source | Distribution, workspace/templates, automation contracts, reconciliation policy, health checks, feature evals | Client credentials, sessions, generated reports, private memory |
+| Company OS source | Distribution, workspace/templates, automation contracts, reconciliation policy, health checks, skill-owned eval cases | Client credentials, sessions, generated reports, private memory |
 | Hermes profile | Secrets, OAuth, MCP configuration, scheduler, plugins, local databases | Repo-authored desired state |
-| Runtime workspace | Generated reports, Project Notes, Employee Memory, proposals, receipts | Source templates treated as co-equal edited copies |
+| Runtime workspace | Generated reports, Project Memory, Employee Memory, proposals, receipts | Source templates treated as co-equal edited copies |
 | Operator | Credentials, OAuth consent, Notion sharing, deploy topology, external-write approval | Hidden manual repair steps |
 | Notion/Drive | Destination permissions and document visibility | Private intermediate management state unless explicitly published |
 
@@ -93,7 +92,7 @@ and persistent entity memory?**
 flowchart TD
   sources[Projects + Work + Meetings + artifact links]
   daily[Daily bounded reconciliation]
-  cache[(Local short-term memory<br/>Project Notes)]
+  cache[(Local short-term memory<br/>Project Memory)]
   freeze[Frozen weekly evidence]
   project[Official Project report]
   employee[(Local long-term<br/>Employee Memory)]
@@ -113,7 +112,7 @@ flowchart TD
   daily --> outbound
 ```
 
-Project Notes are private working memory, not a public report or employee
+Project Memory are private working memory, not a public report or employee
 scorecard. Daily appends source-linked snapshots and findings under fixed
 Markdown sections. The first implementation keeps one notes file per Project
 and week—not separate Daily employee or workflow files.
@@ -127,97 +126,25 @@ the exact source record rather than memory publication.
 
 ### Daily reconciliation
 
-Daily reads active Projects and this union of Work:
-
-```text
-all open Work
-+ changed since last successful watermark
-+ Done Work pending documentation review
-+ Work with unresolved documentation questions
-```
-
-Full page content is fetched only for changed, stale, blocked, Done, or
-unresolved records. Daily appends a complete Work snapshot only when its source
-revision changes. Weekly groups snapshots by stable Work ID and selects the
-greatest source update time. Materially different snapshots tied at that time
-block consolidation; source revisions identify snapshots but are not sorted.
-
-Staleness comes from the last meaningful status, comment, artifact, acceptance,
-or human update. An automation touch does not reset it. Elapsed time comes from
-sourced timestamps and remains `unknown` when a timestamp is missing. It is not
-presented as employee effort or a performance rating.
-
-When Work becomes Done:
-
-```text
-Done Work
-   |
-   v
-Documentation review
-   | sufficient                    | missing information
-   v                               v
-extract outcome + artifacts       record one precise question
-   |                               |
-   v                               v
-Completed outcomes section        keep Work open in weekly notes
-```
+The product requires one bounded daily snapshot to become grounded Project
+Memory updates and message drafts. Exact selection, reconciliation, staleness,
+and documentation rules belong to
+[`PM Daily`](../skills/pm-daily/SKILL.md), where they can be evaluated with the
+files they affect.
 
 ### Weekly lifecycle and recovery
 
-This diagram answers: **what resets, what persists, and what happens after a
-failed rollup or late answer?**
+The product requires one frozen weekly Project set to become reports, qualified
+long-term memory updates, next-week memory, and an executive draft. Exact
+coverage, promotion, recovery, and carry-forward rules belong to
+[`PM Weekly`](../skills/pm-weekly/SKILL.md).
 
-```mermaid
-stateDiagram-v2
-  [*] --> Active: first Daily run
-  Active --> Active: append changed source snapshots
-  Active --> Frozen: Weekly boundary
-  Frozen --> Frozen: projection fails / retry
-  Frozen --> Consolidated: all projections validate
-  Consolidated --> Active: retain frozen week; seed next week
-```
+### Skill-to-file contract
 
-Weekly validates every candidate projection before persistent memory changes.
-On success it:
-
-1. writes the official Project report;
-2. merges factual delivery observations into Employee Memory by employee and
-   source Work ID;
-3. proposes source-linked workflow samples to canonical local SOP Memory;
-4. produces Area and Company rollups, then approved outbound material;
-5. retains the consolidated week's frozen notes immutably and seeds next week
-   with unresolved Work and documentation questions.
-
-Closed Work stops carrying forward after its accepted outcome is retained in
-the official report and Employee Memory. A late answer stays linked to its
-original Work ID and is consumed by the next Daily run. An immutable report is
-corrected only when reporting policy requires it. If projection validation
-fails, persistent memory stays unchanged and the frozen notes remain retryable.
-
-### Template-to-Pydantic contract
-
-Markdown templates supply section instructions, field vocabulary, message
-wording, and golden examples. Sync hash-binds every template into one generated
-catalog. Report templates additionally produce generated Pydantic report
-contracts and show their contract diff before replacement. Daily message-field
-descriptions load the documentation-request and employee-follow-up bodies from
-that catalog; IDs, routing, verdicts, and deduplication remain authored Pydantic
-shape. Daily performs one structured extraction, and a deterministic mapper
-routes the result back into Markdown and Weekly sinks.
-
-| Template section | Structured concepts | Weekly destination |
-| --- | --- | --- |
-| Work and employee updates | Work ID, owner, state, timestamps, staleness, blocker, next action, documentation state, expected/observed artifact, evidence | Project report; Employee latest-week evidence; unresolved items carry forward |
-| Completed outcomes and artifacts | Outcome, accepted artifacts, completion/acceptance time, elapsed duration, documentation result, optional workflow key, evidence | Project report; Employee Memory |
-| Documentation questions | Work/question ID, open state, exact missing fact, update location, evidence checked | Project report; Employee latest-week evidence; open questions carry forward |
-| Problems and inefficiencies | Workflow step, condition, impact, recurrence/volume, time/wait loss, sourced cost, confidence/gaps, next proof | Reports; Issue candidates |
-| Decisions | Choice, rationale/tradeoff, authority, evidence, review trigger | Project report; approved decision destination |
-| Workflow and SOP signals | Explicit workflow key, trigger, actors, method, systems/handoffs, output artifact type, exceptions, controls, timing samples, confidence, promotion state | Canonical SOP candidate/update |
-| Carry-forward items | Original Work ID, source note keys, unresolved state/question, owner, next action, source week | Next week's Project Notes only |
-
-One Daily sample may not establish or silently replace an SOP baseline. Weekly
-must preserve the sample count, evidence window, prior value, approval state,
-and rollback evidence.
+Markdown templates own artifact shape and examples. PM Daily and PM Weekly own
+file transformations. Automations own schedule, context acquisition, skill
+invocation, review, and authorized provider application. There is no generated
+schema or second prose specification between them.
 
 ## User stories
 
@@ -226,11 +153,11 @@ and rollback evidence.
 | US-001 | Install from one entry point. | Clean supported host/profile works and resumes; a blocked step gives one exact action; unchanged rerun creates no duplicates. |
 | US-002 | Update from repo-owned configuration. | Installed source/version is visible; only distribution-owned state changes; profile secrets, auth, memory, sessions, and generated state survive. |
 | US-003 | Use Notion without a local adapter stack. | Interactive mode uses official hosted MCP and bounded tools; receipts separate MCP health from webhook health; headless/event routes are explicit. |
-| US-004 | Tune behavior through output templates. | One representative template yields or validates its structured contract and realistic example; schema/eval drift fails with an actionable diff. |
-| US-005 | Verify the whole installation. | Static health, live probes, scheduler readiness, and feature evals remain separate; skipped probes never pass; receipts contain no secrets or private records. |
+| US-004 | Tune behavior through output templates. | One representative template and its skill-owned file eval fail clearly when behavior drifts. |
+| US-005 | Verify the whole installation. | Static health, installed skill packages, live probes, and operated eval evidence remain distinct; skipped probes never pass; receipts contain no secrets or private records. |
 | US-006 | Learn and recover without tribal knowledge. | A new operator follows the tested path without reading source or legacy pages; docs QA runs every documented command and receipt. |
-| US-007 | Track weekly delivery without employee self-scoring. | Daily appends changed Work snapshots with stable IDs; Weekly selects the greatest sourced update time per Work while using source revision only for identity and deduplication; Done Work passes documentation review; elapsed duration is not called effort or performance. |
-| US-008 | Consolidate weekly evidence into persistent entity memory. | Weekly freezes and validates before promotion; Employee Memory merges by person and Work ID; SOP updates retain sample history; failed projections leave memory unchanged. |
+| US-007 | Track weekly delivery without employee self-scoring. | PM Daily produces grounded Project Memory and drafts according to its owned skill evals; missing evidence is not converted into effort or performance claims. |
+| US-008 | Consolidate weekly evidence into persistent entity memory. | PM Weekly produces reports, qualified memory updates, and carry-forward files according to its owned skill evals. |
 
 ## Functional requirements
 
@@ -248,21 +175,21 @@ and rollback evidence.
   with observed state and `next_action`.
 - **FR-6:** Default Notion read/write to official hosted MCP. Treat webhook
   ingress and unattended access as separate capabilities.
-- **FR-7:** Bind each versioned report template to a compatible Pydantic/JSON schema,
-  realistic example, renderer, and QA.
-- **FR-8:** Install the health policy and frozen feature eval entry points with
-  the distribution.
+- **FR-7:** Give each versioned artifact template a realistic example and
+  skill-owned file/content assertions.
+- **FR-8:** Install both PM skills and their frozen eval cases with the
+  distribution; installation health proves presence, not behavior.
 - **FR-9:** Organize setup docs around installation, authorization, operation,
   update, verification, and recovery.
 
 ### Operating memory
 
-- **FR-10:** Maintain one private append-only Project Notes file per active
-  Project and week from bounded Daily reads.
-- **FR-11:** Extend the Daily Pydantic result and mapper with Work timing/state,
-  documentation questions, accepted outcomes/artifacts, and workflow samples.
-- **FR-12:** Freeze the complete Project Notes set before creating Project, Area, Company,
-  Employee Memory, SOP, or outbound projections.
+- **FR-10:** Maintain one private current-week Project Memory file per selected
+  Project from bounded Daily reads.
+- **FR-11:** PM Daily owns the exact grounded file transformation and proof
+  contract in `skills/pm-daily/`.
+- **FR-12:** PM Weekly owns complete-set reporting, memory consolidation,
+  carry-forward, and proof in `skills/pm-weekly/`.
 - **FR-13:** Store only factual, source-linked Employee Memory observations. Do
   not infer personality, unsourced effort, or automatic performance ratings.
 - **FR-14:** Update SOP timing only through a versioned, auditable sample policy
@@ -283,7 +210,7 @@ and rollback evidence.
 | Supported topology | Fresh install and idempotent rerun on one Windows path and one persistent Docker path, with no undocumented repair. |
 | Honest health | `ready | partial | blocked` receipt; skipped or unauthorized probes cannot appear healthy. |
 | Safe update | Tests prove secrets stay profile-local, unknown files survive, and only allowlisted desired state changes. |
-| Template tuning | Template-contract drift test covers schema, example, renderer, and eval output. |
+| Template tuning | Skill eval covers the template, golden file, and expected content assertions. |
 | Operating memory | Daily/Weekly evals prove stable-ID reconciliation, documentation branches, frozen projection input, carry-forward, and failed-promotion recovery. |
 | Provider access | One official Notion MCP OAuth/read probe; webhook health tested separately. |
 
@@ -312,7 +239,7 @@ target until the topology PoC produces a representative baseline.
 - Use hosted Notion MCP as a headless bearer-token service.
 - Enable production writes or external publication by default.
 - Build a general-purpose installer framework.
-- Rewrite every record template or feature eval in the first slice.
+- Rewrite every record template or skill eval in the first slice.
 
 ## Risks and open proof
 
@@ -323,33 +250,32 @@ target until the topology PoC produces a representative baseline.
   weakening that boundary.
 - Distribution update preserves `config.yaml` by default. The desired-state
   contract must distinguish repo-owned and local settings.
-- Free-form Markdown cannot safely define every semantic schema rule without a
-  compatibility check.
+- Free-form Markdown still requires grounded file/content evals before release.
 - Clean Windows and Docker runners, a deterministic live MCP probe, packaged
   eval fixtures, and a secret-safe receipt validator are still required.
 
 ## Implementation status
 
 The local operating-memory slice is implemented. Daily reconciles bounded Work
-into source-linked Project Notes, including completed outcome/artifact rows and
+into source-linked Project Memory, including completed outcome/artifact rows and
 documentation questions. Weekly freezes the complete all-Project set, then
 produces report, Employee Memory, SOP sample, promotion, and carry-forward
 projections. Employee observations merge by Person and Work; workflow samples
 merge by explicit workflow key without automatically changing an approved
-baseline. Stage 2 stores these outputs locally and treats configured Notion or
+baseline. The native Weekly automation stores these outputs locally and treats configured Notion or
 Drive destinations as optional one-way copies, never as canonical memory.
 
 The remaining gates are external: bind authenticated client destinations and
 operate separately authorized Notion, Drive, messaging, Windows, and persistent
 Docker proof. The next Daily run is the accepted re-review path for unanswered
 documentation questions; event-driven re-review is not required for this
-release. FEAT-0011 and TASK-0016 through TASK-0021 own setup and deployment
+release. Installer documentation and TASK-0016 through TASK-0021 own setup and deployment
 proof.
 
 ## Grounding
 
 - **User evidence:** first external-computer deployment feedback in this task.
-- **Local evidence:** `distribution.yaml`, TASK-0015, setup scripts, schemas,
+- **Local evidence:** `distribution.yaml`, TASK-0015, setup modules, skills,
   templates, evals, and installed Hermes CLI/help/docs.
 - **Provider evidence:** official Notion hosted MCP documentation describes
   OAuth-based read/write access; official webhook documentation requires a

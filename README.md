@@ -42,12 +42,12 @@ Focused or full verification
 ```
 
 The setup wizard creates the Hermes profile, connects the services you choose,
-installs the automations, and runs the health checks and feature evals. When it
+installs the automations, and runs health and skill-package checks. When it
 finishes, open the local dashboard at <http://127.0.0.1:9119>.
 
-The complete [Windows setup guide](docs/customer-setup.md) shows what each
+The complete [Windows setup guide](apps/installer/docs/customer-setup.md) shows what each
 screen means and what you should see before moving to the next step. It also
-covers the one-time Cloudflare steps for optional real-time Notion comments.
+covers the one-time ngrok steps for optional real-time Notion comments.
 
 Run `setup.cmd` again after an update or an interrupted installation. An
 incomplete profile offers Resume; an existing profile opens a maintenance menu.
@@ -59,15 +59,16 @@ Opening the menu alone makes no changes.
 - Hermes model authorization
 - Notion through its hosted MCP, when selected
 - Daily and Weekly schedules
-- Optional real-time Notion comments through a stable named Cloudflare Tunnel
-- Installation receipts, health checks, and packaged feature evals
+- Optional real-time Notion comments through an assigned stable ngrok HTTPS domain
+- Installation receipts, health checks, and PM skill-package checks
 
 Secrets are stored in the persistent Hermes profile. You do not need to edit an
 `.env` file.
 
 Temporary `*.trycloudflare.com` Quick Tunnels are not supported because their
-URL changes across restarts. The supported path uses Cloudflare's web dashboard
-once to create a named tunnel; the included container runs it afterward.
+URL changes across restarts. The supported path uses the stable HTTPS
+development domain assigned to an ngrok account; the included container runs
+the ngrok agent afterward.
 
 The data-source picker uses the arrow keys and Space. Press Enter to continue or
 Escape to skip the step.
@@ -79,7 +80,7 @@ Use the same Compose stack on Linux or a VPS:
 ```bash
 docker compose --profile setup run --rm setup python /distribution/setup.py launch
 docker compose up -d gateway dashboard
-docker compose --profile webhook up -d cloudflared  # only when enabled
+docker compose --profile webhook up -d ngrok  # only when enabled
 docker compose --profile setup run --rm setup python /distribution/setup.py verify --live
 ```
 
@@ -88,13 +89,15 @@ docker compose --profile setup run --rm setup python /distribution/setup.py veri
 | Path | Purpose |
 | --- | --- |
 | `setup.py` | Stable dependency bootstrap and public setup command entry point |
-| `scripts/setup_cli/` | Guided setup, maintenance, certification, and verification flows |
+| `skills/pm-daily/` | Daily extraction instructions, eval cases, and frozen evidence |
+| `skills/pm-weekly/` | Weekly reporting and memory instructions, eval cases, and frozen evidence |
+| `apps/doctor/` | Thin analysis-only launcher for the installed automations |
+| `apps/installer/` | Guided setup, maintenance, certification, verification, documentation, and installer tests |
 | `workspace.hermes.md` | Reviewed company configuration |
 | `automations/` | Daily and Weekly automation contracts |
-| `templates/` | Project and report templates |
+| `templates/` | Flat shared entity shapes; cadence-owned templates live with each PM skill |
 | `plugins/` | Hermes connectors installed into the profile |
-| `evals/` | Network-free feature tests and expected results |
-| `scripts/` and `tests/` | Setup helpers and repository checks |
+| `tests/` | Repository-wide architecture and distribution checks only |
 
 The repository owns reviewed configuration. The Hermes profile owns secrets,
 OAuth sessions, logs, generated reports, and other runtime state. Do not copy
@@ -102,65 +105,28 @@ private runtime data into Git.
 
 ## Develop and verify
 
-Report maintainers edit the Markdown files in `templates/`, then run:
-
-```bash
-python3 scripts/sync_report_templates.py
-```
-
-The maintainer command uses the installed Hermes CLI directly with profile
-`vishan-kamdar-ai`; set `KAMDAR_HERMES_PROFILE` only when the maintained source
-profile has a different ID. A separate `kamdar` alias is neither required nor
-installed by customer setup. Customer setup continues to use the Hermes CLI
-inside Docker, so customers do not install Hermes on Windows.
-
-The command catalogs every changed Markdown template by content hash. It embeds
-their exact bodies into the generated Pydantic template catalog, asks Hermes to
-interpret only changed report shapes, shows the generated contract diff, and
-updates the committed modules in `schemas/reports/`. It then asks before
-creating each synthetic preview in the private, ignored `.reports-preview/`
-directory. Use `python3 scripts/sync_report_templates.py --check` for a
-model-free, non-writing drift check or `--preview` when an explicit
-non-interactive run should generate previews.
-
-Then run:
+Edit the owning skill and Markdown templates directly, then run:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 scripts/validate_company_context.py --context workspace.hermes.md
-python3 scripts/run_installed_evals.py --root .
+python3 apps/installer/validate_context.py --context workspace.hermes.md
 ```
 
 Local evals use packaged fixtures and make no provider calls. Private Notion
 captures and generated private seeds must remain outside the repository.
 
-The operated evaluation has two explicit stages. `setup.py doctor` reads the
-configured sources, runs and judges the AI, writes one immutable handoff per
-cadence, and stops without downstream changes. If setup enabled **Reviewed
-Stage 2**, review and apply one exact handoff without regeneration:
-
-```bash
-python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json
-python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json --apply
-```
-
-The first command is review-only. The second writes canonical short-term
-memory, long-term memory, and versioned reports into the private Hermes
-workspace first. It then makes only the optional one-way provider copies bound
-in the `artifact-sync` table in `workspace.hermes.md`, applies approved Work
-comments or messages, and writes a redacted per-action receipt. A missing
-artifact binding means local-only; the distributed Kamdar workspace has no
-artifact or owner-message bindings by default. Documentation and stale-work
-questions use the exact linked Work item unless an employee route is explicitly
-configured. Provider edits never flow back into memory.
-Production remains unauthorized; disabled policy, failed quality, a changed
-workspace or handoff, and incomplete configured destinations block before
-provider calls. Notion and Drive permissions remain the operator's privacy
-boundary; a configured URL alone does not prove that a destination is private.
+`setup.py doctor` asks native Hermes to execute the selected cadence contract
+in analysis-only mode, with provider mutations and messaging disabled. Normal
+scheduled runs review their skill-produced files, update canonical local state,
+and call configured skills or MCPs directly for explicitly authorized provider
+effects. There is no separate handoff or delivery runtime. A missing artifact
+or message binding means local-only, and provider edits never flow back into
+memory. Notion and Drive permissions remain the operator's privacy boundary; a
+configured URL alone does not prove that a destination is private.
 The [autonomous testing runbook](docs/autonomous-testing.md) defines the safe
 default loop, targeted setup checks, live-test gates, and required evidence.
 The global Python discovery includes the real Telegram test as a skipped-by-
 default case; use the runbook's explicit profile and side-effect gate to run it.
 
 For setup steps and recovery paths, see
-[`docs/customer-setup.md`](docs/customer-setup.md).
+[`apps/installer/docs/customer-setup.md`](apps/installer/docs/customer-setup.md).

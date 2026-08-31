@@ -12,7 +12,7 @@ google_client_secret.json
 # Generated evaluation and helper output
 evals/filesystem/runs/
 evals/filesystem/.vercel-static/
-evals/viewer/dist/
+apps/eval_viewer/dist/
 runs/
 receipts/
 /reports/

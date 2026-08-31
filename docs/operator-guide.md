@@ -1,19 +1,19 @@
 ---
-title: Company OS operator manual
+title: Company OS operator guide
 status: active
 owner: Company OS
 created_at: 2026-08-27
 updated_at: 2026-08-31
 system_id: SYS-0001
 refs:
-  - company-os.md
-  - ../../automations/daily-operating-update.md
-  - ../../automations/weekly-operating-review.md
-  - ../../templates/README.md
-  - ../../workspace.hermes.md
+  - prd.md
+  - ../automations/daily-operating-update.md
+  - ../automations/weekly-operating-review.md
+  - ../templates/README.md
+  - ../workspace.hermes.md
 ---
 
-# Company OS operator manual
+# Company OS operator guide
 
 ## Purpose
 
@@ -32,7 +32,7 @@ production routes and authority are approved.
 | **Projects** | Human-operated source records: goal, owner, Department, current plan, and links to related Work. | Private management assessments, accumulated agent memory, or weekly report history. |
 | **Work items** | Tasks, Features, Issues, and Meetings. This is where people record progress, evidence, blockers, decisions, completion notes, commitments, and discussion. | Cross-Project precedent or reusable procedures after promotion. |
 | **People** | Public/shared identity, role, authority, approved contact channels, and route references. | Employee Memory, management assessments, or inferred permissions. |
-| **Reports** | An optional provider copy of approved finalized Project, Department, or Company reports. | Canonical reports, Project Notes, or entity memory. |
+| **Reports** | An optional provider copy of approved finalized Project, Department, or Company reports. | Canonical reports, Project Memory, or entity memory. |
 | **Decisions / SOPs** | Optional provider views when a long-term-memory destination is explicitly configured. | Canonical memory or automatic publication targets. |
 | **Hermes local workspace** | Canonical short-term memory under `weeks/`, long-term entity memory under `memory/`, finalized local reports, and outbound artifacts. | Provider permissions or employee-facing source records. |
 
@@ -47,7 +47,7 @@ Projects + Work + Meetings + People directory
                        v
 +------------------------------------------------+
 | Private local workspace                        |
-| weeks/<week>/project-notes/ = short-term memory|
+| weeks/<week>/project-memory/ = short-term memory|
 | memory/{employees,sops,decisions,issues}/      |
 |                              = long-term memory|
 | weeks/<week>/reports/         = local reports  |
@@ -82,7 +82,7 @@ back to the evidence.
 
 The lean Kamdar setup connects Projects and Work as read-write sources, keeps
 the People directory read-only for stable employee IDs, and leaves both the
-artifact-sync and communications tables empty. That stores Project Notes,
+artifact-sync and communications tables empty. That stores Project Memory,
 Employee/SOP/Decision/Issue Memory, and Final reports only in the private Hermes
 workspace. Add a provider destination or owner message only when Kamdar wants a
 second copy or notification.
@@ -266,7 +266,7 @@ Agent reads authorized canonical records
        |
        +--> answer or proposal in Telegram
        |
-       `--> derived management state -> private Project Notes
+       `--> derived management state -> private Project Memory
 ```
 
 Do not paste credentials, personal contact details, or private files into
@@ -277,57 +277,30 @@ a request unless the provider route and receipt explicitly prove that claim.
 
 Daily reads one bounded local-day window in `Asia/Kuala_Lumpur`. It reconciles
 active Projects and changed Work, appends grounded observations to private
-Project Notes, and prepares any documentation request or owner chase. It does
+Project Memory, and prepares any documentation request or owner chase. It does
 not rescan unrelated history, invent missing facts, or mark Work `Processed`
 merely because it posted a question.
 
-The executable procedure and authority limits live in
-[`automations/daily-operating-update.md`](../../automations/daily-operating-update.md).
+The behavior contract lives in [`PM Daily`](../skills/pm-daily/SKILL.md).
+The automation owns only scheduling, snapshot acquisition, invocation, review,
+and authorized delivery.
 
 ## 6. Weekly agent task
 
-Weekly freezes the complete Project Notes set instead of rescanning Work or
+Weekly freezes the complete Project Memory set instead of rescanning Work or
 Meetings. It builds the Project, Department, and Company reports, updates only
 qualified long-term memory, and carries unresolved items into next week. Frozen
 notes and finalized reports remain immutable.
 
-Every Problem, Decision, and SOP candidate receives an explicit disposition.
-Weak candidates remain in report history with the reason they were not
-promoted. The executable procedure and promotion gates live in
-[`automations/weekly-operating-review.md`](../../automations/weekly-operating-review.md).
+The behavior and promotion contract lives in
+[`PM Weekly`](../skills/pm-weekly/SKILL.md). The automation owns only the
+weekly boundary, invocation, review, and authorized delivery.
 
 ## When documentation is poor
 
-The recovery path is:
-
-```text
-Done ticket
-    |
-    v
-documentation verdict = needs_information
-    |
-    +--> grounded private Project report may still update
-    +--> partial observation may be staged with explicit gaps
-    +--> one Notion question thread opens
-    `--> AI review = Needs information
-                         |
-                  human edits or replies
-                         |
-           mention-triggered or next Daily re-review
-                         |
-          +--------------+--------------+
-          |                             |
-     still missing                  sufficient
-          |                             |
-same thread asks only          required effects settle
-remaining question                     |
-                                        v
-                                    Processed
-```
-
-Do not skip the item and lose all value. Apply only facts already grounded,
-keep speculative extraction blocked, and leave the item eligible for re-review.
-Do not mark it `Processed` until documentation is sufficient.
+PM Daily owns the documentation-quality decision and draft behavior. Operators
+should inspect the skill-produced draft and source link; they should not invent
+a separate recovery state machine in this manual.
 
 ## Operator checklist
 
@@ -356,6 +329,5 @@ Do not mark it `Processed` until documentation is sufficient.
 - Treat a provider receipt as delivery proof only to the extent it actually
   records the destination and read-back.
 
-Grounding: current local system, automation, schema, template, workspace, and
-Notion onboarding contracts. No external source was needed for this operator
-manual.
+Grounding: current local automation, template, workspace, and Notion onboarding
+contracts. No external source was needed for this operator guide.
