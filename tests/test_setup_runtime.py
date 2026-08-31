@@ -96,7 +96,11 @@ class SetupRuntimeTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertNotIn("app.composio.dev", " ".join(calls[0][0]))
         self.assertIn("app.composio.dev", calls[0][1] or "")
-        self.assertIn('"x-api-key": "${COMPOSIO_API_KEY}"', calls[0][1] or "")
+        payload = json.loads(calls[0][1] or "{}")
+        self.assertEqual(
+            json.loads(payload["headers"]),
+            {"x-api-key": "${COMPOSIO_API_KEY}"},
+        )
 
     def test_webhook_url_requires_stable_public_https_hostname(self) -> None:
         self.assertEqual(

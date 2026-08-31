@@ -293,7 +293,10 @@ def configure_remote_mcp(
                 "url": url,
                 "enabled_key": f"mcp_servers.{name}.enabled",
                 "headers_key": f"mcp_servers.{name}.headers",
-                "headers": headers,
+                # Hermes' native config helper accepts text and parses JSON/YAML
+                # mappings itself.  Passing a Python dict reaches its scalar
+                # normalization path and crashes on ``value.strip()``.
+                "headers": json.dumps(headers) if headers is not None else None,
             }
         ),
     )
