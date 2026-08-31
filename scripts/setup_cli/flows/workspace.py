@@ -194,7 +194,18 @@ def replace_communications(content: str) -> str:
     try:
         current = parse_workspace_communications(content).communications
     except ValueError as error:
-        raise SystemExit(f"Invalid communications configuration: {error}") from error
+        block = MANAGED_COMMUNICATIONS.search(content)
+        retired_poc_row = block and all(
+            value in block.group(1)
+            for value in ("`operator_review`", "| manual |", "proposal-only")
+        )
+        if not retired_poc_row:
+            raise SystemExit(f"Invalid communications configuration: {error}") from error
+        current = []
+        CONSOLE.print(
+            "[yellow]A retired POC messaging setting was found. "
+            "Choose the current options below, or press Enter to keep messaging disabled.[/yellow]"
+        )
     selected, change_details = _message_selection(current)
     if not selected:
         bindings: list[CommunicationBinding] = []

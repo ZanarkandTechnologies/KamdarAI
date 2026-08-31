@@ -7,6 +7,8 @@ import unittest
 import shutil
 from pathlib import Path
 
+from schemas.workspace import parse_workspace_communications
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ANSWERS = "\n".join(
@@ -107,6 +109,31 @@ class SetupInitTests(unittest.TestCase):
             self.assertIn(
                 'company_name: "Acme"',
                 (target / "workspace.hermes.md").read_text(encoding="utf-8"),
+            )
+
+    def test_reconfigure_migrates_retired_manual_poc_messaging(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            self.copy_setup(target)
+            first = self.run_setup(target, "init")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            workspace = target / "workspace.hermes.md"
+            content = workspace.read_text(encoding="utf-8").replace(
+                "| `owner report` | telegram | company-operators | "
+                "prepare drafts for approval |",
+                "| `operator_review` | manual | Zanarkand Discord | proposal-only |",
+            )
+            workspace.write_text(content, encoding="utf-8")
+
+            result = self.run_setup(target, "configure", "\n" * 16)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("A retired POC messaging setting was found", result.stdout)
+            self.assertEqual(
+                parse_workspace_communications(
+                    workspace.read_text(encoding="utf-8")
+                ).communications,
+                [],
             )
 
     def test_installed_resume_reprompts_blank_input_before_any_runtime_apply(self) -> None:
