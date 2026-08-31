@@ -25,13 +25,22 @@ refs:
 
 # Company OS
 
-The Company OS turns one bounded Daily source scan into private Project Notes.
-Weekly freezes every active Project's notes together, then produces official
-reports and persistent entity updates without rescanning raw Work or Meetings.
+The Company OS reads current Work once each day, keeps private notes for every
+Project, and prepares one weekly management view. Employees keep working in
+their existing records; managers receive reports, risks, owners, and follow-up
+linked to the original evidence.
 
 ```text
-company_os(source_window, templates, destination_bindings)
-  -> Project Notes -> reports + Employee Memory + SOP/Decision/Issue updates
+TEAM                         COMPANY OS                    LEADERSHIP
+ |                               |                            |
+ |-- progress and evidence ----->|                            |
+ |                               |-- missing-detail questions |
+ |<-- focused follow-up ---------|                            |
+ |                               |                            |
+ |                               |-- weekly report ---------->|
+ |                               |   decisions, risks, owners |
+ |                               |                            |
+ |-- resolved and open work ---->|-- next-week priorities --->|
 ```
 
 ## At a glance
@@ -51,24 +60,23 @@ company_os(source_window, templates, destination_bindings)
 ## Private workspace contract
 
 ```text
-weeks/
-`-- YYYY-Www/
-    |-- project-notes/
-    |   `-- project--<stable-project-id>.md
-    |-- reports/
-    |   |-- projects/
-    |   |-- departments/
-    |   `-- company/
-    |-- projections/
-    |   |-- employee-memory-updates.json
-    |   `-- sop-updates.json
-    `-- outbound/
-        `-- <approved message or publication>.md
+workspace/
+|-- weeks/YYYY-Www/
+|   |-- project-notes/                 short-term memory
+|   |   `-- project--<project-id>.md
+|   |-- reports/{projects,areas,company}/
+|   `-- outbound/
+`-- memory/                             long-term memory
+    |-- employees/
+    |-- sops/
+    |-- decisions/
+    `-- issues/
 ```
 
-Week-first storage matches the dominant access pattern. Project Notes are
-append-only observation blocks; Weekly report files are projections, not the
-Daily cache. There is no publish queue or separate Daily Person/SOP memory.
+Both memory lifecycles share one private local workspace. Project Notes are
+append-only short-term memory; Weekly consolidates accepted evidence into
+long-term entity memory. Weekly report files are projections, not memory, and
+there is no publish queue or separate Daily Person/SOP memory.
 
 ## System flow
 
@@ -105,14 +113,16 @@ consolidation receipt. It then initializes next week's Project Notes with only
 unresolved Work, open documentation questions, and unaccepted artifacts. Frozen
 notes and Final reports remain immutable.
 
-Stage 1 never decides provider placement. Stage 2 maps validated fields to
-explicit workspace paths, destination URLs, or routes. `workspace.hermes.md`
-holds those bindings; Notion and Drive own destination permissions.
+Stage 1 never decides provider placement. Stage 2 always writes the validated
+artifact locally first. A complete artifact/provider/destination row in
+`workspace.hermes.md` adds a one-way provider copy after filesystem read-back;
+an absent row means local-only and a partial row is invalid. Provider edits do
+not flow back. Notion and Drive own destination permissions.
 
 ```text
 validated projection
-  |-- NOTION / WIKI     approved records and reports at configured URLs
-  |-- GOOGLE DRIVE      approved documents under the configured company root
+  |-- LOCAL WORKSPACE   canonical short-term memory, long-term memory, reports
+  |-- NOTION / DRIVE    optional configured copies only
   `-- EMAIL / TELEGRAM  approved outbound only, with delivery receipts
 ```
 
@@ -151,16 +161,17 @@ actions with a lower setup burden.
 
 | Candidate found during Daily | Weekly disposition | Intended destination |
 | --- | --- | --- |
-| Repeated or material problem | Promote / Duplicate / Monitor / Dismiss | Existing Work database / Issue record linked to the affected SOP step |
-| Decision with future precedent | Promote / Duplicate / Monitor / Dismiss | Decisions database |
-| Observed employee workflow | Observe daily; promote only after authority/reuse review | Existing SOPs database / `templates/sop.md`; `skill.md` remains software-only |
+| Repeated or material problem | Promote / Duplicate / Monitor / Dismiss | Local `memory/issues/`; optional long-term-memory copy |
+| Decision with future precedent | Promote / Duplicate / Monitor / Dismiss | Local `memory/decisions/`; optional long-term-memory copy |
+| Observed employee workflow | Observe daily; promote only after authority/reuse review | Local `memory/sops/`; optional long-term-memory copy; `skill.md` remains software-only |
 
 Daily never promotes canonical knowledge. Proprietary Project-specific facts
 accumulate in private Project Notes and then immutable Project report history,
-linked to their Work or Meeting source and review condition. Weekly may apply only a Problem, Decision, or SOP
-candidate whose source quality, destination mapping, dedupe result, authority,
-privacy, and write policy all pass. Otherwise it remains in the report with a
-named gap.
+linked to their Work or Meeting source and review condition. Weekly may add only
+a Problem, Decision, or SOP candidate whose source quality, dedupe result, and
+authority pass. Provider synchronization additionally requires an explicit
+long-term-memory binding and private destination approval. Otherwise the local
+memory remains canonical and the provider copy is absent or visibly blocked.
 
 ## Proof model
 

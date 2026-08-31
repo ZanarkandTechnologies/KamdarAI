@@ -1,7 +1,7 @@
 ---
-title: Promote only knowledge that earned a home
+title: Promote qualified knowledge to long-term memory
 status: active
-execution_modes: [frozen, operated-v4]
+execution_modes: [frozen, private-local, operated-v4]
 production_mode: proposal-only
 owner: Company OS
 created_at: 2026-08-21
@@ -22,15 +22,15 @@ source_refs:
   - tickets/archive/TASK-0006/data-model-gap-report.md
 evidence_refs:
   - evals/weekly/suite.json
-known_limits: "Only operated-v4 may apply a reviewed canonical record in the eval root after authority, privacy, dedupe, and receipt checks; production remains proposal-only."
+known_limits: "Local long-term memory is canonical; only a configured private destination may receive a one-way provider copy after local read-back."
 ---
 
-# Promote only knowledge that earned a home
+# Promote qualified knowledge to long-term memory
 
-The Company OS reviews candidates from the frozen all-Project Notes set and promotes only evidence-backed Problems,
-Decisions, and employee workflows to the correct canonical record. Problems
-remain Issues in the existing Work database; workflows remain records in the
-existing SOPs database.
+The Company OS reviews candidates from the frozen all-Project Notes set and
+promotes only evidence-backed Problems, Decisions, and employee workflows into
+local long-term memory. Provider databases are optional secondary views, not
+canonical memory.
 
 ## Why it exists
 
@@ -47,13 +47,13 @@ relations. Weekly never rescans raw Work or Meetings.
 
 ```text
 promote_weekly_knowledge(candidates, authority, destination_records, project_relations)
-  -> Work/Issue[] + Decision[] + EmployeeSOP[]
-     + Notion/wiki application
+  -> local Issue[] + Decision[] + EmployeeSOP[]
+     + optional configured provider copies
 ```
 
-`frozen` records the disposition and proposed destination only. `operated-v4`
-applies a passed candidate to the corresponding v4 record with a receipt;
-production remains proposal-only.
+`frozen` records the disposition. Local application writes the passed candidate
+under `memory/`. `operated-v4` may copy it to an explicitly configured private
+destination with a receipt; production remains proposal-only.
 
 ## Flow
 
@@ -67,13 +67,15 @@ check future value, destination, dedupe, authority, privacy, and write policy
 Promote | Duplicate | Monitor | Dismiss
               │
               ▼
-Issue / Decision / Employee SOP record + receipt
+Local Issue / Decision / Employee SOP memory
+              │
+       configured private copy only
 ```
 
 ## State changes and artifacts
 
 - Records an explicit disposition and reason for every reviewed candidate.
-- Creates one mapped canonical record only for an approved candidate, carrying
+- Creates one local canonical record only for an approved candidate, carrying
   its Project relations and source provenance. An Issue preserves the affected
   workflow step, dated Before/economics baseline, measurement gaps and next
   test. An employee SOP preserves the observed steps, timing/volume baseline,
@@ -82,8 +84,8 @@ Issue / Decision / Employee SOP record + receipt
 
 ## Downstream application
 
-Problems become Issue records; precedents become Decisions; repeated workflows
-become employee SOP records after review. Proprietary project-specific
+Problems become local Issue Memory; precedents become Decision Memory; repeated
+workflows become local SOP Memory after review. Proprietary project-specific
 facts remain in the immutable Project report history. Each promoted result
 links to its source Projects and note keys.
 
@@ -97,9 +99,10 @@ actions remain `project_only` in the report.
 
 ## Failure modes
 
-Missing authority, source quality, future value, destination, relation, privacy
-approval, or dedupe result blocks promotion. The automation never uses a report
-mention as proof that a canonical record was created.
+Missing authority, source quality, future value, relation, or dedupe result
+blocks local promotion. Missing provider configuration means local-only; an
+incomplete binding or failed private-destination proof blocks only the copy.
+The automation never uses a report mention as proof that memory was written.
 
 ## Proof contract
 

@@ -7,7 +7,6 @@ updated_at: 2026-08-31
 system_id: SYS-0001
 refs:
   - company-os.md
-  - daily-review-pipeline-gap-report.md
   - ../../automations/daily-operating-update.md
   - ../../automations/weekly-operating-review.md
   - ../../templates/README.md
@@ -18,12 +17,9 @@ refs:
 
 ## Purpose
 
-Use the Company OS to keep work, private management state, follow-up, weekly
-reporting, Decisions, and SOPs connected to the same source evidence. People
-work in Notion tickets and comments. The Daily agent appends current evidence
-to private, week-scoped Project Notes and prepares bounded outbound requests.
-The Weekly agent freezes all Project Notes, produces the report hierarchy, and
-promotes only knowledge that has earned a durable home.
+People record work and evidence in Notion. The Company OS uses those records to
+prepare follow-ups, weekly reports, Decisions, and SOPs without asking people to
+maintain the same information in several places.
 
 The current repository is configured for frozen or isolated evaluation.
 Production Notion writes and employee messages remain proposal-only until the
@@ -35,11 +31,10 @@ production routes and authority are approved.
 | --- | --- | --- |
 | **Projects** | Human-operated source records: goal, owner, Department, current plan, and links to related Work. | Private management assessments, accumulated agent memory, or weekly report history. |
 | **Work items** | Tasks, Features, Issues, and Meetings. This is where people record progress, evidence, blockers, decisions, completion notes, commitments, and discussion. | Cross-Project precedent or reusable procedures after promotion. |
-| **People** | Identity, role, authority, preferred contact channel, approved channels, and route references. | Guessed contact details or inferred permissions. |
-| **Reports** | An optional destination, configured by URL, for approved finalized Project, Department, or Company reports. Notion owns its permissions. | Intermediary management state or the agent's accumulating private report files. |
-| **Decisions** | Provenance database for choices worth remembering: context, options, selected option, authority, rationale, accepted tradeoff, consequences, review trigger, and sources. | Routine next actions or every choice made during execution. |
-| **SOPs** | Reusable employee operating procedures: trigger, owner, inputs, ordered workflow, handoffs, baseline, exceptions, controls, and verification. | Software-agent skills or a one-off personal trick with no reuse proof. |
-| **Hermes weekly workspace** | Private Project Notes, finalized report hierarchy, entity projections, and outbound artifacts under `weeks/<week>/`. | Provider permissions or an employee-facing database. |
+| **People** | Public/shared identity, role, authority, approved contact channels, and route references. | Employee Memory, management assessments, or inferred permissions. |
+| **Reports** | An optional provider copy of approved finalized Project, Department, or Company reports. | Canonical reports, Project Notes, or entity memory. |
+| **Decisions / SOPs** | Optional provider views when a long-term-memory destination is explicitly configured. | Canonical memory or automatic publication targets. |
+| **Hermes local workspace** | Canonical short-term memory under `weeks/`, long-term entity memory under `memory/`, finalized local reports, and outbound artifacts. | Provider permissions or employee-facing source records. |
 
 Problems do not need a separate database. A material problem becomes an
 `Issue` in Work, linked to the affected workflow or SOP step. Its page preserves
@@ -47,62 +42,62 @@ the Before baseline, economics or measurement gaps, intervention, and later
 After measurement.
 
 ```text
-                         +----------------+
-                         |     People     |
-                         | route/authority|
-                         +-------+--------+
-                                 |
-                                 v
-+----------+       +-------------+-------------+       +-----------+
-| Projects |<----->| Work: Task/Feature/Issue  |------>| Decisions |
-| source   |       | and embedded Meetings     |       | provenance|
-+----+-----+       +-------------+-------------+       +-----------+
-     |                           |
-     |                           v
-     |                     +-----+-----+
-     |                     |   SOPs    |
-     |                     | reusable  |
-     |                     +-----+-----+
-     v
-+----+--------------------------------+
-| Private weeks/<week>/              |
-| project-notes/ Daily evidence      |
-| reports/ Project -> Dept -> Company|
-| projections/ Employee + SOP        |
-+------------------+-----------------+
-                   |
-                   v
-       configured Notion / Drive URLs
-       and approved message routes
+Projects + Work + Meetings + People directory
+                       |
+                       v
++------------------------------------------------+
+| Private local workspace                        |
+| weeks/<week>/project-notes/ = short-term memory|
+| memory/{employees,sops,decisions,issues}/      |
+|                              = long-term memory|
+| weeks/<week>/reports/         = local reports  |
++----------------------+-------------------------+
+                       |
+             configured one-way copies
+                       v
+       private Notion/Drive memory destination
+       or management report dashboard
 ```
 
 ## The normal operating loop
 
 ```text
-Human logs Work in Notion
-          |
-          v
-Daily agent reads active Projects + selected Work
-          |
-          v
-one platform-neutral, Pydantic-validated result
-          |
-          v
-deterministic append into the private week
-          |
-          +--> appends one notes file per Project
-          +--> prepares precise documentation requests
-          +--> prepares threatened-target chases
-          `--> appends Problem / Decision / workflow observations
-                                      |
-                                      v
-Weekly freezes every Project Notes file
-          |
-          +--> creates and rolls up Project reports
-          +--> rolls them into Department and Company reports
-          +--> promotes qualified Decisions, Issues, and SOPs
-          `--> carries accepted priorities into next week
+EMPLOYEE                     COMPANY OS                    MANAGER
+   |                             |                            |
+   |-- records progress -------->|                            |
+   |                             |-- asks for missing facts ->|
+   |<-- receives clear follow-up-|                            |
+   |                             |                            |
+   |                             |-- prepares weekly view --->|
+   |                             |   outcomes, risks, owners   |
+   |                             |                            |
+   |-- adds late evidence ------>|-- carries open work ------>|
+   |                             |   into the next review      |
 ```
+
+The agent keeps its working notes private. Employees continue using their
+normal Work records, while managers receive a consolidated view with links back
+to the evidence.
+
+## Optional provider copies
+
+Local storage is automatic. Add a row only when a secondary copy is wanted:
+
+```text
+| Artifact | Provider | Destination |
+| --- | --- | --- |
+| `long-term memory` | notion | https://...private-memory... |
+| `reports` | notion | https://...management-reports... |
+```
+
+No row means local-only. Provider and destination must both be present. The
+copy runs only after the local write reads back, uses a stable action key, and
+upserts the completed local Markdown rather than regenerating it from an
+incremental extraction. It never imports provider edits into memory. Memory URLs must be private and
+operator-approved. Progress and documentation questions remain comments on the
+exact Work item; they are not memory synchronization.
+Never reuse the public/shared People URL for `long-term memory`; validation
+rejects that collision before a provider action is planned.
 
 ## 1. Log your work in tickets
 
@@ -272,102 +267,26 @@ a request unless the provider route and receipt explicitly prove that claim.
 
 ## 5. Daily agent task
 
-The Daily task should run one bounded local-day evidence window in
-`Asia/Kuala_Lumpur`.
+Daily reads one bounded local-day window in `Asia/Kuala_Lumpur`. It reconciles
+active Projects and changed Work, appends grounded observations to private
+Project Notes, and prepares any documentation request or owner chase. It does
+not rescan unrelated history, invent missing facts, or mark Work `Processed`
+merely because it posted a question.
 
-```text
-ACTIVE PROJECTS
-      +
-linked open or changed Work + Done Work where AI review != Processed
-      +
-embedded Meetings + People route facts
-      |
-      v
-one immutable Daily context
-      |
-      v
-one validated Daily result
-          |
-          v
-independent artifact-quality review
-          |
-          v
-deterministic Project Notes/outbound mapping
-          |
-          v
-optional guarded writes to configured URLs/routes + hidden run metadata
-```
-
-Daily responsibilities:
-
-1. Reconcile current Work against each active Project.
-2. Append only changed, grounded observations to that Project's notes file.
-3. Map precise completion questions for Done Work into `outbound`.
-4. Map one factual owner chase for each threatened weekly target into `outbound`.
-5. Append grounded Problem, Decision, and workflow observations to Project Notes.
-6. Keep effect, conflict, blocked-route, duplicate, and read-back metadata in
-   hidden run state rather than adding operator-facing artifact classes.
-
-Daily appends a new complete snapshot only when a source revision changes. It
-does not edit earlier observation blocks. Work created from Meeting commitments
-joins the same flow on the next Daily run.
-
-Daily must not:
-
-- Scan all historical Work because a relation is missing.
-- Invent progress, causes, costs, owners, contact routes, or destinations.
-- Promote a canonical Decision, Issue, or SOP.
-- Publish intermediary management state to Notion or Drive.
-- Mark an item `Processed` merely because a question was posted.
+The executable procedure and authority limits live in
+[`automations/daily-operating-update.md`](../../automations/daily-operating-update.md).
 
 ## 6. Weekly agent task
 
-Weekly reads all Project Notes files for the current week; it does not
-rescan raw Work or Meeting pages.
+Weekly freezes the complete Project Notes set instead of rescanning Work or
+Meetings. It builds the Project, Department, and Company reports, updates only
+qualified long-term memory, and carries unresolved items into next week. Frozen
+notes and finalized reports remain immutable.
 
-```text
-weeks/<week>/project-notes/project--*.md
-        |
-        +--> lock, validate coverage, and freeze hashes
-        +--> create Project reports
-        +--> update Employee Memory by person_id + work_id
-        +--> update SOP samples by workflow_key
-        +--> disposition every Problem / Decision / SOP candidate
-        +--> promote only qualified canonical records
-        `--> initialize next-week unresolved notes
-                          |
-                          v
-               Department reports
-                          |
-                          v
-                 Company report
-                          |
-                          v
-             approved executive delivery
-```
-
-Weekly initializes the next week's private Project Notes from the newest open
-Work and documentation-question snapshots; it does not mutate canonical Work or
-public Project narrative. Accepted completed outcomes do not carry. A late
-human response is appended by the next Daily run under the original Work ID;
-frozen notes and finalized rollups are not reopened.
-
-Promotion rules:
-
-- **Problem:** promote when recurrence or material consequence is grounded and
-  the Issue can preserve a dated Before baseline, measurement gaps, owner, and
-  next test.
-- **Decision:** promote only a reusable precedent or materially consequential,
-  recurring, or costly-to-reverse choice. Preserve real alternatives,
-  rationale, authority, accepted tradeoff, consequences, and review trigger.
-- **SOP:** promote only an approved workflow with an owner, ordered method,
-  systems and handoffs, baseline or explicit gaps, exceptions, output, reuse
-  proof, Project relation, and provenance.
-
-Every candidate receives one disposition: `promoted`, `duplicate`,
-`project_only`, `monitor`, `dismissed`, or `blocked`. A weak candidate stays in
-report history with its reason; it is not silently lost or forced into a
-canonical database.
+Every Problem, Decision, and SOP candidate receives an explicit disposition.
+Weak candidates remain in report history with the reason they were not
+promoted. The executable procedure and promotion gates live in
+[`automations/weekly-operating-review.md`](../../automations/weekly-operating-review.md).
 
 ## When documentation is poor
 

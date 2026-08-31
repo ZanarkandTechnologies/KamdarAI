@@ -153,7 +153,7 @@ message choices -> typed workspace binding -> Hermes gateway setup
     `--approve-draft`. Stale, absent, or tampered route proof returns
     `owner_route_not_confirmed` without calling Hermes.
 11. **Reconcile copy and operated proof (`tickets/TASK-0017/design.md`,
-    `docs/features/FEAT-0011-setup-ux-ascii.md`, `docs/customer-setup.md`,
+    `docs/features/FEAT-0011-seamless-deployment-and-verification.md`, `docs/customer-setup.md`,
     `workspace.hermes.md`, `automations/*.md`; map `M5`).** Use `hermes send`
     everywhere, document setup/recovery without exposing IDs or secrets, and
     capture the review screen plus success/failure result in the existing
@@ -264,6 +264,6 @@ human_gates: [final clean-machine apply]
 - `scripts/setup_cli/`
 - `schemas/workspace.py`
 - `workspace.hermes.template.md`
-- `docs/features/FEAT-0011-setup-ux-ascii.md`
+- `docs/features/FEAT-0011-seamless-deployment-and-verification.md`
 - `tickets/TASK-0017/progress.md`
 - `tickets/archive/TASK-0015/ticket.md`

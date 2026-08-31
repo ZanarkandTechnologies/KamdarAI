@@ -110,11 +110,6 @@ assigned a false pass grade. Reports and the workspace proposal
 remain mode-0600 below the named profile; do not copy their real contents into
 Git or CI artifacts.
 
-The installed-distribution setup test also seeds both retired skill paths. Its
-preview assertion proves no deletion occurs, then its apply assertion proves
-only those exact derived directories are removed while an unrelated customer
-skill is preserved.
-
 ## Installed and live lanes
 
 Installed-profile verification is allowed only against the profile named by

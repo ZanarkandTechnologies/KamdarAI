@@ -93,25 +93,37 @@ and persistent entity memory?**
 flowchart TD
   sources[Projects + Work + Meetings + artifact links]
   daily[Daily bounded reconciliation]
-  cache[(Project Notes)]
+  cache[(Local short-term memory<br/>Project Notes)]
   freeze[Frozen weekly evidence]
   project[Official Project report]
-  employee[(Employee Memory)]
-  sop[(Canonical SOP)]
+  employee[(Local long-term<br/>Employee Memory)]
+  sop[(Local long-term<br/>SOP Memory)]
   rollups[Area + Company rollups]
-  outbound[Approved outbound / publication]
+  mirror[Optional configured<br/>provider copies]
+  outbound[Approved comments / messages]
 
   sources --> daily --> cache
   cache -->|Weekly freeze| freeze
-  freeze --> project --> rollups --> outbound
+  freeze --> project --> rollups --> mirror
   freeze -->|delivery observations| employee
   freeze -->|workflow samples| sop
+  cache -. configured short-term sync .-> mirror
+  employee -. configured long-term sync .-> mirror
+  sop -. configured long-term sync .-> mirror
+  daily --> outbound
 ```
 
 Project Notes are private working memory, not a public report or employee
 scorecard. Daily appends source-linked snapshots and findings under fixed
 Markdown sections. The first implementation keeps one notes file per Project
 and week—not separate Daily employee or workflow files.
+
+The local runtime workspace is canonical for both memory lifecycles and Final
+reports. An optional artifact/provider/destination binding creates a one-way
+copy only after local read-back. No binding means local-only; incomplete pairs
+are invalid; provider edits never flow back. Memory destinations require an
+operator-approved private location. Work comments remain explicit actions on
+the exact source record rather than memory publication.
 
 ### Daily reconciliation
 
@@ -171,7 +183,7 @@ On success it:
 1. writes the official Project report;
 2. merges factual delivery observations into Employee Memory by employee and
    source Work ID;
-3. proposes source-linked workflow samples to the canonical SOP;
+3. proposes source-linked workflow samples to canonical local SOP Memory;
 4. produces Area and Company rollups, then approved outbound material;
 5. retains the consolidated week's frozen notes immutably and seeds next week
    with unresolved Work and documentation questions.
@@ -184,10 +196,14 @@ fails, persistent memory stays unchanged and the frozen notes remain retryable.
 
 ### Template-to-Pydantic contract
 
-The Markdown template supplies the section instructions, field vocabulary,
-enum values, and golden examples. Template sync must show the generated Pydantic
-diff before changing the schema. Daily performs one structured extraction; a
-deterministic mapper routes the result back into Markdown and Weekly sinks.
+Markdown templates supply section instructions, field vocabulary, message
+wording, and golden examples. Sync hash-binds every template into one generated
+catalog. Report templates additionally produce generated Pydantic report
+contracts and show their contract diff before replacement. Daily message-field
+descriptions load the documentation-request and employee-follow-up bodies from
+that catalog; IDs, routing, verdicts, and deduplication remain authored Pydantic
+shape. Daily performs one structured extraction, and a deterministic mapper
+routes the result back into Markdown and Weekly sinks.
 
 | Template section | Structured concepts | Weekly destination |
 | --- | --- | --- |
@@ -253,6 +269,9 @@ and rollback evidence.
   with approval and rollback evidence.
 - **FR-15:** Carry unresolved Work and questions into the next week's notes. Remove
   closed Work only after retaining its accepted outcome evidence.
+- **FR-16:** Always write short-term memory, long-term memory, and Final reports
+  locally. Add a one-way provider copy only for a complete configured
+  artifact/provider/destination binding and only after local read-back.
 
 ## Success and proof
 
@@ -314,7 +333,8 @@ documentation questions. Weekly freezes the complete all-Project set, then
 produces report, Employee Memory, SOP sample, promotion, and carry-forward
 projections. Employee observations merge by Person and Work; workflow samples
 merge by explicit workflow key without automatically changing an approved
-baseline.
+baseline. Stage 2 stores these outputs locally and treats configured Notion or
+Drive destinations as optional one-way copies, never as canonical memory.
 
 The remaining gates are external: bind authenticated client destinations and
 operate separately authorized Notion, Drive, messaging, Windows, and persistent

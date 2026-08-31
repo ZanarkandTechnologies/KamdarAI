@@ -1,5 +1,5 @@
 ---
-title: Project frozen notes into the weekly operating review
+title: Build weekly reports from frozen Project Notes
 status: active
 execution_modes: [source-contract, private-local]
 production_mode: proposal-only
@@ -15,10 +15,10 @@ public: true
 surfaces: [automations/weekly-operating-review.md, templates/project-week-notes.md, templates/weekly-report.md, templates/area-operating-rollup.md, templates/company-operating-rollup.md]
 source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
 evidence_refs: [tests/test_pydantic_weekly_meeting_contracts.py, tests/test_validate_eval_run.py]
-known_limits: "Authenticated publication and executive delivery remain separately gated."
+known_limits: "Reports are locally canonical; authenticated provider copies and executive delivery remain separately gated."
 ---
 
-# Project frozen notes into the weekly operating review
+# Build weekly reports from frozen Project Notes
 
 ## Why it exists
 
@@ -32,7 +32,7 @@ Notes file, prior reports, and targeted Person/SOP records.
 
 ## Pipeline signature
 
-`all Project Notes -> freeze -> validate -> project/entity/area/company outputs`
+`all Project Notes -> freeze -> local reports/entity memory -> optional provider copies`
 
 ## Flow
 
@@ -64,6 +64,9 @@ Project reports cite source note keys; Area and Company reports cite downstream
 reports rather than rescanning raw sources. Missing Project coverage blocks a
 complete Company finalization. Prior Final reports remain immutable. Failed
 projection leaves the frozen set retryable and persistent records unchanged.
+Every Final report is written under the local week before an optional configured
+Reports destination receives a one-way copy. A missing Reports binding is
+local-only, not a configuration gap.
 
 ## Failure modes
 

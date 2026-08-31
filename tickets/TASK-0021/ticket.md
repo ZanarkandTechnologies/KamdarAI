@@ -126,5 +126,5 @@ human_gates: [fresh-reader review]
 ## Links
 
 - `README.md`
-- `docs/systems/kamdar-company-os-operator-manual.md`
+- `docs/systems/company-os-operator-manual.md`
 - `templates/README.md`

@@ -15,7 +15,7 @@ public: true
 surfaces: [automations/daily-operating-update.md, templates/project-week-notes.md]
 source_refs: [workspace.hermes.md, tickets/TASK-0019/ticket.md]
 evidence_refs: [tests/test_project_week_notes.py]
-known_limits: "Provider publication is separate; Project Notes remain private workspace state."
+known_limits: "Project Notes remain locally canonical; an optional configured provider copy must target an operator-approved private destination."
 ---
 
 # Append current Work to private Project Notes
@@ -32,7 +32,7 @@ Work with owners, dates, evidence, and source revisions.
 
 ## Pipeline signature
 
-`DailyContextDiff -> project_note_updates[] -> append results by project_id`
+`DailyContextDiff -> local Project Notes -> optional short-term-memory copy`
 
 ## Flow
 
@@ -50,6 +50,8 @@ Projects + changed/open/Done-unreviewed Work
                     |
                     v
 weeks/<week>/project-notes/project--<id>.md
+                    |
+             configured private copy only
 ```
 
 ## State changes and artifacts
@@ -74,6 +76,10 @@ block that Project append without rolling back successful unrelated Projects.
 
 Proof covers per-Project files, zero-write reruns, conflicts, missing coverage,
 freeze, consolidation, and carry-forward.
+
+An absent short-term-memory sync binding means local-only. A configured
+provider and destination add a one-way copy after filesystem read-back; provider
+edits never flow back into Project Notes.
 
 ## Example
 

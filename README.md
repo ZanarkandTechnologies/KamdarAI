@@ -114,13 +114,14 @@ profile has a different ID. A separate `kamdar` alias is neither required nor
 installed by customer setup. Customer setup continues to use the Hermes CLI
 inside Docker, so customers do not install Hermes on Windows.
 
-The command detects changed report templates by content hash, asks Hermes to
-interpret only those templates, shows the contract diff, and updates the
-committed generated Pydantic modules in `schemas/reports/`. It then asks before
+The command catalogs every changed Markdown template by content hash. It embeds
+their exact bodies into the generated Pydantic template catalog, asks Hermes to
+interpret only changed report shapes, shows the generated contract diff, and
+updates the committed modules in `schemas/reports/`. It then asks before
 creating each synthetic preview in the private, ignored `.reports-preview/`
-directory. Use `python3 scripts/sync_report_templates.py --check` for a model-free, non-writing
-drift check or `--preview` when an explicit non-interactive run should generate
-previews.
+directory. Use `python3 scripts/sync_report_templates.py --check` for a
+model-free, non-writing drift check or `--preview` when an explicit
+non-interactive run should generate previews.
 
 Then run:
 
@@ -143,16 +144,20 @@ python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json
 python3 setup.py deliver --handoff /absolute/private/run/weekly/handoff.json --apply
 ```
 
-The first command is review-only. The second applies the complete configured
-plan—private workspace, Notion or Linear, Drive, knowledge destinations, task
-creation, and configured messages—and writes a redacted per-action receipt.
+The first command is review-only. The second writes canonical short-term
+memory, long-term memory, and versioned reports into the private Hermes
+workspace first. It then makes only the optional one-way provider copies bound
+in the `artifact-sync` table in `workspace.hermes.md`, applies approved Work
+comments or messages, and writes a redacted per-action receipt. A missing
+artifact binding means local-only; provider edits never flow back into memory.
 Production remains unauthorized; disabled policy, failed quality, a changed
-workspace or handoff, and missing exact destinations block before provider
-calls.
+workspace or handoff, and incomplete configured destinations block before
+provider calls. Notion and Drive permissions remain the operator's privacy
+boundary; a configured URL alone does not prove that a destination is private.
 The [autonomous testing runbook](docs/autonomous-testing.md) defines the safe
 default loop, targeted setup checks, live-test gates, and required evidence.
 The global Python discovery includes the real Telegram test as a skipped-by-
 default case; use the runbook's explicit profile and side-effect gate to run it.
 
-For the detailed setup screens and recovery paths, see
-[`docs/features/FEAT-0011-setup-ux-ascii.md`](docs/features/FEAT-0011-setup-ux-ascii.md).
+For setup steps and recovery paths, see
+[`docs/customer-setup.md`](docs/customer-setup.md).

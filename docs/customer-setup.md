@@ -43,22 +43,20 @@ and [Cloudflare's tunnel setup](https://developers.cloudflare.com/tunnel/setup/)
 ## Customer journey
 
 ```text
-Download or clone the Company OS source
-        |
-        +--optional comments--> create named tunnel in Cloudflare dashboard
-        |
-        `--double-click setup.cmd
-                |
-                +--Docker preflight
-                +--Hermes profile and model setup
-                +--official Notion MCP authorization
-                +--optional Gmail/Drive Composio MCP authorization
-                +--optional owner-message app + confirmed route test
-                +--optional tunnel token + stable hostname
-                +--workspace, schedules, and templates
-                +--start containers
-                `--guided Notion webhook verification + health/evals
+YOU                         SETUP                       RESULT
+ |                            |                           |
+ |-- open setup.cmd --------->|                           |
+ |                            |-- asks for company info   |
+ |<-- approve each service ---|                           |
+ |                            |-- checks each connection  |
+ |<-- fix or skip a problem --|                           |
+ |                            |-- installs and verifies ->|
+ |                                                        |
+ |<---------------- dashboard, schedules, health ---------|
 ```
+
+Real-time Notion comments add one optional Cloudflare step before setup. Daily
+and Weekly scheduled reviews do not require it.
 
 ## 1. Prepare Cloudflare for real-time comments
 
@@ -293,10 +291,12 @@ handoff with:
 python setup.py deliver --handoff <private-run>/<cadence>/handoff.json --apply
 ```
 
-Stage 2 covers every applicable configured destination, not only Telegram. A
-disabled policy returns `not_requested`; a missing binding is shown as blocked;
-successful provider actions require read-back or provider acceptance and write
-a redacted `delivery-receipt.json` beside the handoff.
+Stage 2 covers local memory/report writes plus every configured external
+destination, not only Telegram. A disabled policy returns `not_requested`.
+Missing artifact-sync rows mean local-only; missing required Work or messaging
+routes remain visibly blocked. Successful actions require filesystem read-back,
+provider read-back, or provider acceptance and write a redacted
+`delivery-receipt.json` beside the handoff.
 
 ## 5. Restart and update
 

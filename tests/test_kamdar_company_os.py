@@ -41,6 +41,16 @@ class KamdarCompanyOSTests(unittest.TestCase):
         self.assertIn("proposal-only", proposal)
 
     def test_feature_docs_and_system_map_own_the_pipeline_inventory(self) -> None:
+        feature_ids = {
+            line.split(":", 1)[1].strip()
+            for path in (ROOT / "docs/features").glob("FEAT-*.md")
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.startswith("feature_id:")
+        }
+        self.assertEqual(
+            feature_ids,
+            {*(f"FEAT-{index:04d}" for index in range(1, 8)), "FEAT-0010", "FEAT-0011"},
+        )
         feature_docs = [next((ROOT / "docs/features").glob(f"FEAT-{index:04d}-*.md")) for index in range(1, 8)]
         self.assertEqual(len(feature_docs), 7)
         for index, path in enumerate(feature_docs, start=1):
@@ -62,24 +72,23 @@ class KamdarCompanyOSTests(unittest.TestCase):
         system = (ROOT / "docs/systems/company-os.md").read_text(encoding="utf-8")
         for index in range(1, 8):
             self.assertIn(f"FEAT-{index:04d}", system)
-        for destination in ("NOTION / WIKI", "GOOGLE DRIVE", "EMAIL / TELEGRAM"):
+        for destination in ("LOCAL WORKSPACE", "NOTION / DRIVE", "EMAIL / TELEGRAM"):
             self.assertIn(destination, system)
 
     def test_template_registry_has_pinned_and_derived_contracts(self) -> None:
         expected = {
             "project.md": "company-os-project",
             "person.md": "company-os-person",
+            "employee-memory.md": "company-os-employee-memory",
             "task.md": "company-os-task",
             "feature.md": "company-os-feature",
             "decision.md": "company-os-decision",
             "weekly-report.md": "company-os-weekly-report",
             "area-operating-rollup.md": "kamdar-area-operating-rollup",
             "company-operating-rollup.md": "kamdar-company-operating-rollup",
-            "daily-operating-evidence.md": "kamdar-daily-operating-evidence",
             "employee-followups.md": "kamdar-employee-followups",
             "automation-receipt.md": "kamdar-automation-receipt",
             "documentation-request.md": "kamdar-documentation-request",
-            "knowledge-candidates.md": "kamdar-knowledge-candidates",
             "skill.md": "company-os-skill",
             "sop.md": "kamdar-employee-sop",
             "executive-distribution.md": "kamdar-executive-distribution",
@@ -115,6 +124,10 @@ class KamdarCompanyOSTests(unittest.TestCase):
         for field in ("preferred_contact_channel", "approved_contact_channels",
                       "contact_endpoint", "contact_instructions", "timezone", "expertise"):
             self.assertIn(f"{field}:", person, field)
+        self.assertNotIn("Persistent operating memory", person)
+        employee_memory = (ROOT / "templates/employee-memory.md").read_text(encoding="utf-8")
+        self.assertIn("Persistent operating memory", employee_memory)
+        self.assertIn("Latest weekly evidence", employee_memory)
 
         weekly = (ROOT / "templates/weekly-report.md").read_text(encoding="utf-8")
         for section in (

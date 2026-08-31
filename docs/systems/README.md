@@ -3,20 +3,18 @@ title: Company OS systems
 status: active
 owner: Company OS
 created_at: 2026-08-21
-updated_at: 2026-08-29
+updated_at: 2026-08-31
 refs:
   - company-os.md
   - company-os-operator-manual.md
-  - daily-review-pipeline-gap-report.md
   - ../features/README.md
 ---
 
 # Company OS systems
 
-System pages explain how multiple first-class features compose into a product
-workflow. The operator manual explains how people use that system, and the
-schema sanity check records the remaining production-readiness gaps.
+The system spec explains how the Company OS capabilities work together. The
+operator manual covers the human workflow. Feature pages own individual
+capability contracts and their proof links.
 
 - [Company OS](company-os.md)
 - [Company OS operator manual](company-os-operator-manual.md)
-- [Daily and Weekly operating-memory implementation status](daily-review-pipeline-gap-report.md)

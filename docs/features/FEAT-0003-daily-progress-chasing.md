@@ -1,5 +1,5 @@
 ---
-title: Chase threatened Work from the same Project evidence
+title: Follow up on delayed or blocked Work
 status: active
 execution_modes: [source-contract]
 production_mode: proposal-only
@@ -18,12 +18,12 @@ evidence_refs: [tests/test_pydantic_daily_contracts.py, tests/test_validate_eval
 known_limits: "Production delivery still requires an approved route and write authority."
 ---
 
-# Chase threatened Work from the same Project evidence
+# Follow up on delayed or blocked Work
 
 ## Why it exists
 
-Turn observable delivery risk into one precise owner follow-up while preserving
-the same evidence in private Project memory.
+Send one precise owner follow-up when the evidence shows that dated Work is
+delayed, blocked, or at risk. Keep the same evidence in private Project Notes.
 
 ## Trigger and inputs
 
@@ -36,7 +36,7 @@ approved delivery route.
 
 ## Flow
 
-Daily uses one source snapshot for both private PM memory and any owner chase.
+Daily uses one source snapshot for both private Project Notes and any owner follow-up.
 It appends the current Work/problem observation to Project Notes, then prepares
 one factual message only when a dated target is stale, blocked, or threatened.
 

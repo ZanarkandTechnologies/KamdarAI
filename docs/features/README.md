@@ -13,14 +13,13 @@ refs:
 
 # Company OS feature docs
 
-Each `FEAT-*` page owns one buyer-visible Company OS capability and is the
-canonical explanation rendered above that feature's grouped proof. The
-[Company OS system spec](../systems/company-os.md) owns how the
-features run together. Automation files own cadence and procedure. The Daily
-and Weekly eval suites own runnable assertions and tag each case with
-the feature it proves.
+Each `FEAT-*` page describes one Company OS capability and links it to proof.
+The [Company OS system spec](../systems/company-os.md) explains how the
+capabilities work together. Automation files define cadence and procedure.
+The Daily and Weekly eval suites contain the runnable assertions and identify
+the feature proved by each case.
 
-One Daily run reads the bounded source window once and appends source-linked
+One Daily run reads the defined source window once and appends source-linked
 observations to one private Project Notes file per active Project. One Weekly
 run freezes the complete set, builds reports and persistent entity projections,
 then carries unresolved notes forward. Feature boundaries organize behavior
@@ -67,10 +66,10 @@ artifact, draft, or frozen receipt is not external delivery proof.
 | --- | --- | --- | --- |
 | `FEAT-0001` | [Append current Work to Project Notes](FEAT-0001-daily-project-memory.md) | Daily | Per-Project append, dedupe, conflict, and freeze proof |
 | `FEAT-0002` | [Ask for the missing information](FEAT-0002-daily-documentation-quality.md) | Daily | Type-specific field request and Work comment proof |
-| `FEAT-0003` | [Chase delayed work once](FEAT-0003-daily-progress-chasing.md) | Daily | Private PM evidence plus approved-route owner outreach |
+| `FEAT-0003` | [Follow up on delayed or blocked Work](FEAT-0003-daily-progress-chasing.md) | Daily | Private Project evidence plus an approved owner route |
 | `FEAT-0004` | [Append grounded operating knowledge](FEAT-0004-daily-knowledge-candidate-capture.md) | Daily | Source-linked workflow samples, problem baselines or owned gaps, and Decisions in Project Notes |
-| `FEAT-0005` | [Company operating review](FEAT-0005-weekly-operating-reports.md) | Weekly | Project → Department → Company reports |
-| `FEAT-0006` | [Promote earned knowledge](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated employee SOP promotion to the existing SOPs database and problem promotion to Issues in existing Work |
+| `FEAT-0005` | [Build weekly reports from frozen Project Notes](FEAT-0005-weekly-operating-reports.md) | Weekly | Project → Department → Company reports |
+| `FEAT-0006` | [Promote qualified knowledge to long-term memory](FEAT-0006-weekly-knowledge-promotion.md) | Weekly | Authority-gated local Employee/SOP/Decision/Issue Memory with optional private provider copies |
 | `FEAT-0007` | [Carry unresolved Project Notes into next week](FEAT-0007-weekly-next-week-planning.md) | Weekly | Consolidation-gated next-week initialization without Work mutation |
 | `FEAT-0010` | [Turn Meeting commitments into accountable Work](FEAT-0010-meeting-commitment-intake.md) | Event workflow | Explicit Meeting commitments become canonical, deduplicated Task records |
 | `FEAT-0011` | [Install and verify the Company OS from one entry point](FEAT-0011-seamless-deployment-and-verification.md) | Install / update | Implemented local contract; clean Windows/Notion/Cloudflare operation pending |

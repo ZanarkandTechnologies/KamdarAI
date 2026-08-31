@@ -28,21 +28,21 @@ instantiated in the evaluation workspace.
 | Lifecycle | Templates | Current consumer |
 | --- | --- | --- |
 | Active records | `project.md`, `person.md`, `task.md`, `feature.md`, `issue.md`, `meeting.md`, `decision.md`, `skill.md`, `sop.md` | Notion record creation, review, and Weekly promotion. |
-| Active private memory | `project-week-notes.md` | Daily append and Weekly all-Project freeze. |
+| Active private memory | `project-week-notes.md`, `employee-memory.md` | Daily short-term append/freeze and Weekly long-term Employee Memory. |
 | Active reports | `weekly-report.md`, `area-operating-rollup.md`, `company-operating-rollup.md` | Weekly projections; these three use Markdown-to-Pydantic synchronization. |
-| Active outbound | `executive-distribution.md` | Weekly owner distribution renders this template directly. |
-| Feature-declared safety format | `automation-receipt.md` | FEAT-0009 retains this reviewed format, while current Daily/Weekly execution receipts are primarily Pydantic-validated JSON. |
-| Retained optional outbound | `employee-followups.md` | Available for a future rendered employee-chase artifact; current Daily chases are schema-rendered directly. |
-| Inactive compatibility/showcase | `daily-operating-evidence.md`, `documentation-request.md`, `knowledge-candidates.md` | No active automation consumer. Keep only until a separate compatibility cleanup confirms no external installer depends on their template IDs. |
+| Active outbound | `documentation-request.md`, `employee-followups.md`, `executive-distribution.md` | Daily Pydantic descriptions source documentation and progress messages from Markdown; Weekly renders owner distribution. |
+| Reviewed safety format | `automation-receipt.md` | Current Daily and Weekly execution receipts are primarily Pydantic-validated JSON; this template remains the reviewed Markdown format where one is required. |
 
 `task.md`, `feature.md`, `issue.md`, and `meeting.md` share one Work data model
 but deliberately guide different thought: ordinary work, a bounded value
 opportunity, a problem to diagnose, and a discussion whose commitments must be
 captured. `person.md` is the machine-readable directory contract: routing and
 expertise remain frontmatter so an agent can select the right person before it
-reads freeform notes. The active Daily automation writes documentation requests
-and progress chases directly through its schema-validated result; it does not
-need separate intermediary Markdown files for those effects.
+reads freeform notes. Private cross-week delivery evidence belongs in
+`employee-memory.md`, never the public/shared Person record. The active Daily automation writes documentation requests
+and progress chases through its schema-validated result. Their wording and
+examples come from the two Markdown templates; Pydantic continues to own IDs,
+routing fields, verdicts, and deduplication keys.
 `skill.md` is a thin registry card for promoted Farplane software capabilities;
 the full executable workflow, golden nodes, and evals belong with the source
 `SKILL.md`, not in the Notion record. `sop.md` is the canonical employee workflow
@@ -64,4 +64,6 @@ cross-project reuse proves it needs an independent lifecycle.
 
 The setup skill installs this whole directory into the Hermes workspace as
 `workspace/templates/`. `workspace.hermes.md` routes real Notion sources and
-record types to these filenames.
+record types to these filenames. `python3 scripts/sync_report_templates.py`
+hash-binds every template into `schemas/automations/template_catalog.py`; report
+templates additionally compile into their generated Pydantic report modules.
