@@ -10,11 +10,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "plugins/platforms"))
+ROOT = Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(ROOT))
 
-from notion import api  # noqa: E402
-from notion import protocol  # noqa: E402
+from plugins.platforms.notion import api  # noqa: E402
+from plugins.platforms.notion import protocol  # noqa: E402
 
 
 class NotionWebhookProtocolTests(unittest.TestCase):

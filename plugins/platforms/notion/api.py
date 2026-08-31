@@ -18,6 +18,38 @@ _BOT_ID = ""
 DEFAULT_TRIGGER = "@hermes"
 
 
+class NotionCredentialError(RuntimeError):
+    """A redacted credential-validation failure safe for setup output."""
+
+
+def validate_token(token: str) -> None:
+    """Validate one candidate integration token without reading profile state."""
+    cleaned = token.strip()
+    if not cleaned:
+        raise NotionCredentialError("notion_token_invalid")
+    request = urllib.request.Request(
+        API_ROOT + "/users/me",
+        method="GET",
+        headers={
+            "Authorization": f"Bearer {cleaned}",
+            "Notion-Version": DEFAULT_VERSION,
+            "User-Agent": "hermes-notion-platform/1.0",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            if response.status != 200:
+                raise NotionCredentialError("notion_token_invalid")
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as error:
+        code = "notion_token_invalid" if error.code in {401, 403} else "notion_unavailable"
+        raise NotionCredentialError(code) from error
+    except (OSError, ValueError, urllib.error.URLError) as error:
+        raise NotionCredentialError("notion_unavailable") from error
+    if not isinstance(payload, dict) or payload.get("object") != "user":
+        raise NotionCredentialError("notion_token_invalid")
+
+
 def _setting(name: str, default: str = "") -> str:
     """Read profile-scoped values without borrowing another profile's env."""
     try:

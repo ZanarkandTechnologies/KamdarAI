@@ -9,13 +9,13 @@ from types import SimpleNamespace
 from typing import Any, cast
 from unittest.mock import AsyncMock, patch
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[4]
 HERMES_ROOT = Path.home() / ".hermes/hermes-agent"
 sys.path.insert(0, str(HERMES_ROOT))
-sys.path.insert(0, str(ROOT / "plugins/platforms"))
+sys.path.insert(0, str(ROOT))
 
 from gateway.session import SessionSource, build_session_key  # noqa: E402
-from notion import adapter  # noqa: E402
+from plugins.platforms.notion import adapter  # noqa: E402
 
 
 PAGE_ID = "11111111-2222-3333-4444-555555555555"
