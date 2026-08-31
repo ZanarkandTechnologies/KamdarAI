@@ -18,91 +18,64 @@ class KamdarCompanyOSTests(unittest.TestCase):
             self.assertIn("workspace.hermes.md", automation)
             self.assertIn("ntn --help", automation)
             self.assertNotIn("skills/kamdar-company-os", automation)
-        self.assertIn("validate daily-review", daily)
-        self.assertIn("weekly_review_result.py", weekly)
-        sync_start = weekly.index("**4 — Sync to provider")
-        self.assertGreater(weekly.index("create a one-way provider copy"), sync_start)
+        self.assertIn("skills/pm-daily/SKILL.md", daily)
+        self.assertIn("skills/pm-weekly/SKILL.md", weekly)
+        sync_start = weekly.index("**4 — Sync authorized artifacts")
+        self.assertGreater(weekly.index("Create one-way provider copies"), sync_start)
         self.assertNotIn("javascript", daily.lower())
         self.assertNotIn("javascript", weekly.lower())
 
-    def test_runtime_setup_does_not_depend_on_agent_skills(self) -> None:
+    def test_runtime_setup_installs_only_the_two_pm_skills(self) -> None:
         skills = ROOT / "skills"
         packages = sorted(path.parent.name for path in skills.glob("*/SKILL.md")) if skills.exists() else []
-        self.assertEqual(packages, [])
-        self.assertTrue((ROOT / "scripts/setup_profile.py").is_file())
-        self.assertTrue((ROOT / "scripts/setup_workspace.py").is_file())
+        self.assertEqual(packages, ["pm-daily", "pm-weekly"])
+        self.assertTrue((ROOT / "apps/installer/profile.py").is_file())
+        self.assertTrue((ROOT / "apps/installer/workspace.py").is_file())
 
     def test_live_context_is_ignored_but_reviewable_config_is_tracked(self) -> None:
         ignored = (ROOT / ".gitignore").read_text(encoding="utf-8")
         self.assertIn("/.hermes.md", ignored)
         proposal = (ROOT / "workspace.hermes.md").read_text(encoding="utf-8")
         self.assertIn('company_timezone: "Asia/Kuala_Lumpur"', proposal)
-        self.assertIn("workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md", proposal)
+        self.assertIn("workspace/skills/pm-*/templates/", proposal)
         self.assertIn("unmapped_template", proposal)
         self.assertIn("meeting_block_parse_gap", proposal)
         self.assertIn("proposal-only", proposal)
 
-    def test_feature_docs_and_system_map_own_the_pipeline_inventory(self) -> None:
-        feature_ids = {
-            line.split(":", 1)[1].strip()
-            for path in (ROOT / "docs/features").glob("FEAT-*.md")
-            for line in path.read_text(encoding="utf-8").splitlines()
-            if line.startswith("feature_id:")
-        }
-        self.assertEqual(
-            feature_ids,
-            {*(f"FEAT-{index:04d}" for index in range(1, 8)), "FEAT-0010", "FEAT-0011"},
-        )
-        feature_docs = [next((ROOT / "docs/features").glob(f"FEAT-{index:04d}-*.md")) for index in range(1, 8)]
-        self.assertEqual(len(feature_docs), 7)
-        for index, path in enumerate(feature_docs, start=1):
-            content = path.read_text(encoding="utf-8")
-            self.assertIn(f"feature_id: FEAT-{index:04d}", content, path.name)
-            self.assertIn("system_id: SYS-0001", content, path.name)
-            for section in (
-                "## Why it exists",
-                "## Trigger and inputs",
-                "## Pipeline signature",
-                "## Flow",
-                "## State changes and artifacts",
-                "## Downstream application",
-                "## Failure modes",
-                "## Proof contract",
-                "## Example",
-            ):
-                self.assertIn(section, content, f"{path.name}: {section}")
-        system = (ROOT / "docs/systems/company-os.md").read_text(encoding="utf-8")
-        for index in range(1, 8):
-            self.assertIn(f"FEAT-{index:04d}", system)
-        for destination in ("LOCAL WORKSPACE", "NOTION / DRIVE", "EMAIL / TELEGRAM"):
-            self.assertIn(destination, system)
+    def test_three_docs_and_two_skills_own_product_behavior(self) -> None:
+        docs = sorted(path.name for path in (ROOT / "docs").glob("*.md"))
+        self.assertEqual(docs, ["autonomous-testing.md", "operator-guide.md", "prd.md"])
+        for removed in ("features", "research", "systems"):
+            self.assertFalse((ROOT / "docs" / removed).exists())
+        prd = (ROOT / "docs/prd.md").read_text(encoding="utf-8")
+        operator = (ROOT / "docs/operator-guide.md").read_text(encoding="utf-8")
+        for skill in ("pm-daily", "pm-weekly"):
+            self.assertIn(f"skills/{skill}/SKILL.md", prd)
+            self.assertIn(f"skills/{skill}/SKILL.md", operator)
 
     def test_template_registry_has_pinned_and_derived_contracts(self) -> None:
         expected = {
-            "project.md": "company-os-project",
-            "person.md": "company-os-person",
-            "employee-memory.md": "company-os-employee-memory",
-            "task.md": "company-os-task",
-            "feature.md": "company-os-feature",
-            "decision.md": "company-os-decision",
-            "weekly-report.md": "company-os-weekly-report",
-            "area-operating-rollup.md": "kamdar-area-operating-rollup",
-            "company-operating-rollup.md": "kamdar-company-operating-rollup",
-            "employee-followups.md": "kamdar-employee-followups",
-            "automation-receipt.md": "kamdar-automation-receipt",
-            "documentation-request.md": "kamdar-documentation-request",
-            "skill.md": "company-os-skill",
-            "sop.md": "kamdar-employee-sop",
-            "executive-distribution.md": "kamdar-executive-distribution",
-            "issue.md": "kamdar-issue",
-            "meeting.md": "kamdar-meeting",
+            "templates/project.md": "company-os-project",
+            "templates/person.md": "company-os-person",
+            "templates/task.md": "company-os-task",
+            "templates/feature.md": "company-os-feature",
+            "templates/decision.md": "company-os-decision",
+            "skills/pm-weekly/templates/weekly-report.md": "company-os-weekly-report",
+            "skills/pm-weekly/templates/area-operating-rollup.md": "kamdar-area-operating-rollup",
+            "skills/pm-weekly/templates/company-operating-rollup.md": "kamdar-company-operating-rollup",
+            "skills/pm-daily/templates/employee-followups.md": "kamdar-employee-followups",
+            "skills/pm-daily/templates/documentation-request.md": "kamdar-documentation-request",
+            "templates/sop.md": "kamdar-employee-sop",
+            "skills/pm-weekly/templates/executive-distribution.md": "kamdar-executive-distribution",
+            "templates/issue.md": "kamdar-issue",
+            "templates/meeting.md": "kamdar-meeting",
         }
         for filename, template_id in expected.items():
-            content = (ROOT / "templates" / filename).read_text(encoding="utf-8")
+            content = (ROOT / filename).read_text(encoding="utf-8")
             self.assertIn(f"template_id: {template_id}", content, filename)
             self.assertIn("template_version:", content, filename)
         for filename in expected:
-            content = (ROOT / "templates" / filename).read_text(encoding="utf-8")
+            content = (ROOT / filename).read_text(encoding="utf-8")
             self.assertNotIn("required_properties:", content, filename)
             self.assertNotIn("upstream_source:", content, filename)
 
@@ -115,23 +88,26 @@ class KamdarCompanyOSTests(unittest.TestCase):
                 self.assertIn(f"{field}:", content, f"{filename}: {field}")
 
         for filename in (
-            "project.md", "task.md", "feature.md", "issue.md", "meeting.md",
-            "weekly-report.md", "area-operating-rollup.md", "company-operating-rollup.md",
-            "decision.md", "skill.md", "sop.md",
+            "templates/project.md", "templates/task.md", "templates/feature.md", "templates/issue.md", "templates/meeting.md",
+            "skills/pm-weekly/templates/weekly-report.md", "skills/pm-weekly/templates/area-operating-rollup.md", "skills/pm-weekly/templates/company-operating-rollup.md",
+            "templates/decision.md", "templates/sop.md",
         ):
-            content = (ROOT / "templates" / filename).read_text(encoding="utf-8")
+            content = (ROOT / filename).read_text(encoding="utf-8")
             self.assertIn("GOLDEN EXAMPLE", content, filename)
 
         person = (ROOT / "templates/person.md").read_text(encoding="utf-8")
         for field in ("preferred_contact_channel", "approved_contact_channels",
                       "contact_endpoint", "contact_instructions", "timezone", "expertise"):
             self.assertIn(f"{field}:", person, field)
-        self.assertNotIn("Persistent operating memory", person)
-        employee_memory = (ROOT / "templates/employee-memory.md").read_text(encoding="utf-8")
-        self.assertIn("Persistent operating memory", employee_memory)
-        self.assertIn("Latest weekly evidence", employee_memory)
+        self.assertIn("Persistent operating memory", person)
+        self.assertIn("Latest weekly evidence", person)
+        self.assertIn("private local context", person)
 
-        weekly = (ROOT / "templates/weekly-report.md").read_text(encoding="utf-8")
+        sop = (ROOT / "templates/sop.md").read_text(encoding="utf-8")
+        self.assertIn("Long-term context", sop)
+        self.assertIn("Short-term interval context", sop)
+
+        weekly = (ROOT / "skills/pm-weekly/templates/weekly-report.md").read_text(encoding="utf-8")
         for section in (
             "Summary", "Outcomes and open attention", "Problems and inefficiencies",
             "Decisions", "SOPs", "Next-week priorities",
@@ -140,7 +116,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
 
     def test_proposed_context_validates(self) -> None:
         result = subprocess.run(
-             [sys.executable, str(ROOT / "scripts/validate_company_context.py"),
+             [sys.executable, str(ROOT / "apps/installer/validate_context.py"),
              "--context", str(ROOT / "workspace.hermes.md")],
             text=True, capture_output=True, check=False,
         )

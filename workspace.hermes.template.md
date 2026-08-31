@@ -7,9 +7,6 @@ company_description: REPLACE_ME
 company_timezone: REPLACE_ME
 status: draft
 production_write_mode: proposal-only
-automation_delivery:
-  daily: disabled
-  weekly: disabled
 ---
 
 # Company Workspace
@@ -46,7 +43,7 @@ sources.
 
 ## Optional artifact sync
 
-Hermes always writes canonical Project Notes, long-term entity memory, and
+Hermes always writes canonical Project Memory, long-term entity memory, and
 Final reports inside its private runtime workspace. Add a row only when an
 operator wants a one-way secondary copy after local read-back. An empty table
 means local-only; provider edits never flow back into memory.
@@ -65,7 +62,7 @@ the long-term-memory destination must never be the public People directory.
 ```text
 weeks/
 `-- YYYY-Www/
-    |-- project-notes/
+    |-- project-memory/
     |   `-- project--<stable-project-id>.md
     `-- reports/
         |-- projects/
@@ -78,8 +75,8 @@ memory/
 `-- issues/
 ```
 
-Daily validates one platform-neutral structured result before appending to
-Project Notes. Weekly freezes all Project Notes, writes versioned Project/Area/
+PM Daily reviews its grounded local files before updating
+Project Memory. Weekly freezes all Project Memory, writes versioned Project/Area/
 Company reports, and updates the referenced long-term entity records. Optional
 message drafts live under the week only when owner messaging is configured;
 minimal delivery metadata stays in hidden run state.
@@ -88,10 +85,10 @@ minimal delivery metadata stays in hidden run state.
 
 | Output | Template | Local owner |
 | --- | --- | --- |
-| Project Notes | templates/project-week-notes.md | weeks/&lt;week&gt;/project-notes |
-| Employee Memory | templates/employee-memory.md | memory/employees |
+| Project Memory | skills/pm-daily/templates/project-memory.md | weeks/&lt;week&gt;/project-memory |
+| Employee Memory | templates/person.md | memory/employees |
 | SOP Memory | templates/sop.md | memory/sops |
-| Approved Final operating report | templates/weekly-report.md | weeks/&lt;week&gt;/reports |
+| Approved Final operating report | skills/pm-weekly/templates/weekly-report.md | weeks/&lt;week&gt;/reports |
 
 ## Communications
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib
 import unittest
 from pathlib import Path
 
@@ -36,18 +35,6 @@ class PythonOnlyArchitectureTests(unittest.TestCase):
                 if retired in source:
                     findings.append(f"{relative}:{retired}")
         self.assertEqual(findings, [])
-
-    def test_generated_report_contracts_are_importable_pydantic_modules(self) -> None:
-        modules = (
-            "schemas.reports.company_os_weekly_report",
-            "schemas.reports.kamdar_area_operating_rollup",
-            "schemas.reports.kamdar_company_operating_rollup",
-        )
-        for name in modules:
-            with self.subTest(module=name):
-                module = importlib.import_module(name)
-                self.assertEqual(module.REPORT_JSON_SCHEMA["type"], "object")
-
 
 if __name__ == "__main__":
     unittest.main()

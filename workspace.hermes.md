@@ -10,9 +10,6 @@ execution_modes:
   - frozen
   - isolated-eval
 production_write_mode: proposal-only
-automation_delivery:
-  daily: disabled
-  weekly: disabled
 ---
 
 # Kamdar AI Workspace
@@ -48,7 +45,7 @@ and gap in `daily-context-diff.json`.
 ## Optional artifact sync
 
 Hermes always writes canonical artifacts inside its private runtime workspace:
-Project Notes are short-term memory, weekly entity records are long-term
+Project Memory files are short-term memory, weekly entity records are long-term
 memory, and Final reports have immutable local versions. The table below lists
 only optional one-way provider copies. An absent artifact row means local-only;
 there is no enabled/default column. Provider and destination must both be
@@ -65,7 +62,7 @@ dashboard. Notion and Drive own destination permissions; configuring a URL does
 not prove that the destination is private or writable. Production destinations
 remain unbound until setup and operated provider proof confirm them.
 The `long-term memory` destination must not equal the configured People source;
-Stage 2 rejects that public-directory collision before planning a provider action.
+the automation must reject that public-directory collision before writing.
 
 ## Isolated eval proof environment
 
@@ -85,7 +82,7 @@ Stage 2 rejects that public-directory collision before planning a provider actio
 | --- | --- | --- | --- |
 | Google Drive | profile-scoped `google-workspace` skill | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | Canonical root for Kamdar files. Keep retrieval and new company files inside this folder unless explicitly approved otherwise. |
 | Notion | Daily and Weekly automations via `ntn` | [Eval Projects](https://app.notion.com/p/069e3aefb9b74ec4af7406e1be2de51b) · [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) · [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | During evaluation, Projects and Work are bounded sources and Reports are an optional Final-report copy. Local Employee/SOP/Decision/Issue Memory is canonical; no intermediary memory is written to the eval databases unless a private artifact-sync destination is explicitly configured. Do not read/write the production Kamdar root. |
-| Workspace | installed `templates/` folder | `workspace/templates/{project,person,task,feature,issue,meeting,decision,skill,sop,weekly-report,area-operating-rollup,company-operating-rollup}.md` | Runtime-readable template contracts installed from KamdarAI. `skill.md` is software-only; employee workflow baselines use `sop.md`. The skill resolves template ID/version here; it never relies on a profile-local copy. |
+| Workspace | installed entity and skill templates | `workspace/templates/` and `workspace/skills/pm-*/templates/` | Runtime-readable artifact contracts installed from KamdarAI. Provider definitions remain in `apps/installer/providers/`. Automations read cadence-owned templates from their skill package and shared entity shapes from `workspace/templates/`. |
 
 ## Communications
 
@@ -101,14 +98,12 @@ owner.
 
 | Platform | Use via | Pages or sources | How it is structured |
 | --- | --- | --- | --- |
-| Telegram | Hermes native messaging plus `scripts/authorized_message.py` | Profile-private exact target from a confirmed setup test | The workspace stores the named owner and behavior; the private profile owns credentials, target IDs, and current delivery proof. |
+| Telegram | Hermes native messaging skill or MCP | Profile-private exact target from a confirmed setup test | The workspace stores the named owner and behavior; the private profile owns credentials, target IDs, and current delivery proof. |
 
-No owner messages are enabled by default. If configured, drafts are written to
-the current private `weeks/<week>/outbound/` directory. They stay unsent until
-the owner reviews the exact file and invokes
-`python ../scripts/authorized_message.py --workspace .hermes.md --profile-home
-.. --message "owner report" --approve-draft <draft-path>` from the runtime
-workspace. That approval still requires a matching confirmed route. Employee
+No owner messages are enabled by default. If configured for drafts, drafts are
+written to the current private `weeks/<week>/outbound/` directory and stay
+unsent until the owner explicitly approves them through the configured native
+messaging integration. Employee
 progress and documentation questions default to comments on the exact linked
 Work item. A separately configured employee-follow-up route overrides that
 default; Hermes never infers a recipient or falls back to a generic channel.
@@ -149,8 +144,8 @@ The manager's reviewed target hierarchy is:
 ```text
 canonical Projects + Work Items + People
   -> one validated platform-neutral Daily result
-  -> Stage 2 field mapping
-  -> private weeks/<week>/project-notes/ short-term memory
+  -> native schema-guided application
+  -> private weeks/<week>/project-memory/ short-term memory
   -> frozen all-Project weekly input
   -> finalized local Project reports
   -> Area rollup (derived template)
@@ -159,7 +154,7 @@ canonical Projects + Work Items + People
   -> optional one-way copies to configured private destinations
 ```
 
-Each Project Notes file preserves exact progress, blocker,
+Each Project Memory file preserves exact progress, blocker,
 documentation quality, next action, owner, dates, native source URLs, and any
 relevant embedded Meeting evidence. When a plan exists it also preserves planned
 versus actual hours, schedule variance, estimated versus actual cost in MYR, the
@@ -180,13 +175,15 @@ permissions, and explicit authority.
 
 ## Template and meeting-block routing
 
-- The source template registry is KamdarAI `templates/`; the runtime copy is
-  `workspace/templates/`, installed only through `scripts/setup_workspace.py`.
+- Shared entity templates originate in KamdarAI `templates/`; cadence-owned
+  templates originate inside each PM skill. Runtime copies are installed only
+  through `apps/installer/workspace.py`.
 - Projects use `project.md`; ordinary Work uses `task.md`; value opportunities
   use `feature.md`; issue-like Work uses `issue.md`; embedded Meetings use
-  `meeting.md`; Decisions use `decision.md`; employee procedures use `sop.md`;
-  Farplane capability cards use `skill.md`; Reports use their corresponding
-  report templates.
+  `meeting.md`; Decisions use `decision.md`; and employee procedures use
+  `sop.md`. Private Person and SOP projections reuse those shared entity
+  templates. Project Memory, messages, and reports use the templates inside
+  their owning PM skill.
 - A modified Task must be fetched as a complete page before Daily extraction.
   Inspect embedded Meeting blocks and `Meeting notes and updates`; do not depend
   on a missing database `Type` property to discover meeting evidence.

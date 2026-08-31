@@ -1,0 +1,8 @@
+{
+  "date": "2026-08-25",
+  "projects": [{"id": "PROJ-CMT", "name": "CMT Pipeline", "status": "Active"}],
+  "work": [
+    {"id": "TASK-101", "project_id": "PROJ-CMT", "owner_id": "PERSON-AISHA", "status": "Blocked", "due_date": "2026-08-24", "updated_at": "2026-08-20T09:00:00+08:00", "summary": "Bulk cutting waits for the signed collar measurement.", "source_url": "https://example.invalid/TASK-101"},
+    {"id": "TASK-102", "project_id": "PROJ-CMT", "owner_id": "PERSON-DARREN", "status": "Done", "updated_at": "2026-08-25T10:00:00+08:00", "summary": "Guest checkout confirmation was fixed, but no affected order or trace was attached.", "source_url": "https://example.invalid/TASK-102"}
+  ]
+}

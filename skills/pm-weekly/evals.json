@@ -1,0 +1,41 @@
+{
+  "schema_version": "pm-weekly-skill-evals@1.0.0",
+  "skill": "skills/pm-weekly/SKILL.md",
+  "features": [
+    {"feature_id": "FEAT-0005"},
+    {"feature_id": "FEAT-0006"},
+    {"feature_id": "FEAT-0007"}
+  ],
+  "evals": [
+    {
+      "id": "normal-project-to-company-rollup",
+      "case_type": "normal",
+      "feature_ids": ["FEAT-0005"],
+      "prompt": "Run PM Weekly over the complete frozen W35 Project Memory set.",
+      "input_files": ["evals/fixtures/project--cmt.md", "evals/fixtures/project--ecom.md"],
+      "expected_files": ["evals/expected/project--cmt.md", "evals/expected/project--ecom.md", "evals/expected/department--operations.md", "evals/expected/company.md"],
+      "expected_output": "Final Project reports roll into one Department report and one Company report.",
+      "assertions": ["Every report uses its template headings.", "Rollups cite every immediate child report.", "Open measurement gaps remain explicit."]
+    },
+    {
+      "id": "hard-conservative-sop-promotion",
+      "case_type": "hard",
+      "feature_ids": ["FEAT-0006"],
+      "prompt": "Review a workflow observed once beside a repeated receiver-accepted workflow.",
+      "input_files": ["evals/fixtures/project--cmt.md", "evals/fixtures/project--ecom.md"],
+      "expected_files": ["evals/expected/sop--listing-handoff.md"],
+      "expected_output": "Only the repeated workflow updates SOP interval evidence; the one-off stays Project-only.",
+      "assertions": ["The approved baseline is preserved.", "The update cites the repeated listing evidence.", "The one-off collar workflow does not become a company SOP."]
+    },
+    {
+      "id": "boundary-incomplete-project-set",
+      "case_type": "boundary",
+      "feature_ids": ["FEAT-0005", "FEAT-0007"],
+      "prompt": "Run PM Weekly with one expected active Project Memory file missing.",
+      "input_files": ["evals/fixtures/project--cmt.md"],
+      "expected_files": [],
+      "expected_output": "The affected Department and Company reports remain blocked and no long-term memory changes.",
+      "assertions": ["The missing Project is named.", "No Final Company report is written.", "No memory or provider effect is attempted."]
+    }
+  ]
+}

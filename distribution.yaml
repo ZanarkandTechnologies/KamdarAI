@@ -1,6 +1,6 @@
 name: kamdar-ai
 version: 1.8.0
-description: "Kamdar Company OS workspace, provider catalog, automations, onboarding, and connectors"
+description: "Kamdar Company OS workspace, installer providers, automations, onboarding, and connectors"
 hermes_requires: ">=0.20.4"
 author: "Zanarkand Technologies"
 
@@ -18,53 +18,41 @@ distribution_owned:
   - setup.py
   - setup.cmd
   - compose.yaml
-  - scripts/setup_runtime.py
-  - scripts/setup_cli
-  - scripts/setup_workspace.py
-  - scripts/authorized_message.py
-  - scripts/setup_profile.py
-  - scripts/provider_catalog.py
-  - scripts/composio_session.py
-  - scripts/run_connection_evals.py
-  - scripts/run_installed_evals.py
-  - scripts/validate_eval_run.py
-  - scripts/run_company_doctor.py
-  - scripts/automation_prepare.py
-  - scripts/automation_delivery.py
-  - scripts/run_automation.py
-  - scripts/dashboard_bridge.py
-  - scripts/project_week_notes.py
-  - scripts/project_note_reducers.py
-  - schemas/__init__.py
-  - schemas/workspace.py
-  - schemas/evals.py
-  - catalog/data-sources
-  - evals/daily
-  - evals/weekly
-  - evals/__init__.py
-  - evals/viewer/__init__.py
-  - evals/viewer/build.py
-  - evals/viewer/model.py
+  - apps/__init__.py
+  - apps/doctor/__init__.py
+  - apps/installer/__init__.py
+  - apps/installer/schemas
+  - apps/installer/runtime.py
+  - apps/installer/cli
+  - apps/installer/workspace.py
+  - apps/installer/profile.py
+  - apps/installer/provider_catalog.py
+  - apps/installer/composio_session.py
+  - apps/installer/connection_evals.py
+  - apps/doctor/run.py
+  - apps/installer/dashboard.py
+  - apps/installer/schemas/workspace.py
+  - apps/installer/providers
+  - skills/pm-daily/SKILL.md
+  - skills/pm-daily/templates
+  - skills/pm-daily/evals.json
+  - skills/pm-daily/evals/fixtures
+  - skills/pm-daily/evals/expected
+  - skills/pm-weekly/SKILL.md
+  - skills/pm-weekly/templates
+  - skills/pm-weekly/evals.json
+  - skills/pm-weekly/evals/fixtures
+  - skills/pm-weekly/evals/expected
+  - apps/eval_viewer/__init__.py
+  - apps/eval_viewer/build.py
+  - apps/eval_viewer/model.py
   - workspace.hermes.template.md
   - automations
-  - schemas/automations/__init__.py
-  - schemas/automations/artifact_quality_review.py
-  - schemas/automations/daily_context_diff.py
-  - schemas/automations/daily_idempotency_rerun_receipt.py
-  - schemas/automations/daily_integration_receipt.py
-  - schemas/automations/daily_review_result.py
-  - schemas/automations/delivery.py
-  - schemas/automations/feature_outcome.py
-  - schemas/automations/meeting_commitment_intake_result.py
-  - schemas/automations/template_catalog.py
-  - schemas/automations/weekly_context.py
-  - schemas/automations/weekly_review_result.py
-  - schemas/automations/validate.py
-  - evals/rubrics/end-user-artifact-quality.md
   - templates
   - plugins/platforms/notion/__init__.py
   - plugins/platforms/notion/adapter.py
   - plugins/platforms/notion/api.py
   - plugins/platforms/notion/cli.py
+  - plugins/platforms/notion/onboarding.py
   - plugins/platforms/notion/plugin.yaml
   - plugins/platforms/notion/protocol.py

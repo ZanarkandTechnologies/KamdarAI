@@ -10,34 +10,26 @@ and outputs.
 | Daily operating update | `daily-operating-update.md` |
 | Weekly operating review | `weekly-operating-review.md` |
 
-Supporting files live with their owners:
+Extraction behavior and proof live with their owners:
 
-- Runtime data contracts: `schemas/automations/`
-- Evaluation workflows: `evals/automations/`
-- Evaluation-only schemas: `evals/schemas/`
-- Daily evaluation package: `evals/daily/`
-- Weekly evaluation package: `evals/weekly/`
+- Daily: `skills/pm-daily/{SKILL.md,evals.json,evals/}`
+- Weekly: `skills/pm-weekly/{SKILL.md,evals.json,evals/}`
+- Cadence-owned artifact shapes: each skill's `templates/`
+- Shared provider-backed entity shapes: repository `templates/`
 
 Runtime receipts, proposals, and runs belong in ignored runtime directories.
 They are generated state, not automation configuration, and must not be
 committed here.
 
-## Two-stage execution
+## Execution model
 
-Stage 1 generates and judges an immutable cadence result, then writes
-`delivery-plan.json` and `handoff.json`. It never applies provider effects.
-Stage 2 is a separate invocation that verifies the result, plan, workspace,
-quality state, exact destinations, and `automation_delivery.<cadence>` policy
-before applying anything:
-
-```bash
-python3 setup.py deliver --handoff /absolute/private/run/daily/handoff.json
-python3 setup.py deliver --handoff /absolute/private/run/daily/handoff.json --apply
-```
-
-The review lists every configured downstream provider. `--apply` consumes the
-same hashes without regenerating content. Receipts are stored beside the
-private handoff and idempotency state remains in the private Hermes profile.
+Hermes reads the cadence contract and configured workspace, fetches the bounded
+snapshot, then runs the owning skill against the current local files and
+templates. The skill writes artifacts directly. The automation applies
+authorized provider effects through configured skills and MCPs. Safety checks stay at the effect boundary:
+exact destination, explicit authority, read-before-write, idempotency, and a
+truthful receipt. There is no Python preparation, handoff, delivery-plan, or
+provider-executor layer.
 
 This layout cleanup changes repository source only. The workspace setup process
 copies an allowlist and never deletes runtime files. Removing stale files from a

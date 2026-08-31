@@ -1,0 +1,1 @@
+{"date":"2026-08-25","projects":[{"id":"PROJ-CMT","name":"CMT Pipeline","status":"Active"}],"work":[{"id":"TASK-105","project_id":"PROJ-CMT","owner_id":"PERSON-NUR","status":"In progress","updated_at":"2026-08-25T15:00:00+08:00","summary":"Sample check is proceeding on schedule.","source_url":"https://example.invalid/TASK-105"}]}

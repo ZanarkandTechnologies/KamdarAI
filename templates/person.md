@@ -1,6 +1,6 @@
 ---
 template_id: company-os-person
-template_version: "0.3.0"
+template_version: "0.4.0"
 name: "{{PERSON_NAME}}"
 person_id: "{{PERSON_ID}}"
 department: "{{DEPARTMENT}}"
@@ -17,16 +17,22 @@ expertise: "{{EXPERTISE}}"
 
 # {{PERSON_NAME}}
 
-<!-- This is a machine-readable directory record. Keep routing and expertise in
-frontmatter so an agent can filter People rows before it reads page notes.
+<!-- This is the canonical Person contract. Keep routing and expertise in
+frontmatter so an agent can filter People rows before it reads operating context.
 `contact_endpoint` stores a safe approved route alias resolved by workspace
 configuration; it is not a guessed or seed-embedded email address, username, or
-phone number. A route alias grants no send authority by itself. -->
+phone number. A route alias grants no send authority by itself.
 
-## Operating notes
+The directory fields may project to a shared People database. The two memory
+sections are private local context and must never sync back to a shared People
+page or be used to infer personality, intent, effort, or a performance rating. -->
 
-<!-- Add only durable context that does not fit the fields: known handoff
-boundaries, collaboration constraints, or a clarification of the expertise.
+## Persistent operating memory
+
+<!-- Long-term baseline. Keep only accepted cross-interval context: known
+handoff boundaries, durable collaboration constraints, demonstrated expertise,
+and deduplicated completed outcomes. Weekly consolidation appends accepted
+observations; it never creates a rating or speculative profile.
 
 GOLDEN EXAMPLE — replace every fact below; it demonstrates useful detail.
 **Preferred contact channel:** Email
@@ -43,3 +49,12 @@ Lead.
 END GOLDEN EXAMPLE -->
 
 {{OPERATING_NOTES}}
+
+## Latest weekly evidence
+
+<!-- Short-term interval context. Weekly replaces this section with the newest
+accepted, source-linked evidence for comparison against persistent memory.
+Open, stale, or question-pending Work remains weekly context rather than a
+durable claim. -->
+
+{{LATEST_WEEKLY_EVIDENCE}}

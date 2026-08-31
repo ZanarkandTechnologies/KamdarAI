@@ -49,7 +49,7 @@ the current method even when it is inefficient; improvements belong below. -->
 
 ## Timing and volume baseline
 
-<!-- Preserve the dated Before baseline: frequency, volume, active minutes,
+<!-- Long-term context. Preserve the dated Before baseline: frequency, volume, active minutes,
 waiting time, exception/rework rate, measurement window, evidence, and
 confidence. Unknown values remain explicit measurement gaps. -->
 
@@ -57,7 +57,7 @@ confidence. Unknown values remain explicit measurement gaps. -->
 
 ## Latest weekly samples
 
-<!-- Weekly replaces this section with accepted, source-linked samples grouped
+<!-- Short-term interval context. Weekly replaces this section with accepted, source-linked samples grouped
 by workflow_key across Projects. Each sample names its Work ID, Project,
 artifact type, elapsed/active/wait hours when sourced, and acceptance evidence.
 Samples never change the approved baseline automatically. -->
