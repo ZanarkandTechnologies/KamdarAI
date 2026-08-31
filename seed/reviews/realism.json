@@ -3,8 +3,8 @@
   "lane": "seed-realism-review",
   "independent": true,
   "seed_id": "kamdar-company-os-grounded-projects-template-bodies-2026-w34",
-  "seed_sha256": "6a25369f6ce0f26e3547cabb5365dbf74f61c6b3459d6d5f31596fd689d32dee",
-  "rubric_path": "evals/rubrics/seed-realism.md",
+  "seed_sha256": "98745f52ac7d0dce92d0f7222119c31d30bd8189b81d9299f7256b4518f9d16d",
+  "rubric_path": "seed/reviews/rubric.md",
   "public_grounding": [
     {
       "title": "KAMDAR About us",
@@ -360,15 +360,6 @@
       "origin": "synthetic_scenario",
       "reference_refs": [
         "seed/scenarios.json#/6"
-      ],
-      "pass": true,
-      "findings": []
-    },
-    {
-      "target_id": "FEAT-0010",
-      "origin": "synthetic_scenario",
-      "reference_refs": [
-        "seed/scenarios.json#/7"
       ],
       "pass": true,
       "findings": []

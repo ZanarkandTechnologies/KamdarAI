@@ -79,7 +79,7 @@ def compile_private_seed(capture: dict[str, Any]) -> tuple[dict[str, Any], dict[
     }
     manifest_base = {
         "schema_version": "kamdar-private-seed-manifest@1.0.0",
-        "compiler": "scripts/compile_private_kamdar_seed.py",
+        "compiler": "seed/private_capture.py",
         "source_capture_sha256": _digest(raw),
         "input_schema_version": checked.schema_version,
         "aggregate": aggregate,

@@ -14,7 +14,7 @@ feature_refs:
   - FEAT-0007
 refs:
   - manifest.json
-  - ../schemas/seed.py
+  - ../seed/schemas.py
 ---
 
 # Kamdar reference test seed
@@ -105,7 +105,6 @@ citations pointing to another Project.
 
 ```bash
 python3 -m unittest tests.unit.schemas.test_seed_bundle -v
-python3 scripts/run_installed_evals.py --root .
 ```
 
 The operating events, People, metrics, dates, blockers, and evidence identifiers

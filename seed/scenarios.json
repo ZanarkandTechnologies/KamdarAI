@@ -111,20 +111,5 @@
       "Preserve owner, due condition, success evidence, and source IDs.",
       "Do not change source Work or create a separate plan file."
     ]
-  },
-  {
-    "feature_id": "FEAT-0010",
-    "name": "Create canonical Tasks from a new Meeting",
-    "entity_ids": [
-      "TASK-204",
-      "PROJ-MKT-DEEPAVALI_MARKETING",
-      "PERSON-JUN",
-      "PERSON-DARREN"
-    ],
-    "shows": [
-      "Create one canonical Task for each explicit owned and dated commitment.",
-      "Block the unowned discussion note without inventing an owner or due date.",
-      "Preserve the Meeting source and create no duplicate on an unchanged rerun."
-    ]
   }
 ]

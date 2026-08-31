@@ -45,7 +45,7 @@ class SeedRealismReview(StrictModel):
     independent: Literal[True]
     seed_id: str = Field(min_length=1)
     seed_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
-    rubric_path: Literal["evals/rubrics/seed-realism.md"]
+    rubric_path: Literal["seed/reviews/rubric.md"]
     public_grounding: list[PublicGrounding] = Field(min_length=1)
     tier: Literal["A", "B", "C", "D"]
     verdict: Literal["pass", "revise", "block", "invalid"]

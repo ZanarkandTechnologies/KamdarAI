@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SEED_ROOT = PROJECT_ROOT / "seed"
 SEED_MANIFEST = SEED_ROOT / "manifest.json"
-TEMPLATE_ROOT = PROJECT_ROOT / "templates"
+TEMPLATE_ROOT = PROJECT_ROOT
 TABLE_KEYS = (
     "projects",
     "people",
@@ -27,14 +27,13 @@ TABLE_KEYS = (
 )
 REQUIRED_FEATURE_IDS = {
     *(f"FEAT-{index:04d}" for index in range(1, 8)),
-    "FEAT-0010",
 }
 TEMPLATE_FILES = {
-    "project": "project.md",
-    "person": "person.md",
-    "task": "task.md",
-    "meeting": "meeting.md",
-    "project_report": "weekly-report.md",
+    "project": "templates/project.md",
+    "person": "templates/person.md",
+    "task": "templates/task.md",
+    "meeting": "templates/meeting.md",
+    "project_report": "skills/pm-weekly/templates/weekly-report.md",
 }
 
 
@@ -146,7 +145,7 @@ class SeedSource(StrictModel):
                 raise ValueError(f"{record.id}.project references an unknown Project")
         case_ids = [case.feature_id for case in self.pipeline_cases]
         if set(case_ids) != REQUIRED_FEATURE_IDS or len(case_ids) != len(REQUIRED_FEATURE_IDS):
-            raise ValueError("pipeline_cases must cover FEAT-0001..0007 and FEAT-0010 exactly once")
+            raise ValueError("pipeline_cases must cover FEAT-0001..0007 exactly once")
         known_ids = set(ids)
         for case in self.pipeline_cases:
             unknown = set(case.entity_ids) - known_ids

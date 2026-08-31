@@ -5,13 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from schemas.seed import load_seed_config, seed_bundle_sha256
-from schemas.seed_realism_review import SeedRealismReview
-from scripts.compile_private_kamdar_company_os_seed import (
+from seed.schemas import load_seed_config, seed_bundle_sha256
+from seed.review_schema import SeedRealismReview
+from seed.private_overlay import (
     compile_private_company_seed,
     write_private_company_seed,
 )
-from scripts.compile_private_kamdar_seed import (
+from seed.private_capture import (
     assert_expected_shape,
     compile_private_seed,
 )
@@ -63,7 +63,7 @@ class SeedContractTests(unittest.TestCase):
 
     def test_realism_review_is_pydantic_valid_and_bound_to_seed(self) -> None:
         review = SeedRealismReview.model_validate_json(
-            (Path(__file__).resolve().parents[3] / "seed/reviews/realism.json").read_text(encoding="utf-8"),
+            (Path(__file__).resolve().parents[2] / "seed/reviews/realism.json").read_text(encoding="utf-8"),
             strict=True,
         )
         self.assertEqual(review.seed_sha256, seed_bundle_sha256())
