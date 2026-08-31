@@ -91,13 +91,35 @@ def _configure_composio_connection(
     from scripts import composio_session
 
     api_key = runtime.read_profile_secret(profile_home, "COMPOSIO_API_KEY")
+    save_key_after_validation = False
     if not api_key:
         if non_interactive:
             raise runtime.RuntimeSetupError("composio_api_key_requires_input")
         api_key = _prompt_secret("Composio project API key (hidden): ")
-        runtime.save_profile_secret(profile_home, "COMPOSIO_API_KEY", api_key)
+        save_key_after_validation = True
     try:
         state = composio_session.ensure_session(profile_home, providers, api_key)
+    except composio_session.ComposioSessionError as error:
+        if (
+            non_interactive
+            or str(error) not in {"composio_http_401", "composio_http_403"}
+            or save_key_after_validation
+        ):
+            raise runtime.RuntimeSetupError(str(error)) from error
+        CONSOLE.print(
+            "[yellow]Composio rejected the saved API key. "
+            "Paste a replacement key below.[/yellow]"
+        )
+        api_key = _prompt_secret("Replacement Composio project API key (hidden): ")
+        try:
+            state = composio_session.ensure_session(profile_home, providers, api_key)
+        except composio_session.ComposioSessionError as replacement_error:
+            raise runtime.RuntimeSetupError(str(replacement_error)) from replacement_error
+        save_key_after_validation = True
+
+    try:
+        if save_key_after_validation:
+            runtime.save_profile_secret(profile_home, "COMPOSIO_API_KEY", api_key)
         runtime.configure_remote_mcp(
             profile_home,
             str(providers[0]["mcp"]["name"]),
