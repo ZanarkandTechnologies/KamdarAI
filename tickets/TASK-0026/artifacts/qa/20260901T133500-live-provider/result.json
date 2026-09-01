@@ -1,0 +1,32 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0026",
+  "phase": "qa",
+  "proof_type": "cli",
+  "runtime_target": "Hermes profile kamdar-ai with terminal.backend=docker",
+  "proof_policy": "Done + QA Strategy + Agent Contract",
+  "verdict": "revise",
+  "summary": "Drive and Gmail live effects pass through the configured Composio MCP; Telegram and automatic Drive sync are unconfigured.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "blocked",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0026/artifacts/qa/20260901T133500-live-provider/evidence.json",
+  "artifacts": [
+    "tickets/TASK-0026/artifacts/qa/20260901T133500-live-provider/report.md",
+    "tickets/TASK-0026/artifacts/qa/20260901T133500-live-provider/result.json",
+    "tickets/TASK-0026/artifacts/qa/20260901T133500-live-provider/evidence.json"
+  ],
+  "blockers": [
+    "Configure a Telegram credential and exact recipient in the selected kamdar-ai profile.",
+    "Configure an exact Google Drive destination before claiming automatic report sync."
+  ],
+  "residual_risk": [
+    "Recipient-side Gmail arrival still requires the owner to inspect the authorized inbox."
+  ],
+  "judgment_receipts": [],
+  "learning": {"outcome": "ticket_only", "ref": null}
+}

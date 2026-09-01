@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-01T13:35:00+08:00",
+  "profile": "kamdar-ai",
+  "terminal_backend": "docker",
+  "docker_workspace_mount": true,
+  "eval_latency": {
+    "total_seconds": 486.9,
+    "daily": {"model_calls": 20, "api_latency_seconds": 207.7, "file_tool_results": 41},
+    "weekly": {"model_calls": 18, "api_latency_seconds": 224.6, "file_tool_results": 65},
+    "judge": {"model_calls": 1, "api_latency_seconds": 26.3},
+    "root_cause": "each agent tool turn re-enters the model; large generated outputs dominate latency, not Docker"
+  },
+  "google_drive": {
+    "status": "passed",
+    "created": true,
+    "metadata_read_back": true,
+    "name_matched": true,
+    "trashed": true,
+    "provider_id_sha256": "89f01d26cbbb2e47417ad11f674dd754b47e53f0a65b82756d6cc35d4cce8444"
+  },
+  "gmail": {
+    "status": "passed",
+    "recipient": "authorized_operator_test_inbox",
+    "subject": "[Company OS QA] Fake employee follow-up",
+    "provider_message_id_sha256": "5a1865fe71269ef1632599f76deee9bf1d0d6a0cef5a5221155a417b6a6ef630"
+  },
+  "telegram": {
+    "status": "blocked",
+    "native_command_operated": true,
+    "reason": "Platform 'telegram' is not configured in the selected profile"
+  },
+  "current_configuration": {
+    "artifact_sync": "local-only; no destination rows",
+    "communications": "no configured message rows"
+  }
+}

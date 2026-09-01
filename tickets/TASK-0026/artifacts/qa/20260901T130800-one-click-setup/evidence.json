@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-01T13:23:00+08:00",
+  "deterministic_suite": {
+    "status": "passed",
+    "tests": 188,
+    "skipped_live_tests": 2
+  },
+  "context_validation": "passed",
+  "git_diff_check": "passed",
+  "docker_backend_probe": {
+    "status": "passed",
+    "host_workspace_persistence": true,
+    "receipt": "tickets/TASK-0026/artifacts/docker-backend-final.json"
+  },
+  "operated_eval": {
+    "status": "passed",
+    "run_id": "20260901T051032Z-1f5f8c0b",
+    "run_mode": "analysis_only",
+    "provider_mutations": 0,
+    "daily": "passed",
+    "weekly": "passed",
+    "eval_cases": 8,
+    "passed_cases": 8,
+    "judge_calls": 2,
+    "artifact_manifest": "complete run artifact set checksum-validated",
+    "dossier": "profile:workspace/.company-os/eval-runs/20260901T051032Z-1f5f8c0b/dossier/index.html"
+  },
+  "operated_readiness": {
+    "status": "failed_closed",
+    "projects": "mcp connection test failed:notion",
+    "tasks": "mcp connection test failed:notion",
+    "implication": "complete the selected profile's Notion hosted-MCP browser login before customer-data readiness can pass"
+  },
+  "independent_review": {
+    "verdict": "pass / TAS-A",
+    "p0_p1_blockers": 0,
+    "focus": [
+      "stale proof rejection",
+      "transactional schedule activation",
+      "exact MCP read allowlists",
+      "Docker host persistence",
+      "complete dossier integrity"
+    ]
+  }
+}

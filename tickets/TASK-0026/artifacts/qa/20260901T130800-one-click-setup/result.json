@@ -1,0 +1,38 @@
+{
+  "schema_version": "1",
+  "ticket_id": "TASK-0026",
+  "phase": "qa",
+  "proof_type": "cli",
+  "runtime_target": "Hermes profile kamdar-ai with terminal.backend=docker",
+  "proof_policy": "Done + QA Strategy + Agent Contract",
+  "verdict": "revise",
+  "summary": "Implementation, adversarial review, and Docker-backed eval pass; Windows, Notion OAuth, seed readiness, and live webhook acceptance remain.",
+  "gate_results": {
+    "contract": "pass",
+    "mechanism": "pass",
+    "journey": "blocked",
+    "adversarial": "pass",
+    "receipt": "pass"
+  },
+  "best_evidence": "tickets/TASK-0026/artifacts/qa/20260901T130800-one-click-setup/evidence.json",
+  "artifacts": [
+    "tickets/TASK-0026/artifacts/qa/20260901T130800-one-click-setup/report.md",
+    "tickets/TASK-0026/artifacts/qa/20260901T130800-one-click-setup/evidence.json",
+    "tickets/TASK-0026/artifacts/docker-backend-final.json"
+  ],
+  "blockers": [
+    "Complete the selected profile's Notion hosted-MCP browser authorization before live readiness can pass.",
+    "Operate the clean Windows setup.cmd journey, canonical seed readiness, and optional live Notion webhook reply before release acceptance."
+  ],
+  "residual_risk": [
+    "The full one-click launcher has not been operated on Windows in this QA environment.",
+    "The live Telegram send test remains intentionally opt-in and was not sent."
+  ],
+  "judgment_receipts": [
+    "independent implementation review: pass / TAS-A; no P0/P1 blockers"
+  ],
+  "learning": {
+    "outcome": "ticket_only",
+    "ref": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "host-hermes-docker-backend-e2e",
+  "status": "pass",
+  "task_id": "company-os-backend-proof-971de188",
+  "duration_seconds": 0.998,
+  "network": "disabled",
+  "host_workspace_persistence": true,
+  "observation": {
+    "returncode": 0,
+    "output": "{\"backend\": \"docker\", \"cwd\": \"/workspace\", \"ok\": true}"
+  },
+  "cleanup": "complete"
+}
