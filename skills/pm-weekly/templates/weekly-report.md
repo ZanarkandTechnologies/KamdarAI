@@ -1,6 +1,6 @@
 ---
 template_id: company-os-weekly-report
-template_version: "0.9.0"
+template_version: "1.0.0"
 name: "{{PROJECT_NAME}} — Week of {{WEEK_START}}"
 report_type: "Project"
 project: "{{PROJECT}}"
@@ -27,6 +27,16 @@ attention, and next priority. No raw activity log. -->
 | Outcome or attention | Current state | Evidence | Next owner action |
 | --- | --- | --- | --- |
 {{OUTCOME_ROWS}}
+
+## Accepted outputs by employee
+
+<!-- Include every accepted artifact-producing outcome in the evidence window,
+not only actions needing management attention. Preserve exact Person, Work,
+artifact, receiver acceptance, workflow key, and sourced active/wait time. -->
+
+| Employee | Work | Accepted output and result | Workflow | Active / wait time | Acceptance evidence |
+| --- | --- | --- | --- | --- | --- |
+{{ACCEPTED_OUTPUT_ROWS}}
 
 ## Employee actions
 

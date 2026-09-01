@@ -1,5 +1,8 @@
 # Ecommerce — Project Memory — 2026-W35
 
+**Project ID:** PROJ-ECOM
+**Department:** Operations
+
 ## Overview
 
 Two listing batches were accepted using the same handoff. [TASK-203]

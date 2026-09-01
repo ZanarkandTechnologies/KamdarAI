@@ -1,6 +1,6 @@
 ---
 name: pm-weekly
-description: Turn one frozen week of Project Memory into final Project, Department, and Company reports plus grounded long-term memory updates.
+description: Turn a frozen Project Memory set into Project evidence summaries, Department and Company reports, and grounded long-term memory updates.
 ---
 
 # PM Weekly
@@ -21,16 +21,6 @@ data, send the executive report, or sync files.
 - `../pm-daily/templates/project-memory.md` for next-week initialization
 - Shared entity templates under the repository `templates/` directory
 
-## Outputs
-
-- `weeks/<week>/reports/projects/project--<id>.md`
-- `weeks/<week>/reports/departments/department--<id>.md`
-- `weeks/<week>/reports/company.md`
-- Grounded updates under `memory/{employees,sops,issues,decisions}/`
-- Next-week Project Memory files containing unresolved attention only
-- One executive-distribution draft under `weeks/<week>/outbound/`
-- No other files
-
 ## Workflow
 
 - [ ] **1 — Freeze the complete weekly input.**
@@ -39,10 +29,11 @@ data, send the executive report, or sync files.
   Assert: each selected Project has one readable current-week memory file; gaps
   are named and affected rollups remain blocked.
 
-- [ ] **2 — Finalize Project reports.**
+- [ ] **2 — Finalize Project evidence summaries.**
   Rule: use the weekly-report template and compare with the previous report.
   Separate observed results, open attention, problems, decisions, SOP signals,
-  and next actions. Preserve measurement gaps instead of estimating value.
+  accepted artifact-producing outcomes by Person, and next actions. Preserve
+  measurement gaps instead of estimating value.
   Assert: every material claim cites Project Memory evidence and each Final
   report has the complete template structure.
 
@@ -53,11 +44,19 @@ data, send the executive report, or sync files.
   blocked or missing child report.
 
 - [ ] **4 — Consolidate long-term memory.**
-  Rule: update Employee, SOP, Issue, and Decision entries only from repeated or
-  explicitly approved evidence. Keep the current interval separate from the
-  durable baseline. One observation may remain Project-only.
-  Assert: updates preserve prior valid context, cite source reports, and label
-  unmeasured Before/After values as gaps.
+  Rule: group accepted outcomes by exact Person ID and comparable workflow
+  samples by exact `workflow_key` across Project summaries. Employee Memory
+  receives accepted outputs and material unresolved actions without ratings.
+  SOP Memory compares only samples with the same output and acceptance controls;
+  it preserves active versus waiting time, rework, exceptions, and evidence.
+  Keep the current interval separate from the durable baseline. A faster sample
+  becomes a bounded improvement test, not a baseline replacement. Update a
+  baseline only from comparable receiver-accepted evidence plus explicit
+  approval. One observation may remain Project-only.
+  Assert: updates preserve prior valid context, cite immediate source summaries,
+  do not double-count one Work item, and label unmeasured Before/After values as
+  gaps. Every accepted artifact-producing outcome appears in its Person's latest
+  weekly evidence and its Department's accepted-output rollup.
 
 - [ ] **5 — Carry attention forward and draft distribution.**
   Rule: initialize next week from unresolved work only. Render the executive
@@ -65,25 +64,33 @@ data, send the executive report, or sync files.
   Assert: resolved items do not reappear; the draft contains no invented
   provider URL or delivery receipt.
 
-- [ ] **6 — Verify the artifact boundary.**
-  Rule: inspect the changed-file list and reread every changed artifact.
-  Assert: only declared outputs changed, templates are complete, source links
-  resolve to the frozen input, and no provider action was attempted.
+- [ ] **6 — Verify and return the output files.**
+  Rule: inspect the changed-file list and reread every changed artifact. Return
+  each exact changed path and the matching artifact type below to the automation.
+  Assert:
+  - Every finalized Project summary exists at
+    `weeks/<week>/reports/projects/project--<project-id>.md` and is returned as
+    `project_report`.
+  - Every required Department report exists at
+    `weeks/<week>/reports/departments/department--<department-id>.md` and is
+    returned as `department_report`.
+  - The final Company report exists at `weeks/<week>/reports/company.md` and is
+    returned as `company_report`.
+  - Grounded long-term updates exist only under `memory/employees/` as
+    `employee_memory`, `memory/sops/` as `sop_memory`, `memory/issues/` as
+    `issue_memory`, or `memory/decisions/` as `decision_memory`.
+  - Next-week Project Memory exists only under
+    `weeks/<next-week>/project-memory/`, contains unresolved attention only, and
+    is returned as `next_week_project_memory`.
+  - One executive distribution draft exists under `weeks/<week>/outbound/` and
+    is returned as `executive_distribution`.
+  - Only those declared outputs changed, templates are complete, source links
+    resolve to the frozen input, and no provider action was attempted.
 
 ## Golden behavior
 
-A workflow observed once stays in Project reporting with its measurement gaps.
-A repeated, receiver-accepted workflow may update the SOP's latest interval
-evidence, but it does not replace an approved baseline without explicit proof.
-
-## Proof
-
-Cases and frozen inputs live in `evals.json` and `evals/`. Evals assert report
-coverage, template headings, source links, conservative promotion, preserved
-long-term memory, correct carry-forward, and no unauthorized effects. Review
-every output for readable conclusions and next actions, complete template use,
-explicit uncertainty, and source-grounded measurements. Workflow observations
-must remain reconstructable. Do not expose unexplained opaque IDs or hashes in
-reader prose. Financial claims must show their sourced formula; missing inputs
-become an owned measurement gap. Estimated value must never appear verified,
-and a failed quality review blocks provider application.
+A workflow observed once stays in its Project summary with measurement gaps. A
+repeated, receiver-accepted workflow updates the SOP's latest interval evidence.
+Weekly may propose the fastest control-preserving method as a test, but it does
+not replace an approved baseline without comparable evidence and explicit
+approval.

@@ -3,7 +3,7 @@
   "lane": "seed-realism-review",
   "independent": true,
   "seed_id": "kamdar-company-os-grounded-projects-template-bodies-2026-w34",
-  "seed_sha256": "98745f52ac7d0dce92d0f7222119c31d30bd8189b81d9299f7256b4518f9d16d",
+  "seed_sha256": "4f2529f934d9fef3c1fb61e1a689a8a3bb3815f178e244afc01351b4faa67c14",
   "rubric_path": "seed/reviews/rubric.md",
   "public_grounding": [
     {

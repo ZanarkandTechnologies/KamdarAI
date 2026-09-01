@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-area-operating-rollup
-template_version: "0.6.0"
+template_version: "0.7.0"
 name: "{{AREA_NAME}} — Week of {{WEEK_START}}"
 report_type: "Area"
 area: "{{AREA_NAME}}"
@@ -26,6 +26,16 @@ highest-leverage attention, and next Area priority. -->
 | Project | Current result | Open attention | Next owner action | Source report |
 | --- | --- | --- | --- | --- |
 {{PROJECT_RESULT_ROWS}}
+
+## Accepted outputs by employee
+
+<!-- Roll up every accepted artifact-producing outcome from the Department's
+Project summaries so a manager can answer who produced what. Deduplicate by
+Work and artifact; preserve sourced active/wait time and acceptance evidence. -->
+
+| Employee | Accepted output and result | Project | Workflow | Active / wait time | Evidence / Project summary |
+| --- | --- | --- | --- | --- | --- |
+{{ACCEPTED_OUTPUT_ROWS}}
 
 ## Employee actions
 
@@ -61,6 +71,10 @@ END GOLDEN EXAMPLE -->
 {{DECISIONS_VIEW_OR_LIST}}
 
 ## SOPs
+
+<!-- Compare identical workflow keys across Project summaries. Show sample
+count, active/wait range or measurement gap, approved baseline, observed
+control-preserving opportunity, and the next bounded test. -->
 
 {{SOPS_VIEW_OR_LIST}}
 

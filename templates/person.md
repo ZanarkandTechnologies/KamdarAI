@@ -1,6 +1,6 @@
 ---
 template_id: company-os-person
-template_version: "0.4.0"
+template_version: "0.5.0"
 name: "{{PERSON_NAME}}"
 person_id: "{{PERSON_ID}}"
 department: "{{DEPARTMENT}}"
@@ -52,9 +52,11 @@ END GOLDEN EXAMPLE -->
 
 ## Latest weekly evidence
 
-<!-- Short-term interval context. Weekly replaces this section with the newest
-accepted, source-linked evidence for comparison against persistent memory.
-Open, stale, or question-pending Work remains weekly context rather than a
-durable claim. -->
+<!-- Short-term interval context. Weekly replaces this section with every
+accepted artifact-producing outcome for this Person plus material unresolved
+actions, deduplicated by Work and artifact. Preserve source links, receiver
+acceptance, workflow key, and sourced active/wait time for comparison against
+persistent memory. Open, stale, or question-pending Work remains weekly context
+rather than a durable claim. -->
 
 {{LATEST_WEEKLY_EVIDENCE}}

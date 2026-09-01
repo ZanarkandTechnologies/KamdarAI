@@ -1,5 +1,8 @@
 # CMT Pipeline — Project Memory — 2026-W35
 
+**Project ID:** PROJ-CMT
+**Department:** Operations
+
 ## Overview
 
 The sample baseline is approved; cutting remains blocked by one unsigned correction. [TASK-101] [TASK-105]

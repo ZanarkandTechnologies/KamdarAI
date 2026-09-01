@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-employee-sop
-template_version: "1.2.0"
+template_version: "1.3.0"
 name: "{{SOP_NAME}}"
 sop_id: "{{SOP_ID}}"
 workflow_key: "{{WORKFLOW_KEY}}"
@@ -57,10 +57,13 @@ confidence. Unknown values remain explicit measurement gaps. -->
 
 ## Latest weekly samples
 
-<!-- Short-term interval context. Weekly replaces this section with accepted, source-linked samples grouped
-by workflow_key across Projects. Each sample names its Work ID, Project,
-artifact type, elapsed/active/wait hours when sourced, and acceptance evidence.
-Samples never change the approved baseline automatically. -->
+<!-- Short-term interval context. Weekly replaces this section with comparable,
+accepted, source-linked samples grouped by workflow_key across Projects. Each
+sample names its Work ID, Project, artifact type, receiver, elapsed/active/wait
+hours when sourced, rework or exception, and acceptance evidence. Compare only
+samples with the same output and acceptance controls; report the sample count
+and range without cherry-picking the fastest result. Samples never change the
+approved baseline automatically. -->
 
 {{LATEST_WEEKLY_SAMPLES}}
 
@@ -74,7 +77,9 @@ conditions, and actions that must never be skipped. -->
 ## Improvement and verification
 
 <!-- Approved intervention, expected change, test window, success measure, and
-the After measurement used to compare against the preserved baseline. -->
+the After measurement used to compare against the preserved baseline. A faster
+observed method remains a proposed bounded test until comparable evidence and
+explicit approval establish a new calibrated baseline. -->
 
 {{IMPROVEMENT_AND_VERIFICATION}}
 

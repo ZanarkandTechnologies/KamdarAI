@@ -1,6 +1,6 @@
 ---
 template_id: kamdar-company-operating-rollup
-template_version: "0.6.0"
+template_version: "0.7.0"
 name: "Kamdar — Week of {{WEEK_START}}"
 report_type: "Company"
 week_start: "{{WEEK_START}}"
@@ -60,6 +60,10 @@ END GOLDEN EXAMPLE -->
 {{DECISIONS_VIEW_OR_LIST}}
 
 ## SOPs
+
+<!-- Include only cross-Area or materially important workflow opportunities.
+Distinguish the approved baseline, latest comparable evidence, and a proposed
+test; never present the fastest sample as the new standard automatically. -->
 
 {{SOPS_VIEW_OR_LIST}}
 
