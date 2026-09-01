@@ -71,6 +71,5 @@ class NotionWebhookProtocolTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "writes are disabled"):
                 api.update_page_properties("11111111-2222-3333-4444-555555555555", {})
 
-
 if __name__ == "__main__":
     unittest.main()

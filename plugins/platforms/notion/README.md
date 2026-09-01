@@ -44,7 +44,12 @@ Scheduled Daily and Weekly automations do not require this webhook.
    that endpoint and the `comment.created` event. Enable Read content, Read
    comments, and Insert comments.
 5. Paste the one-time verification token shown by setup into Notion. Share an
-   isolated test page with the connection and post `@hermes setup healthcheck`.
+   isolated test page with the connection and manually post the trigger shown
+   by setup, for example `@vishanai setup healthcheck`.
+
+Automatic creation of this isolated test comment is deferred. The current
+acceptance gate keeps the Notion write visible to the operator; the planned
+upgrade is scoped in the customer setup guide.
 
 Do not place ngrok authentication or an interactive traffic policy in front of
 the endpoint because Notion must reach it directly. If verification does not

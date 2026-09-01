@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from pathlib import Path
 
@@ -50,6 +51,20 @@ def _configure_webhook(profile_home: Path) -> None:
         )
     )
     _configure_notion_token(profile_home)
+    saved_trigger = runtime.read_profile_secret(profile_home, "NOTION_COMMENT_TRIGGER")
+    while True:
+        trigger = _prompt_text(
+            "Agent trigger keyword",
+            default=saved_trigger or notion_api.DEFAULT_TRIGGER,
+            console=CONSOLE,
+        )
+        if re.fullmatch(r"@[A-Za-z0-9_]{2,32}", trigger):
+            runtime.save_profile_secret(profile_home, "NOTION_COMMENT_TRIGGER", trigger)
+            break
+        CONSOLE.print(
+            "[yellow]Use one @keyword with letters, numbers, or underscores, "
+            "for example @vishanai.[/yellow]"
+        )
     ngrok_authtoken = _prompt_secret("ngrok agent authtoken (hidden): ")
     while True:
         public_url = _prompt_text(

@@ -11,6 +11,7 @@ refs:
   - ../automations/weekly-operating-review.md
   - ../templates/README.md
   - ../workspace.hermes.md
+  - tuning-sop.md
 ---
 
 # Company OS operator guide
@@ -301,6 +302,10 @@ weekly boundary, invocation, review, and authorized delivery.
 PM Daily owns the documentation-quality decision and draft behavior. Operators
 should inspect the skill-produced draft and source link; they should not invent
 a separate recovery state machine in this manual.
+
+To change the wording, output structure, or decision behavior itself, use the
+[maintenance and tuning SOP](tuning-sop.md). Do not tune installed runtime
+copies directly.
 
 ## Operator checklist
 

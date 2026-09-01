@@ -408,8 +408,6 @@ def _register_tools(ctx) -> None:
         requires_env=["NOTION_TOKEN"],
         schema={"name": "notion_update_page_properties", "description": "Update exact page properties with readback.", "parameters": {"type": "object", "properties": {"page_id": {"type": "string"}, "properties": {"type": "object"}}, "required": ["page_id", "properties"]}},
     )
-
-
 def register(ctx) -> None:
     _register_tools(ctx)
     ctx.register_cli_command(

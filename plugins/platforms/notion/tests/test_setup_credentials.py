@@ -83,6 +83,27 @@ class NotionSetupCredentialTests(unittest.TestCase):
         prompt.assert_not_called()
         save_secret.assert_not_called()
 
+    def test_webhook_setup_requires_and_saves_a_valid_agent_trigger(self) -> None:
+        profile = Path("/tmp/kamdar-profile")
+        with patch.object(onboarding, "_configure_notion_token"), patch.object(
+            runtime, "read_profile_secret", return_value=None
+        ), patch.object(
+            onboarding,
+            "_prompt_text",
+            side_effect=["vishan ai", "@vishanai", "https://test.ngrok-free.app"],
+        ), patch.object(
+            onboarding, "_prompt_secret", return_value="ngrok-token"
+        ), patch.object(
+            runtime,
+            "normalize_webhook_url",
+            return_value="https://test.ngrok-free.app/notion/webhook",
+        ), patch.object(runtime, "begin_ngrok_update"), patch.object(
+            runtime, "configure_notion_webhook"
+        ), patch.object(runtime, "save_ngrok_config"), patch.object(
+            runtime, "save_profile_secret"
+        ) as save:
+            onboarding._configure_webhook(profile)
+        save.assert_called_once_with(profile, "NOTION_COMMENT_TRIGGER", "@vishanai")
 
 if __name__ == "__main__":
     unittest.main()
