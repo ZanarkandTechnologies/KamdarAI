@@ -8,6 +8,7 @@ import html
 import json
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -66,8 +67,8 @@ def render_markdown(markdown: str) -> str:
 
 def render_evidence_html(model: dict) -> str:
     view_model = json.loads(json.dumps(model))
-    for feature in view_model["features"]:
-        for output in feature["outputs"]:
+    for evaluation in view_model["evaluations"]:
+        for output in evaluation["outputs"]:
             output["renderedHtml"] = render_markdown(str(output.get("markdown") or ""))
     safe_model = json.dumps(view_model).replace("<", "\\u003c")
     page = r'''<!doctype html>
@@ -91,7 +92,7 @@ def render_evidence_html(model: dict) -> str:
 <main class="shell">
   <header class="topbar"><h1>kamdar company os — real setup test</h1><div class="metrics" id="metrics"></div></header>
   <div class="workspace">
-    <section class="list-panel" aria-label="Feature checks"><div class="list-head"><span>feature checks · grouped by workflow</span><span>result</span></div><div id="features"></div></section>
+    <section class="list-panel" aria-label="Evaluation checks"><div class="list-head"><span>evals · grouped by automation</span><span>result</span></div><div id="features"></div></section>
     <aside id="detail" class="inspector" aria-live="polite"></aside>
   </div>
 </main>
@@ -103,25 +104,23 @@ const esc=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;'
 const tones=['peach','lavender','mint','pink','yellow'];
 function statusLabel(value){return value==='pass'?'PASSED':value==='fail'?'FAILED':value==='needs_information'?'NEEDS INFO':value==='not_run'?'NOT RUN':'UNJUDGED'}
 function stateClass(value){return 'state-'+String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'-')}
-function cadenceLabel(value){return value==='daily'?'Unified Daily Review':value==='weekly'?'Weekly Operating Review':'Meeting Intake'}
-const metricData=[['mint',model.metrics.features.passed+'/'+model.metrics.features.total+' features'],['lavender',model.metrics.cases.total+'/'+model.metrics.cases.total+' cases'],['peach',model.metrics.checks.passed+'/'+model.metrics.checks.total+' checks'],['yellow',model.metrics.outputs.total+'/'+model.metrics.outputs.total+' outputs']];
-metrics.innerHTML=metricData.map(([tone,label])=>'<span class="metric-pill"><i class="square metric-square tone-'+tone+'"></i>'+esc(label)+'</span>').join('')+'<span class="metric-pill"><i class="square metric-square tone-yellow"></i>'+esc(String(model.runStatus).replaceAll('_',' '))+'</span><a class="run-link" href="activity.jsonl">log ↗</a><a class="run-link" href="eval-receipt.json">receipt ↗</a>';
+function cadenceLabel(value){return value==='daily'?'PM Daily':value==='weekly'?'PM Weekly':'Unknown automation'}
+const metricData=[['mint',model.metrics.evaluations.passed+'/'+model.metrics.evaluations.total+' evals'],['peach',model.metrics.checks.passed+'/'+model.metrics.checks.total+' checks'],['yellow',model.metrics.outputs.total+'/'+model.metrics.outputs.total+' outputs']];
+metrics.innerHTML=metricData.map(([tone,label])=>'<span class="metric-pill"><i class="square metric-square tone-'+tone+'"></i>'+esc(label)+'</span>').join('')+'<span class="metric-pill"><i class="square metric-square tone-yellow"></i>'+esc(String(model.runStatus).replaceAll('_',' '))+'</span>'+(model.activityLogAvailable?'<a class="run-link" href="activity.jsonl">log ↗</a>':'')+'<a class="run-link" href="eval-receipt.json">receipt ↗</a>';
 function render(index,openMobile=true){
-  const f=model.features[index];document.querySelectorAll('.feature-button').forEach((button,i)=>button.setAttribute('aria-current',String(i===index)));const tone=tones[index%tones.length];
-  const sources=f.sources.length?f.sources.map((source,sourceIndex)=>'<details class="record"><summary><i class="square tone-'+tones[sourceIndex%tones.length]+'"></i><span class="record-identity"><small>'+esc(source.kind)+'</small><b>'+esc(source.name)+'</b></span><span class="record-state '+stateClass(source.status)+'">'+esc(source.status||'—')+'</span></summary><pre>'+esc(JSON.stringify(source.record,null,2))+'</pre></details>').join(''):'<p class="empty">No accepted source record was available for this feature.</p>';
-  const cases='<ul class="case-list">'+f.cases.map(row=>'<li><b>'+esc(row.title)+'</b><small>'+esc(row.expectedOutput)+'</small></li>').join('')+'</ul>';
-  const outputs=f.outputs.length?'<div class="output-list">'+f.outputs.map(row=>'<a class="output" href="'+esc(row.url)+'"><i class="square tone-lavender"></i><span class="output-copy"><b>'+esc(row.label)+' ↗</b><small>'+esc(row.kind)+' · '+esc(String(row.state).replaceAll('_',' '))+'</small></span></a><div class="markdown-preview">'+row.renderedHtml+'</div>').join('')+'</div>':'<p class="empty">No human-facing output was recorded for this feature.</p>';
+  const f=model.evaluations[index];document.querySelectorAll('.feature-button').forEach((button,i)=>button.setAttribute('aria-current',String(i===index)));const tone=tones[index%tones.length];
+  const outputs=f.outputs.length?'<div class="output-list">'+f.outputs.map(row=>'<a class="output" href="'+esc(row.url)+'"><i class="square tone-lavender"></i><span class="output-copy"><b>'+esc(row.label)+' ↗</b><small>'+esc(row.kind)+' · '+esc(String(row.state).replaceAll('_',' '))+'</small></span></a><div class="markdown-preview">'+row.renderedHtml+'</div>').join('')+'</div>':'<p class="empty">No human-facing output was recorded for this eval.</p>';
   const checks=f.assertions.length?'<ul class="check-list">'+f.assertions.map(row=>'<li class="check '+row.status+'"><i class="square tone-'+(row.status==='pass'?'mint':row.status==='fail'?'pink':'yellow')+'"></i><span>'+esc(row.assertion)+'</span><strong>'+esc(row.status==='pass'?'MET':row.status==='fail'?'MISS':'PENDING')+'</strong></li>').join('')+'</ul>':'<p class="empty">No assertion result was available.</p>';
-  detail.innerHTML='<header class="inspector-head"><div><p class="kicker">'+esc(cadenceLabel(f.cadence))+'</p><div class="title-row"><i class="square tone-'+tone+'"></i><h2>'+esc(f.name)+'</h2></div></div><button class="close" type="button" aria-label="Close inspector">×</button></header><div class="status-strip"><span class="status-pill '+f.status+'">'+statusLabel(f.status)+'</span><span class="status-note">'+esc(f.statusNote)+'</span></div><section><h3>Task</h3><p class="task-copy">'+esc(f.claim)+'</p></section><section><h3>'+esc(f.sourceLabel)+'</h3>'+sources+'</section><section><h3>Test cases</h3>'+cases+'</section><section><h3>Assertion review</h3><div class="evaluation-workbench"><article class="evaluation-output"><header><b>Skill artifact</b><span>Expected local file; nothing published</span></header>'+outputs+'</article><article class="evaluation-criteria"><header><b>Expected criteria</b><span>'+f.assertions.filter(row=>row.status==='pass').length+'/'+f.assertions.length+' met by the feature judge</span></header><p class="expected-summary">'+esc(f.claim)+'</p>'+checks+'</article></div></section>';
+  detail.innerHTML='<header class="inspector-head"><div><p class="kicker">'+esc(cadenceLabel(f.cadence))+' · '+esc(f.id)+(f.showcase?' · showcase':'')+'</p><div class="title-row"><i class="square tone-'+tone+'"></i><h2>'+esc(f.name)+'</h2></div></div><button class="close" type="button" aria-label="Close inspector">×</button></header><div class="status-strip"><span class="status-pill '+f.status+'">'+statusLabel(f.status)+'</span><span class="status-note">'+esc(f.statusNote)+'</span></div><section><h3>Description</h3><p class="task-copy">'+esc(f.description)+'</p></section><section><h3>Expected behavior</h3><p class="task-copy">'+esc(f.claim)+'</p></section><section><h3>Resultant artifacts</h3>'+outputs+'</section><section><h3>Assertion review</h3><div class="evaluation-workbench"><article class="evaluation-criteria"><header><b>Expected criteria</b><span>'+f.assertions.filter(row=>row.status==='pass').length+'/'+f.assertions.length+' met after the shared run</span></header>'+checks+'</article></div></section>';
   detail.querySelector('.close').addEventListener('click',()=>{detail.classList.remove('open');document.body.classList.remove('inspector-open')});detail.scrollTop=0;if(openMobile){detail.classList.add('open');document.body.classList.add('inspector-open')}
 }
 function group(cadence,label,tone){
-  const indexes=model.features.map((feature,index)=>({feature,index})).filter(row=>row.feature.cadence===cadence);if(!indexes.length)return;const section=document.createElement('section');section.className='feature-group '+cadence;
+  const indexes=model.evaluations.map((feature,index)=>({feature,index})).filter(row=>row.feature.cadence===cadence);if(!indexes.length)return;const section=document.createElement('section');section.className='feature-group '+cadence;
   section.innerHTML='<button class="feature-toggle" type="button" aria-expanded="true"><span class="feature-label"><span class="toggle-glyph">▼</span><i class="square tone-'+tone+'"></i><span>'+esc(label)+'</span></span><span class="group-pill">'+indexes.filter(row=>row.feature.status==='pass').length+'/'+indexes.length+' passed</span></button><div class="feature-rows"></div>';
-  const rows=section.querySelector('.feature-rows');indexes.forEach(({feature,index})=>{const button=document.createElement('button');button.className='feature-button';button.type='button';button.innerHTML='<span class="rail"></span><i class="square tone-'+tone+'"></i><span class="feature-copy"><b>'+esc(feature.name)+'</b><small>'+feature.assertions.length+' required checks · '+statusLabel(feature.status).toLowerCase()+'</small></span><span class="status-pill '+feature.status+'">'+statusLabel(feature.status)+'</span>';button.addEventListener('click',()=>render(index,true));rows.appendChild(button)});
+  const rows=section.querySelector('.feature-rows');indexes.forEach(({feature,index})=>{const button=document.createElement('button');button.className='feature-button';button.type='button';button.innerHTML='<span class="rail"></span><i class="square tone-'+tone+'"></i><span class="feature-copy"><b>'+esc(feature.name)+'</b><small>'+esc(feature.description)+'</small></span><span class="status-pill '+feature.status+'">'+statusLabel(feature.status)+'</span>';button.addEventListener('click',()=>render(index,true));rows.appendChild(button)});
   section.querySelector('.feature-toggle').addEventListener('click',event=>{const open=event.currentTarget.getAttribute('aria-expanded')==='true';event.currentTarget.setAttribute('aria-expanded',String(!open));event.currentTarget.querySelector('.toggle-glyph').textContent=open?'▶':'▼';rows.classList.toggle('hidden',open)});featureList.appendChild(section)
 }
-group('daily','Unified Daily Review','peach');group('weekly','Weekly Operating Review','lavender');group('meeting','Meeting Intake','mint');render(0,false);
+group('daily','PM Daily','peach');group('weekly','PM Weekly','lavender');render(0,false);
 </script>
 </body>
 </html>'''
@@ -129,10 +128,24 @@ group('daily','Unified Daily Review','peach');group('weekly','Weekly Operating R
 
 
 def build_static_evidence_viewer(*, out_dir: Path, eval_run_root: Path) -> dict:
-    model = build_evidence_model(project_root=ROOT, eval_run_root=eval_run_root)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    model_path = out_dir / "model.json"
-    index_path = out_dir / "index.html"
+    run = eval_run_root.resolve()
+    destination = out_dir.resolve()
+    model = build_evidence_model(project_root=ROOT, eval_run_root=run)
+    destination.mkdir(parents=True, exist_ok=True)
+    copied = {"eval-receipt.json"}
+    if model["activityLogAvailable"]:
+        copied.add("activity.jsonl")
+    copied.update(output["url"] for row in model["evaluations"] for output in row["outputs"])
+    for relative in copied:
+        source = (run / relative).resolve()
+        target = destination / relative
+        if source == target.resolve():
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+        os.chmod(target, 0o600)
+    model_path = destination / "model.json"
+    index_path = destination / "index.html"
     model_path.write_text(json.dumps(model, indent=2) + "\n", encoding="utf-8")
     index_path.write_text(render_evidence_html(model), encoding="utf-8")
     os.chmod(model_path, 0o600)

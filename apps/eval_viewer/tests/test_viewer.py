@@ -7,11 +7,10 @@ import unittest
 from pathlib import Path
 
 from apps.eval_viewer.build import build_static_evidence_viewer, render_evidence_html, render_markdown
-from apps.eval_viewer.model import ViewerError, _feature_markdown, _source_cards, build_evidence_model
+from apps.eval_viewer.model import ViewerError, build_evidence_model
 
 
 ROOT = Path(__file__).resolve().parents[3]
-CADENCES = {"daily": ["FEAT-0001", "FEAT-0002", "FEAT-0003", "FEAT-0004"], "weekly": ["FEAT-0005", "FEAT-0006", "FEAT-0007"]}
 
 
 def write_json(path: Path, value: dict) -> None:
@@ -19,63 +18,50 @@ def write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, indent=2), encoding="utf-8")
 
 
+def catalog() -> list[tuple[str, dict]]:
+    rows = []
+    for cadence in ("daily", "weekly"):
+        suite = json.loads((ROOT / f"skills/pm-{cadence}/evals/evals.json").read_text(encoding="utf-8"))
+        rows.extend((cadence, row) for row in suite["evals"])
+    return rows
+
+
 def fixture(root: Path) -> None:
-    write_json(root / "eval-receipt.json", {"run_mode": "analysis_only", "provider_mutations": 0})
-    for feature_ids in CADENCES.values():
-        for feature_id in feature_ids:
-            write_json(root / "eval/judges" / f"{feature_id}.json", {"target": feature_id, "tier": "A", "verdict": "pass", "assertions": [{"assertion": f"{feature_id} grounded", "met": True, "evidence": ["skill eval"]}]})
+    (root / "outputs").mkdir(parents=True, exist_ok=True)
+    (root / "outputs/daily.md").write_text("# Daily output\n\nGrounded daily artifact.\n", encoding="utf-8")
+    (root / "outputs/weekly.md").write_text("# Weekly output\n\nGrounded weekly artifact.\n", encoding="utf-8")
+    results = []
+    for cadence, case in catalog():
+        results.append({
+            "eval_id": case["id"],
+            "outputs": [f"outputs/{cadence}.md"] if case["metadata"]["tags"][-1] == "showcase" else [],
+            "assertions": [
+                {"index": index, "met": True, "evidence": [f"{cadence} shared run"]}
+                for index, _ in enumerate(case["assertions"])
+            ],
+        })
+    write_json(root / "eval-receipt.json", {
+        "status": "passed",
+        "run_mode": "analysis_only",
+        "provider_mutations": 0,
+        "automation_runs": {"daily": {"status": "passed"}, "weekly": {"status": "passed"}},
+        "eval_results": results,
+    })
 
 
 class EvidenceViewerTests(unittest.TestCase):
-    def test_cited_data_source_renders_as_a_readable_inspector_card(self) -> None:
-        source_id = "11111111-1111-1111-1111-111111111111"
-        cards = _source_cards({
-            "sources": {
-                "tasks": {
-                    "source": {"id": source_id, "title": "Tasks"},
-                    "selected_count": 2,
-                    "records": [
-                        {"id": "task-1", "properties": {"Name": "Prepare release", "Status": "Active"}},
-                        {"id": "task-2", "properties": {"Name": "Review proof", "Status": "Done"}},
-                    ],
-                }
-            }
-        }, {source_id})
-        self.assertEqual(len(cards), 1)
-        self.assertEqual(cards[0]["name"], "Tasks")
-        self.assertEqual(cards[0]["status"], "2 records read")
-        self.assertEqual(cards[0]["record"]["records"][0]["name"], "Prepare release")
-        self.assertNotIn("id", cards[0]["record"]["records"][0])
-
-    def test_feature_inspector_embeds_only_the_selected_markdown_section(self) -> None:
-        preview = "# Daily\n\n## Project progress notes\n\nProgress only.\n\n## Documentation review\n\nReview only.\n"
-        selected = _feature_markdown(preview, "Project progress notes")
-        self.assertIn("Progress only.", selected)
-        self.assertNotIn("Review only.", selected)
-
-    def test_failed_run_still_renders_all_features_without_accepted_results(self) -> None:
+    def test_failed_shared_run_renders_every_owned_eval_without_results(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             write_json(root / "eval-receipt.json", {
                 "run_mode": "analysis_only",
                 "provider_mutations": 0,
-                "automation_runs": {
-                    "daily": {"status": "failed"},
-                    "weekly": {"status": "not_run"},
-                },
+                "automation_runs": {"daily": {"status": "failed"}, "weekly": {"status": "not_run"}},
             })
-            (root / "daily").mkdir()
-            (root / "daily/preview.md").write_text(
-                "# Daily validation failed\n\nNo output was accepted or published.\n",
-                encoding="utf-8",
-            )
             model = build_static_evidence_viewer(out_dir=root, eval_run_root=root)
-            self.assertEqual(len(model["features"]), 7)
-            self.assertEqual(
-                [feature["status"] for feature in model["features"]],
-                ["fail", "fail", "fail", "fail", "not_run", "not_run", "not_run"],
-            )
-            self.assertTrue((root / "index.html").is_file())
+            self.assertEqual(len(model["evaluations"]), 8)
+            self.assertEqual([row["status"] for row in model["evaluations"]].count("fail"), 4)
+            self.assertEqual([row["status"] for row in model["evaluations"]].count("not_run"), 4)
 
     def test_setup_block_renders_without_loading_results(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -84,54 +70,102 @@ class EvidenceViewerTests(unittest.TestCase):
                 "status": "needs_information",
                 "run_mode": "analysis_only",
                 "provider_mutations": 0,
-                "automation_runs": {
-                    "daily": {"status": "blocked_by_setup"},
-                    "weekly": {"status": "blocked_by_setup"},
-                },
+                "automation_runs": {"daily": {"status": "blocked_by_setup"}, "weekly": {"status": "blocked_by_setup"}},
             })
             model = build_evidence_model(project_root=ROOT, eval_run_root=root)
-            self.assertTrue(all(feature["status"] == "not_run" for feature in model["features"]))
-            self.assertTrue(all(not feature["outputs"] for feature in model["features"]))
+            self.assertTrue(all(row["status"] == "not_run" for row in model["evaluations"]))
+            self.assertTrue(all(not row["outputs"] for row in model["evaluations"]))
 
-    def test_doctor_model_and_html_are_python_owned_and_safe(self) -> None:
+    def test_shared_summary_joins_eval_ids_and_showcases_first(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             fixture(root)
             model = build_evidence_model(project_root=ROOT, eval_run_root=root)
-            self.assertEqual(len(model["features"]), 7)
-            self.assertEqual(model["runKind"], "skill-eval")
+            self.assertEqual(model["runKind"], "shared-automation-eval")
+            self.assertEqual(model["metrics"]["evaluations"], {"total": 8, "passed": 8})
+            self.assertTrue(all(row["showcase"] for row in model["evaluations"][:6]))
+            self.assertTrue(all(not row["showcase"] for row in model["evaluations"][6:]))
+            self.assertEqual(model["evaluations"][0]["name"], "Documentation-quality follow-up")
+            self.assertIn("right owner", model["evaluations"][0]["description"])
+            self.assertFalse(any(row["id"].startswith("FEAT-") for row in model["evaluations"]))
+
+    def test_html_renders_eval_descriptions_and_resultant_artifacts_safely(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture(root)
+            model = build_evidence_model(project_root=ROOT, eval_run_root=root)
             rendered = render_markdown("# Preview\n\n<script>alert(1)</script>")
             self.assertIn("<h1>Preview</h1>", rendered)
             self.assertIn("&lt;script&gt;", rendered)
-            frontmatter = render_markdown("---\nresult_schema: internal\n---\n\n# Preview")
-            self.assertNotIn("result_schema", frontmatter)
-            self.assertIn("<h1>Preview</h1>", frontmatter)
             html = render_evidence_html(model)
-            self.assertNotIn("<script>alert(1)</script>", html)
-            self.assertIn('class="workspace"', html)
-            self.assertIn('class="list-panel"', html)
-            self.assertIn('class="inspector"', html)
-            self.assertIn("feature checks · grouped by workflow", html)
-            self.assertIn("Unified Daily Review", html)
-            self.assertIn("Weekly Operating Review", html)
-            self.assertIn("Meeting Intake", html)
-            self.assertIn("Skill artifact", html)
-            self.assertIn("Expected criteria", html)
-            self.assertIn('class="markdown-preview"', html)
-            self.assertIn("Project progress notes", html)
-            self.assertNotIn("<b>FEAT-0001", html)
-            self.assertIn('href="activity.jsonl"', html)
+            self.assertIn("evals · grouped by automation", html)
+            self.assertIn("PM Daily", html)
+            self.assertIn("PM Weekly", html)
+            self.assertIn("Documentation-quality follow-up", html)
+            self.assertIn("Shows that PM Daily asks the right owner", html)
+            self.assertIn("Resultant artifacts", html)
+            self.assertNotIn("Meeting Intake", html)
+            self.assertNotIn("FEAT-0001", html)
             self.assertIn('href="eval-receipt.json"', html)
             build_static_evidence_viewer(out_dir=root, eval_run_root=root)
-            self.assertTrue((root / "index.html").is_file())
             self.assertEqual(os.stat(root / "index.html").st_mode & 0o777, 0o600)
 
-    def test_mutating_eval_receipt_is_rejected(self) -> None:
+    def test_unknown_eval_result_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            write_json(root / "eval-receipt.json", {
+                "run_mode": "analysis_only",
+                "provider_mutations": 0,
+                "automation_runs": {"daily": {"status": "passed"}, "weekly": {"status": "passed"}},
+                "eval_results": [{"eval_id": "unknown", "assertions": []}],
+            })
+            with self.assertRaisesRegex(ViewerError, "unknown eval"):
+                build_evidence_model(project_root=ROOT, eval_run_root=root)
+
+    def test_mutations_require_verified_isolated_scope(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             fixture(root)
-            write_json(root / "eval-receipt.json", {"run_mode": "analysis_only", "provider_mutations": 1})
-            with self.assertRaisesRegex(ViewerError, "zero provider mutations"):
+            receipt = json.loads((root / "eval-receipt.json").read_text(encoding="utf-8"))
+            receipt.update({"run_mode": "analysis_only", "provider_mutations": 1})
+            write_json(root / "eval-receipt.json", receipt)
+            with self.assertRaisesRegex(ViewerError, "isolated eval scope"):
+                build_evidence_model(project_root=ROOT, eval_run_root=root)
+            receipt.update({
+                "run_mode": "isolated_eval",
+                "isolation_scope": "notion-eval-2026-09-01",
+                "read_back_verified": True,
+            })
+            write_json(root / "eval-receipt.json", receipt)
+            self.assertEqual(build_evidence_model(project_root=ROOT, eval_run_root=root)["deliveryStatus"], "isolated_eval")
+
+    def test_viewer_copies_linked_run_artifacts_when_output_directory_differs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            run = root / "run"
+            out = root / "viewer"
+            run.mkdir()
+            fixture(run)
+            (run / "activity.jsonl").write_text('{"event":"complete"}\n', encoding="utf-8")
+            build_static_evidence_viewer(out_dir=out, eval_run_root=run)
+            self.assertTrue((out / "eval-receipt.json").is_file())
+            self.assertTrue((out / "activity.jsonl").is_file())
+            self.assertTrue((out / "outputs/daily.md").is_file())
+            self.assertTrue((out / "outputs/weekly.md").is_file())
+
+    def test_passing_assertion_requires_evidence_and_both_automation_results(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture(root)
+            receipt = json.loads((root / "eval-receipt.json").read_text(encoding="utf-8"))
+            receipt["eval_results"][0]["assertions"][0]["evidence"] = []
+            write_json(root / "eval-receipt.json", receipt)
+            with self.assertRaisesRegex(ViewerError, "without evidence"):
+                build_evidence_model(project_root=ROOT, eval_run_root=root)
+            receipt["eval_results"] = []
+            receipt.pop("automation_runs")
+            write_json(root / "eval-receipt.json", receipt)
+            with self.assertRaisesRegex(ViewerError, "exactly one Daily and one Weekly"):
                 build_evidence_model(project_root=ROOT, eval_run_root=root)
 
 

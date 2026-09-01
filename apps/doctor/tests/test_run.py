@@ -12,11 +12,23 @@ from apps.doctor import run as doctor
 
 class CompanyDoctorTests(unittest.TestCase):
     def test_prompt_delegates_analysis_to_native_tools_without_delivery(self) -> None:
-        prompt = doctor.analysis_prompt(Path("/workspace"), "daily")
-        self.assertIn("configured skills and MCP tools", prompt)
-        self.assertIn("stop after producing and reviewing", prompt)
-        self.assertIn("every changed file path", prompt)
-        self.assertIn("Do not modify provider records, send messages, or sync artifacts", prompt)
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            (workspace / "automations").mkdir()
+            (workspace / ".hermes.md").write_text("company context\n", encoding="utf-8")
+            (workspace / "automations/daily-operating-update.md").write_text(
+                "# Daily\n\n- [ ] **1 — Fetch.**\n\n- [ ] **4 — Apply authorized effects.**\n"
+                "sync provider\n\n## Output\nlocal files\n",
+                encoding="utf-8",
+            )
+            prompt = doctor.analysis_prompt(workspace, "daily")
+        self.assertIn("company context", prompt)
+        self.assertIn("**1 — Fetch.**", prompt)
+        self.assertIn("local files", prompt)
+        self.assertNotIn("Apply authorized effects", prompt)
+        self.assertNotIn("sync provider", prompt)
+        self.assertIn("every changed local file path", prompt)
+        self.assertNotIn("Read /", prompt)
 
     def test_parser_exposes_only_profile_and_cadence(self) -> None:
         args = doctor.parser().parse_args(["--cadence", "weekly"])
@@ -30,10 +42,16 @@ class CompanyDoctorTests(unittest.TestCase):
             workspace = profile / "workspace"
             (workspace / "automations").mkdir(parents=True)
             (workspace / ".hermes.md").write_text("company\n", encoding="utf-8")
-            (workspace / "automations/daily-operating-update.md").write_text("daily\n", encoding="utf-8")
+            (workspace / "automations/daily-operating-update.md").write_text(
+                "# Daily\n\n- [ ] **1 — Fetch.**\n\n"
+                "- [ ] **4 — Apply authorized effects.**\n\nsync\n\n"
+                "## Output\nlocal files\n",
+                encoding="utf-8",
+            )
             args = argparse.Namespace(profile_home=profile, cadences=["daily"])
             completed = subprocess.CompletedProcess([], 0, "analysis\n", "")
             with patch.object(doctor.runtime, "run_command", return_value=completed) as invoked:
                 self.assertEqual(doctor.operate(args), 0)
             self.assertEqual(invoked.call_count, 1)
             self.assertEqual(invoked.call_args.args[0][:2], ["hermes", "chat"])
+            self.assertEqual(invoked.call_args.kwargs["timeout"], 900)
