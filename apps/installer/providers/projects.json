@@ -18,6 +18,14 @@
           "The created page is fetched after creation and its title exactly matches the requested title.",
           "The test page is archived and no existing workspace content is changed."
         ]
+      },
+      "readiness": {
+        "importance": "core",
+        "allowed_read_tools": ["mcp__notion__notion_search", "mcp__notion__notion_fetch"],
+        "prompt": "Use only read-only Notion MCP tools. Fetch the configured Projects source at {{source}} and inspect its schema plus a bounded sample of at most 10 records. Report structure and counts only; do not quote record content or make changes.",
+        "required_fields": ["id", "name", "status"],
+        "required_relations": [],
+        "optional_fields": ["department"]
       }
     },
     {
@@ -35,6 +43,14 @@
           "The issue is fetched after creation and its title and team match.",
           "The test issue is left non-active and no existing issue is changed."
         ]
+      },
+      "readiness": {
+        "importance": "core",
+        "allowed_read_tools": ["mcp__linear__get_issue", "mcp__linear__list_issues", "mcp__linear__search_issues", "mcp__linear__get_project", "mcp__linear__list_projects", "mcp__linear__list_issue_statuses", "mcp__linear__list_teams", "mcp__linear__list_users"],
+        "prompt": "Use only read-only Linear MCP tools. Fetch the configured Projects source or team at {{source}} and inspect its schema plus a bounded sample of at most 10 projects. Report structure and counts only; do not quote record content or make changes.",
+        "required_fields": ["id", "name", "status"],
+        "required_relations": [],
+        "optional_fields": ["department"]
       }
     }
   ]

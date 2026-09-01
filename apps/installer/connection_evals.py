@@ -19,6 +19,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from apps.installer import provider_catalog
+from apps.installer import model_output
 from apps.installer import runtime as setup_runtime
 
 
@@ -201,16 +202,9 @@ def _judge_prompt(run_id: str, cases: list[dict[str, Any]]) -> str:
 
 
 def _json_object(raw: str) -> dict[str, Any]:
-    text = raw.strip()
-    if text.startswith("```"):
-        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.IGNORECASE)
-    try:
-        payload = json.loads(text)
-    except json.JSONDecodeError as error:
-        raise ConnectionEvalError("judge_response_invalid_json") from error
-    if not isinstance(payload, dict):
-        raise ConnectionEvalError("judge_response_invalid")
-    return payload
+    return model_output.json_object(
+        raw, ConnectionEvalError("judge_response_invalid_json")
+    )
 
 
 def _validate_judgment(

@@ -13,7 +13,7 @@ from apps.installer import provider_catalog as catalog_api
 from apps.installer import runtime
 from apps.installer.provider_catalog import CatalogError
 from apps.installer.cli.paths import profile_home as resolve_profile_home
-from apps.installer.cli.process import run_visible
+from apps.installer.cli.process import run_mcp_test_visible, run_visible
 from apps.installer.cli.ui import (
     CONSOLE,
     _prompt_secret,
@@ -63,16 +63,9 @@ def _configure_connections(
             default=True,
         ):
             if run_visible(["hermes", "mcp", "login", name], profile_home):
-                CONSOLE.print(
-                    f"[yellow]{provider['label']} authorization is incomplete. "
-                    "Rerun setup to try again.[/yellow]"
-                )
-                continue
-            if run_visible(["hermes", "mcp", "test", name], profile_home):
-                CONSOLE.print(
-                    f"[yellow]{provider['label']} connected, but Hermes could not "
-                    "complete tool discovery. Rerun the health check after fixing it.[/yellow]"
-                )
+                raise runtime.RuntimeSetupError(f"mcp_authorization_incomplete:{name}")
+            if run_mcp_test_visible(name, profile_home):
+                raise runtime.RuntimeSetupError(f"mcp_connection_test_failed:{name}")
     if composio_providers:
         _configure_composio_connection(
             profile_home,
@@ -144,10 +137,14 @@ def _configure_composio_connection(
                 )
             )
             pause(f"Press Enter after {label} is connected")
-        run_visible(
-            ["hermes", "mcp", "test", str(providers[0]["mcp"]["name"])],
-            profile_home,
-        )
+        connected = composio_session.connected_toolkits(state, api_key)
+        missing = sorted(set(state["toolkits"]) - connected)
+        if missing:
+            raise runtime.RuntimeSetupError(
+                "composio_connections_incomplete:" + ",".join(missing)
+            )
+        if run_mcp_test_visible(str(providers[0]["mcp"]["name"]), profile_home):
+            raise runtime.RuntimeSetupError("composio_mcp_connection_test_failed")
     except composio_session.ComposioSessionError as error:
         raise runtime.RuntimeSetupError(str(error)) from error
 
@@ -183,7 +180,7 @@ def _run_connection_evals(
     *,
     allow_side_effects: bool,
 ) -> dict:
-    from apps.installer import connection_evals
+    from apps.installer import connection_evals as run_connection_evals
 
     with CONSOLE.status("[cyan]Testing configured integrations…[/cyan]"):
         receipt = run_connection_evals.run_connection_evals(
@@ -233,7 +230,7 @@ def _defer_connection_evals(
     *,
     previous: dict | None = None,
 ) -> dict:
-    from apps.installer import connection_evals
+    from apps.installer import connection_evals as run_connection_evals
 
     return run_connection_evals.defer_connection_evals(
         profile_home,
@@ -250,7 +247,7 @@ def _certify_with_recovery(
     interactive: bool,
 ) -> dict:
     """Retry failed certification in place or record an explicit defer choice."""
-    from apps.installer import connection_evals
+    from apps.installer import connection_evals as run_connection_evals
 
     deferred = False
 

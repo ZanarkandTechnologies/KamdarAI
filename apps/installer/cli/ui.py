@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import getpass
 import json
+import sys
 
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
@@ -11,7 +12,7 @@ from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import HSplit, Layout, Window
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import CheckboxList
+from prompt_toolkit.widgets import CheckboxList, RadioList
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 
@@ -64,6 +65,22 @@ def _friendly_runtime_error(error: Exception) -> str:
             ("composio_unavailable",),
             "Composio could not be reached. Check the internet connection, then rerun setup and choose Test integrations.",
         ),
+        (
+            ("composio_connections_incomplete",),
+            "One or more requested Composio accounts were not connected. Rerun setup and finish every displayed OAuth link.",
+        ),
+        (
+            ("composio_mcp_connection_test_failed",),
+            "The Google accounts are connected, but Hermes could not discover the restricted Composio tools. Rerun Repair setup.",
+        ),
+        (
+            ("mcp_authorization_incomplete",),
+            "Provider authorization did not finish. Rerun setup and complete the browser authorization before continuing.",
+        ),
+        (
+            ("mcp_connection_test_failed",),
+            "Provider authorization completed, but Hermes could not discover its tools. Rerun Repair setup.",
+        ),
     )
     for prefixes, message in messages:
         if code.startswith(prefixes):
@@ -95,12 +112,65 @@ def confirm(label: str, *, default: bool) -> bool:
 
 
 def choose(label: str, *, choices: list[str], default: str) -> str:
+    if sys.stdin.isatty() and sys.stdout.isatty():
+        return _interactive_choice(label, choices, default)
     return _prompt_text(
         label,
         choices=choices,
         default=default,
         console=CONSOLE,
     )
+
+
+def _interactive_choice(label: str, choices: list[str], default: str) -> str:
+    """Select one option with arrows in an ordinary interactive terminal."""
+    selector = RadioList(values=[(choice, choice) for choice in choices])
+    selector.current_value = default
+    bindings = KeyBindings()
+
+    @bindings.add("enter", eager=True)
+    def confirm_choice(event) -> None:
+        highlighted_value = selector.values[selector._selected_index][0]
+        event.app.exit(result=str(highlighted_value))
+
+    @bindings.add(Keys.ControlC, eager=True)
+    def cancel_choice(event) -> None:
+        event.app.exit(exception=KeyboardInterrupt())
+
+    layout = Layout(
+        HSplit(
+            [
+                Window(
+                    FormattedTextControl([("class:title", f"◆ {label}")]),
+                    height=1,
+                ),
+                Window(
+                    FormattedTextControl(
+                        [("class:hint", "  ↑↓ navigate  ENTER confirm  CTRL+C cancel")]
+                    ),
+                    height=1,
+                ),
+                Window(height=1),
+                selector,
+            ]
+        ),
+        focused_element=selector,
+    )
+    return Application(
+        layout=layout,
+        key_bindings=bindings,
+        style=Style.from_dict(
+            {
+                "title": "bold ansicyan",
+                "hint": "ansibrightblack",
+                "radio-selected": "bold ansigreen",
+                "radio-checked": "ansigreen",
+            }
+        ),
+        full_screen=False,
+        erase_when_done=True,
+        mouse_support=False,
+    ).run()
 
 
 def pause(label: str) -> None:
@@ -142,10 +212,15 @@ def _numbered_checklist(title: str, items: list[str]) -> list[int]:
         CONSOLE.print(f"[yellow]Enter numbers from 1 to {len(items)}, 'all', or Enter.[/yellow]")
 
 
-def _interactive_checklist(title: str, labels: list[str]) -> list[int]:
+def _interactive_checklist(
+    title: str,
+    labels: list[str],
+    selected_indices: list[int] | None = None,
+) -> list[int]:
     """Return selected indices from a portable, non-full-screen checklist."""
     checklist = CheckboxList(
         values=list(enumerate(labels)),
+        default_values=selected_indices or [],
         open_character="[",
         select_character="✓",
         close_character="]",

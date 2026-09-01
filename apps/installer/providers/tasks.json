@@ -17,6 +17,14 @@
           "The source structure or an honestly empty result is reported.",
           "No provider mutation is attempted."
         ]
+      },
+      "readiness": {
+        "importance": "core",
+        "allowed_read_tools": ["mcp__notion__notion_search", "mcp__notion__notion_fetch"],
+        "prompt": "Use only read-only Notion MCP tools. Fetch the configured Tasks source at {{source}} and inspect its schema plus a bounded sample of at most 10 records. For that same bounded sample inspect page bodies for embedded meeting blocks or a 'Meeting notes and updates' section; do not run a separate Meetings query. Report structure and counts only, without quoting content or making changes.",
+        "required_fields": ["id", "name", "status"],
+        "required_relations": ["project", "owner"],
+        "optional_fields": ["due_date", "type", "body_markdown"]
       }
     },
     {
@@ -33,6 +41,14 @@
           "At least one issue or an honestly empty result is reported.",
           "No provider mutation is attempted."
         ]
+      },
+      "readiness": {
+        "importance": "core",
+        "allowed_read_tools": ["mcp__linear__get_issue", "mcp__linear__list_issues", "mcp__linear__search_issues", "mcp__linear__get_project", "mcp__linear__list_projects", "mcp__linear__list_issue_statuses", "mcp__linear__list_comments", "mcp__linear__list_teams", "mcp__linear__list_users"],
+        "prompt": "Use only read-only Linear MCP tools. Fetch the configured Tasks source or team at {{source}} and inspect its schema plus a bounded sample of at most 10 issues. Within that same bounded sample inspect issue descriptions or comments for meeting notes; do not run a separate Meetings query. Report structure and counts only; do not quote issue content or make changes.",
+        "required_fields": ["id", "name", "status"],
+        "required_relations": ["project", "owner"],
+        "optional_fields": ["due_date", "type", "body_markdown"]
       }
     }
   ]

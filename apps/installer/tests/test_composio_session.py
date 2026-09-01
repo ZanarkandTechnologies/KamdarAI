@@ -16,7 +16,7 @@ class FakeComposio:
     def __call__(self, method, path, api_key, payload=None):
         self.asserted_key = api_key
         self.calls.append((method, path, payload))
-        if method == "POST" and path == "/api/v3/tool_router/session":
+        if method == "POST" and path == composio_session.SESSION_API:
             return {
                 "session_id": "trs_test",
                 "mcp": {
@@ -43,14 +43,17 @@ class ComposioSessionTests(unittest.TestCase):
     @staticmethod
     def providers() -> list[dict]:
         catalog = provider_catalog.load_catalog()
-        return [
-            catalog["operator_email"]["providers"][0],
-            next(
-                provider
-                for provider in catalog["knowledge"]["providers"]
-                if provider["id"] == "google-drive"
-            ),
-        ]
+        gmail = catalog["operator_email"]["providers"][0]
+        drive = {
+            "id": "google-drive",
+            "mcp": {
+                "source": "composio_session",
+                "name": "composio-google",
+                "toolkit": "googledrive",
+                "tools": ["GOOGLEDRIVE_FIND_FILE"],
+            },
+        }
+        return [gmail, drive]
 
     def test_session_is_fixed_tool_restricted_private_and_reused(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -60,7 +63,7 @@ class ComposioSessionTests(unittest.TestCase):
                 profile, self.providers(), "secret-test-key", request=fake
             )
             create = fake.calls[0]
-            self.assertEqual(create[:2], ("POST", "/api/v3/tool_router/session"))
+            self.assertEqual(create[:2], ("POST", composio_session.SESSION_API))
             payload = create[2]
             self.assertEqual(
                 payload["toolkits"]["enable"], ["gmail", "googledrive"]
@@ -80,7 +83,7 @@ class ComposioSessionTests(unittest.TestCase):
             self.assertEqual(reused["session_id"], "trs_test")
             self.assertEqual(
                 [call[0:2] for call in fake.calls].count(
-                    ("POST", "/api/v3/tool_router/session")
+                    ("POST", composio_session.SESSION_API)
                 ),
                 1,
             )

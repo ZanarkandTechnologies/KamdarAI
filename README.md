@@ -17,12 +17,15 @@ setup workflow and product-facing contracts remain company-neutral here.
 
 ## Install on Windows
 
-You need Windows, Docker Desktop, and the WSL2 backend. The client runtime does
-not require a host Python installation; Hermes supplies Python/Pydantic inside Docker.
+You need Hermes and Docker Desktop installed on Windows. `setup.cmd` configures
+the existing Windows Hermes profile and uses Hermes' bundled Python, so a
+separate Python installation is not required. Docker is Hermes' isolated
+terminal backend; it does not contain a second Hermes runtime.
 
 1. Clone or download this repository.
 2. Start Docker Desktop.
-3. Double-click `setup.cmd`.
+3. On Windows, double-click `setup.cmd`. On macOS, open Terminal in the
+   downloaded folder and run `./setup.sh`.
 
 Before continuing, check that:
 
@@ -33,7 +36,7 @@ Before continuing, check that:
 The window should move through these stages:
 
 ```text
-Checking Docker Desktop and WSL2
+Checking host Hermes and Docker Desktop
 Interactive setup wizard
   +--new or incomplete: install/resume
   `--existing: workspace, update, health, repair, or dashboard
@@ -41,15 +44,16 @@ Selected action
 Focused or full verification
 ```
 
-The setup wizard creates the Hermes profile, connects the services you choose,
-installs the automations, and runs health and skill-package checks. When it
-finishes, open the local dashboard at <http://127.0.0.1:9119>.
+The setup wizard installs or updates the host `kamdar-ai` Hermes profile,
+connects the services you choose, sets `terminal.backend=docker`, installs the
+automations, starts the host gateway, and runs health and skill-package checks.
+When it finishes, open the local dashboard at <http://127.0.0.1:9119>.
 
 The complete [Windows setup guide](apps/installer/docs/customer-setup.md) shows what each
 screen means and what you should see before moving to the next step. It also
 covers the one-time ngrok steps for optional real-time Notion comments.
 
-Run `setup.cmd` again after an update or an interrupted installation. An
+Run `setup.cmd` on Windows or `./setup.sh` on macOS after an update or an interrupted installation. An
 incomplete profile offers Resume; an existing profile opens a maintenance menu.
 Opening the menu alone makes no changes.
 
@@ -67,22 +71,18 @@ Secrets are stored in the persistent Hermes profile. You do not need to edit an
 
 Temporary `*.trycloudflare.com` Quick Tunnels are not supported because their
 URL changes across restarts. The supported path uses the stable HTTPS
-development domain assigned to an ngrok account; the included container runs
-the ngrok agent afterward.
+development domain assigned to an ngrok account. Only the ngrok agent runs as
+a long-lived Compose service and forwards to the host Hermes gateway through
+`host.docker.internal`.
 
 The data-source picker uses the arrow keys and Space. Press Enter to continue or
 Escape to skip the step.
 
-## Install on another Docker host
+## Runtime boundary
 
-Use the same Compose stack on Linux or a VPS:
-
-```bash
-docker compose --profile setup run --rm setup python /distribution/setup.py launch
-docker compose up -d gateway dashboard
-docker compose --profile webhook up -d ngrok  # only when enabled
-docker compose --profile setup run --rm setup python /distribution/setup.py verify --live
-```
+Hermes, its profile, credentials, MCPs, gateway, cron scheduler, and dashboard
+remain on the host. Hermes creates Docker sandboxes for terminal commands.
+Compose owns only the optional ngrok ingress used by Notion webhooks.
 
 ## Repository guide
 
@@ -91,7 +91,7 @@ docker compose --profile setup run --rm setup python /distribution/setup.py veri
 | `setup.py` | Stable dependency bootstrap and public setup command entry point |
 | `skills/pm-daily/` | Daily extraction instructions, eval cases, and frozen evidence |
 | `skills/pm-weekly/` | Weekly reporting and memory instructions, eval cases, and frozen evidence |
-| `apps/doctor/` | Thin analysis-only launcher for the installed automations |
+| `apps/doctor/` | Data-readiness, isolated full-eval, dossier, and analysis commands |
 | `apps/installer/` | Guided setup, maintenance, certification, verification, documentation, and installer tests |
 | `workspace.hermes.md` | Reviewed company configuration |
 | `automations/` | Daily and Weekly automation contracts |
@@ -115,7 +115,7 @@ python3 apps/installer/validate_context.py --context workspace.hermes.md
 Local evals use packaged fixtures and make no provider calls. Private Notion
 captures and generated private seeds must remain outside the repository.
 
-`setup.py doctor` asks native Hermes to execute the selected cadence contract
+`setup.py doctor analysis` asks native Hermes to execute the selected cadence contract
 in analysis-only mode, with provider mutations and messaging disabled. Normal
 scheduled runs review their skill-produced files, update canonical local state,
 and call configured skills or MCPs directly for explicitly authorized provider
@@ -130,3 +130,5 @@ default case; use the runbook's explicit profile and side-effect gate to run it.
 
 For setup steps and recovery paths, see
 [`apps/installer/docs/customer-setup.md`](apps/installer/docs/customer-setup.md).
+For semi-technical maintenance and behavior changes, follow the
+[`Company OS maintenance and tuning SOP`](docs/tuning-sop.md).

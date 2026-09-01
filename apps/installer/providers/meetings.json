@@ -18,6 +18,13 @@
           "The response describes the visible meeting structure and honestly reports populated or empty state.",
           "The trace contains no write operation."
         ]
+      },
+      "readiness": {
+        "importance": "alias",
+        "alias_of": "tasks",
+        "required_fields": [],
+        "required_relations": [],
+        "optional_fields": ["body_markdown"]
       }
     }
   ]

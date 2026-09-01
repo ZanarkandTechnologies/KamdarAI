@@ -29,6 +29,7 @@ class DistributionTests(unittest.TestCase):
             "apps/installer/composio_session.py",
             "apps/installer/connection_evals.py",
             "apps/installer/providers",
+            "apps/installer/prompts",
             "workspace.hermes.template.md",
             "automations",
             "templates",

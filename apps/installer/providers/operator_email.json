@@ -27,6 +27,13 @@
           "The response reports the sent message ID and thread ID.",
           "The sent message is fetched and its subject and run ID exactly match the request."
         ]
+      },
+      "readiness": {
+        "importance": "capability",
+        "proof": "connection_receipt",
+        "required_fields": [],
+        "required_relations": [],
+        "optional_fields": []
       }
     }
   ]

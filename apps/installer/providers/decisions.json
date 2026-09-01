@@ -17,6 +17,14 @@
           "The response reports its identity, URL, and visible structure.",
           "The trace contains no write operation."
         ]
+      },
+      "readiness": {
+        "importance": "destination",
+        "allowed_read_tools": ["mcp__notion__notion_search", "mcp__notion__notion_fetch"],
+        "prompt": "Use only read-only Notion MCP tools. Fetch the configured Decisions destination at {{source}} and report whether it is reachable plus its visible structure. Do not read decision bodies or make changes.",
+        "required_fields": [],
+        "required_relations": [],
+        "optional_fields": []
       }
     }
   ]

@@ -52,15 +52,22 @@ MANAGED = re.compile(
 def _role_label(row: re.Match[str]) -> str:
     role = row.group("role").replace("_", " ").title()
     provider = current_value(row.group("provider"))
-    return f"{role}  [configured: {provider}]" if provider else role
+    source = current_value(row.group("source"))
+    if provider and source:
+        compact_source = source if len(source) <= 55 else source[:52] + "…"
+        return f"{role}  [{provider} → {compact_source}]"
+    return f"{role}  [not configured]"
 
 
 def select_roles(rows: list[re.Match[str]]) -> set[str]:
     """Ask which managed role rows should be configured in this run."""
     labels = [_role_label(row) for row in rows]
     CONSOLE.print(
-        "[dim]Lean setup: select Projects and Tasks; add People for employee "
-        "rollups. Knowledge and operator email are optional.[/dim]"
+        "[dim]Select the source roles to configure. Each selected role gets its "
+        "own provider and URL; this is not one combined database. Lean setup: "
+        "select Projects and Tasks; add People for employee rollups, SOPs for "
+        "process evidence, and Reports for historical evidence. Operator email "
+        "is optional.[/dim]"
     )
     selected = (
         _interactive_checklist("Data Sources", labels)
@@ -158,6 +165,19 @@ def _message_selection(
 ) -> tuple[set[MessageType], bool]:
     """Return selected jobs and whether the customer requested route changes."""
     selected_now = {binding.message for binding in current}
+    if sys.stdin.isatty() and sys.stdout.isatty():
+        selected_indices = _interactive_checklist(
+            "Messages",
+            [label for _, label in MESSAGE_CHOICES],
+            [
+                index
+                for index, (message, _) in enumerate(MESSAGE_CHOICES)
+                if message in selected_now
+            ],
+        )
+        selected = {MESSAGE_CHOICES[index][0] for index in selected_indices}
+        return selected, selected != selected_now
+
     CONSOLE.rule("[bold cyan]Messages[/bold cyan]")
     CONSOLE.print("What should Hermes help with?")
     for index, (_, label) in enumerate(MESSAGE_CHOICES, start=1):

@@ -1,182 +1,180 @@
 @echo off
 setlocal EnableExtensions
-
 cd /d "%~dp0"
 title Company OS Setup
+set "KAMDAR_PROFILE_HOME=%USERPROFILE%\.hermes\profiles\kamdar-ai"
+set "HERMES_PYTHON=%USERPROFILE%\.hermes\hermes-agent\venv\Scripts\python.exe"
 
 :preflight
 cls
 echo Company OS Setup
-echo Checking Docker Desktop and WSL2...
-
+echo Checking host Hermes and Docker Desktop...
+where hermes >nul 2>nul
+if errorlevel 1 goto hermes_missing
+if not exist "%HERMES_PYTHON%" goto hermes_python_missing
 where docker >nul 2>nul
 if errorlevel 1 goto docker_missing
-
-where wsl.exe >nul 2>nul
-if errorlevel 1 goto wsl_missing
-
-wsl.exe --status >nul 2>nul
-if errorlevel 1 goto wsl_missing
-
 docker info >nul 2>nul
 if errorlevel 1 goto docker_stopped
-
-for /f "usebackq delims=" %%I in (`docker info --format "{{.OSType}}" 2^>nul`) do set "DOCKER_OS=%%I"
-if /i not "%DOCKER_OS%"=="linux" goto linux_containers_required
-
 docker compose version >nul 2>nul
 if errorlevel 1 goto compose_missing
 
-echo Opening the guided setup...
-rem Arguments after the service name replace its Compose command, so keep the setup.py entry point explicit.
-docker compose --profile setup run --rm setup python /distribution/setup.py launch
+echo Opening the guided setup in your Windows Hermes profile...
+call :run_setup launch
 set "KAMDAR_ACTION=%ERRORLEVEL%"
-
 if "%KAMDAR_ACTION%"=="0" exit /b 0
-if "%KAMDAR_ACTION%"=="10" goto live_verify
+if "%KAMDAR_ACTION%"=="10" goto full_proof
 if "%KAMDAR_ACTION%"=="11" goto static_verify
 if "%KAMDAR_ACTION%"=="12" goto live_verify
 if "%KAMDAR_ACTION%"=="13" goto dashboard
 if "%KAMDAR_ACTION%"=="14" goto certify
+if "%KAMDAR_ACTION%"=="15" goto preflight_check
+if "%KAMDAR_ACTION%"=="16" goto eval_check
+if "%KAMDAR_ACTION%"=="17" goto dossier
 if "%KAMDAR_ACTION%"=="130" goto cancelled
 goto failed
+
+:run_setup
+set "HERMES_HOME=%KAMDAR_PROFILE_HOME%"
+"%HERMES_PYTHON%" "%~dp0setup.py" %*
+exit /b %ERRORLEVEL%
+
+:start_runtime
+echo Starting the host Hermes gateway...
+set "HERMES_HOME=%KAMDAR_PROFILE_HOME%"
+call :selected_gateway_running
+if not errorlevel 1 exit /b 0
+start "Kamdar Hermes Gateway" /min cmd /c "set HERMES_HOME=%KAMDAR_PROFILE_HOME%&& hermes gateway run"
+timeout /t 3 /nobreak >nul
+call :selected_gateway_running
+if not errorlevel 1 exit /b 0
+echo The selected Hermes profile gateway did not become ready:
+echo %KAMDAR_PROFILE_HOME%
+echo A gateway running for another profile is not accepted.
+exit /b 1
+
+:selected_gateway_running
+hermes gateway status 2>&1 | findstr /c:"Gateway is running (PID:" >nul
+exit /b %ERRORLEVEL%
+
+:start_webhook_if_enabled
+call :run_setup webhook-enabled >nul 2>nul
+if errorlevel 1 exit /b 0
+echo Starting secure webhook ingress...
+docker compose --profile webhook up -d --force-recreate ngrok
+if errorlevel 1 goto webhook_rollback
+call :run_setup webhook-ingress-ready --wait 30
+if errorlevel 1 (
+  echo The assigned endpoint did not become reachable from the public internet.
+  docker compose --profile webhook logs --no-color --tail 20 ngrok
+  goto webhook_rollback
+)
+docker compose --profile webhook ps --status running --services ngrok | findstr /x /c:"ngrok" >nul
+if errorlevel 1 goto webhook_rollback
+call :run_setup webhook-commit
+if errorlevel 1 goto webhook_rollback
+exit /b 0
+
+:webhook_rollback
+call :run_setup webhook-rollback
+docker compose --profile webhook stop ngrok >nul 2>nul
+exit /b 1
 
 :live_verify
 call :start_runtime
 if errorlevel 1 goto failed
 call :start_webhook_if_enabled
 if errorlevel 1 goto failed
-echo Running the full health check...
-docker compose --profile setup run --rm setup python /distribution/setup.py verify --live
+echo Running the full health and webhook check...
+call :run_setup verify --live
+set "VERIFY_EXIT=%ERRORLEVEL%"
+goto verification_result
+
+:full_proof
+call :start_runtime
+if errorlevel 1 goto failed
+call :start_webhook_if_enabled
+if errorlevel 1 goto failed
+echo Running the installation and webhook check...
+call :run_setup verify --live
+if errorlevel 1 goto failed
+echo Checking whether configured company data is ready...
+call :run_setup doctor preflight
+if errorlevel 1 goto failed
+echo Running the complete isolated PM evaluation...
+call :run_setup doctor eval --open
+if errorlevel 1 goto failed
+echo Activating the verified Daily and Weekly schedules...
+call :run_setup doctor activate
 set "VERIFY_EXIT=%ERRORLEVEL%"
 goto verification_result
 
 :static_verify
 call :start_runtime
 if errorlevel 1 goto failed
-echo Checking the updated installation...
-docker compose --profile setup run --rm setup python /distribution/setup.py verify
+call :run_setup verify
 set "VERIFY_EXIT=%ERRORLEVEL%"
 goto verification_result
 
 :dashboard
 call :start_runtime
 if errorlevel 1 goto failed
+set "HERMES_HOME=%KAMDAR_PROFILE_HOME%"
+start "Kamdar Company OS Dashboard" /min "%HERMES_PYTHON%" "%KAMDAR_PROFILE_HOME%\apps\installer\dashboard.py"
 start "" "http://localhost:9119"
-echo Company OS dashboard opened: http://localhost:9119
-pause
 exit /b 0
 
 :certify
-echo Testing configured integrations...
-docker compose --profile setup run --rm setup python /distribution/setup.py certify
-set "CERTIFY_EXIT=%ERRORLEVEL%"
-echo.
-if "%CERTIFY_EXIT%"=="0" (
-  echo All configured integrations passed.
-) else if "%CERTIFY_EXIT%"=="1" (
-  echo Integration certification was deferred. Run setup.cmd and choose Test integrations when ready.
-) else (
-  echo Integration certification did not pass. Review the failed row above and retry from setup.cmd.
-)
-pause
-exit /b %CERTIFY_EXIT%
+call :run_setup certify
+exit /b %ERRORLEVEL%
+
+:preflight_check
+call :run_setup doctor preflight
+exit /b %ERRORLEVEL%
+
+:eval_check
+call :run_setup doctor eval --open
+exit /b %ERRORLEVEL%
+
+:dossier
+call :run_setup doctor open
+exit /b %ERRORLEVEL%
 
 :verification_result
-echo.
 if "%VERIFY_EXIT%"=="0" (
   echo Company OS is ready. Dashboard: http://localhost:9119
 ) else (
-  echo Company OS needs attention.
-  echo Complete the action shown beside the failed check, then run setup.cmd again.
+  echo Company OS needs attention. Complete the failed check and rerun setup.cmd.
 )
 pause
 exit /b %VERIFY_EXIT%
 
-:start_runtime
-echo Starting Hermes...
-docker compose up -d gateway dashboard
-exit /b %ERRORLEVEL%
-
-:start_webhook_if_enabled
-docker compose --profile setup run --rm setup python /distribution/setup.py webhook-enabled >nul 2>nul
-if errorlevel 1 exit /b 0
-echo Starting secure webhook ingress...
-docker compose --profile webhook up -d --force-recreate ngrok
-if errorlevel 1 goto webhook_rollback
-docker compose --profile setup run --rm setup python /distribution/setup.py webhook-ingress-ready --wait 30
-if errorlevel 1 (
-  echo ngrok rejected its credentials or the assigned endpoint did not become reachable.
-  docker compose --profile webhook logs --no-color --tail 20 ngrok
-  goto webhook_rollback
-)
-docker compose --profile webhook ps --status running --services ngrok | findstr /x /c:"ngrok" >nul
-if errorlevel 1 (
-  echo The assigned endpoint responded, but this ngrok agent is not running.
-  goto webhook_rollback
-)
-docker compose --profile setup run --rm setup python /distribution/setup.py webhook-commit
-if errorlevel 1 goto webhook_rollback
-exit /b 0
-
-:webhook_rollback
-docker compose --profile setup run --rm setup python /distribution/setup.py webhook-rollback
-docker compose --profile setup run --rm setup python /distribution/setup.py webhook-enabled >nul 2>nul
-if errorlevel 1 (
-  docker compose --profile webhook stop ngrok >nul 2>nul
-) else (
-  docker compose --profile webhook up -d --force-recreate ngrok >nul 2>nul
-)
-exit /b 1
-
+:hermes_missing
+echo Hermes must be installed on Windows before Company OS setup.
+pause
+exit /b 2
+:hermes_python_missing
+echo Hermes was found, but its bundled Python runtime is missing at:
+echo %HERMES_PYTHON%
+pause
+exit /b 2
 :docker_missing
-echo.
-echo Docker Desktop is required and was not found.
-choice /c OX /m "Open the official Docker Desktop installer page, or exit"
-if errorlevel 2 exit /b 2
-start "" "https://docs.docker.com/desktop/setup/install/windows-install/"
+echo Docker Desktop is required for the Hermes terminal backend and ngrok.
+pause
 exit /b 2
-
 :docker_stopped
-echo.
-echo Docker Desktop is installed but is not ready.
-echo Start Docker Desktop and wait until it reports Ready.
-choice /c RX /m "Check again, or exit"
-if errorlevel 2 exit /b 2
-goto preflight
-
-:wsl_missing
-echo.
-echo WSL2 is required and is not ready.
-choice /c OX /m "Open the official WSL installation guide, or exit"
-if errorlevel 2 exit /b 2
-start "" "https://learn.microsoft.com/windows/wsl/install"
+echo Docker Desktop is installed but is not ready. Start it and retry.
+pause
 exit /b 2
-
 :compose_missing
-echo.
-echo Docker Compose is unavailable. Update Docker Desktop, then try again.
-choice /c RX /m "Check again, or exit"
-if errorlevel 2 exit /b 2
-goto preflight
-
-:linux_containers_required
-echo.
-echo Docker Desktop is running Windows containers.
-echo Switch Docker Desktop to Linux containers, then try again.
-choice /c RX /m "Check again, or exit"
-if errorlevel 2 exit /b 2
-goto preflight
-
+echo Docker Compose is unavailable. Update Docker Desktop and retry.
+pause
+exit /b 2
 :cancelled
-echo.
-echo Setup stopped safely. Existing configuration was preserved.
+echo Setup stopped safely. Existing host Hermes configuration was preserved.
 pause
 exit /b 0
-
 :failed
-echo.
-echo Setup stopped safely. Existing profile data was preserved.
-echo Run setup.cmd again and choose Repair setup if the problem continues.
+echo Setup stopped safely. Existing host Hermes profile data was preserved.
 pause
 exit /b 2

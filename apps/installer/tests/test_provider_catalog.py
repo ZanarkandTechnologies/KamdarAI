@@ -21,7 +21,6 @@ class ProviderCatalogTests(unittest.TestCase):
                 "projects",
                 "tasks",
                 "people",
-                "knowledge",
                 "reports",
                 "meetings",
                 "operator_email",
@@ -39,13 +38,17 @@ class ProviderCatalogTests(unittest.TestCase):
                 self.assertTrue(provider["test"]["prompt"])
                 self.assertTrue(provider["test"]["expected_output"])
                 self.assertTrue(provider["test"]["assertions"])
+                self.assertIn(
+                    provider["readiness"]["importance"],
+                    {"core", "optional", "destination", "capability", "alias"},
+                )
         self.assertEqual(mcp_sources, {"hermes_catalog", "composio_session"})
         gmail = catalog["operator_email"]["providers"][0]
         self.assertEqual(gmail["id"], "gmail")
         self.assertEqual(gmail["mcp"]["toolkit"], "gmail")
-        self.assertIn(
-            "google-drive",
-            [provider["id"] for provider in catalog["knowledge"]["providers"]],
+        self.assertEqual(
+            [provider["id"] for provider in catalog["reports"]["providers"]],
+            ["notion"],
         )
 
     def test_workspace_bindings_resolve_provider_and_deduplicate_connection_key(self) -> None:
@@ -77,7 +80,7 @@ class ProviderCatalogTests(unittest.TestCase):
             {binding["data_source"] for binding in bindings},
             {
                 "projects", "tasks", "meetings", "people", "operator_email",
-                "knowledge", "reports", "decisions", "sops",
+                "reports", "decisions", "sops",
             },
         )
         self.assertEqual(
@@ -112,6 +115,25 @@ class ProviderCatalogTests(unittest.TestCase):
         changed["provider"]["test"]["assertions"].append("A new required assertion.")
         self.assertNotEqual(before, provider_catalog.configuration_hash([changed]))
 
+    def test_readiness_hash_is_separate_and_includes_role_contract(self) -> None:
+        catalog = provider_catalog.load_catalog()
+        binding = {
+            "case_id": "tasks:notion",
+            "data_source": "tasks",
+            "source": "https://notion.example.test/tasks",
+            "provider": catalog["tasks"]["providers"][0],
+        }
+        connection_before = provider_catalog.configuration_hash([binding])
+        readiness_before = provider_catalog.readiness_hash([binding])
+        changed = json.loads(json.dumps(binding))
+        changed["provider"]["readiness"]["required_relations"].append("department")
+        self.assertEqual(
+            connection_before, provider_catalog.configuration_hash([changed])
+        )
+        self.assertNotEqual(
+            readiness_before, provider_catalog.readiness_hash([changed])
+        )
+
     def test_manifest_filename_and_id_must_match(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
@@ -137,6 +159,21 @@ class ProviderCatalogTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(
                 provider_catalog.CatalogError, "side_effect_confirmation"
+            ):
+                provider_catalog.load_catalog(directory)
+
+    def test_readiness_allowlist_rejects_lexical_wildcards(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            payload = json.loads(
+                (provider_catalog.DEFAULT_CATALOG / "projects.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            payload["providers"][0]["readiness"]["allowed_read_tools"] = ["*fetch*"]
+            (directory / "projects.json").write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(
+                provider_catalog.CatalogError, "allowed_read_tools"
             ):
                 provider_catalog.load_catalog(directory)
 

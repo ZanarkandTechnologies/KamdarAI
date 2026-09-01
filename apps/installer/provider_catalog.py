@@ -80,6 +80,62 @@ def _validate_provider(provider: Any, source_id: str) -> dict[str, Any]:
         isinstance(item, str) and item.strip() for item in assertions
     ):
         raise CatalogError(f"catalog_invalid:{source_id}.{provider_id}.test.assertions")
+    readiness = provider.get("readiness")
+    if not isinstance(readiness, dict):
+        raise CatalogError(f"catalog_invalid:{source_id}.{provider_id}.readiness")
+    importance = readiness.get("importance")
+    if importance not in {"core", "optional", "destination", "capability", "alias"}:
+        raise CatalogError(
+            f"catalog_invalid:{source_id}.{provider_id}.readiness.importance"
+        )
+    if importance == "alias":
+        alias_of = _required_string(
+            readiness.get("alias_of"),
+            f"{source_id}.{provider_id}.readiness.alias_of",
+        )
+        if not IDENTIFIER.fullmatch(alias_of) or alias_of == source_id:
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.alias_of"
+            )
+    elif importance == "capability":
+        if readiness.get("proof") != "connection_receipt":
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.proof"
+            )
+    else:
+        readiness_prompt = _required_string(
+            readiness.get("prompt"),
+            f"{source_id}.{provider_id}.readiness.prompt",
+        )
+        lowered_prompt = readiness_prompt.lower()
+        if "read-only" not in lowered_prompt or not re.search(
+            r"(?:do not|without)[^.]{0,120}(?:make|making) changes|make no changes",
+            lowered_prompt,
+        ):
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.read_only"
+            )
+        allowed = readiness.get("allowed_read_tools")
+        if not isinstance(allowed, list) or not allowed or not all(
+            isinstance(value, str)
+            and re.fullmatch(r"mcp__[A-Za-z0-9_]+__[A-Za-z0-9_]+", value)
+            for value in allowed
+        ):
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.allowed_read_tools"
+            )
+    for field in ("required_fields", "required_relations", "optional_fields"):
+        values = readiness.get(field, [])
+        if not isinstance(values, list) or not all(
+            isinstance(value, str) and IDENTIFIER.fullmatch(value) for value in values
+        ):
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.{field}"
+            )
+        if len(values) != len(set(values)):
+            raise CatalogError(
+                f"catalog_invalid:{source_id}.{provider_id}.readiness.{field}"
+            )
     return provider
 
 
@@ -174,6 +230,27 @@ def configuration_hash(bindings: list[dict[str, Any]]) -> str:
     ]
     encoded = json.dumps(stable, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def readiness_hash(bindings: list[dict[str, Any]]) -> str:
+    """Hash only the selected role-owned data-readiness contracts."""
+    stable = [
+        {
+            "case_id": binding["case_id"],
+            "source": binding["source"],
+            "connection": connection_key(binding["provider"]),
+            "readiness": binding["provider"]["readiness"],
+        }
+        for binding in sorted(bindings, key=lambda item: item["case_id"])
+    ]
+    encoded = json.dumps(stable, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def render_readiness_prompt(binding: dict[str, Any]) -> str:
+    """Render the role's read-only, bounded readiness prompt."""
+    prompt = str(binding["provider"]["readiness"].get("prompt") or "")
+    return prompt.replace("{{source}}", binding["source"])
 
 
 def render_test_prompt(binding: dict[str, Any], run_id: str) -> str:

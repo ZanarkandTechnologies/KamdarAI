@@ -10,13 +10,21 @@
       "test": {
         "risk": "read_only",
         "requires_confirmation": false,
-        "prompt": "Use only the configured Notion MCP tools. Fetch the configured SOPs destination at {{source}}, report its identity, URL, and visible structure, and make no changes.",
-        "expected_output": "The configured SOP destination is fetched and described without a write.",
+        "prompt": "Use only the configured Notion MCP tools. Fetch the configured SOPs source at {{source}}, report its identity, URL, visible structure, and one concise factual observation proving approved process content was read. Make no changes.",
+        "expected_output": "The configured SOP source is fetched and one source-grounded process observation is returned without a write.",
         "assertions": [
-          "The configured SOP destination is fetched successfully.",
+          "The configured SOP source is fetched successfully.",
           "The response reports its identity, URL, and visible structure.",
           "The trace contains no write operation."
         ]
+      },
+      "readiness": {
+        "importance": "optional",
+        "allowed_read_tools": ["mcp__notion__notion_search", "mcp__notion__notion_fetch"],
+        "prompt": "Use only read-only Notion MCP tools. Fetch the configured SOPs source at {{source}} and inspect whether at least one readable SOP with meaningful content exists. Report counts and content presence only; do not quote content or make changes.",
+        "required_fields": [],
+        "required_relations": [],
+        "optional_fields": []
       }
     }
   ]

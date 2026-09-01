@@ -11,7 +11,7 @@ refs:
 
 # Supported Company OS sources
 
-A source is an exact provider location the Company OS may read under a semantic role. Automations ask for `projects`, `tasks`, or `people`; setup decides which provider and exact location fulfill that role.
+A source is an exact provider location the Company OS may read under a semantic role. Automations ask for roles such as `projects`, `tasks`, `people`, `sops`, or `reports`; setup decides which provider and exact location fulfill that role.
 
 A source binding does not grant account-wide access, choose an output destination, or authorize a write. Connections and sinks are separate setup decisions.
 
@@ -24,7 +24,8 @@ These roles exist in the workspace template and are selectable today:
 | `projects` | Active Projects, status, current plan, and Department/Area relationships | Notion, Linear | Core setup and Doctor source |
 | `tasks` | Current Work: Tasks, Features, Issues, and reviewable completed work | Notion, Linear | Core setup and Doctor source |
 | `people` | Shared identity, role, and stable person references | Notion | Optional globally; required for employee performance reporting |
-| `knowledge` | Canonical company knowledge/files | Notion, Google Drive through Composio | Optional; not required by the five current user features |
+| `sops` | Approved source SOPs and operating procedures | Notion | Optional process evidence |
+| `reports` | Historical company and department reports | Notion | Optional reporting evidence |
 | `operator_email` | Isolated operator inbox used for connection certification | Gmail through Composio | Optional certification surface, not company memory |
 
 The lean setup selects Projects and Work. Add People when Weekly employee reporting is expected. Skipped roles remain visibly unconfigured and can be added by rerunning workspace setup.
@@ -75,22 +76,20 @@ Setup’s provider catalog defines how each selected binding is tested:
 | Projects → Linear | Fetch team/source; create, read back, and leave one isolated issue non-active | Reversible; confirmation required |
 | Work → Notion or Linear | Fetch and describe configured structure and populated/empty state | Read-only |
 | People → Notion | Fetch identity, visible properties, and populated/empty state | Read-only |
-| Knowledge → Notion | Fetch content and return one grounded observation | Read-only |
-| Knowledge → Google Drive | Confirm account/folder; create, read back, and trash one isolated file | Reversible; confirmation required |
+| SOPs → Notion | Fetch source and return one grounded process observation | Read-only |
+| Reports → Notion | Fetch source and return one grounded report observation | Read-only |
 | Operator email → Gmail | Confirm the exact isolated inbox; send and read back one self-addressed email | Irreversible; confirmation required |
 
 Risky tests are listed before approval. Certification must not modify an existing provider record. A deferred test keeps the binding but makes setup health `PARTIAL` until certification is rerun.
 
 ## Catalogued roles not exposed by the wizard
 
-The catalog also contains definitions for `meetings`, `decisions`, `sops`, and `reports`. They are not current Data source rows in the workspace wizard:
+The catalog also contains definitions for `meetings` and `decisions`. They are not current Data source rows in the workspace wizard:
 
 | Catalog role | Provider tests present | Current use |
 | --- | --- | --- |
 | `meetings` | Notion read-only | Meeting evidence currently enters through Work/manual intake. |
 | `decisions` | Notion destination inspection | Decision Memory remains locally canonical; copies use artifact sync. |
-| `sops` | Notion destination inspection | SOP Memory remains locally canonical; copies use artifact sync. |
-| `reports` | Notion or Google Drive reversible create/read-back/cleanup | Reports are configured as sinks rather than current source rows. |
 
 Catalog presence proves a validated connection-test definition, not complete wizard support or production authority.
 
@@ -99,7 +98,7 @@ Catalog presence proves a validated connection-test definition, not complete wiz
 - Projects owns human-operated project truth, not private assessments or report history.
 - Work owns progress, evidence, blockers, completion notes, and discussion.
 - People owns shared identity and approved route references, not Employee Memory or inferred permissions.
-- Knowledge owns canonical company files; generated SOP/Decision/Issue Memory stays private unless explicitly copied to a sink.
+- People, SOPs, and Reports own distinct provider evidence. Generated SOP/Decision/Issue Memory and generated reports stay private unless explicitly copied to a sink.
 - Frozen Project Memory and long-term memory are runtime-local state, not setup sources.
 - Bind exact URLs or provider identifiers. Never treat a connected account as an implied company boundary.
 - Credentials and OAuth state remain in the private Hermes profile, never in workspace Markdown or Git.

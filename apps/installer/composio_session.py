@@ -15,6 +15,7 @@ from typing import Any, Callable
 
 
 API_ORIGIN = "https://backend.composio.dev"
+SESSION_API = "/api/v3.1/tool_router/session"
 STATE_PATH = Path("state/composio/session.json")
 Request = Callable[[str, str, str, dict[str, Any] | None], dict[str, Any]]
 
@@ -114,7 +115,7 @@ def ensure_session(
     ):
         request(
             "GET",
-            f"/api/v3/tool_router/session/{state['session_id']}",
+            f"{SESSION_API}/{state['session_id']}",
             api_key,
             None,
         )
@@ -136,7 +137,7 @@ def ensure_session(
         "workbench": {"enable": False, "enable_proxy_execution": False},
         "preload": {"tools": enabled_tools},
     }
-    result = request("POST", "/api/v3/tool_router/session", api_key, payload)
+    result = request("POST", SESSION_API, api_key, payload)
     session_id = result.get("session_id")
     mcp = result.get("mcp")
     mcp_url = mcp.get("url") if isinstance(mcp, dict) else None
@@ -172,7 +173,7 @@ def create_connect_link(
         raise ComposioSessionError("composio_session_state_invalid")
     result = request(
         "POST",
-        f"/api/v3/tool_router/session/{session_id}/link",
+        f"{SESSION_API}/{session_id}/link",
         api_key,
         {"toolkit": toolkit},
     )
@@ -196,7 +197,7 @@ def connected_toolkits(
     names = ",".join(sorted(toolkits))
     result = request(
         "GET",
-        f"/api/v3/tool_router/session/{session_id}/toolkits"
+        f"{SESSION_API}/{session_id}/toolkits"
         f"?limit=50&is_connected=true&toolkits={names}",
         api_key,
         None,

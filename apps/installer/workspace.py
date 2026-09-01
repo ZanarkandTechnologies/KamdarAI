@@ -70,13 +70,24 @@ def context_status() -> str:
 
 def source_files() -> list[tuple[Path, str, Path]]:
     files: list[tuple[Path, str, Path]] = [(CONFIG, "workspace", Path(".hermes.md"))]
+    preflight_prompt = PROJECT / "apps" / "installer" / "prompts" / "preflight.md"
+    if preflight_prompt.is_file():
+        files.append(
+            (preflight_prompt, "workspace", Path("prompts") / "preflight.md")
+        )
     for name in ("pm-daily", "pm-weekly"):
         package = PROJECT / "skills" / name
         skill = package / "SKILL.md"
         if skill.is_file():
             files.append((skill, "workspace", Path("skills") / name / "SKILL.md"))
-        for template in sorted((package / "templates").glob("*.md")):
-            files.append((template, "workspace", Path("skills") / name / "templates" / template.name))
+        for owned_directory in ("templates", "evals"):
+            source_root = package / owned_directory
+            for source in sorted(source_root.rglob("*")):
+                relative = source.relative_to(package)
+                if source.is_symlink() or any(part in EXCLUDED_NAMES for part in relative.parts):
+                    continue
+                if source.is_file() and source.suffix not in EXCLUDED_SUFFIXES:
+                    files.append((source, "workspace", Path("skills") / name / relative))
     for owner, source_root, destination_root in (
         ("workspace", PROJECT / "automations", Path("automations")),
         ("workspace", PROJECT / "templates", Path("templates")),

@@ -16,7 +16,7 @@ PROVIDERS = [
 ]
 STATE = {
     "mcp_url": "https://app.composio.dev/tool_router/v3/test/mcp",
-    "toolkits": [],
+    "toolkits": {"gmail": ["GMAIL_GET_PROFILE"]},
 }
 
 
@@ -35,9 +35,13 @@ class ComposioConnectionTests(unittest.TestCase):
                     with patch.object(runtime, "save_profile_secret") as save_secret:
                         with patch.object(runtime, "configure_remote_mcp") as configure:
                             with patch.object(
-                                composio_session, "connected_toolkits", return_value=set()
+                                composio_session,
+                                "connected_toolkits",
+                                return_value={"gmail"},
                             ):
-                                with patch.object(connections, "run_visible"):
+                                with patch.object(
+                                    connections, "run_mcp_test_visible", return_value=0
+                                ):
                                     connections._configure_composio_connection(
                                         PROFILE, PROVIDERS, non_interactive=False
                                     )
@@ -53,6 +57,47 @@ class ComposioConnectionTests(unittest.TestCase):
             STATE["mcp_url"],
             headers={"x-api-key": "${COMPOSIO_API_KEY}"},
         )
+
+    def test_missing_toolkit_connection_fails_closed(self) -> None:
+        with patch.object(runtime, "read_profile_secret", return_value="key"):
+            with patch.object(composio_session, "ensure_session", return_value=STATE):
+                with patch.object(runtime, "configure_remote_mcp"):
+                    with patch.object(
+                        composio_session, "connected_toolkits", return_value=set()
+                    ):
+                        with patch.object(connections, "pause"):
+                            with patch.object(
+                                composio_session,
+                                "create_connect_link",
+                                return_value="https://app.composio.dev/link/test",
+                            ):
+                                with self.assertRaisesRegex(
+                                    runtime.RuntimeSetupError,
+                                    "composio_connections_incomplete:gmail",
+                                ):
+                                    connections._configure_composio_connection(
+                                        PROFILE, PROVIDERS, non_interactive=False
+                                    )
+
+    def test_mcp_transport_failure_fails_closed(self) -> None:
+        with patch.object(runtime, "read_profile_secret", return_value="key"):
+            with patch.object(composio_session, "ensure_session", return_value=STATE):
+                with patch.object(runtime, "configure_remote_mcp"):
+                    with patch.object(
+                        composio_session,
+                        "connected_toolkits",
+                        return_value={"gmail"},
+                    ):
+                        with patch.object(
+                            connections, "run_mcp_test_visible", return_value=1
+                        ):
+                            with self.assertRaisesRegex(
+                                runtime.RuntimeSetupError,
+                                "composio_mcp_connection_test_failed",
+                            ):
+                                connections._configure_composio_connection(
+                                    PROFILE, PROVIDERS, non_interactive=False
+                                )
 
     def test_failed_replacement_preserves_the_saved_key(self) -> None:
         with patch.object(runtime, "read_profile_secret", return_value="old-key"):

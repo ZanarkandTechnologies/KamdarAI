@@ -40,6 +40,7 @@ class SetupArchitectureTests(unittest.TestCase):
             "update",
             "verify",
             "certify",
+            "doctor",
             "webhook-enabled",
             "webhook-ingress-ready",
             "webhook-commit",
@@ -57,6 +58,7 @@ class SetupArchitectureTests(unittest.TestCase):
             "flows/lifecycle.py",
             "flows/connections.py",
             "flows/verification.py",
+            "flows/doctor.py",
         }
         self.assertTrue(required.issubset({
             path.relative_to(PACKAGE).as_posix()

@@ -90,6 +90,12 @@ def run_command(
     return result
 
 
+def mcp_connection_ready(result: subprocess.CompletedProcess[str]) -> bool:
+    """Interpret Hermes MCP proof because current `mcp test` may exit zero on failure."""
+    output = f"{result.stdout or ''}\n{result.stderr or ''}"
+    return "✓ Connected" in output and "✗ Connection failed" not in output
+
+
 def root_home_for_profile(profile_home: Path) -> Path:
     resolved = profile_home.expanduser().resolve()
     if resolved.parent.name == "profiles":
@@ -108,13 +114,16 @@ def default_profile_home() -> Path:
 
 
 def install_or_update_distribution(source: Path, profile_home: Path) -> str:
-    """Use Hermes' native profile commands to install or update the source."""
+    """Install from the explicit checkout and preserve profile-owned user data."""
     source = source.resolve()
     profile_home = profile_home.resolve()
     root_home = root_home_for_profile(profile_home)
     if (profile_home / "distribution.yaml").is_file():
         run_command(
-            ["hermes", "profile", "update", PROFILE_NAME, "--yes"],
+            [
+                "hermes", "profile", "install", str(source),
+                "--name", PROFILE_NAME, "--force", "--yes",
+            ],
             root_home,
         )
         return "updated"
@@ -179,7 +188,13 @@ def hermes_python(profile_home: Path) -> Path:
     raise RuntimeSetupError("hermes_python_not_found")
 
 
-def save_ngrok_config(profile_home: Path, authtoken: str, public_url: str) -> Path:
+def save_ngrok_config(
+    profile_home: Path,
+    authtoken: str,
+    public_url: str,
+    *,
+    upstream_url: str = "http://host.docker.internal:8645",
+) -> Path:
     """Persist the ngrok agent credential and stable endpoint as owner-only config."""
     cleaned = authtoken.strip()
     if not cleaned:
@@ -201,7 +216,7 @@ def save_ngrok_config(profile_home: Path, authtoken: str, public_url: str) -> Pa
                 "  - name: notion-webhook\n"
                 f"    url: {json.dumps(origin)}\n"
                 "    upstream:\n"
-                "      url: http://gateway:8645\n"
+                f"      url: {upstream_url}\n"
             )
         os.chmod(temporary, 0o600)
         os.replace(temporary, destination)
@@ -296,6 +311,13 @@ def install_catalog_mcp(profile_home: Path, name: str) -> None:
     """Install one Nous-approved MCP through Hermes' catalog owner."""
     if not re.fullmatch(r"[a-z][a-z0-9_-]*", name):
         raise RuntimeSetupError("invalid_mcp_catalog_name")
+    configured = run_command(
+        ["hermes", "config", "get", f"mcp_servers.{name}.url"],
+        profile_home,
+        check=False,
+    )
+    if configured.returncode == 0 and configured.stdout.strip():
+        return
     run_command(["hermes", "mcp", "install", name], profile_home)
 
 
@@ -538,15 +560,27 @@ def wait_for_webhook_ingress(profile_home: Path, timeout: int) -> bool:
 
 
 def model_auth_configured(profile_home: Path) -> bool:
-    """Detect supported model credentials without reading their contents."""
+    """Detect model credentials without mistaking unrelated OAuth state for auth."""
     if configured_secret_names(profile_home) & MODEL_SECRET_NAMES:
         return True
     auth_candidates = (
         profile_home / "auth.json",
-        profile_home / "oauth.json",
         profile_home / "auth" / "credentials.json",
     )
-    return any(path.is_file() and path.stat().st_size > 2 for path in auth_candidates)
+    for path in auth_candidates:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
+            continue
+        providers = payload.get("providers")
+        credential_pool = payload.get("credential_pool")
+        if isinstance(providers, dict) and providers:
+            return True
+        if isinstance(credential_pool, dict) and credential_pool:
+            return True
+    return False
 
 
 def approve_workspace_context(path: Path) -> None:
@@ -716,15 +750,49 @@ def _local_profile_lanes(
         config.returncode == 0
         and Path(config.stdout.strip()).resolve() == workspace.resolve()
     )
+    backend = command_runner(
+        ["hermes", "config", "get", "terminal.backend"],
+        profile_home,
+        check=False,
+    )
+    docker_backend_ready = (
+        backend.returncode == 0 and backend.stdout.strip().lower() == "docker"
+    )
+    workspace_mount = command_runner(
+        [
+            "hermes", "config", "get",
+            "terminal.docker_mount_cwd_to_workspace",
+        ],
+        profile_home,
+        check=False,
+    )
+    workspace_mount_ready = (
+        workspace_mount.returncode == 0
+        and workspace_mount.stdout.strip().lower() in {"true", "1", "yes", "on"}
+    )
+    docker_probe = command_runner(
+        [
+            "docker", "run", "--rm", "--network", "none",
+            "python:3.11-slim@sha256:6d85378d88a19cd4d76079817532d62232be95757cb45945a99fec8e8084b9c2",
+            "python", "-c",
+            "print('KAMDAR_DOCKER_BACKEND_OK')",
+        ],
+        profile_home,
+        check=False,
+    )
+    docker_execution_ready = (
+        docker_probe.returncode == 0
+        and "KAMDAR_DOCKER_BACKEND_OK" in docker_probe.stdout
+    )
 
     jobs_payload = _read_json(profile_home / "cron" / "jobs.json")
     jobs = jobs_payload.get("jobs", []) if isinstance(jobs_payload, dict) else []
-    active_names = {
+    installed_names = {
         str(job.get("name"))
         for job in jobs
-        if isinstance(job, dict) and job.get("enabled", True) is not False
+        if isinstance(job, dict)
     }
-    schedules_ready = EXPECTED_CRON_NAMES.issubset(active_names)
+    schedules_ready = EXPECTED_CRON_NAMES.issubset(installed_names)
 
     skill_packages_ready = all(
         (profile_home / "skills" / name / "SKILL.md").is_file()
@@ -757,6 +825,27 @@ def _local_profile_lanes(
             "workspace is the runtime cwd"
             if cwd_ready
             else "terminal cwd does not match workspace",
+        ),
+        _lane(
+            "terminal_backend",
+            "pass" if docker_backend_ready else "fail",
+            "Hermes commands execute in Docker sandboxes"
+            if docker_backend_ready
+            else "terminal backend is not Docker",
+        ),
+        _lane(
+            "terminal_workspace_mount",
+            "pass" if workspace_mount_ready else "fail",
+            "selected profile workspace is mounted at /workspace"
+            if workspace_mount_ready
+            else "Docker workspace mount is disabled; generated files would be ephemeral",
+        ),
+        _lane(
+            "docker_execution",
+            "pass" if docker_execution_ready else "fail",
+            "an isolated no-network container executed successfully"
+            if docker_execution_ready
+            else "Hermes' Docker execution prerequisite failed",
         ),
         _lane(
             "automations",
@@ -1015,7 +1104,11 @@ def _comment_eval_lane(
         "pass" if ready else "fail",
         "threaded reply observed"
         if ready
-        else "leave one @hermes test comment and retry",
+        else (
+            "leave one "
+            + str(read_profile_secret(profile_home, "NOTION_COMMENT_TRIGGER") or "@hermes")
+            + " test comment and retry"
+        ),
         required=False,
     )
 

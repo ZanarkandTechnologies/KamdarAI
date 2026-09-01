@@ -1,8 +1,10 @@
 # Company OS installer
 
 This first-class package owns customer installation, configuration,
-certification, maintenance, and setup verification. Product automations,
-templates, evaluation cases, and the evaluation viewer remain outside it.
+certification, maintenance, and setup verification. Product automations and
+their skill-owned templates and evaluation cases remain outside its source
+package; the workspace installer copies those runtime inputs. The evaluation
+viewer remains a development app.
 
 ```text
 apps/installer/

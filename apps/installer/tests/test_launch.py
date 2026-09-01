@@ -55,7 +55,7 @@ class SetupLaunchTests(unittest.TestCase):
     def test_existing_profile_health_choice_requests_live_verification(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             profile = self.existing_profile(Path(temporary))
-            result = self.run_launch(profile, "4\n")
+            result = self.run_launch(profile, "6\n")
             self.assertEqual(result.returncode, 12, result.stderr)
             self.assertIn("Existing installation found", result.stdout)
             self.assertIn("Run full health check", result.stdout)
@@ -63,7 +63,7 @@ class SetupLaunchTests(unittest.TestCase):
     def test_existing_profile_dashboard_choice_requests_dashboard(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             profile = self.existing_profile(Path(temporary))
-            result = self.run_launch(profile, "6\n")
+            result = self.run_launch(profile, "9\n")
             self.assertEqual(result.returncode, 13, result.stderr)
 
     def test_existing_profile_exit_does_not_mutate_profile(self) -> None:
@@ -74,7 +74,7 @@ class SetupLaunchTests(unittest.TestCase):
                 for path in profile.rglob("*")
                 if path.is_file()
             }
-            result = self.run_launch(profile, "7\n")
+            result = self.run_launch(profile, "10\n")
             after = {
                 path.relative_to(profile): path.read_bytes()
                 for path in profile.rglob("*")
@@ -91,12 +91,61 @@ class SetupLaunchTests(unittest.TestCase):
                 "name: kamdar-ai\n", encoding="utf-8"
             )
             before = (profile / "distribution.yaml").read_bytes()
-            result = self.run_launch(profile, "n\n")
+            result = self.run_launch(profile, "exit\n")
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("incomplete installation was found", result.stdout)
             self.assertEqual((profile / "distribution.yaml").read_bytes(), before)
             self.assertEqual(
                 [path.name for path in profile.iterdir()], ["distribution.yaml"]
+            )
+
+    def test_incomplete_profile_offers_recoverable_fresh_start(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary) / "profiles" / "kamdar-ai"
+            profile.mkdir(parents=True)
+            (profile / "distribution.yaml").write_text(
+                "name: kamdar-ai\n", encoding="utf-8"
+            )
+            result = self.run_launch(profile, "start-over\nn\n")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("No setup changes were made", result.stdout)
+            self.assertEqual(
+                [path.name for path in profile.iterdir()], ["distribution.yaml"]
+            )
+
+    def test_fresh_start_archives_incomplete_profile_and_relaunches_clean(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary) / "profiles" / "kamdar-ai"
+            profile.mkdir(parents=True)
+            (profile / "workspace.hermes.md").write_text(
+                "saved draft\n", encoding="utf-8"
+            )
+
+            def install_distribution(source: Path, target: Path) -> str:
+                self.assertTrue((source / "workspace.hermes.md").is_file())
+                self.assertFalse(target.exists())
+                target.mkdir(parents=True)
+                (target / "setup.py").write_text("# installed\n", encoding="utf-8")
+                (target / "workspace.hermes.md").write_text(
+                    "copied draft\n", encoding="utf-8"
+                )
+                return "installed"
+
+            with patch.object(
+                runtime,
+                "install_or_update_distribution",
+                side_effect=install_distribution,
+            ), patch.object(subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
+                result = lifecycle._fresh_start(profile)
+
+            self.assertEqual(result, 0)
+            self.assertFalse((profile / "workspace.hermes.md").exists())
+            self.assertTrue((profile / lifecycle.FRESH_START_MARKER).is_file())
+            backups = list(profile.parent.glob("kamdar-ai.incomplete-*"))
+            self.assertEqual(len(backups), 1)
+            self.assertEqual(
+                (backups[0] / "workspace.hermes.md").read_text(encoding="utf-8"),
+                "saved draft\n",
             )
 
     def test_existing_profile_integration_choice_requests_certification(self) -> None:
@@ -105,6 +154,26 @@ class SetupLaunchTests(unittest.TestCase):
             result = self.run_launch(profile, "3\n")
             self.assertEqual(result.returncode, 14, result.stderr)
             self.assertIn("Test integrations", result.stdout)
+
+    def test_existing_profile_preflight_choice_requests_data_readiness(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = self.existing_profile(Path(temporary))
+            result = self.run_launch(profile, "4\n")
+            self.assertEqual(result.returncode, 15, result.stderr)
+            self.assertIn("Check data readiness", result.stdout)
+
+    def test_existing_profile_eval_choice_requests_full_eval(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = self.existing_profile(Path(temporary))
+            result = self.run_launch(profile, "5\n")
+            self.assertEqual(result.returncode, 16, result.stderr)
+            self.assertIn("Run full eval and open dossier", result.stdout)
+
+    def test_existing_profile_dossier_choice_requests_latest_dossier(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = self.existing_profile(Path(temporary))
+            result = self.run_launch(profile, "8\n")
+            self.assertEqual(result.returncode, 17, result.stderr)
 
     def test_workspace_action_uses_profile_owned_configuration(self) -> None:
         source = (
@@ -154,7 +223,7 @@ class SetupLaunchTests(unittest.TestCase):
         ):
             with patch.object(lifecycle, "run_visible", return_value=0) as visible:
                 lifecycle._configure_model(profile, non_interactive=False)
-        visible.assert_called_once_with(["hermes", "setup"], profile)
+        visible.assert_called_once_with(["hermes", "setup", "model"], profile)
 
         with patch.object(runtime, "model_auth_configured", return_value=False):
             with patch.object(lifecycle, "run_visible", return_value=0):

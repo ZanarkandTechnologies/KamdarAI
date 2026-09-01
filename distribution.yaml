@@ -17,6 +17,7 @@ distribution_owned:
   - distribution.yaml
   - setup.py
   - setup.cmd
+  - setup.sh
   - compose.yaml
   - apps/__init__.py
   - apps/doctor/__init__.py
@@ -28,21 +29,21 @@ distribution_owned:
   - apps/installer/profile.py
   - apps/installer/provider_catalog.py
   - apps/installer/composio_session.py
+  - apps/installer/model_output.py
   - apps/installer/connection_evals.py
+  - apps/installer/readiness_evals.py
+  - apps/installer/prompts
   - apps/doctor/run.py
+  - apps/doctor/evaluation.py
   - apps/installer/dashboard.py
   - apps/installer/schemas/workspace.py
   - apps/installer/providers
   - skills/pm-daily/SKILL.md
   - skills/pm-daily/templates
-  - skills/pm-daily/evals.json
-  - skills/pm-daily/evals/fixtures
-  - skills/pm-daily/evals/expected
+  - skills/pm-daily/evals
   - skills/pm-weekly/SKILL.md
   - skills/pm-weekly/templates
-  - skills/pm-weekly/evals.json
-  - skills/pm-weekly/evals/fixtures
-  - skills/pm-weekly/evals/expected
+  - skills/pm-weekly/evals
   - apps/eval_viewer/__init__.py
   - apps/eval_viewer/build.py
   - apps/eval_viewer/model.py

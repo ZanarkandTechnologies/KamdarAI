@@ -17,6 +17,14 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class SetupRuntimeTests(unittest.TestCase):
+    def test_mcp_connection_requires_success_marker_not_only_zero_exit(self) -> None:
+        failed_zero = subprocess.CompletedProcess(
+            [], 0, "✗ Connection failed: login required", ""
+        )
+        connected = subprocess.CompletedProcess([], 0, "✓ Connected\n✓ Tools discovered", "")
+        self.assertFalse(runtime.mcp_connection_ready(failed_zero))
+        self.assertTrue(runtime.mcp_connection_ready(connected))
+
     def test_default_profile_home_uses_named_profile(self) -> None:
         with patch.dict(os.environ, {"HERMES_HOME": "/opt/data"}, clear=False):
             with patch.dict(os.environ, {"KAMDAR_PROFILE_HOME": ""}, clear=False):
@@ -47,6 +55,37 @@ class SetupRuntimeTests(unittest.TestCase):
             )
             self.assertFalse(runtime.model_auth_configured(profile))
             self.assertFalse(runtime.webhook_enabled(profile))
+
+    def test_metadata_only_auth_file_is_not_model_auth(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            (profile / "auth.json").write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "providers": {},
+                        "credential_pool": {},
+                        "updated_at": "2026-09-01T00:00:00Z",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (profile / "oauth.json").write_text(
+                json.dumps({"notion": {"access_token": "not-a-model-token"}}),
+                encoding="utf-8",
+            )
+
+            self.assertFalse(runtime.model_auth_configured(profile))
+
+    def test_provider_auth_record_is_model_auth(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            (profile / "auth.json").write_text(
+                json.dumps({"providers": {"openrouter": {"configured": True}}}),
+                encoding="utf-8",
+            )
+
+            self.assertTrue(runtime.model_auth_configured(profile))
 
     def test_failed_ngrok_candidate_restores_previous_ingress_state(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -197,7 +236,7 @@ class SetupRuntimeTests(unittest.TestCase):
             config = path.read_text(encoding="utf-8")
             self.assertIn('authtoken: "test-token"', config)
             self.assertIn('url: "https://assigned-name.ngrok-free.app"', config)
-            self.assertIn("url: http://gateway:8645", config)
+            self.assertIn("url: http://host.docker.internal:8645", config)
             (profile / ".env").write_text(
                 "NOTION_TOKEN=not-real\n"
                 "NOTION_WEBHOOK_PUBLIC_URL=https://example.invalid/notion/webhook\n",
@@ -210,9 +249,10 @@ class SetupRuntimeTests(unittest.TestCase):
         calls: list[list[str]] = []
 
         def fake_run(arguments, profile_home, **kwargs):
-            del kwargs
             self.assertEqual(profile_home, profile)
             calls.append(arguments)
+            if kwargs.get("check") is False:
+                return subprocess.CompletedProcess(arguments, 1, "", "not set")
             return subprocess.CompletedProcess(arguments, 0, "", "")
 
         with patch.object(runtime, "run_command", side_effect=fake_run):
@@ -239,9 +279,32 @@ class SetupRuntimeTests(unittest.TestCase):
 
         with patch.object(runtime, "run_command", side_effect=fake_run):
             runtime.install_catalog_mcp(profile, "linear")
-        self.assertEqual(calls, [["hermes", "mcp", "install", "linear"]])
+        self.assertEqual(
+            calls,
+            [
+                ["hermes", "config", "get", "mcp_servers.linear.url"],
+                ["hermes", "mcp", "install", "linear"],
+            ],
+        )
         with self.assertRaisesRegex(runtime.RuntimeSetupError, "invalid_mcp_catalog_name"):
             runtime.install_catalog_mcp(profile, "../../unsafe")
+
+    def test_catalog_mcp_install_skips_an_existing_registration(self) -> None:
+        profile = Path("/tmp/kamdar-profile")
+        with patch.object(
+            runtime,
+            "run_command",
+            return_value=subprocess.CompletedProcess(
+                [], 0, runtime.NOTION_MCP_URL + "\n", ""
+            ),
+        ) as run:
+            runtime.install_catalog_mcp(profile, "notion")
+
+        run.assert_called_once_with(
+            ["hermes", "config", "get", "mcp_servers.notion.url"],
+            profile,
+            check=False,
+        )
 
     def test_remote_mcp_url_is_written_through_stdin_not_process_arguments(self) -> None:
         profile = Path("/tmp/kamdar-profile")
@@ -459,6 +522,12 @@ class SetupRuntimeTests(unittest.TestCase):
                 joined = " ".join(arguments)
                 if "terminal.cwd" in joined:
                     output = str(workspace)
+                elif "terminal.backend" in joined:
+                    output = "docker"
+                elif "terminal.docker_mount_cwd_to_workspace" in joined:
+                    output = "true"
+                elif "docker run" in joined:
+                    output = "KAMDAR_DOCKER_BACKEND_OK"
                 elif "mcp_servers.notion.url" in joined:
                     output = runtime.NOTION_MCP_URL
                 elif "gateway status" in joined:
@@ -507,39 +576,39 @@ class SetupRuntimeTests(unittest.TestCase):
 
     def test_compose_keeps_webhook_private_and_uses_profile_ngrok_config(self) -> None:
         compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
-        self.assertIn("kamdar_hermes_data:/opt/data", compose)
-        self.assertGreaterEqual(
-            compose.count("HERMES_HOME: /opt/data/profiles/kamdar-ai"), 2
-        )
-        self.assertIn('"127.0.0.1:9119:9119"', compose)
-        self.assertNotIn("8645:8645", compose)
-        self.assertIn("/opt/data/profiles/kamdar-ai/secrets/ngrok.yml", compose)
+        self.assertNotIn("gateway:", compose)
+        self.assertNotIn("dashboard:", compose)
+        self.assertNotIn("setup:", compose)
+        self.assertIn("${KAMDAR_PROFILE_HOME}/secrets/ngrok.yml", compose)
+        self.assertIn("/etc/ngrok.yml", compose)
         self.assertIn("ngrok/ngrok:latest@sha256:", compose)
         self.assertIn('user: "10000:10000"', compose)
-        self.assertIn("nousresearch/hermes-agent:latest@sha256:", compose)
+        self.assertNotIn("nousresearch/hermes-agent", compose)
         self.assertNotIn("cloudflared", compose.lower())
 
     def test_windows_launcher_exposes_only_one_setup_surface(self) -> None:
         launcher = (ROOT / "setup.cmd").read_text(encoding="utf-8")
-        setup_command = "run --rm setup python /distribution/setup.py"
-        self.assertIn(f"{setup_command} launch", launcher)
-        self.assertIn('if "%KAMDAR_ACTION%"=="10" goto live_verify', launcher)
+        self.assertIn('call :run_setup launch', launcher)
+        self.assertIn('"%HERMES_PYTHON%" "%~dp0setup.py" %*', launcher)
+        self.assertIn('set "HERMES_HOME=%KAMDAR_PROFILE_HOME%"', launcher)
+        self.assertIn('if "%KAMDAR_ACTION%"=="10" goto full_proof', launcher)
         self.assertIn('if "%KAMDAR_ACTION%"=="11" goto static_verify', launcher)
         self.assertIn('if "%KAMDAR_ACTION%"=="14" goto certify', launcher)
-        self.assertIn(f"{setup_command} verify --live", launcher)
-        self.assertIn(f"{setup_command} verify", launcher)
-        self.assertIn(f"{setup_command} certify", launcher)
-        self.assertIn(f"{setup_command} webhook-enabled", launcher)
-        self.assertIn(f"{setup_command} webhook-ingress-ready --wait 30", launcher)
-        self.assertIn(f"{setup_command} webhook-rollback", launcher)
-        self.assertIn(f"{setup_command} webhook-commit", launcher)
-        self.assertNotIn("run --rm setup launch", launcher)
-        self.assertNotIn("run --rm setup verify", launcher)
-        self.assertNotIn("run --rm setup certify", launcher)
-        self.assertNotIn("run --rm setup webhook-enabled", launcher)
-        self.assertIn("wsl.exe --status", launcher.lower())
-        self.assertIn('docker info --format "{{.OSType}}"', launcher)
-        self.assertIn("linux_containers_required", launcher)
+        self.assertIn('if "%KAMDAR_ACTION%"=="15" goto preflight_check', launcher)
+        self.assertIn('if "%KAMDAR_ACTION%"=="16" goto eval_check', launcher)
+        self.assertIn('if "%KAMDAR_ACTION%"=="17" goto dossier', launcher)
+        self.assertIn("call :run_setup verify --live", launcher)
+        self.assertIn("call :run_setup doctor preflight", launcher)
+        self.assertIn("call :run_setup doctor eval --open", launcher)
+        self.assertIn("call :run_setup doctor activate", launcher)
+        self.assertIn("call :run_setup webhook-ingress-ready --wait 30", launcher)
+        self.assertIn("hermes gateway run", launcher)
+        self.assertIn("call :selected_gateway_running", launcher)
+        self.assertIn('findstr /c:"Gateway is running (PID:"', launcher)
+        self.assertNotIn('findstr /i /c:"running"', launcher)
+        self.assertIn("A gateway running for another profile is not accepted.", launcher)
+        self.assertNotIn("docker compose up -d gateway", launcher)
+        self.assertNotIn("run --rm setup", launcher)
         self.assertNotIn("compose --profile setup --profile webhook pull", launcher)
         self.assertNotIn("run --rm setup install", launcher)
         self.assertNotIn("NOTION_TOKEN", launcher)
@@ -547,9 +616,29 @@ class SetupRuntimeTests(unittest.TestCase):
         self.assertIn("assigned endpoint did not become reachable", launcher)
         self.assertIn("ps --status running --services ngrok", launcher)
 
+    def test_macos_launcher_preserves_setup_and_webhook_transactions(self) -> None:
+        launcher = (ROOT / "setup.sh").read_text(encoding="utf-8")
+        self.assertIn('HERMES_PYTHON="${HOME}/.hermes/hermes-agent/venv/bin/python"', launcher)
+        self.assertIn('export HERMES_HOME="$KAMDAR_PROFILE_HOME"', launcher)
+        self.assertIn("run_setup launch", launcher)
+        self.assertIn("run_setup verify --live", launcher)
+        self.assertIn("run_setup doctor preflight", launcher)
+        self.assertIn("run_setup doctor eval --open", launcher)
+        self.assertIn("run_setup doctor activate", launcher)
+        self.assertIn("run_setup webhook-ingress-ready --wait 30", launcher)
+        self.assertIn("run_setup webhook-rollback", launcher)
+        self.assertIn("run_setup webhook-commit", launcher)
+        self.assertIn("selected_gateway_running", launcher)
+        self.assertIn('grep -Fq "Gateway is running (PID:"', launcher)
+        self.assertNotIn("grep -qi running", launcher)
+        self.assertIn("A gateway running for another profile is not accepted.", launcher)
+        self.assertIn('open "http://localhost:9119"', launcher)
+        self.assertNotIn("run --rm setup", launcher)
+        self.assertNotIn("NOTION_TOKEN", launcher)
+
     def test_customer_compose_commands_preserve_the_setup_entry_point(self) -> None:
         compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
-        self.assertIn('command: ["python", "/distribution/setup.py"]', compose)
+        self.assertNotIn("setup:", compose)
 
         surfaces = [ROOT / "README.md"]
         for pattern in ("*.cmd", "*.ps1", "*.sh"):

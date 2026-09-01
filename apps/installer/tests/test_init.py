@@ -18,7 +18,8 @@ ANSWERS = "\n".join(
         "linear", "https://linear.app/acme/projects",
         "linear", "https://linear.app/acme/tasks",
         "notion", "https://notion.so/acme/people",
-        "notion", "https://notion.so/acme/knowledge",
+        "notion", "https://notion.so/acme/sops",
+        "notion", "https://notion.so/acme/reports",
         "gmail", "ops@example.invalid",
         "all", "company-operators", "telegram", "drafts",
         "prepare only",
@@ -264,7 +265,8 @@ class SetupInitTests(unittest.TestCase):
             self.assertIn("| `projects` | linear |", content)
             self.assertIn("| `tasks` | linear |", content)
             self.assertIn("| `people` | — | — |", content)
-            self.assertNotIn("| `reports` |", content)
+            self.assertIn("| `sops` | — | — |", content)
+            self.assertIn("| `reports` | — | — |", content)
             self.assertNotIn("REPLACE_ME", content)
 
     def test_data_sources_can_be_skipped_and_configured_later(self) -> None:

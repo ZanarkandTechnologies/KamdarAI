@@ -26,7 +26,8 @@ refer to the role instead of repeating the URL.
 | `projects` | REPLACE_ME | REPLACE_ME | read-write | Human-operated project source records; private derived management state stays in the Hermes weekly workspace |
 | `tasks` | REPLACE_ME | REPLACE_ME | read-write | Current work items linked to projects |
 | `people` | REPLACE_ME | REPLACE_ME | read | People referenced by configured work only |
-| `knowledge` | REPLACE_ME | REPLACE_ME | read | Canonical company files |
+| `sops` | REPLACE_ME | REPLACE_ME | read | Approved source SOPs and operating procedures |
+| `reports` | REPLACE_ME | REPLACE_ME | read | Historical company and department reports used as evidence |
 | `operator_email` | REPLACE_ME | REPLACE_ME | isolated-eval | Operator-owned inbox used only for bounded connection certification |
 <!-- /hermes:managed data-sources -->
 
@@ -36,10 +37,11 @@ for later configuration; automations must only use configured roles. Notion or
 Drive owns permissions at a configured URL. Hermes records only its bounded
 authority and never infers another destination.
 
-The lean setup needs only Projects and Work. Add People as a read-only directory
-when employee rollups are wanted; Knowledge and operator email are optional.
-Reports and Employee/SOP/Decision/Issue Memory are local artifacts, not data
-sources.
+The lean setup needs only Projects and Work. Add People for employee rollups,
+SOPs for approved process evidence, and Reports for historical reporting
+evidence. Operator email is optional. Generated Reports and
+Employee/SOP/Decision/Issue Memory remain local artifacts, distinct from these
+read-only provider sources.
 
 ## Optional artifact sync
 

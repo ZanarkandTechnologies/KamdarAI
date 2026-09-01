@@ -42,12 +42,16 @@ def verify_command(args: argparse.Namespace) -> int:
 
         webhook_verified = _guide_webhook_verification(profile_home, args.wait)
     if live_webhook and webhook_verified:
+        trigger = runtime.read_profile_secret(
+            profile_home,
+            "NOTION_COMMENT_TRIGGER",
+        ) or "@hermes"
         comment_after = _last_reply_time(profile_home)
         CONSOLE.print(
             Panel.fit(
                 "[bold]Live Notion comment test[/bold]\n"
-                "On the isolated setup test page, add: [cyan]@hermes setup healthcheck[/cyan]\n"
-                "Setup will wait for exactly one new threaded reply.",
+                f"On an isolated setup test ticket, add: [cyan]{trigger} setup healthcheck[/cyan]\n"
+                "Setup will wait for one new threaded reply.",
                 border_style="cyan",
             )
         )

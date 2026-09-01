@@ -18,6 +18,49 @@ SPEC.loader.exec_module(PROFILE)
 
 
 class SetupProfileTests(unittest.TestCase):
+    def test_apply_enables_and_verifies_host_backed_docker_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary)
+            workspace = profile_home / "workspace"
+
+            def fake_command(arguments, selected_profile, **kwargs):
+                del selected_profile, kwargs
+                joined = " ".join(str(item) for item in arguments)
+                if "workspace.py" in joined:
+                    return subprocess.CompletedProcess(
+                        arguments, 0, json.dumps({"state": "configured", "pending": []}), ""
+                    )
+                if arguments[-2:] == ["get", "terminal.backend"]:
+                    return subprocess.CompletedProcess(arguments, 0, "docker\n", "")
+                if arguments[-2:] == ["get", "terminal.cwd"]:
+                    return subprocess.CompletedProcess(arguments, 0, f"{workspace}\n", "")
+                if arguments[-2:] == [
+                    "get", "terminal.docker_mount_cwd_to_workspace"
+                ]:
+                    return subprocess.CompletedProcess(arguments, 0, "true\n", "")
+                return subprocess.CompletedProcess(arguments, 0, "", "")
+
+            gateway = subprocess.CompletedProcess(
+                ["hermes", "gateway", "status"], 0,
+                "✓ Gateway is running (PID: 123)\n", "",
+            )
+            with (
+                patch.object(PROFILE, "run_command", side_effect=fake_command) as commands,
+                patch.object(PROFILE, "cron_plan", return_value=[]),
+                patch.object(PROFILE, "apply_cron"),
+                patch.object(PROFILE.subprocess, "run", return_value=gateway),
+            ):
+                self.assertEqual(PROFILE.run(profile_home, apply=True), 0)
+
+            invoked = [call.args[0] for call in commands.call_args_list]
+            self.assertIn(
+                [
+                    "hermes", "config", "set",
+                    "terminal.docker_mount_cwd_to_workspace", "true",
+                ],
+                invoked,
+            )
+
     def test_gateway_readiness_uses_status_text_not_exit_code(self) -> None:
         stopped = subprocess.CompletedProcess(
             ["hermes", "gateway", "status"], 0, "✗ Gateway is not running\n", ""
@@ -121,6 +164,11 @@ class SetupProfileTests(unittest.TestCase):
                     }
                 )
             (cron / "jobs.json").write_text(json.dumps({"jobs": jobs}), encoding="utf-8")
+            activation = profile_home / PROFILE.ACTIVATION_RECEIPT
+            activation.parent.mkdir(parents=True, exist_ok=True)
+            activation.write_text(
+                json.dumps({"status": "activated"}), encoding="utf-8"
+            )
             self.assertEqual(
                 [item["action"] for item in PROFILE.cron_plan(profile_home, workspace)],
                 ["in_sync", "in_sync"],
@@ -156,17 +204,112 @@ class SetupProfileTests(unittest.TestCase):
                 "action": "update", "id": "weekly-id", "name": "Weekly",
                 "schedule": "0 18 * * 5", "prompt": "weekly prompt",
                 "workdir": "/tmp/client-profile/workspace", "deliver": "local",
-                "resume": True,
             },
         ]
-        with patch.object(PROFILE, "run_command") as run_command:
+        installed_jobs = [
+            {"id": "daily-id", "name": PROFILE.SCHEDULES[0]["name"], "enabled": True},
+            {"id": "weekly-id", "name": PROFILE.SCHEDULES[1]["name"], "enabled": True},
+        ]
+        with (
+            patch.object(PROFILE, "run_command") as run_command,
+            patch.object(PROFILE, "read_jobs", return_value=installed_jobs),
+        ):
             PROFILE.apply_cron(profile_home, actions)
-        create, edit, resume = [call.args[0] for call in run_command.call_args_list]
+        commands = [call.args[0] for call in run_command.call_args_list]
+        create, edit = commands[:2]
         self.assertEqual(create[:4], ["hermes", "cron", "create", "0 8 * * 1-5"])
         self.assertEqual(edit[:4], ["hermes", "cron", "edit", "weekly-id"])
         self.assertIn("--workdir", create)
         self.assertIn("--workdir", edit)
-        self.assertEqual(resume, ["hermes", "cron", "resume", "weekly-id"])
+        self.assertEqual(
+            commands[2:],
+            [["hermes", "cron", "pause", "daily-id"], ["hermes", "cron", "pause", "weekly-id"]],
+        )
+
+    def test_unproved_profile_pauses_managed_schedules(self) -> None:
+        profile_home = Path("/tmp/client-profile")
+        jobs = [
+            {"id": str(index), "name": spec["name"], "enabled": True}
+            for index, spec in enumerate(PROFILE.SCHEDULES, start=1)
+        ]
+        with (
+            patch.object(PROFILE, "read_jobs", return_value=jobs),
+            patch.object(PROFILE, "run_command") as run_command,
+        ):
+            PROFILE.set_managed_schedules_enabled(profile_home, False)
+        self.assertEqual(
+            [call.args[0] for call in run_command.call_args_list],
+            [["hermes", "cron", "pause", "1"], ["hermes", "cron", "pause", "2"]],
+        )
+
+    def test_activation_requires_and_records_proof_before_resuming(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary)
+            jobs = [
+                {"id": str(index), "name": spec["name"], "enabled": False}
+                for index, spec in enumerate(PROFILE.SCHEDULES, start=1)
+            ]
+            enabled_jobs = [
+                {
+                    "id": str(index),
+                    "name": spec["name"],
+                    "enabled": True,
+                    "schedule": spec["schedule"],
+                    "prompt": PROFILE.desired_job(spec, profile_home / "workspace")["prompt"],
+                    "workdir": str(profile_home / "workspace"),
+                    "deliver": "local",
+                }
+                for index, spec in enumerate(PROFILE.SCHEDULES, start=1)
+            ]
+            with (
+                patch.object(PROFILE, "read_jobs", side_effect=[jobs, enabled_jobs]),
+                patch.object(PROFILE, "run_command") as run_command,
+            ):
+                receipt = PROFILE.activate_managed_schedules(
+                    profile_home,
+                    {"live_health": "health.json", "readiness_run_id": "ready", "eval_run_id": "eval"},
+                )
+            payload = json.loads(receipt.read_text(encoding="utf-8"))
+            self.assertEqual(payload["status"], "activated")
+            self.assertEqual(payload["proof"]["eval_run_id"], "eval")
+            self.assertEqual(
+                [call.args[0] for call in run_command.call_args_list],
+                [["hermes", "cron", "resume", "1"], ["hermes", "cron", "resume", "2"]],
+            )
+
+    def test_failed_activation_repauses_jobs_and_commits_no_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_home = Path(temporary)
+            disabled = [
+                {"id": str(index), "name": spec["name"], "enabled": False}
+                for index, spec in enumerate(PROFILE.SCHEDULES, start=1)
+            ]
+            partially_enabled = [
+                {"id": "1", "name": PROFILE.SCHEDULES[0]["name"], "enabled": True},
+                {"id": "2", "name": PROFILE.SCHEDULES[1]["name"], "enabled": False},
+            ]
+            with (
+                patch.object(
+                    PROFILE,
+                    "read_jobs",
+                    side_effect=[disabled, partially_enabled, partially_enabled],
+                ),
+                patch.object(PROFILE, "run_command") as run_command,
+            ):
+                with self.assertRaisesRegex(
+                    PROFILE.ProfileSetupError, "cron_activation_verification_failed"
+                ):
+                    PROFILE.activate_managed_schedules(profile_home, {"eval_run_id": "eval"})
+            self.assertFalse((profile_home / PROFILE.ACTIVATION_RECEIPT).exists())
+            self.assertFalse((profile_home / "state" / "setup-proof.pending.json").exists())
+            self.assertEqual(
+                [call.args[0] for call in run_command.call_args_list],
+                [
+                    ["hermes", "cron", "resume", "1"],
+                    ["hermes", "cron", "resume", "2"],
+                    ["hermes", "cron", "pause", "1"],
+                ],
+            )
 
 
 if __name__ == "__main__":

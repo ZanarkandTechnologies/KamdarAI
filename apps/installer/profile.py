@@ -9,12 +9,15 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
 
 SOURCE_ROOT = Path(__file__).resolve().parents[2]
 SETUP_WORKSPACE = SOURCE_ROOT / "apps" / "installer" / "workspace.py"
+ACTIVATION_RECEIPT = Path("state/setup-proof.json")
 NOTION_PLUGIN_NAME = "notion-platform"
 NOTION_PLUGIN_KEY = "platforms/notion"
 
@@ -164,8 +167,17 @@ def schedule_expression(job: dict[str, Any]) -> str:
     return str(schedule or "")
 
 
+def schedules_activated(profile_home: Path) -> bool:
+    try:
+        receipt = json.loads((profile_home / ACTIVATION_RECEIPT).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return isinstance(receipt, dict) and receipt.get("status") == "activated"
+
+
 def cron_plan(profile_home: Path, workspace: Path) -> list[dict[str, Any]]:
     jobs = read_jobs(profile_home)
+    should_be_enabled = schedules_activated(profile_home)
     actions: list[dict[str, Any]] = []
     for spec in SCHEDULES:
         desired = desired_job(spec, workspace)
@@ -183,17 +195,102 @@ def cron_plan(profile_home: Path, workspace: Path) -> list[dict[str, Any]]:
             and current.get("prompt") == desired["prompt"]
             and current.get("workdir") == desired["workdir"]
             and current.get("deliver", "local") == "local"
-            and current.get("enabled", True) is not False
+            and (current.get("enabled", True) is not False) is should_be_enabled
         )
         actions.append(
             {
                 "action": "in_sync" if exact else "update",
                 "id": str(current.get("id") or ""),
-                "resume": current.get("enabled", True) is False,
                 **desired,
             }
         )
     return actions
+
+
+def set_managed_schedules_enabled(profile_home: Path, enabled: bool) -> list[dict[str, Any]]:
+    """Set only Company OS schedules to the proof-gated desired state."""
+    jobs = read_jobs(profile_home)
+    states: list[dict[str, Any]] = []
+    for spec in SCHEDULES:
+        accepted = {spec["name"], *spec.get("legacy_names", ())}
+        matches = [job for job in jobs if job.get("name") in accepted]
+        if len(matches) != 1 or not matches[0].get("id"):
+            raise ProfileSetupError(f"managed_cron_job_missing:{spec['name']}")
+        job = matches[0]
+        currently_enabled = job.get("enabled", True) is not False
+        if currently_enabled != enabled:
+            verb = "resume" if enabled else "pause"
+            run_command(["hermes", "cron", verb, str(job["id"])], profile_home)
+        states.append({"id": str(job["id"]), "name": spec["name"], "enabled": enabled})
+    return states
+
+
+def activate_managed_schedules(profile_home: Path, proof: dict[str, Any]) -> Path:
+    """Resume and verify managed schedules, committing proof only on success."""
+    destination = profile_home / ACTIVATION_RECEIPT
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    pending = destination.with_suffix(".pending.json")
+
+    def write_atomic(target: Path, payload: dict[str, Any]) -> None:
+        descriptor, temporary = tempfile.mkstemp(prefix=".setup-proof-", dir=target.parent)
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                json.dump(payload, stream, indent=2, sort_keys=True)
+                stream.write("\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(temporary, 0o600)
+            os.replace(temporary, target)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+    write_atomic(
+        pending,
+        {"schema_version": 1, "status": "activating", "proof": proof},
+    )
+    try:
+        set_managed_schedules_enabled(profile_home, True)
+        jobs = read_jobs(profile_home)
+        workspace = profile_home / "workspace"
+        for spec in SCHEDULES:
+            desired = desired_job(spec, workspace)
+            accepted = {desired["name"], *spec.get("legacy_names", ())}
+            matches = [job for job in jobs if job.get("name") in accepted]
+            if len(matches) != 1:
+                raise ProfileSetupError(f"cron_activation_verification_failed:{desired['name']}")
+            current = matches[0]
+            if not (
+                current.get("enabled", True) is not False
+                and current.get("name") == desired["name"]
+                and schedule_expression(current) == desired["schedule"]
+                and current.get("prompt") == desired["prompt"]
+                and current.get("workdir") == desired["workdir"]
+                and current.get("deliver", "local") == "local"
+            ):
+                raise ProfileSetupError(f"cron_activation_verification_failed:{desired['name']}")
+        write_atomic(
+            destination,
+            {
+                "schema_version": 1,
+                "status": "activated",
+                "activated_at": time.time(),
+                "proof": proof,
+            },
+        )
+    except BaseException:
+        rollback_error: BaseException | None = None
+        try:
+            set_managed_schedules_enabled(profile_home, False)
+        except Exception as caught:
+            rollback_error = caught
+        destination.unlink(missing_ok=True)
+        pending.unlink(missing_ok=True)
+        if rollback_error is not None:
+            raise ProfileSetupError("cron_activation_rollback_failed") from rollback_error
+        raise
+    pending.unlink(missing_ok=True)
+    return destination
 
 
 def apply_cron(profile_home: Path, actions: list[dict[str, Any]]) -> None:
@@ -213,8 +310,7 @@ def apply_cron(profile_home: Path, actions: list[dict[str, Any]]) -> None:
                 "--prompt", job["prompt"], *common,
             ]
         run_command(command, profile_home)
-        if job.get("resume"):
-            run_command(["hermes", "cron", "resume", job["id"]], profile_home)
+    set_managed_schedules_enabled(profile_home, schedules_activated(profile_home))
 
 
 def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) -> int:
@@ -266,10 +362,35 @@ def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) ->
 
         if enable_notion_webhook:
             enable_notion_plugin(profile_home)
+        run_command(["hermes", "config", "set", "terminal.backend", "docker"], profile_home)
+        backend_result = run_command(
+            ["hermes", "config", "get", "terminal.backend"], profile_home
+        )
+        if backend_result.stdout.strip().lower() != "docker":
+            raise ProfileSetupError("terminal_backend_verification_failed")
         run_command(["hermes", "config", "set", "terminal.cwd", str(workspace)], profile_home)
         cwd_result = run_command(["hermes", "config", "get", "terminal.cwd"], profile_home)
         if Path(cwd_result.stdout.strip()).expanduser().resolve() != workspace.resolve():
             raise ProfileSetupError("terminal_cwd_verification_failed")
+        # Hermes' Docker backend intentionally defaults to an isolated,
+        # ephemeral /workspace. Company OS artifacts must survive container
+        # teardown, so bind only this selected profile workspace to /workspace.
+        run_command(
+            [
+                "hermes", "config", "set",
+                "terminal.docker_mount_cwd_to_workspace", "true",
+            ],
+            profile_home,
+        )
+        mount_result = run_command(
+            [
+                "hermes", "config", "get",
+                "terminal.docker_mount_cwd_to_workspace",
+            ],
+            profile_home,
+        )
+        if mount_result.stdout.strip().lower() not in {"true", "1", "yes", "on"}:
+            raise ProfileSetupError("terminal_workspace_mount_verification_failed")
         apply_cron(profile_home, actions)
         verified = cron_plan(profile_home, workspace)
         if any(item["action"] != "in_sync" for item in verified):
@@ -286,7 +407,10 @@ def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) ->
             workspace_setup=setup_receipt,
             notion_plugin_action="in_sync" if enable_notion_webhook else "not_requested",
             terminal_cwd=str(workspace),
+            terminal_backend="docker",
+            terminal_workspace_mount=True,
             cron_jobs=verified,
+            schedules_activated=schedules_activated(profile_home),
             scheduler_ready=scheduler_ready,
             next_action=(
                 "verify_installation"

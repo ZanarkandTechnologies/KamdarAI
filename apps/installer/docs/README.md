@@ -97,7 +97,7 @@ Setup copies only distribution-owned files and preserves unknown profile files. 
 ## Current support boundary
 
 - Windows installation is documented and operated through [customer setup](customer-setup.md); this directory does not duplicate that runbook.
-- Projects, Work, People, Knowledge, and operator email are selectable source roles in the current wizard.
+- Projects, Work, People, SOPs, Reports, and operator email are selectable source roles in the current wizard.
 - Local artifacts are always supported. Artifact-sync and communication contracts support additional sinks described in [Sinks](sinks.md).
 - The current wizard exposes owner report/alert messaging, but does not expose employee follow-up or interactive artifact-sync row creation.
 - A provider used only as an artifact sink does not yet cause setup to provision that provider connection automatically.

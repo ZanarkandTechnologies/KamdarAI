@@ -12,7 +12,7 @@ from apps.installer.cli.flows.lifecycle import install_command, launch_command, 
 from apps.installer.cli.flows.verification import verify_command
 from apps.installer.cli.flows.workspace import configure_workspace
 from apps.installer.cli.paths import DEFAULT_TEMPLATE, DEFAULT_WORKSPACE, profile_home
-from apps.installer.cli.ui import CONSOLE, choose
+from apps.installer.cli.ui import CONSOLE
 
 
 DESCRIPTION = (
@@ -58,8 +58,26 @@ def parser() -> argparse.ArgumentParser:
     certify.add_argument("--allow-side-effects", action="store_true")
 
     doctor = subcommands.add_parser("doctor")
-    doctor.add_argument("--profile-home", type=Path)
-    doctor.add_argument(
+    doctor_modes = doctor.add_subparsers(dest="doctor_mode", required=True)
+
+    preflight = doctor_modes.add_parser("preflight")
+    preflight.add_argument("--profile-home", type=Path)
+    preflight.add_argument("--timeout", type=int, default=180)
+
+    evaluate = doctor_modes.add_parser("eval")
+    evaluate.add_argument("--profile-home", type=Path)
+    evaluate.add_argument("--timeout", type=int, default=900)
+    evaluate.add_argument("--open", action="store_true")
+
+    open_dossier = doctor_modes.add_parser("open")
+    open_dossier.add_argument("--profile-home", type=Path)
+
+    activate = doctor_modes.add_parser("activate")
+    activate.add_argument("--profile-home", type=Path)
+
+    analyze = doctor_modes.add_parser("analysis")
+    analyze.add_argument("--profile-home", type=Path)
+    analyze.add_argument(
         "--cadence",
         dest="cadences",
         action="append",
@@ -96,21 +114,17 @@ def main(arguments: list[str] | None = None) -> int:
         if selected == "certify":
             return certify_command(args)
         if selected == "doctor":
-            from apps.doctor.run import operate
+            from apps.installer.cli.flows import doctor
 
-            args.profile_home = profile_home(args.profile_home)
-            if args.cadences is None:
-                cadence = choose(
-                    "Which automation should Doctor run?",
-                    choices=["Daily", "Weekly", "Daily and Weekly"],
-                    default="Daily and Weekly",
-                )
-                args.cadences = {
-                    "Daily": ["daily"],
-                    "Weekly": ["weekly"],
-                    "Daily and Weekly": ["daily", "weekly"],
-                }[cadence]
-            return operate(args)
+            if args.doctor_mode == "preflight":
+                return doctor.preflight_command(args)
+            if args.doctor_mode == "eval":
+                return doctor.evaluation_command(args)
+            if args.doctor_mode == "open":
+                return doctor.open_dossier_command(args)
+            if args.doctor_mode == "activate":
+                return doctor.activate_command(args)
+            return doctor.analysis_command(args)
         if selected == "webhook-enabled":
             return 0 if runtime.webhook_enabled(profile_home(args.profile_home)) else 1
         if selected == "webhook-ingress-ready":

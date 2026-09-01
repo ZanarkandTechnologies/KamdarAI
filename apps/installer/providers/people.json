@@ -17,6 +17,14 @@
           "Visible properties and at least one person or an honestly empty result are reported.",
           "No provider mutation is attempted."
         ]
+      },
+      "readiness": {
+        "importance": "optional",
+        "allowed_read_tools": ["mcp__notion__notion_search", "mcp__notion__notion_fetch"],
+        "prompt": "Use only read-only Notion MCP tools. Fetch the configured People source at {{source}} and inspect its schema plus a bounded sample of at most 10 records. Report structure and counts only; do not quote personal data or make changes.",
+        "required_fields": ["id", "name"],
+        "required_relations": [],
+        "optional_fields": ["department"]
       }
     }
   ]

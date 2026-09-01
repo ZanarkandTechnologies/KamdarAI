@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from rich.panel import Panel
@@ -35,6 +37,11 @@ LAUNCH_STATIC_VERIFY = 11
 LAUNCH_LIVE_HEALTH = 12
 LAUNCH_DASHBOARD = 13
 LAUNCH_CERTIFY = 14
+LAUNCH_PREFLIGHT = 15
+LAUNCH_EVAL = 16
+LAUNCH_DOSSIER = 17
+FRESH_START_MARKER = ".company-os-fresh-start"
+DISTRIBUTION_SOURCE_ENV = "COMPANY_OS_DISTRIBUTION_SOURCE"
 
 
 def _run_profile_setup(profile_home: Path, *, webhook: bool, apply: bool) -> dict:
@@ -61,6 +68,8 @@ def _run_profile_setup(profile_home: Path, *, webhook: bool, apply: bool) -> dic
 
 def _installation_state(profile_home: Path) -> str:
     """Classify only the lifecycle state needed to choose the next UX."""
+    if (profile_home / FRESH_START_MARKER).is_file():
+        return "new"
     if not (profile_home / "distribution.yaml").is_file():
         return "new"
     required = (
@@ -87,6 +96,56 @@ def _installation_state(profile_home: Path) -> str:
     if not runtime.EXPECTED_CRON_NAMES.issubset(active_names):
         return "incomplete"
     return "existing"
+
+
+def _fresh_start(profile_home: Path) -> int:
+    """Archive the incomplete profile and relaunch from a clean installed copy."""
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    backup = profile_home.with_name(f"{profile_home.name}.incomplete-{timestamp}")
+    suffix = 1
+    while backup.exists():
+        backup = profile_home.with_name(
+            f"{profile_home.name}.incomplete-{timestamp}-{suffix}"
+        )
+        suffix += 1
+
+    profile_home.rename(backup)
+    try:
+        source = Path(os.environ.get(DISTRIBUTION_SOURCE_ENV, str(backup)))
+        runtime.install_or_update_distribution(source, profile_home)
+        (profile_home / "workspace.hermes.md").unlink(missing_ok=True)
+        (profile_home / FRESH_START_MARKER).write_text(
+            f"backup={backup}\n", encoding="utf-8"
+        )
+    except Exception:
+        if profile_home.exists():
+            shutil.rmtree(profile_home, ignore_errors=True)
+        backup.rename(profile_home)
+        raise
+
+    CONSOLE.print(
+        Panel.fit(
+            "[bold green]Fresh setup ready[/bold green]\n"
+            f"The incomplete profile was preserved at:\n{backup}\n"
+            "Starting the workspace questions again.",
+            border_style="green",
+        )
+    )
+    installed_setup = profile_home / "setup.py"
+    environment = runtime.profile_environment(profile_home)
+    environment[DISTRIBUTION_SOURCE_ENV] = str(source.resolve())
+    return subprocess.run(
+        [
+            sys.executable,
+            str(installed_setup),
+            "launch",
+            "--profile-home",
+            str(profile_home),
+            "--installed",
+        ],
+        check=False,
+        env=environment,
+    ).returncode
 
 
 def _workspace_update(profile_home: Path) -> int:
@@ -171,7 +230,20 @@ def launch_command(args: argparse.Namespace) -> int:
                 border_style="yellow",
             )
         )
-        if not confirm("Resume setup?", default=True):
+        action = choose(
+            "Incomplete setup",
+            choices=["resume", "start-over", "exit"],
+            default="resume",
+        )
+        if action == "start-over":
+            if not confirm(
+                "Start over and preserve the current incomplete profile as a backup?",
+                default=False,
+            ):
+                CONSOLE.print("[yellow]No setup changes were made.[/yellow]")
+                return 0
+            return _fresh_start(profile_home)
+        if action == "exit":
             CONSOLE.print("[yellow]No setup changes were made.[/yellow]")
             return 0
         return LAUNCH_FULL_VERIFY if install_command(args) == 0 else 2
@@ -185,13 +257,16 @@ def launch_command(args: argparse.Namespace) -> int:
     CONSOLE.print("  [cyan]1.[/cyan] Update workspace configuration")
     CONSOLE.print("  [cyan]2.[/cyan] Update Company OS software")
     CONSOLE.print("  [cyan]3.[/cyan] Test integrations")
-    CONSOLE.print("  [cyan]4.[/cyan] Run full health check")
-    CONSOLE.print("  [cyan]5.[/cyan] Repair setup")
-    CONSOLE.print("  [cyan]6.[/cyan] Open dashboard")
-    CONSOLE.print("  [cyan]7.[/cyan] Exit")
+    CONSOLE.print("  [cyan]4.[/cyan] Check data readiness")
+    CONSOLE.print("  [cyan]5.[/cyan] Run full eval and open dossier")
+    CONSOLE.print("  [cyan]6.[/cyan] Run full health check")
+    CONSOLE.print("  [cyan]7.[/cyan] Repair setup")
+    CONSOLE.print("  [cyan]8.[/cyan] Open latest eval dossier")
+    CONSOLE.print("  [cyan]9.[/cyan] Open dashboard")
+    CONSOLE.print("  [cyan]10.[/cyan] Exit")
     choice = choose(
         "Select",
-        choices=["1", "2", "3", "4", "5", "6", "7"],
+        choices=[str(index) for index in range(1, 11)],
         default="1",
     )
     if choice == "1":
@@ -204,8 +279,12 @@ def launch_command(args: argparse.Namespace) -> int:
     if choice == "3":
         return LAUNCH_CERTIFY
     if choice == "4":
-        return LAUNCH_LIVE_HEALTH
+        return LAUNCH_PREFLIGHT
     if choice == "5":
+        return LAUNCH_EVAL
+    if choice == "6":
+        return LAUNCH_LIVE_HEALTH
+    if choice == "7":
         if runtime.webhook_enabled(profile_home) and confirm(
             "Revalidate or replace the saved Notion/ngrok webhook credentials?",
             default=False,
@@ -214,7 +293,9 @@ def launch_command(args: argparse.Namespace) -> int:
 
             _configure_webhook(profile_home)
         return LAUNCH_FULL_VERIFY if install_command(args) == 0 else 2
-    if choice == "6":
+    if choice == "8":
+        return LAUNCH_DOSSIER
+    if choice == "9":
         return LAUNCH_DASHBOARD
     CONSOLE.print("[dim]No changes made.[/dim]")
     return 0
@@ -243,10 +324,12 @@ def _bootstrap_installed_copy(
     ]
     if non_interactive:
         arguments.append("--non-interactive")
+    environment = runtime.profile_environment(profile_home)
+    environment[DISTRIBUTION_SOURCE_ENV] = str(ROOT.resolve())
     return subprocess.run(
         arguments,
         check=False,
-        env=runtime.profile_environment(profile_home),
+        env=environment,
     ).returncode
 
 
@@ -303,9 +386,7 @@ def _confirm_install_plan(
     review.add_column("Planned state")
     review.add_row(
         "Runtime",
-        "Docker Desktop / WSL2"
-        if os.environ.get("KAMDAR_PROFILE_HOME")
-        else "Current Hermes runtime",
+        "Host Hermes with Docker terminal backend",
     )
     review.add_row("Profile", str(profile_home))
     review.add_row("Storage", "Persistent Hermes profile")
@@ -344,8 +425,8 @@ def _configure_model(profile_home: Path, *, non_interactive: bool) -> None:
         return
     if non_interactive:
         raise runtime.RuntimeSetupError("model_auth_requires_input")
-    CONSOLE.print("[dim]Opening Hermes' native model authorization inside this setup…[/dim]")
-    result = run_visible(["hermes", "setup"], profile_home)
+    CONSOLE.print("[dim]Opening Hermes' model provider chooser inside this setup…[/dim]")
+    result = run_visible(["hermes", "setup", "model"], profile_home)
     if result or not runtime.model_auth_configured(profile_home):
         raise runtime.RuntimeSetupError("model_auth_incomplete")
 
@@ -439,6 +520,7 @@ def install_command(args: argparse.Namespace) -> int:
             bindings=bindings,
             webhook=webhook,
         )
+        (profile_home / FRESH_START_MARKER).unlink(missing_ok=True)
         connection_status = "not_run"
         if bindings and not args.non_interactive:
             if _connection_eval_confirmation(bindings):
@@ -456,15 +538,25 @@ def install_command(args: argparse.Namespace) -> int:
             connection_status = str(connection_receipt["status"])
         CONSOLE.print(
             Panel.fit(
-                "[bold green]Configuration installed[/bold green]\n"
-                f"Support receipt: {receipt_reference(profile_home, receipt_path)}\n"
+                (
+                    "[bold green]Configuration installed[/bold green]\n"
+                    if connection_status in {"not_run", "passed"}
+                    else "[bold yellow]Configuration saved; integration proof is incomplete[/bold yellow]\n"
+                )
+                + f"Support receipt: {receipt_reference(profile_home, receipt_path)}\n"
                 f"Integration certification: {connection_status}\n"
                 f"Messaging connection test: {messaging_result.status}\n"
-                "The launcher will now start Hermes and run verification.",
-                border_style="green",
+                + (
+                    "The launcher will now start Hermes and run verification."
+                    if connection_status in {"not_run", "passed"}
+                    else "Rerun setup and choose Test integrations before continuing."
+                ),
+                border_style=(
+                    "green" if connection_status in {"not_run", "passed"} else "yellow"
+                ),
             )
         )
-        return 0 if connection_status in {"not_run", "passed", "deferred"} else 2
+        return 0 if connection_status in {"not_run", "passed"} else 2
     except (runtime.RuntimeSetupError, CatalogError) as error:
         CONSOLE.print(
             Panel.fit(

@@ -1,69 +1,19 @@
 name: kamdar-hermes
 
 services:
-  gateway:
-    image: nousresearch/hermes-agent:latest@sha256:8cc6e4aea47e0b7362f2da655cc81a1f1120fbdcdcae087850dabb6d7adee964
-    restart: unless-stopped
-    volumes:
-      - kamdar_hermes_data:/opt/data
-    environment:
-      HERMES_HOME: /opt/data/profiles/kamdar-ai
-      HERMES_UID: "10000"
-      HERMES_GID: "10000"
-    command: ["gateway", "run"]
-    networks: [runtime]
-
-  dashboard:
-    image: nousresearch/hermes-agent:latest@sha256:8cc6e4aea47e0b7362f2da655cc81a1f1120fbdcdcae087850dabb6d7adee964
-    restart: unless-stopped
-    depends_on: [gateway]
-    volumes:
-      - kamdar_hermes_data:/opt/data
-    environment:
-      HERMES_HOME: /opt/data/profiles/kamdar-ai
-      HERMES_UID: "10000"
-      HERMES_GID: "10000"
-    ports:
-      - "127.0.0.1:9119:9119"
-    command: ["python", "/opt/data/profiles/kamdar-ai/apps/installer/dashboard.py"]
-    networks: [runtime]
-
-  setup:
-    image: nousresearch/hermes-agent:latest@sha256:8cc6e4aea47e0b7362f2da655cc81a1f1120fbdcdcae087850dabb6d7adee964
-    profiles: [setup]
-    stdin_open: true
-    tty: true
-    volumes:
-      - kamdar_hermes_data:/opt/data
-      - .:/distribution:ro
-    environment:
-      HERMES_HOME: /opt/data
-      KAMDAR_PROFILE_HOME: /opt/data/profiles/kamdar-ai
-      KAMDAR_GATEWAY_ORIGIN: http://gateway:8645
-      HERMES_UID: "10000"
-      HERMES_GID: "10000"
-    working_dir: /distribution
-    command: ["python", "/distribution/setup.py"]
-    networks: [runtime]
-
   ngrok:
     image: ngrok/ngrok:latest@sha256:14d80d083e5b53145f416bbbd36238336c9de4016c43fd950eb2eb845670583b
     user: "10000:10000"
     profiles: [webhook]
     restart: unless-stopped
-    depends_on: [gateway]
     volumes:
-      - kamdar_hermes_data:/opt/data:ro
+      - ${KAMDAR_PROFILE_HOME}/secrets/ngrok.yml:/etc/ngrok.yml:ro
     command:
       - start
       - --all
       - --config
-      - /opt/data/profiles/kamdar-ai/secrets/ngrok.yml
+      - /etc/ngrok.yml
     networks: [runtime]
-
-volumes:
-  kamdar_hermes_data:
-    name: kamdar-hermes-data
 
 networks:
   runtime:

@@ -74,16 +74,23 @@ class SetupWorkspaceTests(unittest.TestCase):
             profile_home = workspace.parent
             source.mkdir(parents=True)
             (source / "automations").mkdir()
+            (source / "apps/installer/prompts").mkdir(parents=True)
             (source / "skills/pm-daily").mkdir(parents=True)
             (source / "skills/pm-daily/templates").mkdir(parents=True)
+            (source / "skills/pm-daily/evals/fixtures").mkdir(parents=True)
             (source / "templates").mkdir()
             (source / "plugins/platforms/notion").mkdir(parents=True)
             workspace.mkdir(parents=True)
             config = source / "workspace.hermes.md"
             config.write_text("---\nstatus: approved\n---\n# Workspace\n", encoding="utf-8")
             (source / "automations/daily.md").write_text("daily\n", encoding="utf-8")
+            (source / "apps/installer/prompts/preflight.md").write_text(
+                "preflight\n", encoding="utf-8"
+            )
             (source / "skills/pm-daily/SKILL.md").write_text("skill\n", encoding="utf-8")
             (source / "skills/pm-daily/templates/project-memory.md").write_text("memory\n", encoding="utf-8")
+            (source / "skills/pm-daily/evals/evals.json").write_text('{"evals": []}\n', encoding="utf-8")
+            (source / "skills/pm-daily/evals/fixtures/snapshot.json").write_text("{}\n", encoding="utf-8")
             (source / "skills/pm-daily/development_only.pyc").write_text("development only\n", encoding="utf-8")
             (source / "templates/project.md").write_text("project\n", encoding="utf-8")
             (source / "plugins/platforms/notion/plugin.yaml").write_text("name: notion-platform\n", encoding="utf-8")
@@ -92,8 +99,20 @@ class SetupWorkspaceTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertEqual((workspace / ".hermes.md").read_text(encoding="utf-8"), config.read_text(encoding="utf-8"))
             self.assertEqual((workspace / "automations/daily.md").read_text(encoding="utf-8"), "daily\n")
+            self.assertEqual(
+                (workspace / "prompts/preflight.md").read_text(encoding="utf-8"),
+                "preflight\n",
+            )
             self.assertEqual((workspace / "skills/pm-daily/SKILL.md").read_text(encoding="utf-8"), "skill\n")
             self.assertEqual((workspace / "skills/pm-daily/templates/project-memory.md").read_text(encoding="utf-8"), "memory\n")
+            self.assertEqual(
+                (workspace / "skills/pm-daily/evals/evals.json").read_text(encoding="utf-8"),
+                '{"evals": []}\n',
+            )
+            self.assertEqual(
+                (workspace / "skills/pm-daily/evals/fixtures/snapshot.json").read_text(encoding="utf-8"),
+                "{}\n",
+            )
             self.assertFalse((workspace / "skills/pm-daily/development_only.pyc").exists())
             self.assertEqual((workspace / "templates/project.md").read_text(encoding="utf-8"), "project\n")
             self.assertEqual(
