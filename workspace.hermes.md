@@ -36,7 +36,6 @@ and gap in `daily-context-diff.json`.
 | `meetings` | notion | `tasks` embedded page content | read | Meeting blocks and `Meeting notes and updates` inside selected Work; this is not a second database query. |
 | `people` | notion | [People](https://app.notion.com/p/8f796be4a629420f9148105da2cb8221) | read | Only seeded people referenced by selected Projects or Work; sending remains proposal-only unless explicitly authorized. |
 | `operator_email` | gmail | `kenji@znrknd.com` | read-write | Operator-owned isolated-eval inbox; never use it for recipient discovery. |
-| `knowledge` | google-drive | [Kamdar AI folder](https://drive.google.com/drive/folders/1QQ-bEjBeMwhB9AHEEJtiOOTYZPceJxBV) | read | Disabled unless a run explicitly enables a bounded retrieval query; no creation or publishing. |
 | `reports` | notion | [Eval Reports](https://app.notion.com/p/311fe58301fe467aaf51a84bc49aa71d) | isolated-eval | Approved Final operating reports only. |
 | `decisions` | notion | [Eval Decisions](https://app.notion.com/p/f4f78dbab22b423fab1e4d0fc8bd5787) | isolated-eval | Source-backed promoted decisions only. |
 | `sops` | notion | [Eval SOPs](https://app.notion.com/p/55a995b1f2104731994582157b8163ba) | isolated-eval | Approved employee workflow baselines only. |

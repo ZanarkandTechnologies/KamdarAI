@@ -23,8 +23,11 @@ from apps.installer.tests.test_runtime import SetupRuntimeTests  # noqa: F401
 from apps.installer.tests.test_workspace import SetupWorkspaceTests  # noqa: F401
 from apps.eval_viewer.tests.test_viewer import EvidenceViewerTests  # noqa: F401
 from apps.doctor.tests.test_run import CompanyDoctorTests  # noqa: F401
+from apps.doctor.tests.test_evaluation import EvaluationRunnerTests  # noqa: F401
 from apps.installer.tests.test_composio_session import ComposioSessionTests  # noqa: F401
+from apps.installer.tests.test_model_output import ModelOutputTests  # noqa: F401
 from apps.installer.tests.test_connection_evals import ConnectionEvalTests  # noqa: F401
+from apps.installer.tests.test_readiness_evals import ReadinessEvalTests  # noqa: F401
 from apps.installer.tests.test_provider_catalog import ProviderCatalogTests  # noqa: F401
 from apps.installer.tests.test_workspace_schema import WorkspaceSchemaTests  # noqa: F401
 from seed.tests.test_seed_bundle import SeedContractTests  # noqa: F401

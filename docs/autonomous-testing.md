@@ -19,10 +19,13 @@ Run these commands from the repository root:
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 python3 apps/installer/validate_context.py --context workspace.hermes.md
+farplane lint evals --changed
+python3 ../Farplane/skills/eval/scripts/check_eval_queries.py --root .
 ```
 
-The lane passes only when every command exits zero and context validation prints
-`context_valid=true`. Do not update expected files merely to turn a failure green.
+The lane passes only when every command exits zero, context validation prints
+`context_valid=true`, and both eval checks accept the changed skill manifests.
+Do not update expected files merely to turn a failure green.
 
 Tests live beside their behavioral owners in `apps/*/tests/`,
 `seed/tests/`, and plugin packages. Root `tests/contracts/`
@@ -57,46 +60,61 @@ python3 -m py_compile \
 After the targeted lane passes, run the complete safe default lane before
 claiming completion.
 
-## Real Docker setup lane
+## Host Hermes Docker-backend lane
 
-Setup-entrypoint, container, dashboard, and restart claims require the real
-pinned image. Run this lane on a Docker-capable macOS or Linux host:
+Claims about the configured terminal backend require host Hermes to execute a
+real isolated container through Hermes' own backend implementation:
 
 ```bash
-python3 apps/installer/e2e.py safe-docker \
+"$HOME/.hermes/hermes-agent/venv/bin/python" apps/installer/backend_e2e.py \
   --receipt /absolute/private-or-ticket-artifact-path/docker-receipt.json
 ```
 
-The runner creates a unique Compose project, data volume, network, and
-loopback dashboard port. It rejects `kamdar-hermes-data` and port `9119`, runs
-the exact `python /distribution/setup.py launch` entry point, distinguishes the
-expected unattended wizard boundary from a routed `hermes launch` error,
-reconciles the newly created native profile, probes the real dashboard, and
-proves stop/start recovery. It retries interrupted image pulls and accepts
-both JSON-array and newline-delimited Compose `ps` output. Cleanup is limited
-to names beginning with `company-os-e2e-`; use `--keep` only for immediate
-visual inspection and then remove that exact run.
+The runner imports Hermes' `DockerEnvironment`, starts a digest-pinned sandbox
+with networking disabled, verifies `/workspace` execution, removes the exact
+container, and writes an owner-only receipt. It does not create another Hermes
+profile or run the gateway inside Docker.
 
-The container dashboard remains bound to Hermes' loopback interface. The
-packaged `dashboard_bridge.py` exposes it to the container port while Compose
-publishes that port only on host `127.0.0.1`; it does not use the removed
-`--insecure` bypass.
-
-## Real PKMS Doctor lane
+## Real data-readiness Doctor lane
 
 When the task explicitly authorizes reads and model spend against one named
 profile, run:
 
 ```bash
-python3 setup.py doctor --profile-home "$COMPANY_OS_PROFILE"
+python3 setup.py doctor preflight --profile-home "$COMPANY_OS_PROFILE"
 ```
 
-Doctor asks native Hermes to read the installed workspace and selected cadence
-contract, use its configured skills and MCP tools, and stop after producing and
-reviewing the declared local output files. Its prompt explicitly disables provider
-mutations, messaging, and artifact sync. Missing information must remain a
-named blocker rather than a guessed value. Generated private results stay below
-the named profile and must not be copied into Git or CI artifacts.
+Preflight temporarily sets selected MCPs to Hermes' `untrusted` tier, so any
+tool without provider-declared `readOnlyHint=true` is blocked before its RPC.
+Every observed tool must also match that provider's positive read allowlist.
+It requires exported tool evidence and writes a redacted private receipt. It
+must return nonzero for missing core sources, empty selected inputs, missing
+required fields or relations, a non-allowlisted tool, or judge failure.
+
+## Isolated full-eval Doctor lane
+
+```bash
+python3 setup.py doctor eval --profile-home "$COMPANY_OS_PROFILE" --open
+```
+
+This runs one file-only Hermes session per PM cadence against private packaged
+fixtures, then one model-only batch judge. It must cover every current eval and
+assertion, record zero provider mutations, build the private dossier, and fail
+closed on missing output or evidence.
+
+Managed schedules remain paused until live health, readiness, and the complete
+checksum-validated eval dossier pass. After repairing a failure, rerun the
+proof stages and then:
+
+```bash
+python3 setup.py doctor activate --profile-home "$COMPANY_OS_PROFILE"
+```
+
+For an installed-company analysis preview without delivery, use:
+
+```bash
+python3 setup.py doctor analysis --profile-home "$COMPANY_OS_PROFILE"
+```
 
 ## Installed and live lanes
 

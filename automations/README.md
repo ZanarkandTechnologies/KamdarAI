@@ -12,8 +12,8 @@ and outputs.
 
 Extraction behavior and proof live with their owners:
 
-- Daily: `skills/pm-daily/{SKILL.md,evals.json,evals/}`
-- Weekly: `skills/pm-weekly/{SKILL.md,evals.json,evals/}`
+- Daily: `skills/pm-daily/{SKILL.md,evals/}`
+- Weekly: `skills/pm-weekly/{SKILL.md,evals/}`
 - Cadence-owned artifact shapes: each skill's `templates/`
 - Shared provider-backed entity shapes: repository `templates/`
 
