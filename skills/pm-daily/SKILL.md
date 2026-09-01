@@ -1,41 +1,36 @@
 ---
 name: pm-daily
-description: Turn one bounded Daily project snapshot and the current weekly Project Memory files into grounded memory updates and message drafts.
+description: Turn one Project-scoped Daily packet and its current weekly Project Memory into grounded memory updates and message drafts.
 ---
 
 # PM Daily
 
 ## Use when
 
-Run once per workday after the automation has fetched active Projects and their
-recent in-progress or completed Work. This skill edits local artifacts only. It
-does not fetch provider data, post comments, send messages, or sync files.
+Run once for one selected Project after the automation has fetched and
+partitioned recent Work by exact Project relation. This skill edits local
+artifacts only. It does not fetch provider data, post comments, send messages,
+sync files, or coordinate other Projects.
 
 ## Inputs
 
-- `daily/context/daily-snapshot-YYYY-MM-DD.json`
-- `weeks/<week>/project-memory/project--<project-id>.md` for every selected Project
+- One Project packet derived from `daily/context/daily-snapshot-YYYY-MM-DD.json`
+- `weeks/<week>/project-memory/project--<project-id>.md` for that Project
 - `templates/project-memory.md`
 - `templates/documentation-request.md`
 - `templates/employee-followups.md`
 
-The snapshot must contain exact Project, Work, Person, relation, status, date,
-source URL, and source revision values. Missing evidence stays missing.
-
-## Outputs
-
-- Updated current-week Project Memory files
-- Documentation-request drafts under `daily/messages/documentation/`
-- Progress-follow-up drafts under `daily/messages/progress/`
-- No other files
+The snapshot must contain exact Project, Work, provider page ID, Person,
+relation, status, date, source URL, and source revision values. Missing evidence
+stays missing.
 
 ## Workflow
 
-- [ ] **1 — Bind each Work item to one Project.**
-  Rule: use only exact relations from the snapshot. Never match by title or
-  infer a Project, Person, route, date, or status.
-  Assert: every proposed change cites source IDs and belongs to one selected
-  Project; unresolved relations are reported as gaps and produce no edit.
+- [ ] **1 — Validate the Project packet.**
+  Rule: accept only Work whose exact relation matches the packet's Project.
+  Never match by title or infer a Project, Person, route, date, or status.
+  Assert: every proposed change cites source IDs and belongs to the packet's
+  Project; unresolved or foreign relations are gaps and produce no edit.
 
 - [ ] **2 — Update Project Memory in place.**
   Rule: read the complete existing file and memory template. Preserve valid
@@ -58,10 +53,22 @@ source URL, and source revision values. Missing evidence stays missing.
   Assert: healthy or recently updated Work produces no draft; one issue does
   not create duplicate documentation and progress messages.
 
-- [ ] **5 — Verify the artifact boundary.**
-  Rule: inspect the changed-file list and reread every changed artifact.
-  Assert: only declared outputs changed, all Markdown is readable, every claim
-  is grounded, and no provider action was attempted.
+- [ ] **5 — Verify and return the output files.**
+  Rule: inspect the changed-file list and reread every changed artifact. Return
+  each exact changed path and its artifact type to the automation.
+  Assert:
+  - `weeks/<week>/project-memory/project--<project-id>.md` exists and matches
+    the Project Memory template, or the result explicitly records no change.
+  - Every documentation request exists at
+    `daily/messages/documentation/work--<work-id>.md` and its frontmatter has
+    `artifact_type: documentation_request`, the exact `work_id`, exact
+    `provider_page_id`, and exact `source_url`.
+  - Every progress follow-up exists at
+    `daily/messages/progress/work--<work-id>.md` and its frontmatter has
+    `artifact_type: progress_followup`, the exact `work_id`, exact
+    `provider_page_id`, and exact `source_url`.
+  - Only those declared outputs changed, all Markdown is readable, every claim
+    is grounded, and no provider action was attempted.
 
 ## Golden behavior
 
@@ -69,14 +76,3 @@ When a completed Work item claims a result but lacks the measurement source,
 retain its factual progress in Project Memory and draft a documentation request
 for that source. Do not mark the result verified, estimate the number, or also
 send a generic progress chase.
-
-## Proof
-
-Cases and frozen inputs live in `evals.json` and `evals/`. Evals assert changed
-paths, required headings, source citations, preserved memory, precise drafts,
-and the absence of unauthorized files or provider effects. Review every output
-for readable conclusions and next actions, complete template use, explicit
-uncertainty, and source-grounded measurements. Do not expose placeholders,
-internal control metadata, unexplained opaque IDs, or hashes in reader prose.
-Financial claims must show their sourced formula; missing inputs become an
-owned measurement gap. A failed quality review blocks provider application.

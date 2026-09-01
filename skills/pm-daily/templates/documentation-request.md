@@ -1,7 +1,18 @@
 ---
 template_id: kamdar-documentation-request
-template_version: "1.0.0"
+template_version: "1.1.0"
 ---
+
+Each generated artifact must begin with this routing frontmatter:
+
+```text
+---
+artifact_type: documentation_request
+work_id: "{{WORK_ID}}"
+provider_page_id: "{{PROVIDER_PAGE_ID}}"
+source_url: "{{SOURCE_URL}}"
+---
+```
 
 # Documentation request
 
@@ -18,8 +29,8 @@ Writing rules:
 - Ask in a direct, helpful tone.
 - Refer to the exact ticket section to update.
 
-Render only the comment below. Do not include template frontmatter, instructions,
-an application receipt, or a separate private artifact. -->
+Render the routing frontmatter followed by only the comment below. Do not include
+template instructions or an application receipt. -->
 
 I understand that {{KNOWN_OUTCOME_OR_DECISION}}.
 

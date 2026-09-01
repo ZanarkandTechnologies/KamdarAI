@@ -1,6 +1,6 @@
 ---
 artifact_type: kamdar-project-memory
-artifact_version: "1.0.0"
+artifact_version: "1.1.0"
 project_id: "{{PROJECT_ID}}"
 project_name: "{{PROJECT_NAME}}"
 week: "{{WEEK}}"
@@ -44,21 +44,29 @@ Golden shape:
 ## Completed outcomes and artifacts
 
 <!--
-Add only when source Work is Done and documentation is sufficient.
+Capture every Done Work that produced or materially changed an artifact. Add it
+here only when the claimed outcome and artifact acceptance are sufficiently
+documented; otherwise retain it above and open one documentation question.
 
 Capture:
 - work_id, project_id, employee_ids, title, accepted business outcome;
-- expected artifact and accepted artifact IDs/links/types;
+- workflow_key when supplied or reconstructable, output receiver, expected
+  artifact, and accepted artifact IDs/links/types;
 - started, completed, and accepted timestamps;
-- elapsed_hours derived from sourced timestamps, or null;
+- elapsed, active, and waiting hours when sourced, otherwise explicit gaps;
+- handoffs, exceptions, rework, and control failures when evidenced;
+- comparison with an existing SOP baseline and the reason for a material
+  variance; do not demand narrative for routine execution;
 - documentation state and closed question IDs;
 - optional explicit workflow_key; source and approval evidence.
 
 Golden shape:
 ### TASK-105 — normalise the supplier count package
 - **Outcome:** Five stores can now be compared from one approved column shape.
-- **Owner / artifacts:** PERSON-NUR · FILE-105 and approval COMMENT-318.
-- **Timing:** Started 09:00; completed 14:30; accepted next day; elapsed 5.5 hours.
+- **Owner / output / receiver:** PERSON-NUR · FILE-105 · Operations lead.
+- **Acceptance:** Approval COMMENT-318.
+- **Timing:** 5.5 active hours; accepted next day after 18 waiting hours.
+- **Variance / rework:** No approved baseline; no rework evidenced.
 - **Documentation:** sufficient; no open questions.
 - **Workflow:** supplier-count-normalisation; one sample, not a baseline.
 - **Evidence:** TASK-105, FILE-105, COMMENT-318.

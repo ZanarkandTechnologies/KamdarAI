@@ -1,7 +1,18 @@
 ---
 template_id: kamdar-employee-followups
-template_version: "1.0.0"
+template_version: "1.1.0"
 ---
+
+Each generated artifact must begin with this routing frontmatter:
+
+```text
+---
+artifact_type: progress_followup
+work_id: "{{WORK_ID}}"
+provider_page_id: "{{PROVIDER_PAGE_ID}}"
+source_url: "{{SOURCE_URL}}"
+---
+```
 
 # Employee progress follow-up
 
@@ -20,8 +31,8 @@ Writing rules:
 - Do not ask documentation-quality questions already handled on the ticket.
 - Do not exaggerate unknown causes, progress, or dates.
 
-Render only the message below. Do not include template frontmatter,
-instructions, route metadata, or a delivery receipt. -->
+Render the routing frontmatter followed by only the message below. Do not include
+template instructions or a delivery receipt. -->
 
 {{OWNER}}, the Project target "{{TARGET}}" is due {{DUE_DATE}}.
 
