@@ -17,15 +17,15 @@
         ]
       },
       "test": {
-        "risk": "irreversible",
-        "requires_confirmation": true,
-        "prompt": "Use only the configured Composio Gmail tools. Confirm the authenticated Gmail profile exactly matches the configured isolated test inbox {{source}}. Send exactly one plain-text email from that account to the same address with subject '[Kamdar connection test {{run_id}}] Gmail' and a body containing the same run ID. Fetch that message after sending and report the authenticated address, message ID, thread ID, exact subject, recipient, and read-back result. Do not send to any other address and do not modify any existing message.",
-        "expected_output": "The configured Gmail account is confirmed, one self-addressed setup-test email is sent, and the same message is fetched successfully.",
+        "risk": "read_only",
+        "requires_confirmation": false,
+        "prompt": "Use only the configured Composio Gmail profile tool. Read the authenticated Gmail profile and report its address. Do not fetch messages, send email, or modify anything.",
+        "expected_output": "The authenticated Gmail profile is returned without reading or sending email.",
         "assertions": [
-          "The authenticated Gmail profile exactly matches the configured isolated test inbox.",
-          "Exactly one email is sent and its only recipient is that same inbox.",
-          "The response reports the sent message ID and thread ID.",
-          "The sent message is fetched and its subject and run ID exactly match the request."
+          "The authenticated Gmail profile is fetched successfully.",
+          "The response reports the authenticated address.",
+          "No message content is fetched.",
+          "No email is sent or modified."
         ]
       },
       "readiness": {

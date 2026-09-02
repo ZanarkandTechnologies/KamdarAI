@@ -16,17 +16,15 @@ from rich.table import Table
 
 from apps.installer import provider_catalog as catalog_api
 from apps.installer import runtime
-from apps.installer.schemas.workspace import parse_workspace_communications
+from apps.installer.feature_setup import FeatureSetupError, load_state, render_files, selected_bindings, with_optional_defaults
 from apps.installer.provider_catalog import CatalogError
 from apps.installer.cli.flows.connections import (
     _certify_with_recovery,
     _configure_connections,
     _connection_eval_confirmation,
     _defer_connection_evals,
-    _selected_bindings,
 )
-from apps.installer.cli.flows.messaging import configure_messaging
-from apps.installer.cli.flows.workspace import configure_workspace
+from apps.installer.cli.flows.features import configure_features
 from apps.installer.cli.paths import ROOT, profile_home as resolve_profile_home, receipt_reference
 from apps.installer.cli.process import run_visible
 from apps.installer.cli.ui import CONSOLE, _friendly_runtime_error, choose, confirm
@@ -44,7 +42,13 @@ FRESH_START_MARKER = ".company-os-fresh-start"
 DISTRIBUTION_SOURCE_ENV = "COMPANY_OS_DISTRIBUTION_SOURCE"
 
 
-def _run_profile_setup(profile_home: Path, *, webhook: bool, apply: bool) -> dict:
+def _run_profile_setup(
+    profile_home: Path,
+    *,
+    webhook: bool,
+    multica: bool,
+    apply: bool,
+) -> dict:
     source_root = (
         profile_home
         if (profile_home / "distribution.yaml").is_file()
@@ -56,6 +60,8 @@ def _run_profile_setup(profile_home: Path, *, webhook: bool, apply: bool) -> dic
         arguments.append("--apply")
     if webhook:
         arguments.append("--enable-notion-webhook")
+    if multica:
+        arguments.append("--enable-multica")
     result = runtime.run_command(arguments, profile_home)
     try:
         payload = json.loads(result.stdout)
@@ -93,7 +99,10 @@ def _installation_state(profile_home: Path) -> str:
         for job in jobs
         if isinstance(job, dict) and job.get("enabled", True) is not False
     }
-    if not runtime.EXPECTED_CRON_NAMES.issubset(active_names):
+    # A previously complete two-job profile must reach the update menu instead
+    # of being mislabeled as an interrupted install. Full verification still
+    # requires every current schedule in runtime.EXPECTED_CRON_NAMES.
+    if not runtime.CORE_CRON_NAMES.issubset(active_names):
         return "incomplete"
     return "existing"
 
@@ -149,52 +158,62 @@ def _fresh_start(profile_home: Path) -> int:
 
 
 def _workspace_update(profile_home: Path) -> int:
-    """Edit and apply only the customer-owned workspace configuration."""
+    """Edit feature answers, render automations, and apply the installed copy."""
     workspace = profile_home / "workspace.hermes.md"
-    template = profile_home / "workspace.hermes.template.md"
     CONSOLE.print(
         Panel.fit(
-            "[bold]Update workspace configuration[/bold]\n"
-            "Current values will be shown as defaults. Credentials, reports, "
-            "memory, software, and provider authorization are preserved.",
+            "[bold]Update Company OS features[/bold]\n"
+            "Current answers are preserved as defaults. Setup will preview the "
+            "rendered automation changes before writing them.",
             border_style="cyan",
         )
     )
     try:
-        if configure_workspace("configure", workspace, template):
-            CONSOLE.print("[yellow]Workspace configuration was not changed.[/yellow]")
+        if configure_features(profile_home):
+            CONSOLE.print("[yellow]Feature configuration was not changed.[/yellow]")
             return 1
-        message_bindings = parse_workspace_communications(
-            workspace.read_text(encoding="utf-8")
-        ).communications
-        messaging_result = configure_messaging(
+        state = load_state(profile_home / "config" / "setup-answers.json")
+        bindings = selected_bindings(
+            state.answers,
+            catalog_api.load_catalog(),
+            state.provider_requirements,
+            state.provider_targets,
+        )
+        _configure_connections(profile_home, bindings, non_interactive=False)
+        _configure_telegram_if_needed(
             profile_home,
-            message_bindings,
-            workspace=workspace,
+            state.provider_requirements,
             non_interactive=False,
         )
-        if not messaging_result.apply:
-            return 1
-        message_bindings = messaging_result.bindings
+        _configure_whatsapp_if_needed(
+            profile_home,
+            state.provider_requirements,
+            non_interactive=False,
+        )
+        _configure_messaging_tools_if_needed(
+            profile_home, state.provider_requirements
+        )
         runtime.approve_workspace_context(workspace)
         receipt = _run_profile_setup(
             profile_home,
             webhook=runtime.webhook_enabled(profile_home),
+            multica="multica" in {
+                provider for values in state.provider_requirements.values() for provider in values
+            },
             apply=True,
         )
         receipt["entry_point"] = "setup.py workspace"
         receipt_path = runtime.write_receipt(profile_home, receipt)
         CONSOLE.print(
             Panel.fit(
-                "[bold green]Workspace configuration applied[/bold green]\n"
-                "Existing model and provider authorization was preserved.\n"
-                f"Messaging connection test: {messaging_result.status}.\n"
+                "[bold green]Feature configuration applied[/bold green]\n"
+                "Required provider connections were reconciled.\n"
                 f"Support receipt: {receipt_reference(profile_home, receipt_path)}",
                 border_style="green",
             )
         )
         return 0
-    except runtime.RuntimeSetupError as error:
+    except (runtime.RuntimeSetupError, FeatureSetupError, CatalogError) as error:
         CONSOLE.print(
             Panel.fit(
                 "[bold red]Workspace update stopped safely[/bold red]\n"
@@ -254,7 +273,7 @@ def launch_command(args: argparse.Namespace) -> int:
             border_style="cyan",
         )
     )
-    CONSOLE.print("  [cyan]1.[/cyan] Update workspace configuration")
+    CONSOLE.print("  [cyan]1.[/cyan] Update Company OS features")
     CONSOLE.print("  [cyan]2.[/cyan] Update Company OS software")
     CONSOLE.print("  [cyan]3.[/cyan] Test integrations")
     CONSOLE.print("  [cyan]4.[/cyan] Check data readiness")
@@ -334,20 +353,32 @@ def _bootstrap_installed_copy(
 
 
 def _prepare_workspace_configuration(*, non_interactive: bool) -> Path:
-    """Create or review the source-owned workspace document before install."""
+    """Collect feature answers and render self-contained automation contracts."""
     workspace = ROOT / "workspace.hermes.md"
-    template = ROOT / "workspace.hermes.template.md"
-    if not workspace.is_file():
-        if non_interactive:
-            raise runtime.RuntimeSetupError("workspace_configuration_requires_input")
-        if configure_workspace("init", workspace, template):
-            raise runtime.RuntimeSetupError("workspace_configuration_cancelled")
-    elif not non_interactive and confirm(
-        "Review or change the existing company workspace configuration?",
-        default=False,
-    ):
-        if configure_workspace("configure", workspace, template):
-            raise runtime.RuntimeSetupError("workspace_configuration_cancelled")
+    answers = ROOT / "config" / "setup-answers.json"
+    if non_interactive and not answers.is_file():
+        raise runtime.RuntimeSetupError("workspace_configuration_requires_input")
+    should_configure = not answers.is_file()
+    if answers.is_file() and not non_interactive:
+        should_configure = confirm(
+            "Review or change the existing Company OS feature setup?",
+            default=False,
+        )
+    if should_configure and configure_features(ROOT):
+        raise runtime.RuntimeSetupError("workspace_configuration_cancelled")
+    if not should_configure:
+        saved = with_optional_defaults(load_state(answers).answers)
+        render_files(
+            tuple(
+                ROOT / "automations" / name
+                for name in (
+                    "daily-operating-update.md",
+                    "weekly-operating-review.md",
+                    "weekly-meeting-ticket.md",
+                )
+            ),
+            saved,
+        )
     return workspace
 
 
@@ -376,7 +407,6 @@ def _confirm_install_plan(
     profile_home: Path,
     *,
     bindings: list[dict],
-    message_bindings: list,
     webhook: bool,
     non_interactive: bool,
 ) -> bool:
@@ -394,16 +424,9 @@ def _confirm_install_plan(
         {catalog_api.connection_key(binding["provider"]) for binding in bindings}
     )
     review.add_row("Provider MCPs", ", ".join(connections) if connections else "None")
-    messaging = sorted(
-        {
-            f"{binding.message.value}: {binding.app.value} → {binding.send_to} "
-            f"({binding.behavior.value})"
-            for binding in message_bindings
-        }
-    )
-    review.add_row("Owner messages", "\n".join(messaging) if messaging else "Not enabled")
+    review.add_row("Behavior", "Rendered directly into Daily, Weekly, and meeting-ticket automations")
     review.add_row("Real-time comments", "Configure" if webhook else "Set up later")
-    review.add_row("Automations", "Daily + Weekly")
+    review.add_row("Automations", "Daily + Weekly + weekly meeting ticket")
     review.add_row("Report template", "Reviewed repository template")
     review.add_row("Deletion", "Nothing")
     CONSOLE.print(review)
@@ -431,16 +454,78 @@ def _configure_model(profile_home: Path, *, non_interactive: bool) -> None:
         raise runtime.RuntimeSetupError("model_auth_incomplete")
 
 
+def _configure_telegram_if_needed(
+    profile_home: Path,
+    provider_requirements: dict[str, tuple[str, ...]],
+    *,
+    non_interactive: bool,
+) -> None:
+    required = {provider for values in provider_requirements.values() for provider in values}
+    if "telegram" not in required:
+        return
+    if runtime.telegram_gateway_configured(profile_home):
+        return
+    if non_interactive:
+        raise runtime.RuntimeSetupError("telegram_gateway_requires_input")
+    CONSOLE.print(
+        Panel.fit(
+            "[bold]Connect Telegram[/bold]\n"
+            "The selected automation behavior requires Hermes messaging. "
+            "Credentials remain in the Hermes profile.",
+            border_style="cyan",
+        )
+    )
+    if run_visible(["hermes", "gateway", "setup"], profile_home):
+        raise runtime.RuntimeSetupError("telegram_gateway_setup_incomplete")
+    if not runtime.telegram_gateway_configured(profile_home):
+        raise runtime.RuntimeSetupError("telegram_gateway_setup_incomplete")
+
+
+def _configure_whatsapp_if_needed(
+    profile_home: Path,
+    provider_requirements: dict[str, tuple[str, ...]],
+    *,
+    non_interactive: bool,
+) -> None:
+    required = {provider for values in provider_requirements.values() for provider in values}
+    if "whatsapp" not in required or runtime.whatsapp_gateway_configured(profile_home):
+        return
+    if non_interactive:
+        raise runtime.RuntimeSetupError("whatsapp_gateway_requires_input")
+    CONSOLE.print(Panel.fit(
+        "[bold]Connect WhatsApp[/bold]\n"
+        "The selected automation behavior requires Hermes messaging. "
+        "Pairing data remains in the Hermes profile.",
+        border_style="cyan",
+    ))
+    if run_visible(["hermes", "whatsapp"], profile_home):
+        raise runtime.RuntimeSetupError("whatsapp_gateway_setup_incomplete")
+    if not runtime.whatsapp_gateway_configured(profile_home):
+        raise runtime.RuntimeSetupError("whatsapp_gateway_setup_incomplete")
+
+
+def _configure_messaging_tools_if_needed(
+    profile_home: Path,
+    provider_requirements: dict[str, tuple[str, ...]],
+) -> None:
+    required = {provider for values in provider_requirements.values() for provider in values}
+    if {"telegram", "whatsapp"} & required:
+        runtime.configure_messaging_mcp(profile_home)
+
+
 def _install_profile(
     profile_home: Path,
     *,
     bindings: list[dict],
     webhook: bool,
+    multica: bool,
 ) -> Path:
     """Apply the reviewed profile plan and write its redacted receipt."""
     CONSOLE.rule("[bold cyan]Install[/bold cyan]")
     CONSOLE.print("[cyan]•[/cyan] Installing workspace, plugins, and schedules…")
-    receipt = _run_profile_setup(profile_home, webhook=webhook, apply=True)
+    receipt = _run_profile_setup(
+        profile_home, webhook=webhook, multica=multica, apply=True
+    )
     receipt.update(
         {
             "entry_point": "setup.py install",
@@ -468,10 +553,16 @@ def install_command(args: argparse.Namespace) -> int:
         workspace_config = _prepare_workspace_configuration(
             non_interactive=args.non_interactive
         )
-        bindings = _selected_bindings(workspace_config)
-        message_bindings = parse_workspace_communications(
-            workspace_config.read_text(encoding="utf-8")
-        ).communications
+        state = load_state(ROOT / "config" / "setup-answers.json")
+        required_providers = {
+            provider for values in state.provider_requirements.values() for provider in values
+        }
+        bindings = selected_bindings(
+            state.answers,
+            catalog_api.load_catalog(),
+            state.provider_requirements,
+            state.provider_targets,
+        )
         notion_selected = any(
             binding["provider"]["id"] == "notion" for binding in bindings
         )
@@ -483,7 +574,6 @@ def install_command(args: argparse.Namespace) -> int:
         if not _confirm_install_plan(
             profile_home,
             bindings=bindings,
-            message_bindings=message_bindings,
             webhook=webhook,
             non_interactive=args.non_interactive,
         ):
@@ -499,26 +589,31 @@ def install_command(args: argparse.Namespace) -> int:
             bindings,
             non_interactive=args.non_interactive,
         )
+        _configure_telegram_if_needed(
+            profile_home,
+            state.provider_requirements,
+            non_interactive=args.non_interactive,
+        )
+        _configure_whatsapp_if_needed(
+            profile_home,
+            state.provider_requirements,
+            non_interactive=args.non_interactive,
+        )
+        _configure_messaging_tools_if_needed(
+            profile_home, state.provider_requirements
+        )
         if webhook and not runtime.webhook_enabled(profile_home):
             from plugins.platforms.notion.onboarding import _configure_webhook
 
             _configure_webhook(profile_home)
 
-        messaging_result = configure_messaging(
-            profile_home,
-            message_bindings,
-            workspace=workspace_config,
-            non_interactive=args.non_interactive,
-        )
-        if not messaging_result.apply:
-            return 1
-        message_bindings = messaging_result.bindings
         runtime.approve_workspace_context(workspace_config)
 
         receipt_path = _install_profile(
             profile_home,
             bindings=bindings,
             webhook=webhook,
+            multica="multica" in required_providers,
         )
         (profile_home / FRESH_START_MARKER).unlink(missing_ok=True)
         connection_status = "not_run"
@@ -545,7 +640,6 @@ def install_command(args: argparse.Namespace) -> int:
                 )
                 + f"Support receipt: {receipt_reference(profile_home, receipt_path)}\n"
                 f"Integration certification: {connection_status}\n"
-                f"Messaging connection test: {messaging_result.status}\n"
                 + (
                     "The launcher will now start Hermes and run verification."
                     if connection_status in {"not_run", "passed"}
@@ -557,7 +651,7 @@ def install_command(args: argparse.Namespace) -> int:
             )
         )
         return 0 if connection_status in {"not_run", "passed"} else 2
-    except (runtime.RuntimeSetupError, CatalogError) as error:
+    except (runtime.RuntimeSetupError, FeatureSetupError, CatalogError) as error:
         CONSOLE.print(
             Panel.fit(
                 "[bold red]Setup stopped safely[/bold red]\n"
@@ -571,10 +665,39 @@ def install_command(args: argparse.Namespace) -> int:
 def update_command(args: argparse.Namespace) -> int:
     profile_home = resolve_profile_home(args.profile_home)
     try:
+        answers_path = profile_home / "config" / "setup-answers.json"
+        if (
+            ROOT.resolve() != profile_home.resolve()
+            and (profile_home / "distribution.yaml").is_file()
+            and not answers_path.is_file()
+        ):
+            raise runtime.RuntimeSetupError("feature_setup_migration_required")
         if ROOT.resolve() != profile_home.resolve():
             runtime.install_or_update_distribution(ROOT, profile_home)
+        multica = False
+        if answers_path.is_file():
+            state = load_state(answers_path)
+            saved = with_optional_defaults(state.answers)
+            multica = "multica" in {
+                provider
+                for values in state.provider_requirements.values()
+                for provider in values
+            }
+            render_files(
+                tuple(
+                    profile_home / "automations" / name
+                    for name in (
+                        "daily-operating-update.md",
+                        "weekly-operating-review.md",
+                        "weekly-meeting-ticket.md",
+                    )
+                ),
+                saved,
+            )
         webhook = runtime.webhook_enabled(profile_home)
-        receipt = _run_profile_setup(profile_home, webhook=webhook, apply=True)
+        receipt = _run_profile_setup(
+            profile_home, webhook=webhook, multica=multica, apply=True
+        )
         receipt["entry_point"] = "setup.py update"
         receipt_path = runtime.write_receipt(profile_home, receipt)
         CONSOLE.print(
@@ -582,7 +705,7 @@ def update_command(args: argparse.Namespace) -> int:
             f"Support receipt: {receipt_reference(profile_home, receipt_path)}"
         )
         return 0
-    except runtime.RuntimeSetupError as error:
+    except (runtime.RuntimeSetupError, FeatureSetupError, CatalogError) as error:
         CONSOLE.print(
             Panel.fit(
                 "[bold red]Update stopped safely[/bold red]\n"

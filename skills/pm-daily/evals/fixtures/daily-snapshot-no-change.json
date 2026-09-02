@@ -9,7 +9,9 @@
   "work": [
     {
       "id": "TASK-105",
-      "provider_page_id": "55555555-5555-4555-8555-555555555555",
+      "source_provider": "notion",
+      "provider_record_id": "55555555-5555-4555-8555-555555555555",
+      "source_reference": "https://example.invalid/TASK-105",
       "project_id": "PROJ-CMT",
       "owner_id": "PERSON-NUR",
       "status": "In progress",

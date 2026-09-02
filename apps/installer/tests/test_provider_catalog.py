@@ -25,6 +25,7 @@ class ProviderCatalogTests(unittest.TestCase):
                 "meetings",
                 "operator_email",
                 "sops",
+                "storage",
             },
         )
         self.assertEqual(
@@ -50,6 +51,7 @@ class ProviderCatalogTests(unittest.TestCase):
             [provider["id"] for provider in catalog["reports"]["providers"]],
             ["notion"],
         )
+        self.assertEqual(catalog["storage"]["providers"][0]["id"], "google_drive")
 
     def test_workspace_bindings_resolve_provider_and_deduplicate_connection_key(self) -> None:
         catalog = provider_catalog.load_catalog()

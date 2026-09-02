@@ -103,7 +103,7 @@ class SetupProfileTests(unittest.TestCase):
         )
         self.assertEqual(commands[1], ["hermes", "plugins", "doctor", "platforms/notion"])
 
-    def test_missing_jobs_plan_two_creates_with_client_paths(self) -> None:
+    def test_missing_jobs_plan_creates_every_managed_job_with_client_paths(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             profile_home = Path(temporary)
             workspace = profile_home / "workspace"
@@ -113,9 +113,10 @@ class SetupProfileTests(unittest.TestCase):
                 encoding="utf-8",
             )
             actions = PROFILE.cron_plan(profile_home, workspace)
-            self.assertEqual([item["action"] for item in actions], ["create", "create"])
+            self.assertEqual([item["action"] for item in actions], ["create"] * 3)
             self.assertEqual(actions[0]["schedule"], "0 8 * * 1-5")
             self.assertEqual(actions[1]["schedule"], "0 18 * * 5")
+            self.assertEqual(actions[2]["schedule"], "0 9 * * 1")
             for action in actions:
                 self.assertEqual(action["workdir"], str(workspace))
                 self.assertIn(str(workspace / ".hermes.md"), action["prompt"])
@@ -167,11 +168,19 @@ class SetupProfileTests(unittest.TestCase):
             activation = profile_home / PROFILE.ACTIVATION_RECEIPT
             activation.parent.mkdir(parents=True, exist_ok=True)
             activation.write_text(
-                json.dumps({"status": "activated"}), encoding="utf-8"
+                json.dumps(
+                    {
+                        "status": "activated",
+                        "schedule_configuration_hash": (
+                            PROFILE.schedule_configuration_hash(profile_home, workspace)
+                        ),
+                    }
+                ),
+                encoding="utf-8",
             )
             self.assertEqual(
                 [item["action"] for item in PROFILE.cron_plan(profile_home, workspace)],
-                ["in_sync", "in_sync"],
+                ["in_sync"] * 3,
             )
 
     def test_drifted_job_is_updated_and_duplicate_name_blocks(self) -> None:
@@ -209,6 +218,7 @@ class SetupProfileTests(unittest.TestCase):
         installed_jobs = [
             {"id": "daily-id", "name": PROFILE.SCHEDULES[0]["name"], "enabled": True},
             {"id": "weekly-id", "name": PROFILE.SCHEDULES[1]["name"], "enabled": True},
+            {"id": "meeting-id", "name": PROFILE.SCHEDULES[2]["name"], "enabled": True},
         ]
         with (
             patch.object(PROFILE, "run_command") as run_command,
@@ -223,7 +233,7 @@ class SetupProfileTests(unittest.TestCase):
         self.assertIn("--workdir", edit)
         self.assertEqual(
             commands[2:],
-            [["hermes", "cron", "pause", "daily-id"], ["hermes", "cron", "pause", "weekly-id"]],
+            [["hermes", "cron", "pause", "daily-id"], ["hermes", "cron", "pause", "weekly-id"], ["hermes", "cron", "pause", "meeting-id"]],
         )
 
     def test_unproved_profile_pauses_managed_schedules(self) -> None:
@@ -239,7 +249,7 @@ class SetupProfileTests(unittest.TestCase):
             PROFILE.set_managed_schedules_enabled(profile_home, False)
         self.assertEqual(
             [call.args[0] for call in run_command.call_args_list],
-            [["hermes", "cron", "pause", "1"], ["hermes", "cron", "pause", "2"]],
+            [["hermes", "cron", "pause", "1"], ["hermes", "cron", "pause", "2"], ["hermes", "cron", "pause", "3"]],
         )
 
     def test_activation_requires_and_records_proof_before_resuming(self) -> None:
@@ -274,7 +284,7 @@ class SetupProfileTests(unittest.TestCase):
             self.assertEqual(payload["proof"]["eval_run_id"], "eval")
             self.assertEqual(
                 [call.args[0] for call in run_command.call_args_list],
-                [["hermes", "cron", "resume", "1"], ["hermes", "cron", "resume", "2"]],
+                [["hermes", "cron", "resume", "1"], ["hermes", "cron", "resume", "2"], ["hermes", "cron", "resume", "3"]],
             )
 
     def test_failed_activation_repauses_jobs_and_commits_no_receipt(self) -> None:
@@ -287,6 +297,7 @@ class SetupProfileTests(unittest.TestCase):
             partially_enabled = [
                 {"id": "1", "name": PROFILE.SCHEDULES[0]["name"], "enabled": True},
                 {"id": "2", "name": PROFILE.SCHEDULES[1]["name"], "enabled": False},
+                {"id": "3", "name": PROFILE.SCHEDULES[2]["name"], "enabled": False},
             ]
             with (
                 patch.object(
@@ -307,6 +318,7 @@ class SetupProfileTests(unittest.TestCase):
                 [
                     ["hermes", "cron", "resume", "1"],
                     ["hermes", "cron", "resume", "2"],
+                    ["hermes", "cron", "resume", "3"],
                     ["hermes", "cron", "pause", "1"],
                 ],
             )

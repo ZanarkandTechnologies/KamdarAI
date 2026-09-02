@@ -320,7 +320,7 @@ or the computer restarts.
 Rerunning `setup.cmd` on an existing installation shows:
 
 ```text
-1. Update workspace configuration
+1. Update Company OS features
 2. Update Company OS software
 3. Test integrations
 4. Check data readiness
@@ -332,9 +332,10 @@ Rerunning `setup.cmd` on an existing installation shows:
 10. Exit
 ```
 
-Choose **Update workspace configuration** to edit the profile-owned desired
-workspace, apply it, and run a static check without repeating model or Notion
-authorization. After downloading repository updates, choose **Update Company OS
+Choose **Update Company OS features** to revisit the explained Memory, Daily,
+and Weekly questions. Setup preserves the saved answers, previews the rendered
+automation diff, reconciles any newly required provider connections, and runs a
+static check. After downloading repository updates, choose **Update Company OS
 software**; setup updates the distribution allowlist, preserves unknown runtime
 files, reconciles schedules, and runs static verification. Use **Test
 integrations** to retry the same provider certification without reinstalling

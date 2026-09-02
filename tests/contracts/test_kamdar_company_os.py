@@ -16,30 +16,46 @@ class KamdarCompanyOSTests(unittest.TestCase):
         for automation, cadence in ((daily, "daily"), (weekly, "weekly")):
             self.assertIn(f"cadence: {cadence}", automation)
             self.assertIn("## Authority", automation)
-            self.assertIn("## Deployment values", automation)
-            self.assertIn("REPLACE_WITH", automation)
             self.assertNotIn("workspace.hermes.md", automation)
             self.assertNotIn("ntn --help", automation)
-            self.assertIn("configured hosted Notion MCP", automation)
+            self.assertIn("hosted Notion MCP", automation)
             self.assertNotIn("skills/kamdar-company-os", automation)
         self.assertIn("skills/pm-daily/SKILL.md", daily)
         self.assertIn("skills/pm-weekly/SKILL.md", weekly)
+        self.assertIn("at most 1,900 characters", weekly)
+        self.assertIn("[company-os:<token>:part <number>/<count>]", weekly)
         self.assertLess(daily.index("[Daily parent]"), daily.index("## Purpose"))
-        self.assertIn("one native subagent per Project packet", daily)
-        self.assertIn("reject overlapping write paths", daily)
-        self.assertIn("For `project_memory`, call no integration", daily)
-        self.assertIn(
-            "For `documentation_request`, call the configured Notion MCP",
-            daily,
-        )
-        self.assertIn(
-            "For `progress_followup`, call the configured Notion MCP",
-            daily,
-        )
+        self.assertIn("Run PM Daily once per packet in a native subagent", daily)
+        self.assertNotIn("## Deployment values", daily)
+        self.assertGreater(daily.index("<!-- setup:daily.projects -->"), daily.index("**1 — Build"))
+        self.assertGreater(daily.index("<!-- setup:daily.people -->"), daily.index("**1 — Build"))
+        self.assertGreater(daily.index("<!-- setup:daily.progress_route -->"), daily.index("**4 — Apply authorized effects"))
+        self.assertIn("Record completeness facts", daily)
+        self.assertIn("`contact_route_missing`", daily)
+        self.assertIn("question plus the exact Work source", daily)
+        self.assertIn("one attempt for each `notion_comment`, `gmail`, `telegram`, or", daily)
+        self.assertIn("`whatsapp`", daily)
+        self.assertIn("Reject overlapping write paths", daily)
+        self.assertIn("Keep every `project_memory` file local", daily)
+        self.assertIn("each `documentation_request` and `progress_followup`", daily)
         self.assertIn("`notion-fetch`", daily)
         self.assertIn("`notion-create-comment`", daily)
         self.assertIn("`notion-get-comments`", daily)
+        self.assertIn("`conversations_list`", daily)
+        self.assertIn("`conversation_get`", daily)
         self.assertNotIn("notion_create_page_comment", daily)
+        self.assertNotIn("TASKS_URL=", daily)
+        self.assertIn("one snapshot for every active Project", daily)
+        self.assertIn("`raw_status`", daily)
+        self.assertIn("`normalized_status`", daily)
+        self.assertIn("`project_work_source_missing`", daily)
+        self.assertIn("`task_schema_gap`", daily)
+        self.assertIn("`templates/task.md` as the remediation template", daily)
+        missing_source_policy = daily.split(
+            "If a Project has no", 1
+        )[1].split("- [ ] **2", 1)[0]
+        self.assertIn("Do not create a follow-up", missing_source_policy)
+        self.assertIn("Notion comment", missing_source_policy)
         for template_name, artifact_type in (
             ("documentation-request.md", "documentation_request"),
             ("employee-followups.md", "progress_followup"),
@@ -49,14 +65,18 @@ class KamdarCompanyOSTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
             self.assertIn(f"artifact_type: {artifact_type}", template)
             self.assertIn('work_id: "{{WORK_ID}}"', template)
-            self.assertIn('provider_page_id: "{{PROVIDER_PAGE_ID}}"', template)
-            self.assertIn('source_url: "{{SOURCE_URL}}"', template)
+            self.assertIn('source_provider: "{{SOURCE_PROVIDER}}"', template)
+            self.assertIn('provider_record_id: "{{PROVIDER_RECORD_ID}}"', template)
+            self.assertIn('source_reference: "{{SOURCE_REFERENCE}}"', template)
+            self.assertIn('source_url: "{{SOURCE_URL_OR_EMPTY}}"', template)
         daily_integration_outputs = daily.split("## Integration outputs", 1)[1]
         self.assertIn("daily/context/daily-snapshot", daily_integration_outputs)
         self.assertIn("daily/receipts/daily-", daily_integration_outputs)
         self.assertNotIn("project-memory", daily_integration_outputs)
         self.assertNotIn("daily/messages", daily_integration_outputs)
         self.assertLess(weekly.index("[Weekly parent]"), weekly.index("## Purpose"))
+        self.assertNotIn("## Deployment values", weekly)
+        self.assertGreater(weekly.index("<!-- setup:weekly.projects -->"), weekly.index("**1 — Freeze"))
         self.assertIn("by Person ID", weekly)
         self.assertIn("by workflow_key", weekly)
         weekly_skill = (ROOT / "skills" / "pm-weekly" / "SKILL.md").read_text(
@@ -76,9 +96,7 @@ class KamdarCompanyOSTests(unittest.TestCase):
             self.assertIn(f"`{artifact_type}`", weekly_skill)
             self.assertIn(f"`{artifact_type}`", weekly)
         sync_start = weekly.index("**4 — Sync authorized artifacts")
-        self.assertGreater(
-            weekly.index("REPORTS_SYNC_DESTINATION", sync_start), sync_start
-        )
+        self.assertGreater(weekly.index("<!-- setup:weekly.reports_destination -->", sync_start), sync_start)
         weekly_integration_outputs = weekly.split("## Integration outputs", 1)[1]
         self.assertIn("weekly/context/weekly-snapshot", weekly_integration_outputs)
         self.assertIn("weekly/receipts/weekly-", weekly_integration_outputs)

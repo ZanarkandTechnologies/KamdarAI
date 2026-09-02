@@ -180,9 +180,22 @@ class SetupLaunchTests(unittest.TestCase):
             ROOT / "apps" / "installer" / "cli" / "flows" / "lifecycle.py"
         ).read_text(encoding="utf-8")
         self.assertIn('workspace = profile_home / "workspace.hermes.md"', source)
-        self.assertIn('template = profile_home / "workspace.hermes.template.md"', source)
+        self.assertIn("configure_features(profile_home)", source)
         self.assertIn('source_root / "apps" / "installer" / "profile.py"', source)
         self.assertIn('receipt["entry_point"] = "setup.py workspace"', source)
+
+    def test_software_update_rerenders_saved_feature_answers(self) -> None:
+        source = (
+            ROOT / "apps" / "installer" / "cli" / "flows" / "lifecycle.py"
+        ).read_text(encoding="utf-8")
+        update = source.split("def update_command", 1)[1]
+        self.assertIn('profile_home / "config" / "setup-answers.json"', update)
+        self.assertIn("render_files(", update)
+        self.assertIn('profile_home / "automations" / name', update)
+        self.assertLess(
+            update.index("feature_setup_migration_required"),
+            update.index("runtime.install_or_update_distribution"),
+        )
 
     def test_install_calls_webhook_selector_with_supported_arguments(self) -> None:
         tree = ast.parse(
@@ -242,6 +255,50 @@ class SetupLaunchTests(unittest.TestCase):
                         Path("/tmp/kamdar-profile"), non_interactive=True
                     )
         visible.assert_not_called()
+
+    def test_telegram_setup_is_one_time_and_noninteractive_fails_closed(self) -> None:
+        requirements = {"weekly.report_recipients": ("gmail", "telegram")}
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            with self.assertRaisesRegex(
+                runtime.RuntimeSetupError, "telegram_gateway_requires_input"
+            ):
+                lifecycle._configure_telegram_if_needed(
+                    profile, requirements, non_interactive=True
+                )
+
+            with patch.object(lifecycle, "run_visible", return_value=0) as visible:
+                with patch.object(
+                    runtime,
+                    "telegram_gateway_configured",
+                    side_effect=[False, True, True],
+                ):
+                    lifecycle._configure_telegram_if_needed(
+                        profile, requirements, non_interactive=False
+                    )
+                    lifecycle._configure_telegram_if_needed(
+                        profile, requirements, non_interactive=False
+                    )
+            visible.assert_called_once_with(["hermes", "gateway", "setup"], profile)
+
+    def test_whatsapp_setup_is_one_time_and_noninteractive_fails_closed(self) -> None:
+        requirements = {"weekly.report_recipients": ("whatsapp",)}
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            with self.assertRaisesRegex(
+                runtime.RuntimeSetupError, "whatsapp_gateway_requires_input"
+            ):
+                lifecycle._configure_whatsapp_if_needed(
+                    profile, requirements, non_interactive=True
+                )
+            with patch.object(lifecycle, "run_visible", return_value=0) as visible:
+                with patch.object(
+                    runtime, "whatsapp_gateway_configured", side_effect=[False, True]
+                ):
+                    lifecycle._configure_whatsapp_if_needed(
+                        profile, requirements, non_interactive=False
+                    )
+            visible.assert_called_once_with(["hermes", "whatsapp"], profile)
 
 
 if __name__ == "__main__":

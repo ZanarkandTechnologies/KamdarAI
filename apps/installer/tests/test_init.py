@@ -37,7 +37,7 @@ class SetupInitTests(unittest.TestCase):
         (target / "apps" / "__init__.py").write_bytes(
             (ROOT / "apps" / "__init__.py").read_bytes()
         )
-        for name in ("__init__.py", "runtime.py"):
+        for name in ("__init__.py", "runtime.py", "feature_setup.py"):
             (target / "apps" / "installer" / name).write_bytes(
                 (ROOT / "apps" / "installer" / name).read_bytes()
             )
@@ -113,7 +113,7 @@ class SetupInitTests(unittest.TestCase):
                 (target / "workspace.hermes.md").read_text(encoding="utf-8"),
             )
 
-    def test_installed_resume_reprompts_blank_input_before_any_runtime_apply(self) -> None:
+    def test_installed_feature_setup_stops_safely_before_runtime_apply_on_eof(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             target = Path(temporary)
             self.copy_setup(target)
@@ -126,9 +126,8 @@ class SetupInitTests(unittest.TestCase):
                 str(target),
                 "--installed",
             )
-            self.assertEqual(result.returncode, 1, result.stderr)
-            self.assertIn("A value is required", result.stdout)
-            self.assertIn("No runtime services or credentials changed", result.stdout)
+            self.assertEqual(result.returncode, 130, result.stderr)
+            self.assertIn("Stopped safely", result.stdout)
             self.assertNotIn("Traceback", result.stderr)
 
     def test_early_runtime_error_does_not_crash_the_error_handler(self) -> None:

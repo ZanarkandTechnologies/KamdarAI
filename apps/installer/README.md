@@ -6,6 +6,12 @@ their skill-owned templates and evaluation cases remain outside its source
 package; the workspace installer copies those runtime inputs. The evaluation
 viewer remains a development app.
 
+The normal flow is feature-first. It asks explained questions about memory,
+Daily Review + Chase, and Weekly reporting. Answers are saved privately at
+`config/setup-answers.json`, then compiled into named slots inside the Daily
+and Weekly Markdown. Hermes reads those rendered contracts directly and never
+loads the answer JSON at runtime. See [design.md](design.md).
+
 ```text
 apps/installer/
 ├── cli/                # guided commands and interactive flows
@@ -24,5 +30,6 @@ the root because Docker Compose and the Windows launcher discover it there.
 
 ```bash
 python3 setup.py --help
+python3 setup.py features
 python3 -m unittest apps.installer.tests.test_architecture apps.installer.tests.test_init -v
 ```

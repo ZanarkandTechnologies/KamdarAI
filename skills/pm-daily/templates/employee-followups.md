@@ -9,8 +9,10 @@ Each generated artifact must begin with this routing frontmatter:
 ---
 artifact_type: progress_followup
 work_id: "{{WORK_ID}}"
-provider_page_id: "{{PROVIDER_PAGE_ID}}"
-source_url: "{{SOURCE_URL}}"
+source_provider: "{{SOURCE_PROVIDER}}"
+provider_record_id: "{{PROVIDER_RECORD_ID}}"
+source_reference: "{{SOURCE_REFERENCE}}"
+source_url: "{{SOURCE_URL_OR_EMPTY}}"
 ---
 ```
 
@@ -30,6 +32,8 @@ Writing rules:
 - Address the owner by name when it is known from the bounded source context.
 - Do not ask documentation-quality questions already handled on the ticket.
 - Do not exaggerate unknown causes, progress, or dates.
+- When the active Work entry has no usable update, ask for its current status,
+  next action, and blocker without inventing a risk explanation.
 
 Render the routing frontmatter followed by only the message below. Do not include
 template instructions or a delivery receipt. -->
@@ -58,3 +62,10 @@ Please reply with:
 
 Update the linked Work items here: TASK-103 and TASK-104.
 END GOLDEN EXAMPLE -->
+
+<!-- EMPTY ACTIVE WORK VARIANT — render this body instead of the standard body
+when owner, target, due date, or progress is unavailable. It requires only the
+source reference.
+No usable update is recorded. Please add the current status, next action, and
+blocker here: {{SOURCE_REFERENCE}}.
+END EMPTY ACTIVE WORK VARIANT -->

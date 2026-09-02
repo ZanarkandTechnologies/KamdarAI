@@ -19,6 +19,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from apps.installer import provider_catalog
+from apps.installer.feature_setup import bindings_for_workspace
 from apps.installer import model_output
 from apps.installer import runtime as setup_runtime
 
@@ -276,7 +277,7 @@ def run_connection_evals(
     started = time.time()
     run_id = run_id or time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + uuid.uuid4().hex[:8]
     catalog = provider_catalog.load_catalog(catalog_directory)
-    bindings = provider_catalog.selected_bindings(workspace, catalog)
+    bindings = bindings_for_workspace(workspace, catalog)
     selected: list[dict[str, Any]] = []
     blocked: list[dict[str, Any]] = []
     for binding in bindings:
@@ -416,7 +417,7 @@ def defer_connection_evals(
     catalog_directory: Path = provider_catalog.DEFAULT_CATALOG,
 ) -> dict[str, Any]:
     """Persist an honest, configuration-bound defer decision for later retry."""
-    bindings = provider_catalog.selected_bindings(
+    bindings = bindings_for_workspace(
         workspace, provider_catalog.load_catalog(catalog_directory)
     )
     receipt = dict(previous or {})

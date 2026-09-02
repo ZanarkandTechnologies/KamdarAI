@@ -9,8 +9,10 @@ Each generated artifact must begin with this routing frontmatter:
 ---
 artifact_type: documentation_request
 work_id: "{{WORK_ID}}"
-provider_page_id: "{{PROVIDER_PAGE_ID}}"
-source_url: "{{SOURCE_URL}}"
+source_provider: "{{SOURCE_PROVIDER}}"
+provider_record_id: "{{PROVIDER_RECORD_ID}}"
+source_reference: "{{SOURCE_REFERENCE}}"
+source_url: "{{SOURCE_URL_OR_EMPTY}}"
 ---
 ```
 
@@ -28,6 +30,8 @@ Writing rules:
 - Do not repeat facts already present in the ticket.
 - Ask in a direct, helpful tone.
 - Refer to the exact ticket section to update.
+- When the completed Work entry has no usable outcome or evidence, say so
+  directly and ask the owner to add both.
 
 Render the routing frontmatter followed by only the comment below. Do not include
 template instructions or an application receipt. -->
@@ -51,3 +55,9 @@ Please add this under Notes > Decision:
 
 Why this matters: we cannot safely reuse the release rule without its rationale.
 END GOLDEN EXAMPLE -->
+
+<!-- EMPTY COMPLETION VARIANT — render this body instead of the standard body
+when no outcome or evidence is available. It requires only the source reference.
+This Work item is complete, but its outcome and evidence are not recorded.
+Please add both here: {{SOURCE_REFERENCE}}.
+END EMPTY COMPLETION VARIANT -->

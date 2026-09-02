@@ -12,6 +12,7 @@ from rich.table import Table
 from apps.installer import provider_catalog as catalog_api
 from apps.installer import runtime
 from apps.installer.provider_catalog import CatalogError
+from apps.installer.feature_setup import bindings_for_workspace
 from apps.installer.cli.paths import profile_home as resolve_profile_home
 from apps.installer.cli.process import run_mcp_test_visible, run_visible
 from apps.installer.cli.ui import (
@@ -25,7 +26,7 @@ from apps.installer.cli.ui import (
 
 def _selected_bindings(workspace: Path) -> list[dict]:
     catalog = catalog_api.load_catalog()
-    return catalog_api.selected_bindings(workspace, catalog)
+    return bindings_for_workspace(workspace, catalog)
 
 
 def _configure_connections(

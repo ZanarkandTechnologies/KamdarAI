@@ -9,6 +9,7 @@ and outputs.
 | --- | --- |
 | Daily operating update | `daily-operating-update.md` |
 | Weekly operating review | `weekly-operating-review.md` |
+| Weekly meeting ticket | `weekly-meeting-ticket.md` |
 
 Extraction behavior and proof live with their owners:
 

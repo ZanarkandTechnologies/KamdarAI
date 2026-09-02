@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -20,6 +21,8 @@ SETUP_WORKSPACE = SOURCE_ROOT / "apps" / "installer" / "workspace.py"
 ACTIVATION_RECEIPT = Path("state/setup-proof.json")
 NOTION_PLUGIN_NAME = "notion-platform"
 NOTION_PLUGIN_KEY = "platforms/notion"
+MULTICA_PLUGIN_NAME = "multica"
+MULTICA_PLUGIN_KEY = "multica"
 
 SCHEDULES = (
     {
@@ -35,6 +38,13 @@ SCHEDULES = (
         "schedule": "0 18 * * 5",
         "contract": "automations/weekly-operating-review.md",
         "cadence": "Weekly",
+    },
+    {
+        "name": "Company OS Weekly Meeting Ticket",
+        "legacy_names": (),
+        "schedule": "0 9 * * 1",
+        "contract": "automations/weekly-meeting-ticket.md",
+        "cadence": "Weekly meeting-ticket",
     },
 )
 
@@ -104,6 +114,35 @@ def enable_notion_plugin(profile_home: Path) -> None:
         raise ProfileSetupError("notion_plugin_enable_verification_failed")
 
 
+def multica_plugin_enabled(profile_home: Path) -> bool:
+    result = run_command(
+        ["hermes", "plugins", "list", "--user", "--json"], profile_home
+    )
+    try:
+        plugins = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise ProfileSetupError("plugin_list_unreadable") from error
+    return isinstance(plugins, list) and any(
+        isinstance(plugin, dict)
+        and plugin.get("name") == MULTICA_PLUGIN_NAME
+        and plugin.get("status") == "enabled"
+        for plugin in plugins
+    )
+
+
+def enable_multica_plugin(profile_home: Path) -> None:
+    run_command(
+        [
+            "hermes", "plugins", "enable", MULTICA_PLUGIN_KEY,
+            "--no-allow-tool-override",
+        ],
+        profile_home,
+    )
+    run_command(["hermes", "plugins", "doctor", MULTICA_PLUGIN_KEY], profile_home)
+    if not multica_plugin_enabled(profile_home):
+        raise ProfileSetupError("multica_plugin_enable_verification_failed")
+
+
 def read_jobs(profile_home: Path) -> list[dict[str, Any]]:
     path = profile_home / "cron" / "jobs.json"
     if not path.is_file():
@@ -167,17 +206,36 @@ def schedule_expression(job: dict[str, Any]) -> str:
     return str(schedule or "")
 
 
-def schedules_activated(profile_home: Path) -> bool:
+def schedule_configuration_hash(profile_home: Path, workspace: Path | None = None) -> str:
+    """Bind activation proof to current jobs, contracts, and rendered answers."""
+    workspace = workspace or profile_home / "workspace"
+    digest = hashlib.sha256()
+    for spec in SCHEDULES:
+        desired = desired_job(spec, workspace)
+        digest.update(json.dumps(desired, sort_keys=True).encode())
+        contract = workspace / spec["contract"]
+        digest.update(contract.read_bytes() if contract.is_file() else b"<missing-contract>")
+    answers = profile_home / "config" / "setup-answers.json"
+    digest.update(answers.read_bytes() if answers.is_file() else b"<missing-answers>")
+    return digest.hexdigest()
+
+
+def schedules_activated(profile_home: Path, workspace: Path | None = None) -> bool:
     try:
         receipt = json.loads((profile_home / ACTIVATION_RECEIPT).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return False
-    return isinstance(receipt, dict) and receipt.get("status") == "activated"
+    return (
+        isinstance(receipt, dict)
+        and receipt.get("status") == "activated"
+        and receipt.get("schedule_configuration_hash")
+        == schedule_configuration_hash(profile_home, workspace)
+    )
 
 
 def cron_plan(profile_home: Path, workspace: Path) -> list[dict[str, Any]]:
     jobs = read_jobs(profile_home)
-    should_be_enabled = schedules_activated(profile_home)
+    should_be_enabled = schedules_activated(profile_home, workspace)
     actions: list[dict[str, Any]] = []
     for spec in SCHEDULES:
         desired = desired_job(spec, workspace)
@@ -276,6 +334,9 @@ def activate_managed_schedules(profile_home: Path, proof: dict[str, Any]) -> Pat
                 "status": "activated",
                 "activated_at": time.time(),
                 "proof": proof,
+                "schedule_configuration_hash": schedule_configuration_hash(
+                    profile_home, workspace
+                ),
             },
         )
     except BaseException:
@@ -310,10 +371,18 @@ def apply_cron(profile_home: Path, actions: list[dict[str, Any]]) -> None:
                 "--prompt", job["prompt"], *common,
             ]
         run_command(command, profile_home)
-    set_managed_schedules_enabled(profile_home, schedules_activated(profile_home))
+    set_managed_schedules_enabled(
+        profile_home,
+        schedules_activated(profile_home, profile_home / "workspace"),
+    )
 
 
-def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) -> int:
+def run(
+    profile_home: Path,
+    apply: bool,
+    enable_notion_webhook: bool = False,
+    enable_multica: bool = False,
+) -> int:
     try:
         profile_home = profile_home.expanduser().resolve()
         if not profile_home.is_dir():
@@ -346,15 +415,19 @@ def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) ->
         plugin_action = (
             "in_sync" if notion_plugin_enabled(profile_home) else "enable"
         ) if enable_notion_webhook else "not_requested"
+        multica_plugin_action = (
+            "in_sync" if multica_plugin_enabled(profile_home) else "enable"
+        ) if enable_multica else "not_requested"
         if not apply:
             emit(
                 "changes_pending" if setup_receipt.get("pending") or any(
                     item["action"] != "in_sync" for item in actions
-                ) or plugin_action == "enable" else "in_sync",
+                ) or plugin_action == "enable" or multica_plugin_action == "enable" else "in_sync",
                 profile_home=str(profile_home),
                 workspace=str(workspace),
                 workspace_setup=setup_receipt,
                 notion_plugin_action=plugin_action,
+                multica_plugin_action=multica_plugin_action,
                 cron_actions=actions,
                 next_action="rerun_with_apply",
             )
@@ -362,6 +435,8 @@ def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) ->
 
         if enable_notion_webhook:
             enable_notion_plugin(profile_home)
+        if enable_multica:
+            enable_multica_plugin(profile_home)
         run_command(["hermes", "config", "set", "terminal.backend", "docker"], profile_home)
         backend_result = run_command(
             ["hermes", "config", "get", "terminal.backend"], profile_home
@@ -406,6 +481,7 @@ def run(profile_home: Path, apply: bool, enable_notion_webhook: bool = False) ->
             workspace=str(workspace),
             workspace_setup=setup_receipt,
             notion_plugin_action="in_sync" if enable_notion_webhook else "not_requested",
+            multica_plugin_action="in_sync" if enable_multica else "not_requested",
             terminal_cwd=str(workspace),
             terminal_backend="docker",
             terminal_workspace_mount=True,
@@ -437,6 +513,11 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Enable and validate the optional Notion webhook plugin.",
     )
+    command.add_argument(
+        "--enable-multica",
+        action="store_true",
+        help="Enable and validate the host-side Multica task plugin.",
+    )
     return command
 
 
@@ -445,7 +526,12 @@ def main() -> int:
     if args.profile_home is None:
         emit("blocked", blocker="profile_home_required")
         return 2
-    return run(args.profile_home, args.apply, args.enable_notion_webhook)
+    return run(
+        args.profile_home,
+        args.apply,
+        args.enable_notion_webhook,
+        args.enable_multica,
+    )
 
 
 if __name__ == "__main__":

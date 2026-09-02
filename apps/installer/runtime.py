@@ -36,9 +36,14 @@ WEBHOOK_ROLLBACK_RELATIVE = Path("state/notion-webhook.rollback.json")
 NGROK_UPDATE_RELATIVE = Path("state/ngrok-update.json")
 RECEIPT_DIRECTORY = Path("receipts")
 MESSAGING_TEST_RECEIPT = Path("state/messaging-setup/latest.json")
-EXPECTED_CRON_NAMES = {
+MESSAGING_MCP_NAME = "company_os_messaging"
+CORE_CRON_NAMES = {
     "Company OS Daily Operating Update",
     "Company OS Weekly Operating Review",
+}
+EXPECTED_CRON_NAMES = {
+    *CORE_CRON_NAMES,
+    "Company OS Weekly Meeting Ticket",
 }
 MODEL_SECRET_NAMES = {
     "OPENROUTER_API_KEY",
@@ -242,6 +247,47 @@ def configured_secret_names(profile_home: Path) -> set[str]:
         if match:
             effective[match.group(1)] = bool(_parse_dotenv_value(match.group(2)))
     return {name for name, present in effective.items() if present}
+
+
+def telegram_gateway_configured(profile_home: Path) -> bool:
+    """Return whether Hermes owns a nonempty Telegram bot credential."""
+    return "TELEGRAM_BOT_TOKEN" in configured_secret_names(profile_home)
+
+
+def whatsapp_gateway_configured(profile_home: Path) -> bool:
+    """Return whether WhatsApp is enabled and has a completed pairing session."""
+    if "WHATSAPP_ENABLED" not in configured_secret_names(profile_home):
+        return False
+    return any(
+        path.is_file() and path.stat().st_size > 0
+        for path in (
+            profile_home / "platforms" / "whatsapp" / "session" / "creds.json",
+            profile_home / "whatsapp" / "session" / "creds.json",
+        )
+    )
+
+
+def configure_messaging_mcp(profile_home: Path) -> None:
+    """Expose only the opt-in Hermes messaging MCP tools to automation agents."""
+    settings = {
+        f"mcp_servers.{MESSAGING_MCP_NAME}.command": "hermes",
+        f"mcp_servers.{MESSAGING_MCP_NAME}.args": '["mcp","serve"]',
+        f"mcp_servers.{MESSAGING_MCP_NAME}.tools.include": (
+            '["messages_send","messages_read","channels_list",'
+            '"conversations_list","conversation_get"]'
+        ),
+        f"mcp_servers.{MESSAGING_MCP_NAME}.enabled": "true",
+    }
+    for key, value in settings.items():
+        run_command(["hermes", "config", "set", "--force", key, value], profile_home)
+    result = run_command(
+        ["hermes", "mcp", "test", MESSAGING_MCP_NAME],
+        profile_home,
+        check=False,
+        timeout=60,
+    )
+    if result.returncode or not mcp_connection_ready(result):
+        raise RuntimeSetupError("messaging_mcp_connection_test_failed")
 
 
 def _parse_dotenv_value(raw: str) -> str:
@@ -1116,6 +1162,7 @@ def _comment_eval_lane(
 def _connection_eval_lane(profile_home: Path, *, live: bool) -> dict[str, Any]:
     """Report whether the latest certification matches current provider bindings."""
     from apps.installer import provider_catalog
+    from apps.installer.feature_setup import bindings_for_workspace
 
     workspace = profile_home / "workspace.hermes.md"
     catalog_directory = profile_home / "apps" / "installer" / "providers"
@@ -1125,7 +1172,7 @@ def _connection_eval_lane(profile_home: Path, *, live: bool) -> dict[str, Any]:
             if catalog_directory.is_dir()
             else provider_catalog.DEFAULT_CATALOG
         )
-        bindings = provider_catalog.selected_bindings(workspace, catalog)
+        bindings = bindings_for_workspace(workspace, catalog)
     except (provider_catalog.CatalogError, OSError) as error:
         return _lane(
             "connection_evals",

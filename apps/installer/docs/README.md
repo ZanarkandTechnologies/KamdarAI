@@ -14,42 +14,40 @@ refs:
 
 This directory documents what Company OS setup configures and supports. The operated installation procedure remains in [Install the Company OS on Hermes for Windows](customer-setup.md). The [PRD](../../../docs/prd.md) owns product boundaries and architecture; the [operator guide](../../../docs/operator-guide.md) owns day-to-day use.
 
-Setup’s job is narrower: bind company roles to exact provider locations, establish permitted destinations, install the reviewed workspace and automation contracts, and prove the configured connections without inventing authority.
+Setup asks how the Company OS should operate, renders those answers directly
+into self-contained automation contracts, installs them, and proves the
+required connections without inventing authority. See
+[the feature-first design](../design.md).
 
 ## Configuration model
 
 ```text
-Company identity + timezone
-          |
-          v
-SOURCES — exact places Hermes may read
-          |
-          v
-Daily/Weekly analysis + private local memory
-          |
-          v
-SINKS — exact places approved effects may go
+explained feature questions
+          -> private config/setup-answers.json
+          -> named automation template slots
+          -> hardcoded Daily and Weekly prompts
 ```
 
 | Configuration | Question it answers | Canonical owner |
 | --- | --- | --- |
 | Company | Whose context and timezone govern the run? | Workspace frontmatter |
-| Sources | Which provider location fulfills Projects, Work, People, or Knowledge? | Managed Data sources table |
+| Sources | Where should each automation fetch its exact evidence? | Rendered automation nodes |
 | Local state | Where do Project Memory, reports, and long-term memory live? | Private Hermes workspace structure |
-| Artifact sync | Where may a completed local artifact be copied? | Managed Artifact sync table |
-| Communications | Which message, app, named recipient, and behavior are enabled? | Managed Communications table |
+| Artifact sync | Where may each completed artifact be copied? | Rendered Weekly nodes |
+| Communications | How may each follow-up or report reach its recipient? | Rendered Daily/Weekly nodes |
 | Credentials | Can this profile use the configured model/provider? | Private Hermes profile; never workspace Markdown |
 
 Read [Sources](sources.md) for readable roles, supported providers, required feature content, and certification. Read [Sinks](sinks.md) for canonical local artifacts, provider copies, Work comments, messaging, authority, and receipts.
 
 ## What setup installs
 
-After the operator reviews the plan, setup installs the allowlisted distribution into one private Hermes profile, applies the approved workspace context, enables required plugins, and reconciles two native jobs:
+After the operator reviews the plan, setup installs the allowlisted distribution into one private Hermes profile, applies the approved workspace context, enables required plugins, and reconciles three native jobs:
 
 | Automation | Default schedule | Contract |
 | --- | --- | --- |
 | Company OS Daily Operating Update | `0 8 * * 1-5` | `automations/daily-operating-update.md` |
 | Company OS Weekly Operating Review | `0 18 * * 5` | `automations/weekly-operating-review.md` |
+| Company OS Weekly Meeting Ticket | `0 9 * * 1` | `automations/weekly-meeting-ticket.md` |
 
 The job prompt tells Hermes to read the installed workspace and the complete automation contract. Missing jobs are created, drifted jobs are updated, paused matching jobs are resumed, and exact jobs remain unchanged. Duplicate accepted job names stop reconciliation.
 
@@ -66,9 +64,9 @@ One Notion MCP connection may serve several role bindings. A successful OAuth co
 ## Setup and verification flow
 
 ```text
-create/review workspace configuration
-  -> resolve every selected role through provider catalog
-  -> show planned profile, connections, messages, webhook, and schedules
+answer Workspace, Memory, Daily, and Weekly questions
+  -> preview and render hardcoded automation prompts
+  -> derive required providers from rendered behavior
   -> authorize model and unique provider connections
   -> install workspace, plugins, and jobs
   -> certify configured integrations
@@ -88,7 +86,8 @@ feature-readiness engine.
 ## Ownership boundaries
 
 - Source repository: shipped workspace template, automation contracts, schemas, catalog, and setup code.
-- Reviewed workspace configuration: nonsecret company choices, role bindings, sinks, and authority policy.
+- Private setup answers: resumable nonsecret choices used only when rendering.
+- Rendered automations: exact sources, destinations, and authority policy used at runtime.
 - Private Hermes profile: credentials, OAuth, installed contracts, schedules, receipts, and generated operational state.
 - Provider: account permissions and the records reachable at each exact binding.
 
@@ -97,8 +96,7 @@ Setup copies only distribution-owned files and preserves unknown profile files. 
 ## Current support boundary
 
 - Windows installation is documented and operated through [customer setup](customer-setup.md); this directory does not duplicate that runbook.
-- Projects, Work, People, SOPs, Reports, and operator email are selectable source roles in the current wizard.
-- Local artifacts are always supported. Artifact-sync and communication contracts support additional sinks described in [Sinks](sinks.md).
-- The current wizard exposes owner report/alert messaging, but does not expose employee follow-up or interactive artifact-sync row creation.
-- A provider used only as an artifact sink does not yet cause setup to provision that provider connection automatically.
+- Every feature question includes an explainer, two presets, Custom, and Back.
+- Local artifacts are always supported; Weekly questions expose per-artifact destinations.
+- Provider connections are derived from the selected automation behavior.
 - Doctor is analysis-only. Scheduled Daily and Weekly jobs apply authorized effects directly through native skills and MCPs.

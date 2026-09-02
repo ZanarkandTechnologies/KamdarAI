@@ -24,6 +24,7 @@ distribution_owned:
   - apps/installer/__init__.py
   - apps/installer/schemas
   - apps/installer/runtime.py
+  - apps/installer/feature_setup.py
   - apps/installer/cli
   - apps/installer/workspace.py
   - apps/installer/profile.py
@@ -49,6 +50,7 @@ distribution_owned:
   - apps/eval_viewer/model.py
   - workspace.hermes.template.md
   - automations
+  - apps/installer/design.md
   - templates
   - plugins/platforms/notion/__init__.py
   - plugins/platforms/notion/adapter.py
@@ -57,3 +59,5 @@ distribution_owned:
   - plugins/platforms/notion/onboarding.py
   - plugins/platforms/notion/plugin.yaml
   - plugins/platforms/notion/protocol.py
+  - plugins/multica/__init__.py
+  - plugins/multica/plugin.yaml

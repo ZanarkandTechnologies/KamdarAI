@@ -11,13 +11,14 @@ from apps.installer.cli.flows.connections import certify_command
 from apps.installer.cli.flows.lifecycle import install_command, launch_command, update_command
 from apps.installer.cli.flows.verification import verify_command
 from apps.installer.cli.flows.workspace import configure_workspace
+from apps.installer.cli.flows.features import configure_features
 from apps.installer.cli.paths import DEFAULT_TEMPLATE, DEFAULT_WORKSPACE, profile_home
 from apps.installer.cli.ui import CONSOLE
 
 
 DESCRIPTION = (
-    "Configure a company workspace and manage its installed Hermes profile. "
-    "The workspace wizard writes only the managed fields in workspace.hermes.md. "
+    "Configure Company OS features and manage its installed Hermes profile. "
+    "The feature wizard saves resumable answers and renders self-contained automations. "
     "Runtime commands delegate filesystem, credential, and health-check operations "
     "to deterministic setup backends."
 )
@@ -31,6 +32,9 @@ def parser() -> argparse.ArgumentParser:
         workspace = subcommands.add_parser(name)
         workspace.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
         workspace.add_argument("--template", type=Path, default=DEFAULT_TEMPLATE)
+
+    features = subcommands.add_parser("features")
+    features.add_argument("--root", type=Path, default=Path.cwd())
 
     launch = subcommands.add_parser("launch")
     launch.add_argument("--profile-home", type=Path)
@@ -103,6 +107,8 @@ def main(arguments: list[str] | None = None) -> int:
                 args.workspace.expanduser().resolve(),
                 args.template.expanduser().resolve(),
             )
+        if selected == "features":
+            return configure_features(args.root.expanduser().resolve())
         if selected == "launch":
             return launch_command(args)
         if selected == "install":

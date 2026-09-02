@@ -17,6 +17,11 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class SetupRuntimeTests(unittest.TestCase):
+    def test_runtime_health_requires_weekly_meeting_ticket_job(self) -> None:
+        self.assertIn(
+            "Company OS Weekly Meeting Ticket", runtime.EXPECTED_CRON_NAMES
+        )
+
     def test_mcp_connection_requires_success_marker_not_only_zero_exit(self) -> None:
         failed_zero = subprocess.CompletedProcess(
             [], 0, "✗ Connection failed: login required", ""
@@ -266,6 +271,46 @@ class SetupRuntimeTests(unittest.TestCase):
             calls,
         )
         self.assertFalse(any("npx" in item for call in calls for item in call))
+
+    def test_messaging_mcp_exposes_only_required_message_tools(self) -> None:
+        profile = Path("/tmp/kamdar-profile")
+        calls: list[tuple[list[str], bool]] = []
+
+        def fake_run(arguments, profile_home, **kwargs):
+            self.assertEqual(profile_home, profile)
+            calls.append((arguments, kwargs.get("check", True)))
+            return subprocess.CompletedProcess(
+                arguments,
+                0,
+                "✓ Connected\n✓ Tools discovered" if arguments[1:3] == ["mcp", "test"] else "",
+                "",
+            )
+
+        with patch.object(runtime, "run_command", side_effect=fake_run):
+            runtime.configure_messaging_mcp(profile)
+
+        settings = {call[0][-2]: call[0][-1] for call in calls[:-1]}
+        self.assertEqual(settings["mcp_servers.company_os_messaging.command"], "hermes")
+        self.assertEqual(settings["mcp_servers.company_os_messaging.args"], '["mcp","serve"]')
+        self.assertEqual(
+            settings["mcp_servers.company_os_messaging.tools.include"],
+            '["messages_send","messages_read","channels_list",'
+            '"conversations_list","conversation_get"]',
+        )
+        self.assertEqual(
+            calls[-1],
+            (["hermes", "mcp", "test", "company_os_messaging"], False),
+        )
+
+    def test_whatsapp_requires_enabled_secret_and_paired_credentials(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            profile = Path(temporary)
+            (profile / ".env").write_text("WHATSAPP_ENABLED=true\n", encoding="utf-8")
+            self.assertFalse(runtime.whatsapp_gateway_configured(profile))
+            credentials = profile / "platforms/whatsapp/session/creds.json"
+            credentials.parent.mkdir(parents=True)
+            credentials.write_text("{}\n", encoding="utf-8")
+            self.assertTrue(runtime.whatsapp_gateway_configured(profile))
 
     def test_catalog_mcp_install_uses_hermes_owner_and_validates_name(self) -> None:
         profile = Path("/tmp/kamdar-profile")

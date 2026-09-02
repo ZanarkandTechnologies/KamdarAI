@@ -6,13 +6,19 @@ import getpass
 import json
 import sys
 
-from prompt_toolkit.application import Application
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.keys import Keys
-from prompt_toolkit.layout import HSplit, Layout, Window
-from prompt_toolkit.layout.controls import FormattedTextControl
-from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import CheckboxList, RadioList
+try:
+    from prompt_toolkit.application import Application
+    from prompt_toolkit.key_binding import KeyBindings
+    from prompt_toolkit.keys import Keys
+    from prompt_toolkit.layout import HSplit, Layout, Window
+    from prompt_toolkit.layout.controls import FormattedTextControl
+    from prompt_toolkit.styles import Style
+    from prompt_toolkit.widgets import CheckboxList, RadioList
+    PROMPT_TOOLKIT_AVAILABLE = True
+except ImportError:  # pragma: no cover - exercised only in minimal Python installs
+    Application = KeyBindings = Keys = HSplit = Layout = Window = None
+    FormattedTextControl = Style = CheckboxList = RadioList = None
+    PROMPT_TOOLKIT_AVAILABLE = False
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 
@@ -36,6 +42,10 @@ def _friendly_runtime_error(error: Exception) -> str:
         (
             ("workspace_configuration_requires_input",),
             "Workspace setup needs your answers. Run setup interactively instead of unattended mode.",
+        ),
+        (
+            ("feature_setup_migration_required",),
+            "This profile predates feature setup. Choose Update Company OS features before updating software; existing schedules and prompts were left unchanged.",
         ),
         (
             ("workspace_configuration_cancelled",),
@@ -112,7 +122,7 @@ def confirm(label: str, *, default: bool) -> bool:
 
 
 def choose(label: str, *, choices: list[str], default: str) -> str:
-    if sys.stdin.isatty() and sys.stdout.isatty():
+    if PROMPT_TOOLKIT_AVAILABLE and sys.stdin.isatty() and sys.stdout.isatty():
         return _interactive_choice(label, choices, default)
     return _prompt_text(
         label,
@@ -120,6 +130,23 @@ def choose(label: str, *, choices: list[str], default: str) -> str:
         default=default,
         console=CONSOLE,
     )
+
+
+def choose_many(
+    label: str,
+    *,
+    choices: list[str],
+    selected: list[str] | None = None,
+) -> list[str]:
+    """Choose zero or more values with the same portable interaction model."""
+    selected_indices = [
+        index for index, value in enumerate(choices) if value in (selected or [])
+    ]
+    if PROMPT_TOOLKIT_AVAILABLE and sys.stdin.isatty() and sys.stdout.isatty():
+        indices = _interactive_checklist(label, choices, selected_indices)
+    else:
+        indices = _numbered_checklist(label, choices)
+    return [choices[index] for index in indices]
 
 
 def _interactive_choice(label: str, choices: list[str], default: str) -> str:

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from apps.installer import provider_catalog
+from apps.installer.feature_setup import bindings_for_workspace
 from apps.installer import model_output
 from apps.installer import runtime as setup_runtime
 
@@ -423,7 +424,7 @@ def run_readiness_evals(
     started = time.time()
     run_id = run_id or time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + uuid.uuid4().hex[:8]
     catalog = provider_catalog.load_catalog(catalog_directory)
-    bindings = provider_catalog.selected_bindings(workspace, catalog)
+    bindings = bindings_for_workspace(workspace, catalog)
     configured_roles = {binding["data_source"] for binding in bindings}
     aliases = [binding for binding in bindings if binding["provider"]["readiness"]["importance"] == "alias"]
     capabilities = [binding for binding in bindings if binding["provider"]["readiness"]["importance"] == "capability"]
@@ -622,7 +623,7 @@ def latest_valid_passed_receipt(profile_home: Path, workspace: Path) -> tuple[Pa
     if saved != receipt:
         raise ReadinessEvalError("readiness_latest_stale")
     catalog = provider_catalog.load_catalog()
-    bindings = provider_catalog.selected_bindings(workspace, catalog)
+    bindings = bindings_for_workspace(workspace, catalog)
     if receipt.get("configuration_sha256") != provider_catalog.configuration_hash(bindings):
         raise ReadinessEvalError("readiness_configuration_stale")
     if receipt.get("readiness_sha256") != provider_catalog.readiness_hash(bindings):

@@ -31,10 +31,11 @@ class SetupArchitectureTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("workspace wizard writes only the managed fields", result.stdout)
+        self.assertIn("feature wizard saves resumable answers", result.stdout)
         for command in (
             "init",
             "configure",
+            "features",
             "launch",
             "install",
             "update",
